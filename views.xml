@@ -22,3 +22,13 @@
                   parent="sales_team.menu_sales"/>
     </data>
 </odoo>
+
+<odoo>
+    <data>
+        <template id="assets_backend" name="custom_sales_order_search_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/custom_sales_order_search/static/src/js/custom_search.js"></script>
+            </xpath>
+        </template>
+    </data>
+</odoo>
