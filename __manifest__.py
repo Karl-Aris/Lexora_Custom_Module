@@ -2,12 +2,15 @@
     'name': 'Custom Sales Order Search',
     'version': '1.0',
     'category': 'Sales',
-    'description': 'Allows users to paste multiple Sales Order numbers and search them.',
-    'depends': ['base', 'sale'],
+    'depends': ['sale'],
     'data': [
-        'views/custom_sales_order_search_view.xml',
+        'views/custom_search_view.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'Lexora_Custom_Module/static/src/js/custom_search.js',
+        ],
+    },
     'installable': True,
     'application': False,
 }
-
