@@ -1,37 +1,31 @@
-odoo.define('custom_sales_order_search', function (require) {
-    var rpc = require('web.rpc');
-    var core = require('web.core');
-    var QWeb = core.qweb;
+/** @odoo-module **/
 
-    var Widget = require('web.Widget');
+import { registry } from "@web/core/registry";
+const { Component, onMounted, useState } = owl;
+const { SearchBar } = await import("@web/search/search_bar/search_bar");
 
-    var CustomSalesOrderSearch = Widget.extend({
-        template: 'custom_search_template',
+class BulkSOInput extends Component {
+    setup() {
+        this.state = useState({ value: "" });
+    }
 
-        events: {
-            'click #custom_search_button': 'onSearchClick',
-        },
+    onInput(ev) {
+        this.state.value = ev.target.value;
+        const terms = this.state.value.split(/[\s,;]+/).filter(Boolean);
+        this.props.onChange({
+            domain: [["name", "in", terms]],
+        });
+    }
 
-        onSearchClick: function () {
-            // Get the input list and split it by commas
-            var searchText = $('#custom_search_input').val();
-            var salesOrders = searchText.split(',').map(function (so) {
-                return so.trim();  // Remove extra spaces
-            });
+    render() {
+        return (
+            <input
+                type="text"
+                placeholder="Paste SO numbers (e.g. SO1001, SO1002)..."
+                onInput={this.onInput.bind(this)}
+            />
+        );
+    }
+}
 
-            // Perform the search on the Sales Order model
-            rpc.query({
-                model: 'sale.order',
-                method: 'search_read',
-                args: [[['name', 'in', salesOrders]], ['name', 'date_order', 'partner_id']],
-            }).then(function (orders) {
-                console.log(orders);  // Display results in the console or update the UI
-                // Optionally, you can show the results directly in the UI
-                // For example, you could render a list below the input field.
-            });
-        },
-    });
-
-    core.action_registry.add('custom_sales_order_search_widget', CustomSalesOrderSearch);
-});
-
+registry.category("search_components").add("bulk_so_input", BulkSOInput);
