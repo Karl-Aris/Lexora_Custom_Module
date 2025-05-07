@@ -1,1 +1,24 @@
+<odoo>
+    <data>
+        <!-- Define the custom search field UI -->
+        <template id="custom_search_template">
+            <div class="o_custom_search_view">
+                <input type="text" id="custom_search_input" class="form-control"
+                       placeholder="Paste Sales Orders (comma separated)"/>
+                <button type="button" class="btn btn-primary" id="custom_search_button">Search</button>
+            </div>
+        </template>
 
+        <!-- Define the action for the search -->
+        <record id="action_custom_sales_order_search" model="ir.actions.client">
+            <field name="name">Custom Sales Order Search</field>
+            <field name="tag">custom_sales_order_search_widget</field>
+        </record>
+
+        <!-- Add menu item for easy access -->
+        <menuitem id="menu_custom_sales_order_search"
+                  name="Custom Sales Order Search"
+                  action="action_custom_sales_order_search"
+                  parent="sales_team.menu_sales"/>
+    </data>
+</odoo>
