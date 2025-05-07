@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="sale.view_order_filter" />
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
-                <field name="name" string="Order Ref" filter_domain="[]"/>
+                <field name="name" string="Bulk SO Input" widget="bulk_so_input"/>
             </xpath>
         </field>
     </record>
