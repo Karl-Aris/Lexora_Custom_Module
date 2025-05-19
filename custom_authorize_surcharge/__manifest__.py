@@ -6,7 +6,7 @@
     "author": "Carl Aris Areglado",
     "category": "Accounting",
     "depends": ["sale", "account", "payment"],
-    "data": [],
+    "data": ['data/product.xml'],
     "installable": True,
     "application": False
 }
