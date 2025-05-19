@@ -1,9 +1,9 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    authorize_fee = fields.Monetary(string='Authorize.Net Fee', compute='_compute_authorize_fee', store=True)
+    authorize_fee = fields.Monetary(string="Authorize.net Fee", currency_field='currency_id')
 
     @api.depends('payment_acquirer_id', 'amount_untaxed')
     def _compute_authorize_fee(self):
