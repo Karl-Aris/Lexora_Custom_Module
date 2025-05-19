@@ -10,7 +10,7 @@ class AccountMove(models.Model):
         # Only add surcharge to customer invoices with a payment reference
         if move.move_type == 'out_invoice' and move.payment_reference:
             try:
-                surcharge_product = self.env.ref('your_module_name.authorize_surcharge_product_id')
+                surcharge_product = self.env.ref('custom_authorize_surcharge.authorize_surcharge_product_id')
             except exceptions.MissingError:
                 raise exceptions.UserError("Surcharge product not found. Please configure 'authorize_surcharge_product_id' properly.")
 
@@ -20,7 +20,7 @@ class AccountMove(models.Model):
 
                 # Use the account from an existing line if available, else fallback
                 account_id = move.invoice_line_ids[:1].account_id.id or surcharge_product.categ_id.property_account_income_categ_id.id
-
+                
                 move.write({
                     'invoice_line_ids': [(0, 0, {
                         'product_id': surcharge_product.id,
