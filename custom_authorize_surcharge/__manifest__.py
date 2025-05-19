@@ -7,5 +7,5 @@
     "depends": ["account", "sale", "product"],
     "data": ["data/product.xml"],
     "installable": True,
-    "application": False,
+    "application": False
 }
