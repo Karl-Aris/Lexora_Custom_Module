@@ -1,1 +1,1 @@
-# Models init
+from . import models
