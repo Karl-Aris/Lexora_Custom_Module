@@ -1,9 +1,0 @@
-<odoo>
-    <record id="authorize_surcharge_product_id" model="product.product">
-        <field name="name">Authorize.Net Surcharge</field>
-        <field name="type">service</field>
-        <field name="sale_ok" eval="True"/>
-        <field name="purchase_ok" eval="False"/>
-        <field name="list_price">0.0</field>
-    </record>
-</odoo>
