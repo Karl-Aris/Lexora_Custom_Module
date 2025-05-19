@@ -5,7 +5,6 @@
     "category": "Sales",
     "depends": ["sale_management", "website_sale", "payment"],
     "data": [
-        "views/payment_fee_template.xml",
         "views/sale_order_views.xml",
         "data/product_data.xml"
     ],
