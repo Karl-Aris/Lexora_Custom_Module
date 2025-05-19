@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="payment_fee_template" name="Payment Fee Template">
+        <t t-call="web.basic_layout">
+            <div class="oe_structure">
+                <h1>Payment Fee</h1>
+                <p>This is a sample template.</p>
+            </div>
+        </t>
+    </template>
+</odoo>
