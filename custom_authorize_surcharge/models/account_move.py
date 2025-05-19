@@ -12,9 +12,11 @@ class AccountMove(models.Model):
 
         try:
             if move.move_type == 'out_invoice' and move.payment_reference:
-                surcharge_product = self.env.ref('custom_authorize_surcharge.authorize_surcharge_product_id')
+                surcharge_product = self.env['product.product'].search(
+                    [('default_code', '=', 'authorize_surcharge')], limit=1
+                )
 
-                if not any(line.product_id == surcharge_product for line in move.invoice_line_ids):
+                if surcharge_product and not any(line.product_id == surcharge_product for line in move.invoice_line_ids):
                     surcharge_amount = round(move.amount_untaxed * 0.03, 2)
                     account_id = (
                         move.invoice_line_ids[:1].account_id.id or
