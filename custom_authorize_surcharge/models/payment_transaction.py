@@ -32,18 +32,5 @@ class AccountMove(models.Model):
                             'account_id': move.invoice_line_ids[0].account_id.id if move.invoice_line_ids else self.env['account.account'].search([('user_type_id.type', '=', 'income')], limit=1).id,
                         })]
                     })
-            except Exception as e:
-                # Log any failure (helps in debugging)
-                _logger = self.env['ir.logging']
-                _logger.create({
-                    'name': 'Authorize Surcharge',
-                    'type': 'server',
-                    'dbname': self.env.cr.dbname,
-                    'level': 'error',
-                    'message': f'Failed to add surcharge: {str(e)}',
-                    'path': __name__,
-                    'line': '0',
-                    'func': 'create',
-                })
-
+                    
         return move
