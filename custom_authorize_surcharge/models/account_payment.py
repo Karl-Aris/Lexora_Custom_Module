@@ -18,7 +18,7 @@ class AccountPayment(models.Model):
                 continue
 
             surcharge_amount = invoice.amount_total * 0.03
-            product = self.env['product.product'].search([('name', '=', 'Authorize.Net Surcharge')], limit=1)
+            product = self.env.ref('product.authorize_net_surcharge')
 
             if product and surcharge_amount > 0:
                 invoice.write({
