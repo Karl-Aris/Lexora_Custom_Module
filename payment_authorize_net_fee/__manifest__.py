@@ -3,7 +3,7 @@
     "version": "1.0",
     "category": "Accounting",
     "summary": "Add 3% processing fee for Authorize.Net payments",
-    "author": "ChatGPT",
+    "author": "Carl Aris Areglado",
     "depends": ["payment_authorize_net"],
     "installable": True,
     "application": False,
