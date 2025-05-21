@@ -4,7 +4,7 @@
     "category": "Accounting",
     "summary": "Add 3% processing fee for Authorize.Net payments",
     "author": "Carl Aris Areglado",
-    "depends": ["payment_authorize_net"],
+    "depends": ["payment"],
     "installable": True,
     "application": False,
 }
