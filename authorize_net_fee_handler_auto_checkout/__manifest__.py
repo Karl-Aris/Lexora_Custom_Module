@@ -4,7 +4,7 @@
     "category": "Accounting",
     "summary": "Automatically adds a 3% surcharge when Authorize.Net is used as payment method",
     "author": "Carl Aris Areglado",
-    "depends": ["sale", "payment", "website_sale"],
+    "depends": ["sale", "payment"],
     "data": [],
     "installable": True,
     "application": False
