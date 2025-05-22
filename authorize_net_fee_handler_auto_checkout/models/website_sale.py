@@ -2,7 +2,7 @@
 from odoo import models
 
 class WebsiteSale(models.Model):
-    _inherit = 'website.sale'
+    _inherit = 'website_sale'
 
     def _place_order(self, **kwargs):
         order = super()._place_order(**kwargs)
