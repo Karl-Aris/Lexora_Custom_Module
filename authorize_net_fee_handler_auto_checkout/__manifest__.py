@@ -1,11 +1,11 @@
 {
-    "name": "Authorize.Net Fee Handler",
-    "version": "1.0",
-    "category": "Accounting",
-    "summary": "Automatically adds a 3% surcharge when Authorize.Net is used as payment method",
-    "author": "Carl Aris Areglado",
-    "depends": ["sale", "payment"],
-    "data": [],
-    "installable": True,
-    "application": False
+    'name': 'Authorize.Net Fee Handler',
+    'version': '1.0',
+    'depends': ['account', 'payment_authorize'],
+    'author': 'Carl Areglado',
+    'category': 'Accounting',
+    'description': 'Automatically adds a 3% surcharge on invoice if Authorize.Net is used for payment.',
+    'installable': True,
+    'application': False,
+    'auto_install': False,
 }
