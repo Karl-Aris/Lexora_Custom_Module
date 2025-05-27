@@ -9,16 +9,30 @@
                     </button>
                 </h2>
                 <div id="o_wsale_offcanvas_availability" class="accordion-collapse collapse" aria-labelledby="o_wsale_offcanvas_availability_header">
-                    <div class="accordion-body pt-0">
+                    <form id="filtersForm" method="get" class="accordion-body pt-0">
                         <div class="form-check">
-                            <input class="form-check-input availability-checkbox" type="checkbox" value="available" id="availabilityAvailable" t-att-checked="'available' in request.params.get('availability', '')"/>
+                            <input 
+                                class="form-check-input availability-checkbox" 
+                                type="checkbox" 
+                                value="available" 
+                                name="availability"
+                                id="availabilityAvailable" 
+                                t-att-checked="'available' in request.params.get('availability', '')"
+                            />
                             <label class="form-check-label" for="availabilityAvailable">Available</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input availability-checkbox" type="checkbox" value="not_available" id="availabilityNotAvailable" t-att-checked="'not_available' in request.params.get('availability', '')"/>
+                            <input 
+                                class="form-check-input availability-checkbox" 
+                                type="checkbox" 
+                                value="not_available" 
+                                name="availability"
+                                id="availabilityNotAvailable" 
+                                t-att-checked="'not_available' in request.params.get('availability', '')"
+                            />
                             <label class="form-check-label" for="availabilityNotAvailable">Not Available</label>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </xpath>
