@@ -1,13 +1,47 @@
 from odoo.addons.website_sale.controllers.main import WebsiteSale
+from odoo import http
 from odoo.http import request
+from odoo.osv import expression
 
 class WebsiteSaleStockFiltered(WebsiteSale):
 
-    def _get_search_domain(self, search, category, attrib_values, search_in_description=True):
-        domain = super()._get_search_domain(search, category, attrib_values, search_in_description)
+    def _get_shop_domain(self, search, category, attrib_values, search_in_description=True):
+        domains = [request.website.sale_product_domain()]
 
-        # Only include templates where at least one variant has stock
-        in_stock_variant_ids = request.env['product.product'].search([('qty_available', '>', 0)]).ids
-        domain += [('product_variant_ids', 'in', in_stock_variant_ids)]
+        if search:
+            for srch in search.split(" "):
+                subdomains = [
+                    [('name', 'ilike', srch)],
+                    [('product_variant_ids.default_code', 'ilike', srch)],
+                ]
+                if search_in_description:
+                    subdomains += [
+                        [('website_description', 'ilike', srch)],
+                        [('description_sale', 'ilike', srch)],
+                    ]
+                subdomains += self._add_search_subdomains_hook(srch)
+                domains.append(expression.OR(subdomains))
 
-        return domain
+        if category:
+            domains.append([('public_categ_ids', 'child_of', int(category))])
+
+        if attrib_values:
+            attrib = None
+            ids = []
+            for value in attrib_values:
+                if not attrib:
+                    attrib = value[0]
+                    ids.append(value[1])
+                elif value[0] == attrib:
+                    ids.append(value[1])
+                else:
+                    domains.append([('attribute_line_ids.value_ids', 'in', ids)])
+                    attrib = value[0]
+                    ids = [value[1]]
+            if attrib:
+                domains.append([('attribute_line_ids.value_ids', 'in', ids)])
+
+        # ✅ Add stock filter
+        domains.append([('qty_available', '>', 0)])
+
+        return expression.AND(domains)
