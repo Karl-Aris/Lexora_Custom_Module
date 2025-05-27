@@ -5,7 +5,6 @@
     "category": "Website",
     "author": "Carl Areglado",
     "depends": ["website_sale"],
-    "data": ["website_sale_filters.xml"], 
     "installable": True,
     "application": False,
     "auto_install": False
