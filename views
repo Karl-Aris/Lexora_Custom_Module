@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="add_availability_filter" inherit_id="website_sale.products_filters" name="Add Availability Filter">
+    <xpath expr="//div[contains(@class, 'filter-block')]" position="inside">
+      <div class="form-check">
+        <input type="radio" name="availability" id="available" value="available" class="form-check-input"/>
+        <label class="form-check-label" for="available">Available</label>
+      </div>
+      <div class="form-check">
+        <input type="radio" name="availability" id="unavailable" value="unavailable" class="form-check-input"/>
+        <label class="form-check-label" for="unavailable">Out of Stock</label>
+      </div>
+    </xpath>
+  </template>
+</odoo>
