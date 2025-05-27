@@ -42,6 +42,6 @@ class WebsiteSaleStockFiltered(WebsiteSale):
                 domains.append([('attribute_line_ids.value_ids', 'in', ids)])
 
         # ✅ Add stock filter
-        domains.append([('qty_available', '>', 0)])
+        domains.append([('product_variant_ids.qty_available', '>', 0)])
 
         return expression.AND(domains)
