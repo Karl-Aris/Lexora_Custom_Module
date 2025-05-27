@@ -2,10 +2,15 @@ from odoo.addons.website_sale.controllers.main import WebsiteSale
 from odoo import http
 from odoo.http import request
 from odoo.osv import expression
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class WebsiteSaleStockFiltered(WebsiteSale):
 
     def _get_shop_domain(self, search, category, attrib_values, search_in_description=True):
+        _logger.warning("🧪 Using custom _get_shop_domain with stock filtering")
+
         domains = [request.website.sale_product_domain()]
 
         if search:
@@ -41,7 +46,7 @@ class WebsiteSaleStockFiltered(WebsiteSale):
             if attrib:
                 domains.append([('attribute_line_ids.value_ids', 'in', ids)])
 
-        # ✅ Add stock filter
+        # ✅ Only show products if at least one variant has stock
         domains.append([('product_variant_ids.qty_available', '>', 0)])
 
         return expression.AND(domains)
