@@ -4,7 +4,7 @@
     'category': 'Website',
     'summary': 'Adds product availability filter to website sale shop',
     'description': 'Adds a filter for available and out of stock products on the shop page',
-    'author': 'ChatGPT',
+    'author': 'Carl Aris',
     'depends': ['website_sale'],
     'data': [],
     'installable': True,
