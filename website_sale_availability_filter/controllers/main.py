@@ -1,25 +1,31 @@
 from odoo import http
-from odoo.addons.website_sale.controllers import main as website_sale_main
 from odoo.http import request
 
+class WebsiteSale(http.Controller):
 
-class WebsiteSaleWithAvailabilityFilter(website_sale_main.WebsiteSale):
+    @http.route(['/shop'], type='http', auth="public", website=True)
+    def shop(self, **kwargs):
+        domain = []
 
-    def _get_search_domain(self, search, category, attrib_values):
-        domain = super()._get_search_domain(search, category, attrib_values)
+        # Product Availability filtering logic
+        availability = kwargs.get('availability')
+        if availability:
+            location = request.env.ref('stock.stock_location_stock')  # Change if needed
+            product_ids_with_stock = request.env['stock.quant'].sudo().read_group(
+                [('location_id', '=', location.id)],
+                ['product_id', 'quantity:sum'],
+                ['product_id']
+            )
+            in_stock_product_ids = [res['product_id'][0] for res in product_ids_with_stock if res['quantity'] > 0]
 
-        availability_filters = request.params.getlist('availability')
-        if availability_filters:
-            # If filtering for 'available' products only
-            if 'available' in availability_filters:
-                domain.append(('qty_available', '>', 0))
-            # If filtering for 'not_available' products only
-            if 'not_available' in availability_filters:
-                domain.append(('qty_available', '=', 0))
+            if availability == 'available':
+                domain += [('id', 'in', in_stock_product_ids)]
+            elif availability == 'not_available':
+                domain += [('id', 'not in', in_stock_product_ids)]
 
-            # If both selected, show all products (remove availability filter)
-            if 'available' in availability_filters and 'not_available' in availability_filters:
-                # Remove any availability filters (optional, already no effect)
-                pass
+        # continue with your normal shop product search logic
+        products = request.env['product.template'].sudo().search(domain)
 
-        return domain
+        return request.render("website_sale.products", {
+            'products': products,
+        })
