@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="product_stock_filter" inherit_id="website_sale.products" name="Stock Filter">
+        <xpath expr="//div[@id='wsale_products_categories']" position="after">
+            <div class="accordion-item border-top-0 order-3">
+                <h2 class="accordion-header mb-0" id="o_wsale_offcanvas_availability_header">
+                    <button class="o_wsale_offcanvas_title accordion-button rounded-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#o_wsale_offcanvas_availability" aria-expanded="false" aria-controls="o_wsale_offcanvas_availability">
+                        <b>Product Availability</b>
+                    </button>
+                </h2>
+                <div id="o_wsale_offcanvas_availability" class="accordion-collapse collapse" aria-labelledby="o_wsale_offcanvas_availability_header">
+                    <div class="accordion-body pt-0">
+                        <div class="form-check">
+                            <input class="form-check-input availability-checkbox" type="checkbox" value="available" id="availabilityAvailable" t-att-checked="'available' in request.params.get('availability', '')"/>
+                            <label class="form-check-label" for="availabilityAvailable">Available</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input availability-checkbox" type="checkbox" value="not_available" id="availabilityNotAvailable" t-att-checked="'not_available' in request.params.get('availability', '')"/>
+                            <label class="form-check-label" for="availabilityNotAvailable">Not Available</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>
