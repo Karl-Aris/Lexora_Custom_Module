@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="product_stock_filter" inherit_id="website_sale.products" name="Stock Filter">
+    <template id="product_stock_filter" inherit_id="website_sale.o_wsale_offcanvas" name="Stock Filter">
         <xpath expr="//div[contains(@class, 'o_wsale_offcanvas_filters')]" position="inside">
             <div class="accordion-item border-top-0 order-3">
                 <h2 class="accordion-header mb-0" id="o_wsale_offcanvas_availability_header">
