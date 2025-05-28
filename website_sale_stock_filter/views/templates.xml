@@ -1,0 +1,17 @@
+<odoo>
+  <template id="assets_frontend" inherit_id="website_sale.assets_frontend" name="Add availability filter JS" priority="10">
+    <!-- Optional: Add JS if needed -->
+  </template>
+
+  <template id="product_filters_inherit" inherit_id="website_sale.products" name="Availability Filter">
+    <xpath expr="//form[contains(@class, 'o_wsale_products_searchbar_form')]" position="inside">
+      <div class="form-group">
+        <select name="availability" class="form-control">
+          <option value="">All</option>
+          <option value="available" t-att-selected="'available' == request.params.get('availability')">Available</option>
+          <option value="not_available" t-att-selected="'not_available' == request.params.get('availability')">Not Available</option>
+        </select>
+      </div>
+    </xpath>
+  </template>
+</odoo>
