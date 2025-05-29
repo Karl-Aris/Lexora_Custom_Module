@@ -1,12 +1,14 @@
-<form t-if="opt_wsale_attributes or opt_wsale_attributes_top" t-attf-class="js_attributes d-flex flex-column" method="get">
-    <input t-if="category" type="hidden" name="category" t-att-value="category.id"/>
-    <input type="hidden" name="search" t-att-value="search"/>
-
-    <div class="form-group mb-2">
+<odoo>
+  <template id="product_filters_inherit" inherit_id="website_sale.o_wsale_offcanvas" name="Availability Filter">
+    <xpath expr="//form[@method='get']" position="inside">
+      <div class="form-group mb-2">
         <label for="availability" class="form-label">Stock Availability</label>
         <select name="availability" class="form-control" id="availability">
-            <option value="">All</option>
-            <option value="available" t-att-selected="'available' == request.params.get('availability')">Available</option>
-            <option value="not_available" t-att-selected="'not_available' == request.params.get('availability')">Not Available</option>
+          <option value="">All</option>
+          <option value="available" t-att-selected="'available' == request.params.get('availability')">Available</option>
+          <option value="not_available" t-att-selected="'not_available' == request.params.get('availability')">Not Available</option>
         </select>
-    </div>
+      </div>
+    </xpath>
+  </template>
+</odoo>
