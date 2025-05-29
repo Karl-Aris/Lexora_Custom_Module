@@ -1,8 +1,4 @@
 <odoo>
-  <template id="assets_frontend" inherit_id="website_sale.assets_frontend" name="Add availability filter JS" priority="10">
-    <!-- Optional: Add JS if needed -->
-  </template>
-
   <template id="product_filters_inherit" inherit_id="website_sale.products" name="Availability Filter">
     <xpath expr="//form[contains(@class, 'o_wsale_products_searchbar_form')]" position="inside">
       <div class="form-group">
