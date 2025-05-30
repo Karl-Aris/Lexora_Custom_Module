@@ -12,10 +12,10 @@ class WebsiteSaleStockFilter(WebsiteSale):
     def shop(self, page=0, category=None, search='', **post):
         availability = post.get('availability')
         _logger.info("[LOG] Availability selected: %s", availability)
-
+        
         response = super().shop(page=page, category=category, search=search, **post)
         products = response.qcontext.get('products')
-
+        _logger.info("[LOG] Product raw details (full read): %s", products.read())
         if products:
             products = products.sudo()
             _logger.info("[LOG] Initial products count: %d", len(products))
