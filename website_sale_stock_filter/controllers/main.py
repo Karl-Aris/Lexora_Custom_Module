@@ -12,8 +12,8 @@ class WebsiteSaleStockFilter(WebsiteSale):
 
         availability = request.params.get('availability')
         if availability == 'available':
-            domain += [('qty_available', '=', 3)]
+            domain += [('inventory_quantity_auto_apply', '>', 0)]
         elif availability == 'not_available':
-            domain += [('qty_available', '<=', 0)]
+            domain += [('inventory_quantity_auto_apply', '<=', 0)]
 
         return domain
