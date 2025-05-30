@@ -1,6 +1,10 @@
-from odoo.addons.website_sale.controllers.main import WebsiteSale, QueryURL
+# -*- coding: utf-8 -*-
+from odoo import http
+from odoo.http import request
+from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 class WebsiteSaleStockFilter(WebsiteSale):
+
     @http.route(['/shop'], type='http', auth="public", website=True, sitemap=True)
     def shop(self, page=0, category=None, search='', **post):
         response = super().shop(page=page, category=category, search=search, **post)
@@ -13,8 +17,5 @@ class WebsiteSaleStockFilter(WebsiteSale):
             elif availability == 'not_available':
                 products = products.filtered(lambda p: p.qty_available <= 0)
             response.qcontext['products'] = products
-
-            # Update pager with new product count
-            response.qcontext['pager']['total'] = len(products)
 
         return response
