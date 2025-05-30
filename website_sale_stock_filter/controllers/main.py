@@ -1,12 +1,21 @@
-import logging
-_logger = logging.getLogger(__name__)
+# -*- coding: utf-8 -*- 
+from odoo import http
+from odoo.http import request
+from odoo.addons.website_sale.controllers.main import WebsiteSale
 
-def _shop_get_product_search_domain(self, search, category, attrib_values):
-    _logger.info(f"Filtering by availability: {request.params.get('availability')}")
-    domain = super()._shop_get_product_search_domain(search, category, attrib_values)
-    availability = request.params.get('availability')
-    if availability == 'available':
-        domain += [('inventory_quantity_auto_apply', '>', 0)]
-    elif availability == 'not_available':
-        domain += [('inventory_quantity_auto_apply', '<=', 0)]
-    return domain
+class WebsiteSaleStockFilter(WebsiteSale):
+
+    @http.route(['/shop'], type='http', auth="public", website=True, sitemap=True)
+    def shop(self, page=0, category=None, search='', **post):
+        response = super().shop(page=page, category=category, search=search, **post)
+
+        availability = post.get('availability')
+        products = response.qcontext.get('products')
+        if products and availability:
+            if availability == 'available':
+                products = products.filtered(lambda p: p.qty_available > 0)
+            elif availability == 'not_available':
+                products = products.filtered(lambda p: p.qty_available <= 0)
+            response.qcontext['products'] = products
+
+        return response
