@@ -3,19 +3,17 @@ from odoo import http
 from odoo.http import request
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 
+
 class WebsiteSaleStockFilter(WebsiteSale):
 
-    @http.route(['/shop'], type='http', auth="public", website=True, sitemap=True)
-    def shop(self, page=0, category=None, search='', **post):
-        response = super().shop(page=page, category=category, search=search, **post)
+    def _shop_get_product_search_domain(self, search, category, attrib_values):
+        # Start with the default domain
+        domain = super()._shop_get_product_search_domain(search, category, attrib_values)
 
-        availability = post.get('availability')
-        products = response.qcontext.get('products')
-        if products and availability:
-            if availability == 'available':
-                products = products.filtered(lambda p: p.qty_available > 0)
-            elif availability == 'not_available':
-                products = products.filtered(lambda p: p.qty_available <= 0)
-            response.qcontext['products'] = products
+        availability = request.params.get('availability')
+        if availability == 'available':
+            domain += [('qty_available', '>', 0)]
+        elif availability == 'not_available':
+            domain += [('qty_available', '<=', 0)]
 
-        return response
+        return domain
