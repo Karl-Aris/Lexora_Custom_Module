@@ -1,5 +1,5 @@
 <odoo>
-  <template id="product_filters_inherit" inherit_id="website_sale.products_categories_list" name="Availability Filter">
+  <template id="product_filters_inherit" inherit_id="website_sale.o_wsale_offcanvas" name="Availability Filter">
     <xpath expr="//form[@method='get']" position="inside">
       <div class="form-group mb-2">
         <label for="availability" class="form-label">Stock Availability</label>
