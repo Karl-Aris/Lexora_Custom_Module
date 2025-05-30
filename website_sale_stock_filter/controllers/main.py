@@ -15,10 +15,10 @@ class WebsiteSaleStockFilter(WebsiteSale):
         if products:
             # Auto publish/unpublish based on stock
             for product in products.sudo():  # gives full access
-        if product.qty_available > 0 and not product.website_published:
-            product.sudo().write({'website_published': True})
-        elif product.qty_available <= 0 and product.website_published:
-            product.sudo().write({'website_published': False})
+                if product.qty_available > 0 and not product.website_published:
+                    product.sudo().write({'website_published': True})
+                elif product.qty_available <= 0 and product.website_published:
+                    product.sudo().write({'website_published': False})
 
 
             response.qcontext['products'] = products
