@@ -13,9 +13,9 @@ class WebsiteSaleStockFilter(WebsiteSale):
         products = response.qcontext.get('products')
         if products and availability:
             if availability == 'available':
-                products = products.filtered(lambda p: p.qty_available > 0)
+                products = products.filtered(lambda p: p.inventory_quantity_auto_supply > 0)
             elif availability == 'not_available':
-                products = products.filtered(lambda p: p.qty_available <= 0)
+                products = products.filtered(lambda p: p.inventory_quantity_auto_supply <= 0)
             response.qcontext['products'] = products
 
         return response
