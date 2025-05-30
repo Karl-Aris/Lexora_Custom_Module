@@ -12,7 +12,7 @@ class WebsiteSaleStockFilter(WebsiteSale):
 
         availability = request.params.get('availability')
         if availability == 'available':
-            domain += [('qty_available', '>', 0)]
+            domain += [('qty_available', '=', 3)]
         elif availability == 'not_available':
             domain += [('qty_available', '<=', 0)]
 
