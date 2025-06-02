@@ -8,6 +8,6 @@
     'depends': ['website_sale'],
     'data': [],
     'installable': True,
-    'application': True,
+    'application': False,
     'auto_install': False,
 }
