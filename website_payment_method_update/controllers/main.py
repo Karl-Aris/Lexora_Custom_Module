@@ -1,24 +1,44 @@
+
 from odoo import http
 from odoo.http import request
+from odoo.fields import Command
+from odoo.addons.website_sale.controllers.main import WebsiteSale
+from werkzeug.exceptions import Forbidden
 
-class WebsitePaymentMethod(http.Controller):
+class WebsiteSaleAuthorizePatch(WebsiteSale):
 
-    @http.route(['/shop/payment_method/update'], type='http', auth='user', website=True, csrf=True)
-    def update_payment_method(self, order_id=None, x_payment_method=None, **kwargs):
-        """
-        Custom route to update the custom payment method field on the sale.order.
-        """
+    @http.route(['/shop/shipping/validate'], type='http', methods=['GET', 'POST'], auth="user", website=True, sitemap=False)
+    def order_finalize_validate(self, **kw):
         order = request.website.sale_get_order()
-    
-        # Basic checks
-        if not order or not x_payment_method:
-            return request.redirect("/shop/shipping-details")
-    
-        # Write custom field
-        try:
-            order.sudo().write({'x_payment_method': x_payment_method})
-        except Exception:
-            pass  # Optionally log error here
-    
-        return request.redirect("/shop/shipping-details")
+        if order and kw:
+            order.write({
+                "state": "to_add_shipment",
+                "order_customer": kw.get("order_customer"),
+                "order_address": kw.get("order_address"),
+                "order_phone": kw.get("order_phone"),
+            })
 
+            # Simulate Authorize.Net transaction creation
+            acquirer = request.env['payment.acquirer'].sudo().search([
+                ('provider', 'in', ['authorize', 'authorize_net']),
+                ('state', '=', 'enabled')
+            ], limit=1)
+
+            if acquirer:
+                tx_vals = {
+                    'amount': order.amount_total,
+                    'currency_id': order.currency_id.id,
+                    'acquirer_id': acquirer.id,
+                    'partner_id': order.partner_id.id,
+                    'reference': order.name,
+                    'sale_order_ids': [Command.set([order.id])],
+                }
+                tx = request.env['payment.transaction'].sudo().create(tx_vals)
+                tx._set_done()
+
+                order.action_confirm()
+
+            request.website.sale_reset()
+            return request.render("website_sale_lexora.order_complete_thank_you")
+
+        return Forbidden()
