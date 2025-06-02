@@ -4,34 +4,40 @@ from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 class WebsiteSaleExtended(WebsiteSale):
 
-    @http.route(['/shop/shipping/validate'], type='http', auth="user", website=True, sitemap=False)
-    def order_finalize_validate(self, **kw):
-        order = request.website.sale_get_order()
-        if order and kw:
-            # Write custom shipping info
+    @http.route(['/shop/shipping-details/confirm'], type='http', methods=['POST'], auth="user", website=True)
+    def order_finalize(self, **kw):
+        try:
+            order = request.website.sale_get_order()
+            if not order:
+                _logger.error("No order found.")
+                return request.redirect("/shop")
+    
+            _logger.info("Order found: %s", order.name)
+            _logger.info("POST data: %s", kw)
+    
+            # Validate and save shipping info
             order.write({
-                "state": "to_add_shipment",
-                "order_customer": kw.get("order_customer"),
-                "order_address": kw.get("order_address"),
-                "order_phone": kw.get("order_phone"),
+                'order_customer': kw.get('order_customer'),
+                'order_address': kw.get('order_address'),
+                'order_phone': kw.get('order_phone'),
+                'state': 'to_add_shipment',
             })
     
-            # Simulate transaction
-            acquirer = request.env['payment.acquirer'].sudo().search([('provider', '=', 'authorize')], limit=1)
-            if acquirer:
-                tx_vals = {
-                    'acquirer_id': acquirer.id,
-                    'amount': order.amount_total,
-                    'currency_id': order.currency_id.id,
-                    'reference': order.name,
-                    'partner_id': order.partner_id.id,
-                    'sale_order_ids': [(6, 0, [order.id])],
-                }
-                tx = request.env['payment.transaction'].sudo().create(tx_vals)
-                tx._set_done()  # Mark as paid
-                order.write({'payment_transaction_id': tx.id})
-                order.action_confirm()
-                request.website.sale_reset()
-                return request.render("website_sale_lexora.order_complete_thank_you")
+            # Optional: log payment transaction creation
+            tx = request.env['payment.transaction'].sudo().create({
+                'amount': order.amount_total,
+                'currency_id': order.currency_id.id,
+                'acquirer_id': request.env['payment.acquirer'].search([('provider', '=', 'authorize')], limit=1).id,
+                'partner_id': order.partner_id.id,
+                'reference': order.name,
+                'sale_order_ids': [(6, 0, [order.id])],
+            })
+            tx._set_done()
+            order.action_confirm()
     
-        return http.request.redirect("/shop/checkout")
+            return request.render("website_sale_lexora.order_complete_thank_you")
+    
+        except Exception as e:
+            _logger.exception("Error finalizing shipping details")
+            return request.redirect("/shop")
+    
