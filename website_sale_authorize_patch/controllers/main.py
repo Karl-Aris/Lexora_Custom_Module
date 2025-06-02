@@ -4,15 +4,34 @@ from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 class WebsiteSaleExtended(WebsiteSale):
 
-    @http.route(['/shop/confirm_order'], type='http', auth="public", website=True)
-    def confirm_order(self, post):
+    @http.route(['/shop/shipping/validate'], type='http', auth="user", website=True, sitemap=False)
+    def order_finalize_validate(self, **kw):
         order = request.website.sale_get_order()
-
-        # Save the x_payment_method field to sale.order
-        if post.get("x_payment_method"):
+        if order and kw:
+            # Write custom shipping info
             order.write({
-                'x_payment_method': post.get("x_payment_method")
+                "state": "to_add_shipment",
+                "order_customer": kw.get("order_customer"),
+                "order_address": kw.get("order_address"),
+                "order_phone": kw.get("order_phone"),
             })
-
-        # Continue the default behavior
-        return super(WebsiteSaleExtended, self).confirm_order(post)
+    
+            # Simulate transaction
+            acquirer = request.env['payment.acquirer'].sudo().search([('provider', '=', 'authorize')], limit=1)
+            if acquirer:
+                tx_vals = {
+                    'acquirer_id': acquirer.id,
+                    'amount': order.amount_total,
+                    'currency_id': order.currency_id.id,
+                    'reference': order.name,
+                    'partner_id': order.partner_id.id,
+                    'sale_order_ids': [(6, 0, [order.id])],
+                }
+                tx = request.env['payment.transaction'].sudo().create(tx_vals)
+                tx._set_done()  # Mark as paid
+                order.write({'payment_transaction_id': tx.id})
+                order.action_confirm()
+                request.website.sale_reset()
+                return request.render("website_sale_lexora.order_complete_thank_you")
+    
+        return http.request.redirect("/shop/checkout")
