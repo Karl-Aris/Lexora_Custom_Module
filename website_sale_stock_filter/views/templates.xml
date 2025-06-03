@@ -1,0 +1,14 @@
+<odoo>
+  <template id="product_filters_inherit" inherit_id="website_sale.o_wsale_offcanvas" name="Availability Filter">
+  <xpath expr="//form[@method='get']" position="inside">
+    <div class="form-group mb-2">
+      <label for="availability" class="form-label">Stock Availability</label>
+      <select name="availability" class="form-control" id="availability" onchange="this.form.submit();">
+        <option value="">All</option>
+        <option value="available" t-att-selected="request.params.get('availability') == 'available'">Available</option>
+        <option value="not_available" t-att-selected="request.params.get('availability') == 'not_available'">Not Available</option>
+      </select>
+    </div>
+  </xpath>
+  </template>
+</odoo>
