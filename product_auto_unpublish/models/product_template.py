@@ -17,7 +17,7 @@ class ProductTemplate(models.Model):
 
     def _check_stock_and_publish(self):
         for product in self:
-            if product.virtual_available <= 0 and product.website_published:
+            if product.qty_available <= 0 and product.website_published:
                 product.website_published = False
-            elif product.virtual_available > 0 and not product.website_published:
+            elif product.qty_available > 0 and not product.website_published:
                 product.website_published = True
