@@ -1,4 +1,3 @@
-
 from odoo import models, fields, api
 
 class ProductTemplate(models.Model):
@@ -17,7 +16,7 @@ class ProductTemplate(models.Model):
 
     def _check_stock_and_publish(self):
         for product in self:
-            if product.qty_available <= 0 and product.website_published:
+            if product.qty_available <= 0;
                 product.website_published = False
-            elif product.qty_available > 0 and not product.website_published:
+            elif product.qty_available > 0;
                 product.website_published = True
