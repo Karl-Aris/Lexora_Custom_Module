@@ -3,11 +3,11 @@ from odoo import models, fields
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-   # is_saleable = fields.Boolean(
-    #    string="Is Saleable",
-    #    default=True,
-    #    help="If unchecked, product will be unpublished when out of stock."
-  #  )
+    is_saleable = fields.Boolean(
+        string="Is Saleable",
+        default=True,
+        help="If unchecked, product will be unpublished when out of stock."
+    )
 
     def check_and_toggle_published(self):
         for product in self.with_context(active_test=False).search([]):
