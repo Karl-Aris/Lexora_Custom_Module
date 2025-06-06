@@ -13,12 +13,15 @@ class ProductTemplate(models.Model):
     )
 
     def check_and_toggle_published(self):
-        for product in self.with_context(active_test=False).search([]):
+        products = self.with_context(active_test=False).search([])
+        for product in products:
             qty = product.qty_available
             published = product.website_published
             saleable = product.is_saleable
 
             if not saleable and qty <= 0 and published:
                 product.website_published = False
+                _logger.info("Unpublished: %s (Qty: %s)", product.display_name, qty)
             elif (qty > 0 or saleable) and not published:
                 product.website_published = True
+                _logger.info("Published: %s (Qty: %s)", product.display_name, qty)
