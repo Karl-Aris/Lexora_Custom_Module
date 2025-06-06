@@ -1,7 +1,4 @@
 from odoo import models, fields, api
-import logging
-
-_logger = logging.getLogger(__name__)
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -21,7 +18,5 @@ class ProductTemplate(models.Model):
 
             if not saleable and qty <= 0 and published:
                 product.website_published = False
-                _logger.info("Unpublished: %s (Qty: %s)", product.display_name, qty)
             elif (qty > 0 or saleable) and not published:
                 product.website_published = True
-                _logger.info("Published: %s (Qty: %s)", product.display_name, qty)
