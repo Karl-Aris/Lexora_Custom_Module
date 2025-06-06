@@ -1,24 +1,21 @@
-from odoo import models, api
-import logging
-
-_logger = logging.getLogger(name)
+from odoo import models, fields
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    is_saleable = fields.Boolean(
+        string="Is Saleable",
+        default=True,
+        help="If unchecked, product will be unpublished when out of stock."
+    )
+
     def check_and_toggle_published(self):
         for product in self.with_context(active_test=False).search([]):
-            if not product.is_saleable:
-                # Always unpublish non-sellable products
-                if product.website_published:
-                    product.website_published = False
-                    _logger.info(f"Unpublished non-sellable product: {product.name}")
-                continue
+            qty = product.qty_available
+            published = product.website_published
 
-            # Publish or unpublish sellable products based on stock
-            if product.qty_available <= 0 and product.website_published:
+            # Respect is_saleable flag
+            if not product.is_saleable and qty <= 0 and published:
                 product.website_published = False
-                _logger.info(f"Unpublished due to no stock: {product.name}")
-            elif product.qty_available > 0 and not product.website_published:
+            elif qty > 0 and not published:
                 product.website_published = True
-                _logger.info(f"Published sellable product with stock: {product.name}")
