@@ -10,13 +10,24 @@ class ProductTemplate(models.Model):
     )
 
     def check_and_toggle_published(self):
-        products = self.with_context(active_test=False).search([])
-        for product in products:
-            qty = product.qty_available
-            published = product.website_published
-            saleable = product.is_saleable
+    _logger.info("Running product website publish toggle based on stock...")
 
-            if not saleable and qty <= 0 and published:
-                product.website_published = False
-            elif (qty > 0 or saleable) and not published:
-                product.website_published = True
+    # Only fetch relevant products
+    products = self.with_context(active_test=False).search([
+        '|', ('qty_available', '<=', 0), ('website_published', '=', False)
+    ])
+
+    for product in products:
+        qty = product.qty_available
+        published = product.website_published
+        saleable = product.is_saleable
+
+        if not saleable and qty <= 0 and published:
+            product.website_published = False
+            _logger.info(f"Unpublished: [{product.default_code}] {product.name} (Qty: {qty})")
+        elif (qty > 0 or saleable) and not published:
+            product.website_published = True
+            _logger.info(f"Published: [{product.default_code}] {product.name} (Qty: {qty})")
+
+    _logger.info("Completed product website publish toggle.")
+
