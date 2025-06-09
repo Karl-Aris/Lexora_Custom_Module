@@ -15,7 +15,7 @@ class ProductTemplate(models.Model):
     def check_and_toggle_published(self):
         _logger.info("Running product website publish toggle for 80 products...")
     
-        products = self.with_context(active_test=False).search([], limit=80)
+        products = self.with_context(active_test=False).search([], limit=20)
     
         for product in products:
             qty = product.qty_available
