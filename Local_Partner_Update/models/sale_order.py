@@ -1,12 +1,12 @@
-from odoo import models, api
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    @api.model
-    def create(self, vals):
-        order = super(SaleOrder, self).create(vals)
+    x_studio_local = fields.Char(string="Is Local", compute="_compute_x_studio_local", store=True, readonly=True)
 
+    @api.depends('partner_id')
+    def _compute_x_studio_local(self):
         allowed_merchants = {
             'Bell+Modern Shopify',
             'Lore & Lane Amazon',
@@ -15,9 +15,8 @@ class SaleOrder(models.Model):
             'Dealers',
             "Lowe's"
         }
-
-        if order.partner_id:
-            new_val = 'LOCAL' if order.partner_id.name in allowed_merchants else ''
-            order.partner_id.write({'x_studio_local': new_val})
-
-        return order
+        for order in self:
+            if order.partner_id and order.partner_id.name in allowed_merchants:
+                order.x_studio_local = "LOCAL"
+            else:
+                order.x_studio_local = ""
