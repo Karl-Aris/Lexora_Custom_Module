@@ -18,8 +18,8 @@ class SaleOrder(models.Model):
 
         if order.partner_id:
             if order.partner_id.name in allowed_merchants:
-                order.partner_id.x_studio_local = True
+                order.partner_id.x_studio_local = "LOCAL"
             else:
-                order.partner_id.x_studio_local = False
+                order.partner_id.x_studio_local = ""
 
         return order
