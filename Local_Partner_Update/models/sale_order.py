@@ -16,11 +16,15 @@ class SaleOrder(models.Model):
             "Lowe's"
         }
         allowed_states = {'PA', 'NY', 'NJ', 'MD', 'VA', 'DC', 'WV', 'OH'}
-
+    
         for order in self:
             merchant_ok = order.partner_id and order.partner_id.name in allowed_merchants
-            state_ok = order.partner_id and order.partner_id.x_studio_state in allowed_states
-
+            state_ok = False
+    
+            if order.partner_id and 'x_studio_state' in order.partner_id._fields:
+                state = order.partner_id.x_studio_state
+                state_ok = state in allowed_states
+    
             if merchant_ok and state_ok:
                 order.x_studio_local = "LOCAL"
             else:
