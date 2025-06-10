@@ -5,6 +5,6 @@
     "depends": ["sale"],
     "data": [],
     "installable": True,
-    "application": False,
+    "application": True,
     "auto_install": False
 }
