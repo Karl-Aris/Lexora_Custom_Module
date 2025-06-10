@@ -36,11 +36,8 @@ class SaleOrder(models.Model):
             state_ok = state_val in allowed_states
     
             _logger.info(
-                f\"[LOCAL_CHECK] Order: {order.name}, Partner: {order.partner_id.name}, "
-                f\"State: {state_val} (from: {state_source}), Merchant OK: {merchant_ok}, State OK: {state_ok}\"
+                f"[LOCAL_CHECK] Order: {order.name}, Partner: {order.partner_id.name}, "
+                f"State: {state_val} (from: {state_source}), Merchant OK: {merchant_ok}, State OK: {state_ok}"
             )
     
-            if merchant_ok and state_ok:
-                order.x_studio_local = \"LOCAL\"
-            else:
-                order.x_studio_local = \"\"
+            order.x_studio_local = "LOCAL" if merchant_ok and state_ok else ""
