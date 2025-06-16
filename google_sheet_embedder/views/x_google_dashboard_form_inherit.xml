@@ -1,31 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-  <!-- Base form view for x_google_dashboard -->
-  <record id="view_google_dashboard_form" model="ir.ui.view">
-    <field name="name">x_google_dashboard.form</field>
-    <field name="model">x_google_dashboard</field>
-    <field name="arch" type="xml">
-      <form string="Google Dashboard">
-        <sheet>
-          <group>
-            <field name="x_google_sheet"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-  </record>
-
-  <!-- Inherited view to apply html_frame widget -->
-  <record id="view_google_dashboard_form_inherit" model="ir.ui.view">
+  <record id="view_x_google_dashboard_form_inherit" model="ir.ui.view">
     <field name="name">x_google_dashboard.form.inherit</field>
     <field name="model">x_google_dashboard</field>
-    <field name="inherit_id" ref="google_sheet_embedder.view_google_dashboard_form"/>
+    <field name="inherit_id" ref="your_module.view_google_dashboard_form"/> <!-- Replace with actual XML ID -->
     <field name="arch" type="xml">
       <xpath expr="//field[@name='x_google_sheet']" position="attributes">
-        <attribute name="widget">html_frame</attribute>
+        <attribute name="widget">html</attribute>
       </xpath>
     </field>
   </record>
-
 </odoo>
