@@ -1,14 +1,16 @@
 <odoo>
-    <record id="view_form_x_report" model="ir.ui.view">
-        <field name="name">x.report.form</field>
-        <field name="model">x_report</field>
+    <record id="view_form_google_sheet_embed" model="ir.ui.view">
+        <field name="name">google.sheet.embed.form</field>
+        <field name="model">google.sheet.embed</field>
         <field name="arch" type="xml">
-            <form string="Report">
+            <form string="Google Sheet Embed">
                 <sheet>
                     <group>
-                        <field name="x_name"/>
-                        <field name="x_studio_embedded_google_sheet" widget="html"/>
+                        <field name="name"/>
+                        <field name="iframe_html" invisible="1"/>
                     </group>
+                    <div t-if="record.iframe_html.raw_value"
+                         t-esc="record.iframe_html.raw_value"/>
                 </sheet>
             </form>
         </field>
