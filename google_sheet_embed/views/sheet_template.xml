@@ -6,11 +6,11 @@
             <sheet>
                 <group>
                     <field name="x_name"/>
+                    <field name="x_google_url"/>
                 </group>
-
-                <div class="oe_title">
-                    <field name="x_studio_embedded_google_sheet" widget="iframe_wrapper"/>
-                </div>
+                <group>
+                    <field name="x_iframe" widget="html_frame"/>
+                </group>
             </sheet>
         </form>
     </field>
