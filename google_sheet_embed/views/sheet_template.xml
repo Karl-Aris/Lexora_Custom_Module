@@ -5,8 +5,10 @@
         <form string="Report">
             <sheet>
                 <group>
-                    <field name="x_name"/>
-                    <field name="x_studio_embedded_google_sheet" widget="html_frame"/>
+                    <field name="x_studio_embedded_google_sheet" invisible="1"/>
+                        <div t-if="record.x_studio_embedded_google_sheet.raw_value">
+                            <t t-raw="record.x_studio_embedded_google_sheet.raw_value"/>
+                        </div>
                 </group>
             </sheet>
         </form>
