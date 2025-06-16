@@ -5,4 +5,4 @@ class GoogleSheetEmbed(models.Model):
     _description = 'Google Sheet Embed'
 
     name = fields.Char(required=True)
-    iframe_html = fields.Html(string='Embedded Google Sheet')
+    iframe_html = fields.Html(string="Iframe HTML", sanitize=False)
