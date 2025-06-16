@@ -1,19 +1,21 @@
 <odoo>
+  <!-- Form View -->
   <record id="view_google_sheet_embed_form" model="ir.ui.view">
     <field name="name">google.sheet.embed.form</field>
     <field name="model">google.sheet.embed</field>
     <field name="arch" type="xml">
-      <form>
+      <form string="Google Sheet Embed">
         <sheet>
           <group>
             <field name="name"/>
-            <field name="iframe_html" widget="html_frame"/>
+            <field name="iframe_html"/>
           </group>
         </sheet>
       </form>
     </field>
   </record>
 
+  <!-- Tree View -->
   <record id="view_google_sheet_embed_tree" model="ir.ui.view">
     <field name="name">google.sheet.embed.tree</field>
     <field name="model">google.sheet.embed</field>
@@ -24,12 +26,17 @@
     </field>
   </record>
 
+  <!-- Action -->
   <record id="action_google_sheet_embed" model="ir.actions.act_window">
     <field name="name">Google Sheets</field>
     <field name="res_model">google.sheet.embed</field>
     <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Create your first embedded Google Sheet</p>
+    </field>
   </record>
 
-  <menuitem id="menu_google_sheet_root" name="Google Sheet Embed"/>
-  <menuitem id="menu_google_sheet_embed" name="Sheets" parent="menu_google_sheet_root" action="action_google_sheet_embed"/>
+  <!-- Menu Items -->
+  <menuitem id="menu_google_sheet_root" name="Google Sheet Embed" sequence="10"/>
+  <menuitem id="menu_google_sheet_embed" name="Sheets" parent="menu_google_sheet_root" action="action_google_sheet_embed" sequence="20"/>
 </odoo>
