@@ -6,7 +6,7 @@
             <sheet>
                 <group>
                     <field name="x_name"/>
-                    <field name="x_studio_embedded_google_sheet" widget="html_frame"/>
+                    <field name="x_studio_embedded_google_sheet" widget="html"/>
                 </group>
             </sheet>
         </form>
