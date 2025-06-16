@@ -5,4 +5,4 @@ class GoogleSheetEmbed(models.Model):
     _description = 'Google Sheet Embed'
 
     x_name = fields.Char(required=True)
-    x_studio_embedded_google_sheet = fields.Html("Embedded Google Sheet", sanitize=False)
+    x_studio_embedded_google_sheet = fields.Html("Embedded Google Sheet")
