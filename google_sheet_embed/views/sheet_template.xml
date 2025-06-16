@@ -9,8 +9,10 @@
                         <field name="name"/>
                         <field name="iframe_html" invisible="1"/>
                     </group>
-                    <div t-if="record.iframe_html.raw_value"
-                         t-esc="record.iframe_html.raw_value"/>
+
+                    <!-- This is the key part -->
+                    <div type="html" t-if="record.iframe_html.raw_value"
+                         t-raw="record.iframe_html.raw_value"/>
                 </sheet>
             </form>
         </field>
