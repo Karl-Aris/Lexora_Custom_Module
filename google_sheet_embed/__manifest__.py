@@ -9,7 +9,7 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'your_module/static/src/js/html_frame_widget.js',
+            'google_sheet_embed/static/src/js/html_frame_widget.js',
         ],
     },
     'installable': True,
