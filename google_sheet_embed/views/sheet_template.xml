@@ -1,18 +1,19 @@
 <odoo>
-    <record id="view_form_google_sheet_embed" model="ir.ui.view">
-        <field name="name">google.sheet.embed.form</field>
-        <field name="model">google.sheet.embed</field>
+    <record id="view_form_x_report_embed" model="ir.ui.view">
+        <field name="name">x.report.embed.form</field>
+        <field name="model">x_report</field>
         <field name="arch" type="xml">
-            <form string="Google Sheet Embed">
+            <form string="Embedded Google Sheet">
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="iframe_html" invisible="1"/>
+                        <field name="x_name"/>
+                        <field name="x_studio_embedded_google_sheet" invisible="1"/>
                     </group>
 
-                    <!-- This is the key part -->
-                    <div type="html" t-if="record.iframe_html.raw_value"
-                         t-raw="record.iframe_html.raw_value"/>
+                    <!-- This renders the embedded iframe -->
+                    <div type="html"
+                         t-if="record.x_studio_embedded_google_sheet.raw_value"
+                         t-raw="record.x_studio_embedded_google_sheet.raw_value"/>
                 </sheet>
             </form>
         </field>
