@@ -1,12 +1,14 @@
-<odoo>
-    <record id="view_x_report_tree" model="ir.ui.view">
-        <field name="name">x.report.tree</field>
-        <field name="model">x_report</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="x_name"/>
-                <field name="x_studio_embedded_google_sheet" optional="show"/>
-            </tree>
-        </field>
-    </record>
-</odoo>
+<record id="view_x_report_form" model="ir.ui.view">
+    <field name="name">x.report.form</field>
+    <field name="model">x_report</field>
+    <field name="arch" type="xml">
+        <form string="Report">
+            <sheet>
+                <group>
+                    <field name="x_name"/>
+                    <field name="x_studio_embedded_google_sheet" widget="html_frame"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
