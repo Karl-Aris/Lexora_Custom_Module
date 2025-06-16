@@ -1,32 +1,12 @@
 <odoo>
-    <record id="view_google_sheet_embed_form" model="ir.ui.view">
-        <field name="name">google.sheet.embed.form</field>
+    <record id="view_google_sheet_embed_tree" model="ir.ui.view">
+        <field name="name">google.sheet.embed.tree</field>
         <field name="model">google.sheet.embed</field>
         <field name="arch" type="xml">
-            <form string="Google Sheet Embed">
-                <sheet>
-                    <group>
-                        <field name="name"/>
-                        <field name="iframe_html" widget="html_frame"/>
-                    </group>
-                </sheet>
-            </form>
+            <tree>
+                <field name="x_name"/>
+                <field name="x_studio_embedded_google_sheet" optional="show"/>
+            </tree>
         </field>
     </record>
-
-    <record id="action_google_sheet_embed" model="ir.actions.act_window">
-        <field name="name">Embedded Google Sheet</field>
-        <field name="res_model">google.sheet.embed</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <menuitem id="menu_google_sheet_embed_root"
-              name="Report"
-              sequence="10"/>
-
-    <menuitem id="menu_google_sheet_embed"
-              name="Embedded Google Sheet"
-              parent="menu_google_sheet_embed_root"
-              action="action_google_sheet_embed"
-              sequence="20"/>
 </odoo>
