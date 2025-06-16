@@ -1,11 +1,8 @@
-from odoo import http
-from odoo.http import request
+from odoo import models, fields
 
-class GoogleSheetController(http.Controller):
+class GoogleSheetEmbed(models.Model):
+    _name = 'google.sheet.embed'
+    _description = 'Google Sheet Embed'
 
-    @http.route('/google-sheet', auth='public', website=True)
-    def show_google_sheet(self):
-        iframe_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ.../pubhtml?widget=true&amp;headers=false"
-        return request.render('google_sheet_embed.sheet_embed_template', {
-            'iframe_url': iframe_url
-        })
+    name = fields.Char(required=True)
+    x_studio_embedded_google_sheet = fields.Html("Embedded Google Sheet", sanitize=False)
