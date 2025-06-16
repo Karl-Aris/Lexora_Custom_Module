@@ -1,42 +1,96 @@
-<odoo>
-  <!-- Form View -->
-  <record id="view_google_sheet_embed_form" model="ir.ui.view">
-    <field name="name">google.sheet.embed.form</field>
-    <field name="model">google.sheet.embed</field>
-    <field name="arch" type="xml">
-      <form string="Google Sheet Embed">
-        <sheet>
-          <group>
-            <field name="name"/>
-            <field name="iframe_html"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-  </record>
-
-  <!-- Tree View -->
-  <record id="view_google_sheet_embed_tree" model="ir.ui.view">
-    <field name="name">google.sheet.embed.tree</field>
-    <field name="model">google.sheet.embed</field>
-    <field name="arch" type="xml">
-      <tree>
-        <field name="name"/>
-      </tree>
-    </field>
-  </record>
-
-  <!-- Action -->
-  <record id="action_google_sheet_embed" model="ir.actions.act_window">
-    <field name="name">Google Sheets</field>
-    <field name="res_model">google.sheet.embed</field>
-    <field name="view_mode">tree,form</field>
-    <field name="help" type="html">
-      <p class="o_view_nocontent_smiling_face">Create your first embedded Google Sheet</p>
-    </field>
-  </record>
-
-  <!-- Menu Items -->
-  <menuitem id="menu_google_sheet_root" name="Google Sheet Embed" sequence="10"/>
-  <menuitem id="menu_google_sheet_embed" name="Sheets" parent="menu_google_sheet_root" action="action_google_sheet_embed" sequence="20"/>
-</odoo>
+<form __validate__="1">
+  <sheet string="Google Dashboard">
+    <group>
+      <field name="res_model" invisible="1"/>
+      <field name="activity_ids" on_change="1"
+             groups="base.group_user"
+             studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+    </group>
+    <group>
+      <group>
+        <field name="activity_state" groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+        <field name="activity_type_id" can_create="True" can_write="True"
+               groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+        <field name="activity_date_deadline" groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+        <field name="activity_summary" groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+        <field name="activity_exception_icon"/>
+        <field name="message_is_follower"/>
+      </group>
+      <group>
+        <field name="activity_user_id" groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+        <field name="activity_type_icon"/>
+        <field name="my_activity_date_deadline" groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+        <field name="activity_exception_decoration"/>
+        <field name="activity_calendar_event_id" groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+      </group>
+    </group>
+    <group>
+      <field name="message_follower_ids" on_change="1" groups="base.group_user"
+             studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+    </group>
+    <group>
+      <field name="message_partner_ids" can_create="True" can_write="True" groups="base.group_user"
+             studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+    </group>
+    <group>
+      <field name="message_ids"/>
+    </group>
+    <group>
+      <group>
+        <field name="has_message"/>
+        <field name="message_needaction_counter"/>
+        <field name="message_has_error_counter"/>
+      </group>
+      <group>
+        <field name="message_needaction"/>
+        <field name="message_has_error"/>
+        <field name="message_attachment_count" groups="base.group_user"
+               studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+      </group>
+    </group>
+    <group>
+      <field name="rating_ids" groups="base.group_user"
+             studio_groups="[{'id': 1, 'name': 'Internal User', 'display_name': 'User types / Internal User'}]"/>
+    </group>
+    <group>
+      <field name="website_message_ids"/>
+    </group>
+    <group>
+      <group>
+        <field name="message_has_sms_error"/>
+      </group>
+      <group>
+        <field name="x_name"/>
+      </group>
+    </group>
+    <group><field name="x_studio_html_field_2rj_1itl5oroo"/></group>
+    <group><field name="x_studio_html_field_40h_1itl5pe9u"/></group>
+    <group><field name="x_studio_html_field_2h2_1itl5q15i"/></group>
+    <group><field name="x_studio_html_field_360_1itl5rq8m"/></group>
+    <group><field name="x_studio_html_field_6p6_1itl5t2nv"/></group>
+    <group><field name="x_studio_html_field_680_1itl69nas"/></group>
+    <group><field name="x_studio_html_field_66u_1itl5ua18"/></group>
+    <group><field name="x_studio_html_field_7v3_1itl5vlgu"/></group>
+    <group><field name="x_studio_report"/></group>
+    <group><field name="x_google_sheet"/></group>
+    <group><field name="x_studio_html_field_7sf_1itslml1e"/></group>
+    <group>
+      <group>
+        <field name="x_studio_binary_field_13l_1itskt9jk"/>
+      </group>
+      <group>
+        <field name="x_studio_binary_field_13l_1itskt9jk_filename"/>
+      </group>
+    </group>
+    <group><field name="x_studio_html_field_3r8_1itspbk99"/></group>
+    <group/>
+    <group><separator/></group>
+  </sheet>
+</form>
