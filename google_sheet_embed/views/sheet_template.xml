@@ -1,7 +1,7 @@
 <odoo>
-    <record id="view_google_sheet_embed_tree" model="ir.ui.view">
-        <field name="name">google.sheet.embed.tree</field>
-        <field name="model">google.sheet.embed</field>
+    <record id="view_x_report_tree" model="ir.ui.view">
+        <field name="name">x.report.tree</field>
+        <field name="model">x_report</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="x_name"/>
