@@ -2,7 +2,7 @@
   <record id="view_x_google_dashboard_form_inherit" model="ir.ui.view">
     <field name="name">x_google_dashboard.form.inherit</field>
     <field name="model">x_google_dashboard</field>
-    <field name="inherit_id" ref="your_module.view_google_dashboard_form"/> <!-- Replace with actual XML ID -->
+    <field name="inherit_id" ref="x_google_dashboard_form_inherit.view_google_dashboard_form"/> <!-- Replace with actual XML ID -->
     <field name="arch" type="xml">
       <xpath expr="//field[@name='x_google_sheet']" position="attributes">
         <attribute name="widget">html</attribute>
