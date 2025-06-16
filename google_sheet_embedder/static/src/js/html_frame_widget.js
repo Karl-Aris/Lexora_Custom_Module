@@ -6,9 +6,13 @@ odoo.define('google_sheet_embedder.html_frame_widget', function (require) {
 
   const HtmlFrameWidget = FieldHtml.extend({
     _renderReadonly: function () {
-      // Use safe rendering to avoid undefined issues
-      const content = this.value || '';
-      this.$el.html(content);
+      try {
+        const content = this.value || '';
+        this.$el.html(content);
+      } catch (error) {
+        console.error("Failed to render iframe content:", error);
+        this.$el.html('<p style="color:red;">Error rendering iframe</p>');
+      }
     },
   });
 
