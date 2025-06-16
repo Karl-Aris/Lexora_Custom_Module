@@ -1,19 +1,14 @@
-<odoo>
-    <record id="view_form_x_report_embed" model="ir.ui.view">
-        <field name="name">x.report.embed.form</field>
-        <field name="model">x_report</field>
-        <field name="arch" type="xml">
-            <form string="Embedded Google Sheet">
-                <sheet>
-                    <group>
-                        <field name="x_name"/>
-                    </group>
-                    <group>
-                        <!-- This will properly render the HTML iframe -->
-                        <field name="x_studio_embedded_google_sheet" widget="html"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-</odoo>
+<record id="view_x_report_form" model="ir.ui.view">
+    <field name="name">x.report.form</field>
+    <field name="model">x_report</field>
+    <field name="arch" type="xml">
+        <form string="Report">
+            <sheet>
+                <group>
+                    <field name="x_name"/>
+                    <field name="x_studio_embedded_google_sheet" widget="html_frame"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
