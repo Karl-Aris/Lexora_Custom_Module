@@ -6,7 +6,9 @@ odoo.define('google_sheet_embedder.html_frame_widget', function (require) {
 
   const HtmlFrameWidget = FieldHtml.extend({
     _renderReadonly: function () {
-      this.$el.html(this.value || '');
+      // Use safe rendering to avoid undefined issues
+      const content = this.value || '';
+      this.$el.html(content);
     },
   });
 
