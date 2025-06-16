@@ -10,7 +10,7 @@
                         <field name="x_studio_embedded_google_sheet" invisible="1"/>
                     </group>
 
-                    <!-- This renders the embedded iframe -->
+                    <!-- Important: This should NOT be inside <group> -->
                     <div type="html"
                          t-if="record.x_studio_embedded_google_sheet.raw_value"
                          t-raw="record.x_studio_embedded_google_sheet.raw_value"/>
