@@ -1,20 +1,13 @@
-odoo.define('google_sheet_embedder.html_frame_widget', function (require) {
-  "use strict";
+/** @odoo-module **/
 
-  const fieldRegistry = require('web.field_registry');
-  const FieldHtml = require('web.basic_fields').FieldHtml;
+import { FieldHtml } from "@web/views/fields/html/html_field";
+import { registry } from "@web/core/registry";
 
-  const HtmlFrameWidget = FieldHtml.extend({
-    _renderReadonly: function () {
-      try {
-        const content = this.value || '';
-        this.$el.html(content);
-      } catch (error) {
-        console.error("Failed to render iframe content:", error);
-        this.$el.html('<p style="color:red;">Error rendering iframe</p>');
-      }
+const HtmlFrame = {
+    ...FieldHtml,
+    get htmlContent() {
+        return this.props.value || "";
     },
-  });
+};
 
-  fieldRegistry.add('html_frame', HtmlFrameWidget);
-});
+registry.category("fields").add("html_frame", HtmlFrame);
