@@ -1,0 +1,24 @@
+<odoo>
+  <template id="google_sheet_iframe_template" name="Google Sheet Dashboard">
+    <t t-name="google_sheet_iframe">
+      <div style="padding: 0 20px;">
+        <h2>Live Google Sheet Dashboard</h2>
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQABC12345/pubhtml?widget=true&amp;headers=false"
+                width="100%"
+                height="800px"
+                frameborder="0"
+                allowfullscreen></iframe>
+      </div>
+    </t>
+  </template>
+
+  <record id="action_google_sheet_dashboard" model="ir.actions.client">
+    <field name="name">Google Sheet Dashboard</field>
+    <field name="tag">google_sheet_dashboard</field>
+  </record>
+
+  <menuitem id="menu_google_sheet_dashboard"
+            name="Google Sheet Dashboard"
+            parent="base.menu_custom"
+            action="action_google_sheet_dashboard" />
+</odoo>
