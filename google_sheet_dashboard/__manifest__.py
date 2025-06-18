@@ -1,8 +1,7 @@
 {
     "name": "Google Sheet Dashboard",
     "version": "1.0",
-    "author": "ChatGPT",
-    "license": "LGPL-3",
+    "author": "Karl Areglado",
     "depends": ["web"],
     "category": "Tools",
     "summary": "Embed Google Sheet as a dashboard inside Odoo",
