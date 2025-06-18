@@ -9,8 +9,8 @@
     "data": ["views/dashboard_view.xml"],
     "assets": {
         "web.assets_backend": [
-            "google_sheet_dashboard/static/src/js/google_sheet_dashboard.js"
-        ]
+            "google_sheet_dashboard/static/src/js/google_sheet_dashboard.js",
+        ],
     },
     "installable": True,
     "application": True,
