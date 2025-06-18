@@ -1,14 +1,19 @@
-odoo.define('google_sheet_dashboard.google_sheet_dashboard', function (require) {
-    "use strict";
+/** @odoo-module **/
 
-    var AbstractAction = require('web.AbstractAction');
-    var core = require('web.core');
+import { registry } from "@web/core/registry";
+import AbstractAction from "@web/webclient/actions/abstract_action";
 
-    var GoogleSheetDashboard = AbstractAction.extend({
-        template: 'google_sheet_iframe',
-    });
+export class GoogleSheetDashboard extends AbstractAction {
+    setup() {
+        // Any additional logic if needed
+    }
 
-    core.action_registry.add('google_sheet_dashboard', GoogleSheetDashboard);
+    async willStart() {
+        await super.willStart();
+    }
+}
 
-    return GoogleSheetDashboard;
-});
+GoogleSheetDashboard.template = "google_sheet_dashboard.google_sheet_iframe";
+
+// Register the action
+registry.category("actions").add("google_sheet_dashboard.action", GoogleSheetDashboard);
