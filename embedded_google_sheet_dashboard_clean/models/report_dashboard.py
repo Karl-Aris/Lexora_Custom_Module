@@ -5,19 +5,16 @@ class ReportDashboard(models.Model):
     _description = 'Google Sheet Dashboard'
 
     name = fields.Char(required=True)
-    google_sheet_url = fields.Char()
-    embedded_google_sheet = fields.Html(compute="_compute_embed", store=True)
+    google_sheet_url = fields.Char(string="Google Sheet URL")
+
+    embedded_google_sheet = fields.Html(string="Embedded Sheet", compute="_compute_embedded_google_sheet", sanitize=False)
 
     @api.depends('google_sheet_url')
-    def _compute_embed(self):
+    def _compute_embedded_google_sheet(self):
         for rec in self:
-            url = rec.google_sheet_url or ""
-            if "/edit" in url:
-                embed_url = url.replace("/edit", "/pubhtml?widget=true&headers=false")
-            elif "/pubhtml" in url and "widget=true" not in url:
-                embed_url = url + "?widget=true&headers=false"
+            if rec.google_sheet_url:
+                rec.embedded_google_sheet = f"""
+                    <iframe src="{rec.google_sheet_url}" width="100%" height="700px" frameborder="0" allowfullscreen></iframe>
+                """
             else:
-                embed_url = url
-            rec.embedded_google_sheet = (
-                f'<iframe src="{embed_url}" width="100%" height="800" frameborder="0" allowfullscreen></iframe>' if embed_url else ''
-            )
+                rec.embedded_google_sheet = "<p>No sheet URL provided.</p>"
