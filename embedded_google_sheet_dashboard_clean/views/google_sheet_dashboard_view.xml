@@ -1,16 +1,16 @@
 <odoo>
   <record id="view_form_google_sheet_dashboard" model="ir.ui.view">
-    <field name="name">embedded.google.sheet.dashboard.form</field>
-    <field name="model">embedded.google.sheet.dashboard</field>
+    <field name="name">x_report.form</field>
+    <field name="model">x_report</field>
     <field name="arch" type="xml">
       <form string="Google Sheet Dashboard">
         <sheet>
           <group>
-            <field name="name"/>
-            <field name="google_sheet_url"/>
+            <field name="x_name"/>
+            <field name="x_google_sheet_url"/>
           </group>
           <group>
-            <field name="embedded_google_sheet" widget="html" nolabel="1"/>
+            <field name="x_studio_embedded_google_sheet" widget="html" nolabel="1"/>
           </group>
         </sheet>
       </form>
@@ -19,7 +19,7 @@
 
   <record id="action_google_sheet_dashboard" model="ir.actions.act_window">
     <field name="name">Google Sheet Dashboard</field>
-    <field name="res_model">embedded.google.sheet.dashboard</field>
+    <field name="res_model">x_report</field>
     <field name="view_mode">form</field>
     <field name="target">current</field>
   </record>
