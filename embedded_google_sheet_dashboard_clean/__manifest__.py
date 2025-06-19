@@ -2,6 +2,7 @@
     "name": "Embedded Google Sheet Dashboard Clean",
     "version": "1.0",
     "summary": "Embed Google Sheets in backend & portal",
+    'author': 'Karl Areglado',
     "category": "Tools",
     "depends": ["base", "web", "website"],
     "data": [
