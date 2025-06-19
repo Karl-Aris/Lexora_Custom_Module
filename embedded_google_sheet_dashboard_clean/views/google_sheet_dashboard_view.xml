@@ -1,4 +1,17 @@
 <odoo>
+  <!-- Tree View -->
+  <record id="view_tree_report_dashboard" model="ir.ui.view">
+    <field name="name">report.dashboard.tree</field>
+    <field name="model">report.dashboard</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="google_sheet_url"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- Form View -->
   <record id="view_form_report_dashboard" model="ir.ui.view">
     <field name="name">report.dashboard.form</field>
     <field name="model">report.dashboard</field>
@@ -17,13 +30,21 @@
     </field>
   </record>
 
+  <!-- Action -->
   <record id="action_report_dashboard" model="ir.actions.act_window">
     <field name="name">Google Sheet Dashboard</field>
     <field name="res_model">report.dashboard</field>
-    <field name="view_mode">form</field>
+    <field name="view_mode">tree,form</field>
     <field name="target">current</field>
   </record>
 
-  <menuitem id="menu_report_dashboard_root" name="Google Sheet Dashboard" sequence="10"/>
-  <menuitem id="menu_report_dashboard" name="Dashboard" parent="menu_report_dashboard_root" action="action_report_dashboard"/>
+  <!-- Menu -->
+  <menuitem id="menu_report_dashboard_root"
+            name="Google Sheet Dashboard"
+            sequence="10"/>
+
+  <menuitem id="menu_report_dashboard"
+            name="Dashboard"
+            parent="menu_report_dashboard_root"
+            action="action_report_dashboard"/>
 </odoo>
