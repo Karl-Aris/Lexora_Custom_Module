@@ -14,7 +14,7 @@ class ReportDashboard(models.Model):
         for rec in self:
             if rec.google_sheet_url:
                 rec.embedded_google_sheet = f"""
-                    <iframe src="{rec.google_sheet_url}" width="100%" height="700px" frameborder="0" allowfullscreen></iframe>
+                    <iframe src="{rec.google_sheet_url}" width="100%" height="1400px" frameborder="0" allowfullscreen></iframe>
                 """
             else:
                 rec.embedded_google_sheet = "<p>No sheet URL provided.</p>"
