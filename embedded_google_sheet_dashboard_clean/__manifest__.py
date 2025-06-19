@@ -5,8 +5,8 @@
     "data": [
         "views/google_sheet_dashboard_view.xml"
     ],
-    "installable": true,
-    "application": true,
+    "installable": True,
+    "application": True,
     "category": "Tools",
     "summary": "Embed live Google Sheet Dashboards into Odoo backend",
     "license": "LGPL-3"
