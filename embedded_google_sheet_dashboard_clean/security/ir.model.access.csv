@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_report_dashboard_user,access.report.dashboard.user,model_report_dashboard,base.group_user,1,1,1,1
