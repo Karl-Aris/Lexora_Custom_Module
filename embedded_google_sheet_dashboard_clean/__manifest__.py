@@ -3,7 +3,8 @@
     "version": "1.0",
     "depends": ["base"],
     "data": [
-        "views/google_sheet_dashboard_view.xml"
+        "security/ir.model.access.csv",
+        "views/google_sheet_dashboard_view.xml"   
     ],
     "installable": True,
     "application": True,
