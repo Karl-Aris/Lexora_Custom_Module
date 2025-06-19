@@ -23,9 +23,6 @@
           <group>
             <field name="embedded_google_sheet" widget="html" nolabel="1"/>
           </group>
-          <footer>
-            <button name="%(action_google_sheet_portal)d" type="action" string="Open Full View" class="btn-primary"/>
-          </footer>
         </sheet>
       </form>
     </field>
