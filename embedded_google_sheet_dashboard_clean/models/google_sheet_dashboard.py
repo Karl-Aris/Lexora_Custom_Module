@@ -4,6 +4,7 @@ from odoo import models, fields, api
 class EmbeddedGoogleSheetDashboard(models.Model):
     _name = 'embedded.google.sheet.dashboard'
     _description = 'Embedded Google Sheet Dashboard'
+    _inherit = []
 
     name = fields.Char(string="Dashboard Name", required=True)
     google_sheet_url = fields.Char(string="Google Sheet URL")
