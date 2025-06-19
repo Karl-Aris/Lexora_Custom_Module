@@ -1,0 +1,29 @@
+<odoo>
+  <record id="view_form_google_sheet_dashboard" model="ir.ui.view">
+    <field name="name">embedded.google.sheet.dashboard.form</field>
+    <field name="model">embedded.google.sheet.dashboard</field>
+    <field name="arch" type="xml">
+      <form string="Google Sheet Dashboard">
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="google_sheet_url"/>
+          </group>
+          <group>
+            <field name="embedded_google_sheet" widget="html" nolabel="1"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_google_sheet_dashboard" model="ir.actions.act_window">
+    <field name="name">Google Sheet Dashboard</field>
+    <field name="res_model">embedded.google.sheet.dashboard</field>
+    <field name="view_mode">form</field>
+    <field name="target">current</field>
+  </record>
+
+  <menuitem id="menu_google_sheet_dashboard_root" name="Google Sheet Dashboard" sequence="10"/>
+  <menuitem id="menu_google_sheet_dashboard" name="Dashboard" parent="menu_google_sheet_dashboard_root" action="action_google_sheet_dashboard"/>
+</odoo>
