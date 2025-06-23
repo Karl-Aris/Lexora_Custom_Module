@@ -6,6 +6,7 @@
     "category": "Warehouse",
     "summary": "Restrict inventory adjustments unless in scan mode",
     "data": [
+        "security/groups.xml",
         "security/inventory_adjustment_security.xml",
         "views/res_company_views.xml",
     ],
