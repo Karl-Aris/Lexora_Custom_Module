@@ -1,8 +1,0 @@
-<odoo>
-    <record id="inventory_adjustment_rule" model="ir.rule">
-        <field name="name">Inventory Blocked Users</field>
-        <field name="model_id" ref="stock.model_stock_quant"/>
-        <field name="domain_force">[(0, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('inventory_adjustment_restrict.group_inventory_scan'))]"/>
-    </record>
-</odoo>
