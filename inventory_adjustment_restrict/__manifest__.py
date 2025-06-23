@@ -2,7 +2,7 @@
     "name": "Inventory Adjustment Restriction",
     "version": "1.0",
     "depends": ["stock"],
-    "author": "ChatGPT",
+    "author": "Karl Areglado",
     "category": "Warehouse",
     "description": "Restricts Inventory Adjustments unless during scan period or with access group.",
     "data": [
