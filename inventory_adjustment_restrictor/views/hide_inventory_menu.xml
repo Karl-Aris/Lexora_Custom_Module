@@ -1,0 +1,7 @@
+<odoo>
+    <data>
+        <record id="menu_stock_inventory_adjustment" model="ir.ui.menu">
+            <field name="groups_id" eval="[(4, ref('inventory_adjustment_restrictor.group_can_adjust_inventory'))]"/>
+        </record>
+    </data>
+</odoo>
