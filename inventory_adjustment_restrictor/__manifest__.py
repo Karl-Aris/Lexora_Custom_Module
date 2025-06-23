@@ -3,7 +3,7 @@
     "version": "16.0.1.0.0",
     "category": "Inventory",
     "summary": "Restricts inventory adjustments unless user is in the special group.",
-    "author": "ChatGPT",
+    "author": "Karl Areglado",
     "depends": ["stock"],
     "data": [
         "security/groups.xml",
