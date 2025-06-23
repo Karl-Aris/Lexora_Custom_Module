@@ -1,0 +1,6 @@
+<odoo>
+    <record id="group_inventory_scan" model="res.groups">
+        <field name="name">Inventory Scan Restriction Group</field>
+        <field name="category_id" ref="base.module_category_inventory"/>
+    </record>
+</odoo>
