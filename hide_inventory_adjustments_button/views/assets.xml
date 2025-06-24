@@ -1,0 +1,7 @@
+<odoo>
+    <data inherit_id="web.assets_backend" name="Hide Inventory Button JS">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/hide_inventory_adjustment_button/static/src/js/hide_button.js"/>
+        </xpath>
+    </data>
+</odoo>
