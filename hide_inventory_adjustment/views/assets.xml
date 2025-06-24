@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="hide_inventory_assets" inherit_id="web.assets_backend" name="Hide Inventory Button Assets">
+    <xpath expr="." position="inside">
+      <link rel="stylesheet" type="text/css" href="/hide_inventory_adjustment_button/static/src/css/hide_inventory_button.css"/>
+    </xpath>
+  </template>
+</odoo>
