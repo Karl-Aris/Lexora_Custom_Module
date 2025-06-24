@@ -7,8 +7,7 @@
     "description": "Restricts Inventory Adjustment unless explicitly allowed.",
     "data": [
         "security/inventory_block_rules.xml",
-        "security/ir.model.access.csv",
-        "views/inventory_menu.xml"
+        "security/ir.model.access.csv"
     ],
     "installable": True,
     "application": False,
