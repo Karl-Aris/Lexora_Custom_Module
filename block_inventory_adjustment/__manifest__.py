@@ -2,7 +2,7 @@
     "name": "Block Inventory Adjustment",
     "version": "1.0",
     "depends": ["stock"],
-    "author": "ChatGPT Custom",
+    "author": "Karl Areglado",
     "category": "Inventory",
     "description": "Restricts Inventory Adjustment unless explicitly allowed.",
     "data": [
