@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_stock_quant_blocked,stock.quant.blocked,stock.model_stock_quant,block_inventory_adjustment.group_inventory_blocked,1,0,0,0
