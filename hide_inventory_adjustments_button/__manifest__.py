@@ -6,6 +6,8 @@
     "depends": ["stock", "stock_barcode", "web"],
     "data": [
         "views/assets.xml"
+        "views/assets_template.xml"
+        "views/barcode_dashboard.xml"
     ],
     "assets": {},
     "installable": True,
