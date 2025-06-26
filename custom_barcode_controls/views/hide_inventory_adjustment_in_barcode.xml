@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="hide_inventory_adjustment_barcode" inherit_id="stock_barcode.stock_barcode_main_menu">
+    <xpath expr="//div[@data-id='inventory']" position="attributes">
+      <attribute name="t-if">False</attribute>
+    </xpath>
+  </template>
+</odoo>
