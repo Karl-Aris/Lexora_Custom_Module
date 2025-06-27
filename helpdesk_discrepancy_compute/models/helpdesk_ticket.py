@@ -22,7 +22,7 @@ class HelpdeskTicket(models.Model):
         for rec in self:
             charged = getattr(rec, 'x_studio_charged_amount', 0.0) or 0.0
             processed = getattr(rec, 'x_studio_monetary_field_782_1iumcjho4', 0.0) or 0.0
-            rec.x_studio_discrepancy = charged - processed 
+            rec.x_studio_discrepancy = charged + processed 
 
     @api.depends('x_po')
     def _compute_linked_bill(self):
