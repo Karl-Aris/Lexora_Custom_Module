@@ -3,9 +3,11 @@ from odoo import models, fields, api
 class HelpdeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
 
-    # Redeclare the discrepancy field ONLY to attach compute
-    x_studio_discrepancy = fields.Float(
+    # Re-define discrepancy field with compute and currency
+    x_studio_discrepancy = fields.Monetary(
+        string='Discrepancy',
         compute='_compute_x_studio_discrepancy',
+        currency_field='x_studio_currency_id',
         store=True
     )
 
