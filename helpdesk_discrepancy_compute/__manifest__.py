@@ -5,7 +5,6 @@
     "summary": "Computes discrepancy between Charged and Processed Amount on existing Studio fields",
     "author": "Karl Areglado",
     "depends": ["helpdesk"],
-    "data": [],
     "installable": True,
     "application": False,
     "auto_install": False
