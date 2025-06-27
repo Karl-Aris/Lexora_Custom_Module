@@ -3,7 +3,7 @@
     "version": "1.0",
     "category": "Helpdesk",
     "summary": "Computes discrepancy between Charged and Processed Amount on existing Studio fields",
-    "author": "Code Copilot",
+    "author": "Karl Areglado",
     "depends": ["helpdesk"],
     "data": [],
     "installable": True,
