@@ -3,7 +3,7 @@
     "version": "1.0",
     "category": "Accounting",
     "summary": "Adds discrepancy field between charged amount and vendor bill total",
-    "author": "Code Copilot",
+    "author": "Karl Areglado",
     "depends": ["account"],
     "data": [],
     "installable": True,
