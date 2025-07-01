@@ -2,7 +2,7 @@
     "name": "Helpdesk RTV",
     "version": "1.0",
     "depends": ["helpdesk", "stock", "purchase"],
-    "author": "Code Copilot",
+    "author": "Karl Areglado",
     "category": "Custom",
     "description": "Add Return to Vendor (RTV) logic to Helpdesk Tickets",
     "data": [
