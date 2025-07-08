@@ -1,0 +1,14 @@
+<odoo>
+    <record id="view_helpdesk_team_form_inherit" model="ir.ui.view">
+        <field name="name">helpdesk.team.form.smtp</field>
+        <field name="model">helpdesk.team</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_team_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='description']" position="after">
+                <group>
+                    <field name="mail_server_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
