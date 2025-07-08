@@ -2,7 +2,7 @@
     "name": "Helpdesk Mail SMTP Router (Advanced)",
     "version": "1.1",
     "depends": ["helpdesk", "mail"],
-    "author": "Code Copilot",
+    "author": "Karl Areglado",
     "category": "Helpdesk",
     "summary": "Force helpdesk replies to use team-specific SMTP before mail creation.",
     "installable": True,
