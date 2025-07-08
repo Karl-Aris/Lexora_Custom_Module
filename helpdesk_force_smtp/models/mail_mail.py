@@ -5,10 +5,11 @@ class MailMail(models.Model):
 
     def send(self, auto_commit=False, raise_exception=False):
         for mail in self:
-            if mail.model == 'helpdesk.ticket' and mail.res_id:
-                ticket = self.env['helpdesk.ticket'].browse(mail.res_id)
-                if ticket.team_id and ticket.team_id.mail_server_id:
-                    mail.mail_server_id = ticket.team_id.mail_server_id.id
-                    if ticket.team_id.alias_id and ticket.team_id.alias_id.display_name:
-                        mail.email_from = ticket.team_id.alias_id.display_name
+            if not mail.email_from and mail.mail_server_id:
+                from_filter = mail.mail_server_id.from_filter
+                if from_filter:
+                    if '@' in from_filter:
+                        mail.email_from = from_filter
+                    elif mail.mail_server_id.smtp_user:
+                        mail.email_from = mail.mail_server_id.smtp_user
         return super().send(auto_commit=auto_commit, raise_exception=raise_exception)
