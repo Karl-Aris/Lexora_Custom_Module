@@ -3,11 +3,8 @@ from odoo import models
 class HelpdeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
 
-    def message_get_email_values(self, notifications):
-        res = super().message_get_email_values(notifications)
-        for ticket, values in res.items():
-            team = ticket.team_id
-            if team and team.x_alias_email_from:
-                values['email_from'] = team.x_alias_email_from
-                # DO NOT override reply_to – Odoo will handle threading
-        return res
+    def message_post(self, **kwargs):
+        email_from = self.team_id.x_alias_email_from
+        if email_from:
+            kwargs['email_from'] = email_from
+        return super().message_post(**kwargs)
