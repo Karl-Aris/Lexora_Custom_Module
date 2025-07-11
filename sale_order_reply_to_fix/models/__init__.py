@@ -1,1 +1,1 @@
-from . import mail_template
+from . import sale_order
