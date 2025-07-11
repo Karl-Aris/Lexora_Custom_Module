@@ -1,10 +1,12 @@
 {
-    "name": "Sale Order Reply-To Fix",
+    "name": "Sales Reply-To Fix",
     "version": "1.0",
+    "depends": ["sale"],
+    "author": "Karl Areglado",
     "category": "Sales",
-    "summary": "Fixes reply-to email on sale order email templates.",
-    "depends": ["sale", "mail"],
+    "description": "Overrides reply-to logic in sales order emails to use Sales Team email.",
     "data": [],
     "installable": True,
     "application": False,
+    "auto_install": False
 }
