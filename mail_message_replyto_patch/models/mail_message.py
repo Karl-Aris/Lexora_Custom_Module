@@ -1,7 +1,7 @@
 from odoo import models, api
 
-class MailMail(models.Model):
-    _inherit = 'mail.mail'
+class MailMessage(models.Model):
+    _inherit = 'mail.message'
 
     @api.model
     def create(self, vals):
