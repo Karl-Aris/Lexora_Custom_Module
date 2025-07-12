@@ -2,7 +2,7 @@
     "name": "Sale Custom Reply-To",
     "version": "1.0",
     "depends": ["sale"],
-    "author": "ChatGPT",
+    "author": "Karl Areglado",
     "category": "Sales",
     "description": "Overrides reply_to in sales order email to use orders@lexorahome.com",
     "installable": True,
