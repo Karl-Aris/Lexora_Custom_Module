@@ -1,36 +1,44 @@
+# controllers/main.py
 from odoo import http
 from odoo.http import request
+from werkzeug.utils import redirect
 
-class WebsiteSaleLexora(http.Controller):
+class LexoraShipping(http.Controller):
 
-    @http.route(['/shop/shipping-details/confirm'], type='http', auth="public", website=True, csrf=True)
+    @http.route(['/shop/shipping-details/confirm'], type='http', auth='public', website=True, csrf=True)
     def shipping_details_confirm(self, **post):
-        error = {}
-        purchase_order = post.get('purchase_order', '').strip()
+        purchase_order = post.get('purchase_order')
+        order_customer = post.get('order_customer')
+        order_phone = post.get('order_phone')
+        order_address = post.get('order_address')
 
-        # Check if purchase_order already exists
-        if purchase_order:
-            existing_order = request.env['sale.order'].sudo().search([('purchase_order', '=', purchase_order)], limit=1)
-            if existing_order:
-                error['purchase_order'] = 'This PO # already exists.'
+        # Get current order
+        sale_order = request.website.sale_get_order()
 
-        required_fields = ['order_customer', 'order_phone', 'order_address']
-        for field in required_fields:
-            if not post.get(field):
-                error[field] = "This field is required."
+        # Check if PO number already exists in another sale.order
+        existing = request.env['sale.order'].sudo().search([
+            ('purchase_order', '=', purchase_order),
+            ('id', '!=', sale_order.id)
+        ], limit=1)
 
-        if error:
-            return request.render("website_sale_lexora.shipping-details", {
+        if existing:
+            error = {'purchase_order': 'PO number already used. Please enter a unique value.'}
+            values = {
                 'error': error,
                 'purchase_order': purchase_order,
-                'order_customer': post.get('order_customer', ''),
-                'order_phone': post.get('order_phone', ''),
-                'order_address': post.get('order_address', ''),
-            })
+                'order_customer': order_customer,
+                'order_phone': order_phone,
+                'order_address': order_address,
+            }
+            return request.render('website_sale_lexora_shipping.shipping-details', values)
 
-        sale_order = request.env['sale.order'].sudo().create({
+        # Save the shipping info to the current sale order
+        sale_order.sudo().write({
             'purchase_order': purchase_order,
-            'partner_id': request.env.user.partner_id.id,
+            'partner_name': order_customer,
+            'partner_phone': order_phone,
+            'partner_street': order_address,
         })
 
-        return request.redirect('/shop/confirmation')
+        # Redirect to payment or next step
+        return redirect('/shop/payment')
