@@ -4,9 +4,7 @@
     "category": "Website",
     "summary": "Custom shipping details page with PO validation",
     "depends": ["website_sale"],
-    "data": [
-        "views/shipping_template.xml"
-    ],
+    "data": [],
     "installable": True,
     "application": False
 }
