@@ -7,4 +7,3 @@ class SaleOrder(models.Model):
     order_customer = fields.Char(string="Order Customer")
     order_address = fields.Char(string="Order Address")
     order_phone = fields.Char(string="Order Phone")
-    x_payment_method = fields.Char(string="Payment Method")  # optional if used
