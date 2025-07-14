@@ -12,14 +12,12 @@ class WebsiteSaleLexora(http.Controller):
 
         if order and kw:
             order.sudo().write({
-                'purchase_order': kw.get("purchase_order"),       # <-- this is the key field
-                'partner_name': kw.get("order_customer"),
-                'partner_phone': kw.get("order_phone"),
-                'partner_street': kw.get("order_address"),
-                'x_payment_method': kw.get("x_payment_method"),   # if this is a valid custom field
+                'purchase_order': kw.get("purchase_order"),        # PO #
+                'order_customer': kw.get("order_customer"),        # Custom Field
+                'order_address': kw.get("order_address"),          # Custom Field
+                'order_phone': kw.get("order_phone"),              # Custom Field
+                'x_payment_method': kw.get("x_payment_method"),    # Optional Custom Field
             })
-
-            # Optional: reset session or move to thank you page
             request.website.sale_reset()
             return request.render("website_sale_lexora.order_complete_thank_you")
 
