@@ -16,7 +16,6 @@ class WebsiteSaleLexora(http.Controller):
                 'order_customer': kw.get("order_customer"),        # Custom Field
                 'order_address': kw.get("order_address"),          # Custom Field
                 'order_phone': kw.get("order_phone"),              # Custom Field
-                'x_payment_method': kw.get("x_payment_method"),    # Optional Custom Field
             })
             request.website.sale_reset()
             return request.render("website_sale_lexora.order_complete_thank_you")
