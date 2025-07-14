@@ -4,9 +4,7 @@
     "version": "1.0",
     "summary": "Add PO# validation and save to sale order",
     "depends": ["website_sale"],
-    "data": [
-        "views/website_shipping_form.xml",
-    ],
+    "data": [],
     "installable": True,
     "auto_install": False,
 }
