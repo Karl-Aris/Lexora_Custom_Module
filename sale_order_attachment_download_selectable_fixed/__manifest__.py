@@ -2,7 +2,7 @@
     "name": "Sale Order Attachment Download with Selection",
     "version": "1.1",
     "depends": ["sale"],
-    "author": "ChatGPT",
+    "author": "Karl Areglado",
     "category": "Sales",
     "description": "Add wizard for selecting and downloading attachments from Sale Orders.",
     "data": [
