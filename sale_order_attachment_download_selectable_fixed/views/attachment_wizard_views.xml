@@ -21,11 +21,10 @@
         </field>
     </record>
 
-    <record id="action_sale_order_attachment_wizard" model="ir.actions.act_window">
+    <record id="sale_order_attachment_download_selectable_fixed.action_sale_order_attachment_wizard" model="ir.actions.act_window">
         <field name="name">Download Attachments</field>
         <field name="res_model">sale.order.attachment.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
-        <field name="context">{}</field>
     </record>
 </odoo>
