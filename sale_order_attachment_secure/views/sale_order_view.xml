@@ -4,7 +4,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@string='Attachments']" position="inside">
+            <xpath expr="//field[@name='message_ids']" position="after">
                 <group string="Attachment Selection">
                     <field name="attachment_selection_line_ids">
                         <tree editable="bottom">
