@@ -9,7 +9,7 @@
                     <field name="attachment_ids">
                         <tree editable="bottom">
                             <field name="selected"/>
-                            <field name="name"/>
+                            <field name="name" readonly="1"/>
                         </tree>
                     </field>
                 </group>
