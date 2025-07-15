@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <record id="view_order_form_inherit_attachment_wizard" model="ir.ui.view">
+            <field name="name">sale.order.form.attachment.wizard</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <header position="inside">
+                    <button name="%(sale_order_attachment_download_selectable_fixed.action_sale_order_attachment_wizard)d"
+                            string="Select Attachments"
+                            type="action"
+                            class="btn-secondary"
+                            context="{'default_sale_order_id': active_id}"/>
+                </header>
+            </field>
+        </record>
+    </data>
+</odoo>
