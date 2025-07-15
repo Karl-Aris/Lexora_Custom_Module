@@ -2,7 +2,7 @@
     <record id="view_order_form_inherit_attachment_selection" model="ir.ui.view">
         <field name="name">sale.order.form.attachment.selection</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.sale_order_view_form"/>
+        <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="Attachment Selections">
