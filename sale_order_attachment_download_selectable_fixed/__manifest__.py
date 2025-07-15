@@ -6,7 +6,7 @@
     "category": "Sales",
     "description": "Add wizard for selecting and downloading attachments from Sale Orders.",
     "data": [
-        "views/attachment_wizard_views.xml"
+        "views/attachment_wizard_views.xml",
         "views/sale_order_view.xml",
     ],
     "installable": True,
