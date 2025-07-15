@@ -6,6 +6,7 @@
     "category": "Sales",
     "description": "Add wizard for selecting and downloading attachments from Sale Orders.",
     "data": [
+        "security/ir.model.access.csv",
         "views/attachment_wizard_views.xml",
         "views/sale_order_view.xml",
     ],
