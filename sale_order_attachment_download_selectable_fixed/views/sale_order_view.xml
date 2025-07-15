@@ -11,6 +11,7 @@
                             type="action"
                             class="btn-secondary"
                             context="{'default_sale_order_id': active_id}"/>
+
                 </header>
             </field>
         </record>
