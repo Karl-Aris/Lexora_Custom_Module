@@ -1,24 +1,20 @@
-odoo.define('multi_attachment_print.multi_attachment_download', function (require) {
-    'use strict';
+/** @odoo-module **/
 
-    var AbstractAction = require('web.AbstractAction');
-    var core = require('web.core');
+import { registry } from "@web/core/registry";
+import { AbstractAction } from "@web/core/action/action_service";
 
-    var MultiAttachmentDownload = AbstractAction.extend({
-        start: function () {
-            var attachment_ids = this.action.context.attachment_ids || [];
+class MultiAttachmentDownload extends AbstractAction {
+    async setup() {
+        const attachment_ids = this.props.action.context.attachment_ids || [];
 
-            attachment_ids.forEach(function (id) {
-                var url = '/web/content/' + id + '?download=true';
-                window.open(url, '_blank');
-            });
+        for (const id of attachment_ids) {
+            const url = `/web/content/${id}?download=true`;
+            window.open(url, '_blank');
+        }
 
-            this.do_action({ type: 'ir.actions.act_window_close' });
-            return Promise.resolve();
-        },
-    });
+        // Close the action
+        this.props.closeAction();
+    }
+}
 
-    core.action_registry.add('multi_attachment_download', MultiAttachmentDownload);
-
-    return MultiAttachmentDownload;
-});
+registry.category("actions").add("multi_attachment_download", MultiAttachmentDownload);
