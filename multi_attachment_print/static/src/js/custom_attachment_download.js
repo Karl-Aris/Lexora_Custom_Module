@@ -1,19 +1,17 @@
-@http.route('/download/attachments_by_ids', type='http', auth="user")
-def download_attachments_by_ids(self, ids=None):
-    attachment_ids = [int(i) for i in ids.split(',') if i]
-    attachments = request.env['ir.attachment'].sudo().browse(attachment_ids)
+/** @odoo-module **/
 
-    zip_stream = io.BytesIO()
-    with zipfile.ZipFile(zip_stream, 'w') as zip_file:
-        for att in attachments:
-            if att.type == 'binary' and att.datas:
-                zip_file.writestr(att.name or 'file', base64.b64decode(att.datas))
+import { registry } from "@web/core/registry";
+import { download } from "@web/core/network/download";
 
-    zip_stream.seek(0)
-    return request.make_response(
-        zip_stream.read(),
-        headers=[
-            ('Content-Type', 'application/zip'),
-            ('Content-Disposition', 'attachment; filename="attachments.zip"')
-        ]
-    )
+registry.category("client_actions").add("multi_attachment_download", {
+    async execute(env, action) {
+        const ids = action.context.attachment_ids;
+        if (!ids || !ids.length) {
+            console.warn("No attachments to download.");
+            return;
+        }
+
+        const url = `/download/attachments_by_ids?ids=${ids.join(",")}`;
+        download({ url });
+    },
+});
