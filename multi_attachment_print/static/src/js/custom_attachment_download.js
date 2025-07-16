@@ -1,10 +1,10 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { AbstractAction } from "@web/core/action/action_service";
+import { ClientAction } from "@web/core/client_action/client_action";
 
-class MultiAttachmentDownload extends AbstractAction {
-    async setup() {
+class MultiAttachmentDownload extends ClientAction {
+    setup() {
         const attachment_ids = this.props.action.context.attachment_ids || [];
 
         for (const id of attachment_ids) {
@@ -12,9 +12,11 @@ class MultiAttachmentDownload extends AbstractAction {
             window.open(url, '_blank');
         }
 
-        // Close the action
-        this.props.closeAction();
+        // Close the action after a short delay
+        setTimeout(() => {
+            this.props.closeAction();
+        }, 500);
     }
 }
 
-registry.category("actions").add("multi_attachment_download", MultiAttachmentDownload);
+registry.category("client_actions").add("multi_attachment_download", MultiAttachmentDownload);
