@@ -1,31 +1,23 @@
 from odoo import http
 from odoo.http import request
-import base64
-import io
-import zipfile
-
+import json
 
 class MultiAttachmentDownloadController(http.Controller):
 
-    @http.route('/download/attachments_by_ids', type='http', auth="user")
-    def download_attachments_by_ids(self, ids=None):
-        if not ids:
-            return request.not_found()
+    @http.route('/multi_attachment/download_urls', type='json', auth='user')
+    def get_download_urls(self):
+        # Adjust this to suit your model and filtering logic
+        record_ids = request.params.get('record_ids', [])
+        model = request.params.get('model')
 
-        attachment_ids = [int(i) for i in ids.split(',') if i]
-        attachments = request.env['ir.attachment'].sudo().browse(attachment_ids)
+        if not model or not record_ids:
+            return []
 
-        zip_stream = io.BytesIO()
-        with zipfile.ZipFile(zip_stream, 'w') as zip_file:
-            for att in attachments:
-                if att.type == 'binary' and att.datas:
-                    zip_file.writestr(att.name or f'file_{att.id}', base64.b64decode(att.datas))
+        records = request.env[model].browse(record_ids)
 
-        zip_stream.seek(0)
-        return request.make_response(
-            zip_stream.read(),
-            headers=[
-                ('Content-Type', 'application/zip'),
-                ('Content-Disposition', 'attachment; filename="attachments.zip"')
-            ]
-        )
+        urls = []
+        for rec in records:
+            for attachment in rec.attachment_ids:
+                urls.append(f'/web/content/{attachment.id}?download=true')
+
+        return urls
