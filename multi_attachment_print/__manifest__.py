@@ -6,7 +6,7 @@
     "depends": ["base"],
     "assets": {
         "web.assets_backend": [
-            "multi_attachment_print/static/src/js/custom_attachment_download.js"
+            ("type", "module", "multi_attachment_print/static/src/js/custom_attachment_download.js")
         ]
     },
     "installable": True,
