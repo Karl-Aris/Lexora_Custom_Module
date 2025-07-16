@@ -5,11 +5,6 @@
     'category': 'Tools',
     'license': 'LGPL-3',
     'depends': ['base', 'web'],
-    'assets': {
-        'web.assets_backend': [
-            'multi_attachment_print/static/src/js/custom_attachment_download.js',
-        ],
-    },
     'installable': True,
     'application': False,
 }
