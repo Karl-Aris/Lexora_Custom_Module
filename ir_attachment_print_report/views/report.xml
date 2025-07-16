@@ -1,13 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <report
-    id="report_ir_attachment_pdf"
-    model="ir.attachment"
-    string="Print Attachments"
-    name="ir_attachment_print_report.report_attachment_template"
-    file="ir_attachment_print_report.report_attachment_template"
-    report_type="qweb-pdf"
-    print_report_name="'Attachment - %s' % (object.name)"
-    binding_model_id="ir.model_attachment"
-    binding_type="report"
-  />
+  <record id="report_ir_attachment_pdf" model="ir.actions.report">
+    <field name="name">Print Attachments</field>
+    <field name="model">ir.attachment</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">ir_attachment_print_report.report_attachment_template</field>
+    <field name="report_file">ir_attachment_print_report.report_attachment_template</field>
+    <field name="print_report_name">'Attachment - %s' % (object.name)</field>
+    <field name="binding_model_id" ref="base.model_ir_attachment"/>
+    <field name="binding_type">report</field>
+  </record>
 </odoo>
