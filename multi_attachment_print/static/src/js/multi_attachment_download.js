@@ -1,21 +1,12 @@
-/** @odoo-module **/
+/ @odoo-module /
 
-import { Component } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
 
-class MultiAttachmentDownload extends Component {
-    setup() {
-        this.rpc = useService("rpc");
-        this.notification = useService("notification");
-        this.downloadAttachments();
-    }
-
-    async downloadAttachments() {
+registry.category("client_actions").add("multi_attachment_download", {
+    async execute(env, action) {
         try {
-            const urls = await this.rpc("/multi_attachment/download_urls", {
-                model: this.props.model,
-                record_ids: this.props.resIds,
+            const urls = await env.services.rpc("/multi_attachment/download_urls", {
+                attachment_ids: action.context.attachment_ids,
             });
 
             for (const url of urls) {
@@ -28,13 +19,8 @@ class MultiAttachmentDownload extends Component {
                 document.body.removeChild(a);
             }
         } catch (error) {
-            this.notification.add("Download failed", { type: "danger" });
+            env.services.notification.add("Download failed", { type: "danger" });
             console.error("Download error", error);
         }
-    }
-
-    // no template needed
-    static template = null;
-}
-
-registry.category("action").add("multi_attachment_download", MultiAttachmentDownload);
+    },
+});
