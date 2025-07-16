@@ -2,7 +2,7 @@
 
 import { registry } from "@web/core/registry";
 
-registry.category("client_actions").add("multi_attachment_download", {
+registry.category("action").add("multi_attachment_download", {
     async execute(env, action) {
         try {
             const urls = await env.services.rpc("/multi_attachment/download_urls", {
