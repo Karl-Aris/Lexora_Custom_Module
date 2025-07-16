@@ -5,7 +5,7 @@
     'category': 'Tools',
     'license': 'LGPL-3',
     'depends': ['base', 'web'],
-    'data': ['assets.xml'],
+    'data': ["views/assets.xml"],
     'assets': {
         'web.assets_backend': [
             'multi_attachment_print/static/src/js/multi_attachment_download.js',
