@@ -1,22 +1,19 @@
-/** @odoo-module **/
+@http.route('/download/attachments_by_ids', type='http', auth="user")
+def download_attachments_by_ids(self, ids=None):
+    attachment_ids = [int(i) for i in ids.split(',') if i]
+    attachments = request.env['ir.attachment'].sudo().browse(attachment_ids)
 
-import { registry } from "@web/core/registry";
-import { ClientAction } from "@web/core/client_action/client_action";
+    zip_stream = io.BytesIO()
+    with zipfile.ZipFile(zip_stream, 'w') as zip_file:
+        for att in attachments:
+            if att.type == 'binary' and att.datas:
+                zip_file.writestr(att.name or 'file', base64.b64decode(att.datas))
 
-class MultiAttachmentDownload extends ClientAction {
-    setup() {
-        const ids = this.props.action.context.attachment_ids || [];
-
-        for (const id of ids) {
-            const url = `/web/content/${id}?download=true`;
-            window.open(url, '_blank');
-        }
-
-        // Close action after a short delay
-        setTimeout(() => {
-            this.props.closeAction();
-        }, 500);
-    }
-}
-
-registry.category("client_actions").add("multi_attachment_download", MultiAttachmentDownload);
+    zip_stream.seek(0)
+    return request.make_response(
+        zip_stream.read(),
+        headers=[
+            ('Content-Type', 'application/zip'),
+            ('Content-Disposition', 'attachment; filename="attachments.zip"')
+        ]
+    )
