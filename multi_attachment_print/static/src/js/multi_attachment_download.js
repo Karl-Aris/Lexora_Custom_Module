@@ -1,17 +1,36 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { download } from "@web/core/network/download";
+import { AbstractAction } from "@web/webclient/actions/abstract_action";
+import { useService } from "@web/core/utils/hooks";
 
-registry.category("client_actions").add("multi_attachment_download", {
-    async execute(env, action) {
-        const ids = action.context?.attachment_ids || [];
-        if (!ids.length) {
-            console.warn("No attachments to download.");
-            return;
+class MultiAttachmentDownload extends AbstractAction {
+    setup() {
+        super.setup();
+        this.rpc = useService("rpc");
+        this.notification = useService("notification");
+    }
+
+    async start() {
+        try {
+            // Example RPC to fetch attachment URLs
+            const attachments = await this.rpc("/your/custom/download/url", {});
+
+            for (const url of attachments) {
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } catch (err) {
+            this.notification.add("Failed to download attachments.", { type: "danger" });
+            console.error("multi_attachment_download error:", err);
         }
+    }
+}
 
-        const url = `/download/attachments_by_ids?ids=${ids.join(",")}`;
-        download({ url });
-    },
-});
+registry.action.add("multi_attachment_download", MultiAttachmentDownload);
+
+export default MultiAttachmentDownload;
