@@ -1,7 +1,11 @@
-from odoo import models
+# helpdesk_bcc_extension/models/mail_message.py
+from odoo import models, fields
 
 class MailMessage(models.Model):
     _inherit = 'mail.message'
+
+    recipient_cc_ids = fields.Many2many('res.partner', string='CC Recipients')
+
 
     def _notify(self, force_send=False, send_after_commit=True, user_signature=True):
         notifications = super()._notify(
