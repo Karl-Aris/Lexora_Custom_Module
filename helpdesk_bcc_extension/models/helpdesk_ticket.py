@@ -12,9 +12,10 @@ class HelpdeskTicket(models.Model):
     )
 
     def message_post(self, **kwargs):
-        bcc_emails = [p.email for p in self.bcc_partner_ids if p.email]
         bcc_partners = self.bcc_partner_ids
+        bcc_emails = [p.email for p in bcc_partners if p.email]
     
+        # Add BCC emails to actual outgoing email
         if kwargs.get('message_type') == 'email':
             email_values = kwargs.get('email_values', {})
             existing_bcc = email_values.get('bcc', '')
@@ -22,7 +23,9 @@ class HelpdeskTicket(models.Model):
             email_values['bcc'] = ','.join(combined_bcc)
             kwargs['email_values'] = email_values
     
-        # Inject bcc_partner_ids into message record
-        kwargs.setdefault('bcc_partner_ids', [(6, 0, bcc_partners.ids)])
+        # Add BCC partners to message record for chatter
+        if bcc_partners:
+            kwargs['bcc_partner_ids'] = [(6, 0, bcc_partners.ids)]
     
-        return super(HelpdeskTicket, self).message_post(**kwargs)
+        return super().message_post(**kwargs)
+
