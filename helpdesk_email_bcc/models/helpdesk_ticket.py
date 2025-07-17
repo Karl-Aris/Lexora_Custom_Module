@@ -13,12 +13,14 @@ class HelpdeskTicket(models.Model):
         message = super().message_post(**kwargs)
         for ticket in self:
             if ticket.bcc_partner_ids:
-                self.env['mail.compose.message'].with_context({
+                composer = self.env['mail.compose.message'].with_context({
                     'default_model': 'helpdesk.ticket',
-                    'default_res_ids': [ticket.id],  # ✅ FIXED: use plural
+                    'default_res_ids': [ticket.id],
                     'default_partner_ids': ticket.bcc_partner_ids.ids,
                 }).create({
                     'body': kwargs.get('body') or '',
                     'subject': kwargs.get('subject') or ticket.name,
-                }).send_mail()
+                })
+                composer.action_send_mail()
         return message
+
