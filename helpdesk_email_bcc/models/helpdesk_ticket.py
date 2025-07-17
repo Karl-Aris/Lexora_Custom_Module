@@ -11,17 +11,15 @@ class HelpdeskTicket(models.Model):
 
     def message_post(self, **kwargs):
         message = super().message_post(**kwargs)
+
         for ticket in self:
             if ticket.bcc_partner_ids:
-                bcc_emails = [p.email for p in ticket.bcc_partner_ids if p.email]
-                if bcc_emails and ticket.partner_id and ticket.partner_id.email:
-                    self.env['mail.mail'].create({
-                        'subject': kwargs.get('subject') or ticket.name,
-                        'body_html': kwargs.get('body') or '',
-                        'email_to': ticket.partner_id.email,
-                        'email_bcc': ','.join(bcc_emails),
-                        'model': self._name,
-                        'res_id': ticket.id,
-                        'auto_delete': True,
-                    }).send()
+                self.env['mail.compose.message'].with_context({
+                    'default_model': 'helpdesk.ticket',
+                    'default_res_id': ticket.id,
+                    'default_partner_ids': ticket.bcc_partner_ids.ids,
+                }).create({
+                    'body': kwargs.get('body') or '',
+                    'subject': kwargs.get('subject') or ticket.name,
+                }).send_mail()
         return message
