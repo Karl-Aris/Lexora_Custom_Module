@@ -1,12 +1,13 @@
 {
-    "name": "Helpdesk Email BCC",
-    "version": "1.2",
+    "name": "Helpdesk BCC Email",
+    "version": "1.0",
     "category": "Helpdesk",
-    "summary": "Add BCC Recipients to Helpdesk Tickets",
-    "description": "Allow users to select BCC partners on tickets using tags.",
-    "author": "Karl Areglado",
+    "summary": "Add BCC functionality to Helpdesk Tickets",
     "depends": ["helpdesk", "mail"],
-    "data": ["views/helpdesk_ticket_views.xml"],
+    "data": [
+        "views/helpdesk_ticket_view.xml"
+    ],
     "installable": True,
+    "application": False,
     "license": "OEEL-1"
 }
