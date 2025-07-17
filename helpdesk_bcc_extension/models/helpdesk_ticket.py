@@ -1,9 +1,15 @@
 from odoo import models, fields
 
 class HelpdeskTicket(models.Model):
-    _inherit = "helpdesk.ticket"
+    _inherit = 'helpdesk.ticket'
 
-    bcc_partner_id = fields.Many2one('res.partner', string="BCC Recipient")
+    bcc_partner_ids = fields.Many2many(
+        'res.partner',
+        'helpdesk_ticket_bcc_partner_rel',  # relation table name
+        'ticket_id',                        # column for helpdesk.ticket ID
+        'partner_id',                       # column for res.partner ID
+        string='BCC Partners'
+    )
 
     def custom_send_email_with_bcc(self, body, subject, to_partner_id):
         if not to_partner_id:
