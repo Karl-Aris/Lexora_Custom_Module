@@ -1,26 +1,24 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class HelpdeskTicket(models.Model):
-    _inherit = 'helpdesk.ticket'
+    _inherit = "helpdesk.ticket"
 
     bcc_partner_ids = fields.Many2many(
-        comodel_name="res.partner",
-        string="BCC Recipients",
-        help="Partners who will be BCC'd on outgoing messages."
-    )
+        'res.partner',
+        'helpdesk_ticket_bcc_rel',
+        'ticket_id', 'partner_id',
+        string='BCC Recipients')
 
-    def message_post(self, **kwargs):
-        message = super().message_post(**kwargs)
+    def action_send_bcc_email(self):
         for ticket in self:
-            if ticket.bcc_partner_ids:
-                composer = self.env['mail.compose.message'].with_context({
-                    'default_model': 'helpdesk.ticket',
-                    'default_res_ids': [ticket.id],
-                    'default_partner_ids': ticket.bcc_partner_ids.ids,
-                }).create({
-                    'body': kwargs.get('body') or '',
-                    'subject': kwargs.get('subject') or ticket.name,
-                })
-                composer.action_send_mail()
-        return message
-
+            bcc_emails = [p.email for p in ticket.bcc_partner_ids if p.email]
+            if bcc_emails:
+                self.env['mail.mail'].create({
+                    'subject': f"[Ticket {ticket.id}] {ticket.name}",
+                    'body_html': ticket.description or 'No content',
+                    'email_to': '',
+                    'email_bcc': ','.join(bcc_emails),
+                    'auto_delete': True,
+                    'model': self._name,
+                    'res_id': ticket.id,
+                }).send()
