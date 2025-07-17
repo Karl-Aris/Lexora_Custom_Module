@@ -3,7 +3,8 @@
     "summary": "Enable BCC in chatter messages for helpdesk",
     "version": "1.0",
     "depends": ["helpdesk", "mail"],
-    "author": "Your Company",
+    "data": ["views/helpdesk_ticket_views.xml"],
+    "author": "Karl Areglado",
     "category": "Tools",
     "installable": True,
     "application": False
