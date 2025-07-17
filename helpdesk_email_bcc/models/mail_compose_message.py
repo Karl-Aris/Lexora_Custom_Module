@@ -6,7 +6,7 @@ class MailComposeMessage(models.TransientModel):
     bcc_partner_ids = fields.Many2many(
         comodel_name='res.partner',
         relation='mail_compose_message_res_partner_rel',
-        column1='compose_id',  # instead of mail_compose_message_id
+        column1='mail_compose_message_id',  # ✅ correct FK to this model
         column2='partner_id',
         string='BCC Recipients'
     )
