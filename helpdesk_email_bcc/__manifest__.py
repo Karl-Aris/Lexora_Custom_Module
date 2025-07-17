@@ -8,5 +8,5 @@
     "depends": ["helpdesk", "mail"],
     "data": ["views/helpdesk_ticket_views.xml"],
     "installable": True,
-    "license": "OEEL-1"
+    "license": "OEEL-1",
 }
