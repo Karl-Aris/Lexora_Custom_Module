@@ -1,31 +1,24 @@
-from odoo import models, fields
+from odoo import models
 
 class HelpdeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
 
-    bcc_partner_ids = fields.Many2many(
-        'res.partner',
-        'helpdesk_ticket_bcc_partner_rel',
-        'ticket_id',
-        'partner_id',
-        string='BCC Partners'
-    )
-
     def message_post(self, **kwargs):
-        bcc_partners = self.bcc_partner_ids
-        bcc_emails = [p.email for p in bcc_partners if p.email]
-    
-        # Add BCC emails to actual outgoing email
-        if kwargs.get('message_type') == 'email':
-            email_values = kwargs.get('email_values', {})
-            existing_bcc = email_values.get('bcc', '')
-            combined_bcc = list(set(filter(None, existing_bcc.split(',') + bcc_emails)))
-            email_values['bcc'] = ','.join(combined_bcc)
-            kwargs['email_values'] = email_values
-    
-        # Add BCC partners to message record for chatter
-        if bcc_partners:
-            kwargs['bcc_partner_ids'] = [(6, 0, bcc_partners.ids)]
-    
-        return super().message_post(**kwargs)
+        bcc_partners = kwargs.pop('bcc_partner_ids', False)
 
+        # Post the normal message first
+        message = super().message_post(**kwargs)
+
+        if bcc_partners:
+            bcc_emails = self.env['res.partner'].browse(bcc_partners).mapped('email')
+            if bcc_emails:
+                mail_values = {
+                    'subject': kwargs.get('subject', f'Re: {self.display_name}'),
+                    'body_html': kwargs.get('body', ''),
+                    'email_from': self.env.user.email_formatted,
+                    'email_bcc': ','.join(bcc_emails),
+                    'auto_delete': True,
+                }
+                self.env['mail.mail'].create(mail_values).send()
+
+        return message
