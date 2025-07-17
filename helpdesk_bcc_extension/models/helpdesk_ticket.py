@@ -12,22 +12,17 @@ class HelpdeskTicket(models.Model):
     )
 
     def message_post(self, **kwargs):
-        # Get BCC emails
-        bcc_emails = [partner.email for partner in self.bcc_partner_ids if partner.email]
-
-        # Inject BCC into email values if message is meant to be emailed
+        bcc_emails = [p.email for p in self.bcc_partner_ids if p.email]
+        bcc_partners = self.bcc_partner_ids
+    
         if kwargs.get('message_type') == 'email':
             email_values = kwargs.get('email_values', {})
             existing_bcc = email_values.get('bcc', '')
-
-            # Combine existing and new BCCs (if any)
-            combined_bcc = existing_bcc.split(',') if existing_bcc else []
-            combined_bcc += bcc_emails
-            # Remove duplicates
-            combined_bcc = list(set([email.strip() for email in combined_bcc if email.strip()]))
-
-            # Update email_values with new BCC list
+            combined_bcc = list(set(filter(None, existing_bcc.split(',') + bcc_emails)))
             email_values['bcc'] = ','.join(combined_bcc)
             kwargs['email_values'] = email_values
-
+    
+        # Inject bcc_partner_ids into message record
+        kwargs.setdefault('bcc_partner_ids', [(6, 0, bcc_partners.ids)])
+    
         return super(HelpdeskTicket, self).message_post(**kwargs)
