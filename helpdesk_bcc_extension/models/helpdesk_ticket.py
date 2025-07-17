@@ -5,21 +5,22 @@ class HelpdeskTicket(models.Model):
 
     bcc_partner_ids = fields.Many2many(
         'res.partner',
-        'helpdesk_ticket_bcc_partner_rel',  # relation table name
-        'ticket_id',                        # column for helpdesk.ticket ID
-        'partner_id',                       # column for res.partner ID
+        'helpdesk_ticket_bcc_partner_rel',
+        'ticket_id',
+        'partner_id',
         string='BCC Partners'
     )
 
-    def custom_send_email_with_bcc(self, body, subject, to_partner_id):
-        if not to_partner_id:
-            return
-        bcc_email = self.bcc_partner_id.email if self.bcc_partner_id and self.bcc_partner_id.email else False
-        self.message_post(
-            body=body,
-            subject=subject,
-            partner_ids=[to_partner_id.id],
-            email_bcc=[bcc_email] if bcc_email else [],
-            message_type='email',
-            subtype_xmlid='mail.mt_comment',
-        )
+    def message_post(self, **kwargs):
+        if 'email_layout_xmlid' in kwargs or 'template_id' in kwargs:
+            # Extract email addresses from bcc_partner_ids
+            bcc_emails = [partner.email for partner in self.bcc_partner_ids if partner.email]
+
+            # Inject BCC in email context if not already passed
+            ctx = kwargs.get('mail_post_autofollow', True)
+            if bcc_emails:
+                # Force context and override email values
+                ctx = dict(self.env.context, bcc=bcc_emails)
+                self = self.with_context(ctx)
+
+        return super(HelpdeskTicket, self).message_post(**kwargs)
