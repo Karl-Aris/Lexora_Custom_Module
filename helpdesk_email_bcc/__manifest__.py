@@ -4,7 +4,7 @@
     "category": "Helpdesk",
     "summary": "Add BCC Recipients to Helpdesk Tickets",
     "description": "Allow users to select BCC partners on tickets using tags.",
-    "author": "Code Copilot",
+    "author": "Karl Areglado",
     "depends": ["helpdesk", "mail"],
     "data": ["views/helpdesk_ticket_views.xml"],
     "installable": True,
