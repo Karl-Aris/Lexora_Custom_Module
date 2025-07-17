@@ -2,11 +2,13 @@
     "name": "Helpdesk Body Search",
     "version": "1.0",
     "depends": ["helpdesk"],
-    "author": "Code Copilot",
+    "author": "Karl Areglado",
     "category": "Helpdesk",
     "description": "Enable helpdesk search bar to also search ticket body.",
-    "data": ["views/helpdesk_ticket_views.xml"],
+    "data": [
         "views/helpdesk_ticket_views.xml",
-        "views/helpdesk_ticket_chatter_view.xml",
+        "views/helpdesk_ticket_chatter_view.xml"
+    ],
+    "installable": True,
     "auto_install": False,
 }
