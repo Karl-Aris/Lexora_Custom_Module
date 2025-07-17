@@ -1,13 +1,10 @@
 {
-    "name": "Helpdesk BCC Email",
+    "name": "Helpdesk Email BCC",
     "version": "1.0",
-    "category": "Helpdesk",
-    "summary": "Add BCC functionality to Helpdesk Tickets",
     "depends": ["helpdesk", "mail"],
     "data": [
-        "views/helpdesk_ticket_view.xml"
+        "views/helpdesk_ticket_views.xml"
     ],
     "installable": True,
     "application": False,
-    "license": "OEEL-1"
 }
