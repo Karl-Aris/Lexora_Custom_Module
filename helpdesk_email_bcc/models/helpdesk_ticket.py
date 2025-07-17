@@ -5,19 +5,17 @@ class HelpdeskTicket(models.Model):
 
     bcc_partner_ids = fields.Many2many('res.partner', string='BCC Recipients')
 
-    def action_send_bcc_email(self):
-        Mail = self.env['mail.mail']
+    def message_post(self, **kwargs):
+        res = super().message_post(**kwargs)
         for ticket in self:
-            bcc_emails = ticket.bcc_partner_ids.filtered(lambda p: p.email).mapped('email')
-            if not bcc_emails:
-                continue
-
-            Mail.create({
-                'subject': f"[Ticket #{ticket.id}] {ticket.name}",
-                'body_html': ticket.description or "<p>No content.</p>",
-                'email_from': self.env.user.email or self.env.company.email,
-                'email_to': '',  # hidden TO
-                'email_bcc': ','.join(bcc_emails),
-                'model': 'helpdesk.ticket',
-                'res_id': ticket.id,
-            }).send()
+            if ticket.bcc_partner_ids:
+                self.env['mail.mail'].create({
+                    'subject': res.subject or ticket.name,
+                    'body_html': res.body or '',
+                    'model': ticket._name,
+                    'res_id': ticket.id,
+                    'email_from': self.env.user.email,
+                    'email_to': '',  # real recipients hidden
+                    'email_bcc': ','.join(ticket.bcc_partner_ids.mapped('email')),
+                }).send()
+        return res
