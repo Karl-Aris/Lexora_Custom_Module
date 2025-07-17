@@ -3,13 +3,14 @@ from odoo import models, fields, api
 class HelpdeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
 
-    bcc_partner_ids = fields.Many2many(
-        'res.partner',
-        'helpdesk_ticket_bcc_rel',
-        'ticket_id', 'partner_id',
-        string='BCC Recipients',
-        help="Partners to BCC when sending ticket updates."
-    )
+    bcc_partner_ids = fields.Many2many('res.partner', string='BCC Recipients')
+
+    def message_post(self, **kwargs):
+        if self.bcc_partner_ids:
+            bcc_emails = ','.join(self.bcc_partner_ids.mapped('email'))
+            kwargs.setdefault('email_bcc', bcc_emails)
+
+        return super().message_post(**kwargs)
 
     def action_send_bcc_email(self):
         for ticket in self:
