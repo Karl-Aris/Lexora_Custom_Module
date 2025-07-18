@@ -1,4 +1,6 @@
-from odoo import models, fields
+from odoo import models, fields, _
+from odoo.exceptions import ValidationError
+
 
 class MailComposeMessage(models.TransientModel):
     _inherit = 'mail.compose.message'
@@ -17,12 +19,12 @@ class MailComposeMessage(models.TransientModel):
         column2='partner_id',
         string='BCC'
     )
-    
+
     def action_send_mail(self):
         email_to = ','.join(self.partner_ids.mapped('email'))
         email_cc = ','.join(self.cc_partner_ids.mapped('email'))
         email_bcc = ','.join(self.bcc_partner_ids.mapped('email'))
-    
+
         _logger = self.env['ir.logging']
         _logger.create({
             'name': 'Mail Real BCC Debug',
@@ -34,7 +36,7 @@ class MailComposeMessage(models.TransientModel):
             'func': 'action_send_mail',
             'line': 0,
         })
-    
+
         mail_values = {
             'subject': self.subject or '(No Subject)',
             'body_html': self.body or '',
@@ -45,14 +47,31 @@ class MailComposeMessage(models.TransientModel):
             'email_from': self.env.user.email or 'noreply@example.com',
             'reply_to': self.env.user.email or 'noreply@example.com',
         }
-    
+
         res_model = self.model
-        res_id = self.env.context.get('default_res_id')
-        if res_model and res_id:
-            mail_values['res_model'] = res_model
-            mail_values['res_id'] = res_id
-    
+        res_id = self.res_id or self.env.context.get('default_res_id')
+
+        _logger.create({
+            'name': 'PreMessageCreate',
+            'type': 'server',
+            'level': 'info',
+            'dbname': self._cr.dbname,
+            'message': f"[SEND TRIGGER] model={res_model}, id={res_id}",
+            'path': __name__,
+            'func': 'action_send_mail',
+            'line': 0,
+        })
+
+        if not res_model or not res_id:
+            raise ValidationError(_("Cannot send email: no linked record."))
+
+        mail_values.update({
+            'res_model': res_model,
+            'res_id': res_id,
+        })
+
         mail = self.env['mail.mail'].sudo().create(mail_values)
+
         _logger.create({
             'name': 'Mail Created',
             'type': 'server',
@@ -63,6 +82,6 @@ class MailComposeMessage(models.TransientModel):
             'func': 'action_send_mail',
             'line': 0,
         })
-    
+
         mail.send()
         return {'type': 'ir.actions.act_window_close'}
