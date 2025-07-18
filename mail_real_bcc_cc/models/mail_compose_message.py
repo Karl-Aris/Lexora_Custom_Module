@@ -19,13 +19,14 @@ class MailComposeMessage(models.TransientModel):
     )
 
     def action_send_mail(self):
-        Mail = self.env['mail.mail']
-        Mail.create({
+        self.env['mail.mail'].create({
             'subject': self.subject or '(No Subject)',
             'body_html': self.body or '',
             'email_to': ','.join(self.partner_ids.mapped('email')),
             'email_cc': ','.join(self.cc_partner_ids.mapped('email')),
             'email_bcc': ','.join(self.bcc_partner_ids.mapped('email')),
             'auto_delete': True,
+            'res_model': self.model,
+            'res_id': self.res_id,
         }).send()
         return {'type': 'ir.actions.act_window_close'}
