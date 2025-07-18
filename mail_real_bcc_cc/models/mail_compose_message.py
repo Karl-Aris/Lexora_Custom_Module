@@ -4,13 +4,17 @@ class MailComposeMessage(models.TransientModel):
     _inherit = 'mail.compose.message'
 
     cc_partner_ids = fields.Many2many(
-        'res.partner',
+        comodel_name='res.partner',
         relation='mail_compose_cc_partner_rel',
+        column1='compose_id',
+        column2='partner_id',
         string='CC'
     )
     bcc_partner_ids = fields.Many2many(
-        'res.partner',
+        comodel_name='res.partner',
         relation='mail_compose_bcc_partner_rel',
+        column1='compose_id',
+        column2='partner_id',
         string='BCC'
     )
 
