@@ -3,8 +3,20 @@ from odoo import models, fields, api
 class MailComposeMessage(models.TransientModel):
     _inherit = 'mail.compose.message'
 
-    cc_partner_ids = fields.Many2many('res.partner', string='CC')
-    bcc_partner_ids = fields.Many2many('res.partner', string='BCC')
+        cc_partner_ids = fields.Many2many(
+        comodel_name='res.partner',
+        relation='mail_compose_cc_partner_rel',
+        column1='compose_id',
+        column2='partner_id',
+        string='CC'
+        )
+        bcc_partner_ids = fields.Many2many(
+            comodel_name='res.partner',
+            relation='mail_compose_bcc_partner_rel',  # ✅ different relation name!
+            column1='compose_id',
+            column2='partner_id',
+            string='BCC'
+        )
 
     def action_send_mail(self):
         res = super().action_send_mail()
