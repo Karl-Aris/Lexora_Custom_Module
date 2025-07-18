@@ -34,9 +34,11 @@ class MailComposeMessage(models.TransientModel):
             'reply_to': self.env.user.email or 'noreply@example.com',
         }
 
-        if self.model and self.res_id:
-            mail_values['res_model'] = self.model
-            mail_values['res_id'] = self.res_id
+        res_model = self.model
+        res_id = self.env.context.get('default_res_id')
+        if res_model and res_id:
+            mail_values['res_model'] = res_model
+            mail_values['res_id'] = res_id
 
         self.env['mail.mail'].sudo().create(mail_values).send()
         return {'type': 'ir.actions.act_window_close'}
