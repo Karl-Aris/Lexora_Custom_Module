@@ -50,7 +50,7 @@ class MailComposeMessage(models.TransientModel):
 
         res_model = self.model
         res_id = self.env.context.get('default_res_id')
-        
+
         _logger.create({
             'name': 'PreMessageCreate',
             'type': 'server',
@@ -61,15 +61,12 @@ class MailComposeMessage(models.TransientModel):
             'func': 'action_send_mail',
             'line': 0,
         })
-        
-        if not res_model or not res_id:
-            raise ValidationError(_("Cannot send email: no linked record."))
 
-
-        mail_values.update({
-            'res_model': res_model,
-            'res_id': res_id,
-        })
+        if res_model and res_id:
+            mail_values.update({
+                'res_model': res_model,
+                'res_id': res_id,
+            })
 
         mail = self.env['mail.mail'].sudo().create(mail_values)
 
