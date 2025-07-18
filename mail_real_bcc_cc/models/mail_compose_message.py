@@ -1,5 +1,5 @@
 from odoo import models, fields, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 
 
 class MailComposeMessage(models.TransientModel):
@@ -25,42 +25,27 @@ class MailComposeMessage(models.TransientModel):
         email_cc = ','.join(self.cc_partner_ids.mapped('email'))
         email_bcc = ','.join(self.bcc_partner_ids.mapped('email'))
 
-        _logger = self.env['ir.logging']
-        _logger.create({
-            'name': 'Mail Real BCC Debug',
-            'type': 'server',
-            'level': 'info',
-            'dbname': self._cr.dbname,
-            'message': f"[BCC PATCH] To: {email_to} CC: {email_cc} BCC: {email_bcc}",
-            'path': __name__,
-            'func': 'action_send_mail',
-            'line': 0,
-        })
+        if not any([email_to, email_cc, email_bcc]):
+            raise UserError("Please specify at least one recipient.")
+
+        subject = self.subject or '(No Subject)'
+        body_html = self.body or ''
+        email_from = self.env.user.email or 'noreply@example.com'
+        reply_to = self.env.user.email or 'noreply@example.com'
 
         mail_values = {
-            'subject': self.subject or '(No Subject)',
-            'body_html': self.body or '',
+            'subject': subject,
+            'body_html': body_html,
             'email_to': email_to,
             'email_cc': email_cc,
             'email_bcc': email_bcc,
             'auto_delete': True,
-            'email_from': self.env.user.email or 'noreply@example.com',
-            'reply_to': self.env.user.email or 'noreply@example.com',
+            'email_from': email_from,
+            'reply_to': reply_to,
         }
 
         res_model = self.model
         res_id = self.env.context.get('default_res_id')
-
-        _logger.create({
-            'name': 'PreMessageCreate',
-            'type': 'server',
-            'level': 'info',
-            'dbname': self._cr.dbname,
-            'message': f"[SEND TRIGGER] model={res_model}, id={res_id}",
-            'path': __name__,
-            'func': 'action_send_mail',
-            'line': 0,
-        })
 
         if res_model and res_id:
             mail_values.update({
@@ -70,16 +55,8 @@ class MailComposeMessage(models.TransientModel):
 
         mail = self.env['mail.mail'].sudo().create(mail_values)
 
-        _logger.create({
-            'name': 'Mail Created',
-            'type': 'server',
-            'level': 'info',
-            'dbname': self._cr.dbname,
-            'message': f"[MAIL CREATED] ID: {mail.id} Subject: {mail.subject}",
-            'path': __name__,
-            'func': 'action_send_mail',
-            'line': 0,
-        })
+        if not mail:
+            raise UserError("Mail creation failed — check logs and values.")
 
         mail.send()
         return {'type': 'ir.actions.act_window_close'}
