@@ -19,19 +19,13 @@ class MailComposeMessage(models.TransientModel):
     )
 
     def action_send_mail(self):
-        res = super().action_send_mail()
-        if not self.env.context.get('mail_mail_created_ids'):
-            return res
-
-        mails = self.env['mail.mail'].browse(self.env.context.get('mail_mail_created_ids'))
-        for mail in mails:
-            if self.cc_partner_ids:
-                mail.email_cc = ','.join(self.cc_partner_ids.mapped('email'))
-            if self.bcc_partner_ids:
-                bcc_emails = self.bcc_partner_ids.mapped('email')
-                mail.email_bcc = ','.join(bcc_emails)
-                if mail.email_to:
-                    mail.email_to = ','.join(
-                        e for e in mail.email_to.split(',') if e.strip() not in bcc_emails
-                    )
-        return res
+        Mail = self.env['mail.mail']
+        Mail.create({
+            'subject': self.subject or '(No Subject)',
+            'body_html': self.body or '',
+            'email_to': ','.join(self.partner_ids.mapped('email')),
+            'email_cc': ','.join(self.cc_partner_ids.mapped('email')),
+            'email_bcc': ','.join(self.bcc_partner_ids.mapped('email')),
+            'auto_delete': True,
+        }).send()
+        return {'type': 'ir.actions.act_window_close'}
