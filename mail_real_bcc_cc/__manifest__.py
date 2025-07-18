@@ -1,7 +1,7 @@
 {
     "name": "Real CC/BCC in Mail Composer",
-    "version": "15.0.1.0.0",
-    "summary": "Restore proper CC and BCC email headers, bypassing OCA social",
+    "version": "17.0.1.0.0",
+    "summary": "Proper CC and BCC email header support for Odoo 17, bypassing OCA/social",
     "author": "Karl Areglado",
     "license": "AGPL-3",
     "depends": ["mail"],
