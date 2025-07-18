@@ -19,14 +19,25 @@ class MailComposeMessage(models.TransientModel):
     )
 
     def action_send_mail(self):
-        self.env['mail.mail'].create({
+        email_to = ','.join(self.partner_ids.mapped('email'))
+        email_cc = ','.join(self.cc_partner_ids.mapped('email'))
+        email_bcc = ','.join(self.bcc_partner_ids.mapped('email'))
+    
+        mail_values = {
             'subject': self.subject or '(No Subject)',
             'body_html': self.body or '',
-            'email_to': ','.join(self.partner_ids.mapped('email')),
-            'email_cc': ','.join(self.cc_partner_ids.mapped('email')),
-            'email_bcc': ','.join(self.bcc_partner_ids.mapped('email')),
+            'email_to': email_to,
+            'email_cc': email_cc,
+            'email_bcc': email_bcc,
             'auto_delete': True,
-            'res_model': self.model,
-            'res_id': self.res_id,
-        }).send()
+            'email_from': self.env.user.email or 'noreply@example.com',
+        }
+    
+        if self.model and self.res_id:
+            mail_values['res_model'] = self.model
+            mail_values['res_id'] = self.res_id
+    
+        self.env['mail.mail'].create(mail_values).send()
+    
         return {'type': 'ir.actions.act_window_close'}
+
