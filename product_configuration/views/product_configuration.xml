@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <record id="product_sku_page_view">
+  <record id="product_sku_page_view" model="ir.ui.view">
     <field name="name">product.sku.page</field>
     <field name="type">qweb</field>
     <field name="website_id" eval="False"/>
