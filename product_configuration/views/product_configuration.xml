@@ -2,6 +2,7 @@
   <record id="product_sku_page" model="ir.ui.view">
     <field name="name">product_sku_page</field>
     <field name="type">qweb</field>
+    <field name="website_id" eval="False"/>
     <field name="arch" type="xml">
       <template id="product_sku_page">
         <t t-call="website.layout">
