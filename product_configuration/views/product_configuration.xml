@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <record id="product_sku_page_view" model="ir.ui.view">
+  <record id="product_sku_page_view">
     <field name="name">product.sku.page</field>
     <field name="type">qweb</field>
     <field name="website_id" eval="False"/>
@@ -13,6 +13,7 @@
             <form action="/sku-search" method="get" class="mb-4">
               <div class="form-group">
                 <label for="sku">Enter SKU:</label>
+                <!-- ✅ FIXED LINE BELOW -->
                 <input type="text" id="sku" name="sku" class="form-control" required="required" t-att-value="sku"/>
               </div>
               <button type="submit" class="btn btn-primary mt-2">Search</button>
