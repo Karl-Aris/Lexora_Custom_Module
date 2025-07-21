@@ -1,18 +1,13 @@
-from odoo import models
-import logging
-_logger = logging.getLogger(__name__)
+from odoo import models, fields
 
 class MailMail(models.Model):
     _inherit = 'mail.mail'
 
-    def _build_email(self, mail_values):
-        msg = super()._build_email(mail_values)
-        if self.email_bcc:
-            bcc_list = [e.strip() for e in self.email_bcc.split(',') if e.strip()]
-            # Add a real Bcc header
-            existing = msg.get_all('Bcc', [])
-            for bcc in bcc_list:
-                if bcc not in existing:
-                    msg['Bcc'] = ', '.join(existing + bcc_list)
-            _logger.info("Injected real BCC header: %s", msg['Bcc'])
-        return msg
+    custom_bcc = fields.Char(string='Custom BCC')
+
+    def _send_prepare_values(self, mail_values=None):
+        values = super()._send_prepare_values(mail_values)
+        if self.custom_bcc:
+            bcc_list = [email.strip() for email in self.custom_bcc.split(',') if email.strip()]
+            values['bcc'] = bcc_list
+        return values
