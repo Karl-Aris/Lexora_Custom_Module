@@ -9,6 +9,7 @@
         "views/helpdesk_ticket_views.xml",
         "views/helpdesk_ticket_action.xml",
         "views/helpdesk_sale_link_actions.xml",
+        "actions.xml",
     ],
     "installable": True,
     "application": False,
