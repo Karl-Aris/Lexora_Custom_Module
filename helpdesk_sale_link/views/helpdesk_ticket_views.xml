@@ -6,16 +6,16 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet" position="inside">
                 <group>
-                    <field name="x_matched_sale_order_ids" widget="many2many_tags" options="{'no_create': True}" />
+                    <field name="x_matched_sale_order_ids" widget="many2many_tags" options="{'no_create': True}"/>
                 </group>
             </xpath>
             <xpath expr="//form/header" position="inside">
-                <button name="%(action_helpdesk_matched_sale_orders)d"
+                <button name="%(helpdesk_sale_link.action_helpdesk_matched_sale_orders)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-shopping-cart"
                         attrs="{'invisible': [('x_matched_sale_order_ids', '=', False)]}">
-                    <field name="x_x_matched_sale_order_ids_helpdesk_ticket_count" widget="statinfo" />
+                    <field name="x_x_matched_sale_order_ids_helpdesk_ticket_count" widget="statinfo"/>
                     <span>Matched SO</span>
                 </button>
             </xpath>
