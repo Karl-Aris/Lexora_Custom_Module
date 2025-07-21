@@ -5,8 +5,9 @@
     'author': 'ChatGPT',
     'category': 'Custom',
     'data': [
-        'views/sale_order_views.xml',
-        'views/helpdesk_ticket_views.xml',
+    'views/sale_order_views.xml',
+    'views/helpdesk_ticket_views.xml',
+    'views/helpdesk_ticket_action.xml',
     ],
     'installable': True,
     'application': False,
