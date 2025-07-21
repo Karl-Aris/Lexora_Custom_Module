@@ -5,7 +5,9 @@
     "category": "Mail",
     "depends": ["mail_composer_cc_bcc", "mail"],
     "data": [
+        "views/mail_compose_message_view.xml",
         "views/mail_mail_views.xml",
+        
     ],
     "installable": True
 }
