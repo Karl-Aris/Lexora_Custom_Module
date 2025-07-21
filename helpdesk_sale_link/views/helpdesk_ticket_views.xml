@@ -1,0 +1,14 @@
+<odoo>
+    <record id="view_helpdesk_ticket_form_inherit_sale_orders" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit.sale.orders</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet//div[@name='button_box']" position="inside">
+                <button name="%(helpdesk_sale_link.action_view_matched_sale_orders)d" type="action" class="oe_stat_button" icon="fa-briefcase">
+                    <field name="x_matched_sale_order_count" widget="statinfo" string="Matched SO"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
