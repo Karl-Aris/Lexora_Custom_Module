@@ -1,7 +1,7 @@
 {
     'name': 'Product Config',
     'version': '1.0',
-    'depends': ['website_sales'],
+    'depends': ['website_sale'],
     'author': 'Aljon Garde',
     'category': 'Website',
     'description': 'Automatically hides or shows products on the website based on stock availability.',
