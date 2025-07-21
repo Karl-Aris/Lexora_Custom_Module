@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="product_sku_page_view" model="ir.ui.view">
+    <field name="name">product.sku.page</field>
+    <field name="type">qweb</field>
+    <field name="arch" type="xml">
+      <template id="product_sku_page" name="Product by SKU" page="True">
+        <t t-call="website.layout">
+          <div class="container my-5">
+            <h2>Search Result for SKU: <t t-esc="sku"/></h2>
+            <t t-if="product">
+              <p><strong>Name:</strong> <t t-esc="product.name"/></p>
+              <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
+            </t>
+            <t t-else="">
+              <p>No product found for SKU "<t t-esc="sku"/>".</p>
+            </t>
+          </div>
+        </t>
+      </template>
+    </field>
+  </record>
+</odoo>
