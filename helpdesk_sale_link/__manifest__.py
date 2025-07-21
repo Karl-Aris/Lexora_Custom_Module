@@ -7,7 +7,7 @@
     "description": "Link Sale Orders to Helpdesk Tickets with smart button",
     "data": [
         "views/actions.xml",
-        "views/helpdesk_sale_link_actions.xml"
+        "views/helpdesk_sale_link_actions.xml",
         "views/helpdesk_ticket_action.xml",
         "views/helpdesk_ticket_views.xml",
     ],
