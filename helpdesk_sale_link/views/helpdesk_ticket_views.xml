@@ -10,11 +10,12 @@
                 </group>
             </xpath>
             <xpath expr="//form/header" position="inside">
-                <button name="%(helpdesk_sale_link.action_helpdesk_matched_sale_orders)d"
-                        type="action"
-                        class="oe_stat_button"
-                        icon="fa-shopping-cart"
-                        attrs="{'invisible': [('x_matched_sale_order_ids', '=', False)]}">
+                <button
+                    name="%(helpdesk_sale_link.action_helpdesk_matched_sale_orders)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="fa-shopping-cart"
+                    >
                     <field name="x_x_matched_sale_order_ids_helpdesk_ticket_count" widget="statinfo"/>
                     <span>Matched SO</span>
                 </button>
