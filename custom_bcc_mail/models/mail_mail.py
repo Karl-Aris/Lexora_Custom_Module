@@ -8,19 +8,21 @@ class MailMail(models.Model):
             if mail.state not in ('outgoing', 'exception'):
                 continue
 
-            # Prepare base email payload
+            attachments = []
+            for attach in mail.attachment_ids:
+                attachments.append((attach.name, attach.raw or attach.datas))
+
             email_values = {
                 'email_to': mail.email_to,
                 'email_cc': mail.email_cc,
+                'email_bcc': mail.email_bcc,  # BCC injection here
                 'subject': mail.subject,
                 'body': mail.body,
-                'email_bcc': mail.email_bcc,  # inject BCC directly
                 'reply_to': mail.reply_to,
-                'headers': mail.headers,
-                'attachments': [(a['filename'], a['content']) for a in mail.attachment_ids._get_mail_attachments()],
+                'headers': mail.headers or {},
+                'attachments': attachments,
             }
 
-            # Send using preferred mail server
             mail.mail_server_id.send_email(
                 message=mail,
                 email_values=email_values,
@@ -30,4 +32,5 @@ class MailMail(models.Model):
             )
 
             mail.state = 'sent'
+
         return True
