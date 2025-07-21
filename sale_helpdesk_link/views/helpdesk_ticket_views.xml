@@ -1,0 +1,13 @@
+<odoo>
+    <record id="helpdesk_ticket_search_view_inherit" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.search.inherit</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="matched_sale_order_id" string="Matched SO"
+                        domain="[('x_matched_sale_order_ids','=',active_id)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
