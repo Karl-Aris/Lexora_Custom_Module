@@ -1,0 +1,17 @@
+<odoo>
+    <data noupdate="0"> <!-- change to 0 so it updates even if module is reinstalled -->
+
+        <record id="ir_cron_check_stock_and_toggle_published" model="ir.cron">
+            <field name="name">Auto Unpublish/Publish Products Based on Stock</field>
+            <field name="model_id" ref="model_product_template"/>
+            <field name="state">code</field>
+            <field name="code">model.check_and_toggle_published()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field> <!-- run indefinitely -->
+            <field name="doall">False</field>
+            <field name="active">True</field>
+        </record>
+
+    </data>
+</odoo>
