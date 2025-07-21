@@ -1,3 +1,5 @@
+# mail_mail_bcc_fix/models/mail_mail.py
+
 from odoo import models
 
 class MailMail(models.Model):
