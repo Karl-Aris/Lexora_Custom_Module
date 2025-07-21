@@ -8,13 +8,19 @@ class MailMail(models.Model):
             if mail.state not in ('outgoing', 'exception'):
                 continue
 
-            email_values = mail._send_prepare_values()
+            # Prepare base email payload
+            email_values = {
+                'email_to': mail.email_to,
+                'email_cc': mail.email_cc,
+                'subject': mail.subject,
+                'body': mail.body,
+                'email_bcc': mail.email_bcc,  # inject BCC directly
+                'reply_to': mail.reply_to,
+                'headers': mail.headers,
+                'attachments': [(a['filename'], a['content']) for a in mail.attachment_ids._get_mail_attachments()],
+            }
 
-            # Inject BCC directly into outgoing payload
-            if mail.email_bcc:
-                email_values['email_bcc'] = mail.email_bcc
-
-            # Use Odoo mail server
+            # Send using preferred mail server
             mail.mail_server_id.send_email(
                 message=mail,
                 email_values=email_values,
