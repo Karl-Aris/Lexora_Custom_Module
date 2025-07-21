@@ -1,13 +1,11 @@
 {
-    "name": "Custom BCC on Mail Compose",
+    "name": "Custom BCC Mail v2",
     "version": "1.0",
     "depends": ["mail"],
-    "author": "Code Copilot",
+    "author": "Karl Areglado",
     "category": "Tools",
-    "description": "Adds a custom BCC field in mail.compose.message and applies it to outgoing mails.",
-    "data": [
-        "views/mail_compose_message_view.xml"
-    ],
+    "description": "Add BCC field to mail.compose.message",
+    "data": ["views/mail_compose_message_view.xml"],
     "installable": True,
-    "application": False
+    "auto_install": False
 }
