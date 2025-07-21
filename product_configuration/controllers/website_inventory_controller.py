@@ -3,7 +3,7 @@ from odoo.http import request
 
 class WebsiteInventoryController(http.Controller):
 
-    @http.route(['/sku-search'], type='http', auth='public', website=True)
+    @http.route(['/store'], type='http', auth='public', website=True)
     def search_by_sku(self, sku=None, **kwargs):
         product = None
         if sku:
