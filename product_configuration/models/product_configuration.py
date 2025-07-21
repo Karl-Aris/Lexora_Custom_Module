@@ -9,7 +9,7 @@ class WebsiteInventoryController(http.Controller):
         if sku:
             product = request.env['product.product'].sudo().search([('default_code', '=', sku)], limit=1)
 
-        return request.render('website_inventory_sku_search.product_sku_page', {
+        return request.render('product_configuration.product_sku_page', {
             'product': product,
             'sku': sku,
         })
