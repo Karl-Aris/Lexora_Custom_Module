@@ -5,9 +5,8 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet//div[@name='button_box']" position="inside">
-                <button name="%(helpdesk.helpdesk_ticket_action)d"
+                <button name="%(sale_helpdesk_link.action_helpdesk_ticket_by_sale_order)d"
                         type="action"
-                        context="{'search_default_matched_sale_order_id': active_id}"
                         class="oe_stat_button"
                         icon="fa-ticket">
                     <field name="x_x_matched_sale_order_ids_helpdesk_ticket_count" widget="statinfo"/>
