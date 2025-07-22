@@ -74,7 +74,7 @@ class MailMail(models.Model):
                     continue
                 new_msg = m.copy()
                 new_msg.update({
-                    "email_to": bcc_email,
+                    "email_to": tools.email_normalize(str(bcc_email)),
                     "email_cc": "",  # Ensure no CC in BCC email
                     "body": (
                         "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
