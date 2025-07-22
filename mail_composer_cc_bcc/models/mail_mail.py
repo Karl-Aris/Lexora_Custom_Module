@@ -35,14 +35,12 @@ class MailMail(models.Model):
         for msg in res:
             extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
             msg_to_emails = extract_result[0] if extract_result else []
-
             if not msg_to_emails:
                 continue
 
             recipient_email = tools.email_normalize(msg_to_emails[0])
-
-            if recipient_email in bcc_emails:
-                continue  # skip original BCC delivery
+            if recipient_email in bcc_emails or recipient_email in seen_recipients:
+                continue  # Skip BCCs and duplicates
 
             msg.update({
                 "email_to": email_to,
@@ -50,11 +48,9 @@ class MailMail(models.Model):
                 "email_bcc": False,
             })
             final_msgs.append(msg)
-
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
 
-        # Add one email for BCCs with the BCC note
         for bcc_email in bcc_emails:
             if bcc_email in seen_recipients:
                 continue
