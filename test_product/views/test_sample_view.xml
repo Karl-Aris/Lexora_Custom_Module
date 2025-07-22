@@ -12,11 +12,12 @@
           <div class="row mt-4">
             <!-- Left: Image -->
             <div class="col-md-6 text-center">
-              <t t-if="image_1920">
-                <img t-att-src="'data:image/png;base64,%s' % image_1920" 
+              <t t-if="product.image_1920">
+                <img t-att-src="'data:image/png;base64,%s' % product.image_1920" 
                      class="img-fluid rounded shadow-sm"
                      alt="Product Image"
                      style="max-height: 300px;"/>
+                     <t t-esc="product.image_1920"/>
               </t>
               <t t-else="">
                 <div class="alert alert-secondary" role="alert">
