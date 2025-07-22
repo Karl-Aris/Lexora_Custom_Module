@@ -1,5 +1,5 @@
 <odoo>
-  <template id="custom_page_templaye" name="Custom Page">
+  <template id="custom_page_template" name="Custom Page">
     <t t-call="website.layout">
       <div class="container my-5">
         <div class="row">
