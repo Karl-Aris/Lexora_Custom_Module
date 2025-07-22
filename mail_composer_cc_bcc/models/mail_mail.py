@@ -62,6 +62,15 @@ class MailMail(models.Model):
                 if rcpt_to in email_bcc:
                     m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
 
+            # Prepend visible message to body
+                    bcc_notice_html = "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
+                    bcc_notice_text = "🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.\n\n"
+                
+                    if m.get("body_html"):
+                        m["body_html"] = bcc_notice_html + m["body_html"]
+                    if m.get("body"):
+                        m["body"] = bcc_notice_text + m["body"]
+
             # in the absence of self.email_to, Odoo creates one special mail for CC
             # see https://github.com/odoo/odoo/commit/46bad8f0
             elif m["email_cc"]:
