@@ -10,7 +10,7 @@ def format_emails(partners):
 
 
 def format_emails_raw(partners):
-    return ", ".join([p.email for p in partners if p.email])
+    return ", ".join([tools.email_normalize(p.email) for p in partners if p.email])
 
 
 class MailMail(models.Model):
@@ -29,32 +29,28 @@ class MailMail(models.Model):
         if is_out_of_scope or not is_from_composer:
             return res
 
-        # Prepare TO/CC headers
-        partner_to_ids = [
-            r.id for r in self.recipient_ids
-            if r.id not in self.recipient_cc_ids.ids and r.id not in self.recipient_bcc_ids.ids
-        ]
-        partner_to = self.env["res.partner"].browse(partner_to_ids)
-        email_to = format_emails(partner_to)
-        email_to_raw = format_emails_raw(partner_to)
-        email_cc = format_emails(self.recipient_cc_ids)
-        bcc_emails = [p.email for p in self.recipient_bcc_ids if p.email]
+        # Identify recipients
+        to_partners = self.recipient_ids - self.recipient_cc_ids - self.recipient_bcc_ids
+        cc_partners = self.recipient_cc_ids
+        bcc_partners = self.recipient_bcc_ids
+
+        email_to = format_emails(to_partners)
+        email_to_raw = format_emails_raw(to_partners)
+        email_cc = format_emails(cc_partners)
+        bcc_emails = [tools.email_normalize(p.email) for p in bcc_partners if p.email]
 
         normal_recipients = set()
-        base_msg = None
         new_res = []
 
         for m in res:
             recipient_email = None
-            to_addr = m.get("email_to", "")
-            cc_addr = m.get("email_cc", "")
-
-            to_addrs = extract_rfc2822_addresses(to_addr or "")
-            cc_addrs = extract_rfc2822_addresses(cc_addr or "")
-            recipient_email = (to_addrs + cc_addrs)[0] if (to_addrs + cc_addrs) else None
+            if m.get("email_to"):
+                recipient_email = extract_rfc2822_addresses(m["email_to"])[0]
+            elif m.get("email_cc"):
+                recipient_email = extract_rfc2822_addresses(m["email_cc"])[0]
 
             if recipient_email in bcc_emails:
-                continue
+                continue  # Skip; handled separately
 
             if recipient_email:
                 normal_recipients.add(recipient_email)
@@ -64,39 +60,35 @@ class MailMail(models.Model):
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
             })
-            base_msg = m
             new_res.append(m)
 
-        # Generate separate emails for each BCC recipient
+        # Create separate messages for each BCC email
         for bcc_email in bcc_emails:
-            if not bcc_email:
-                continue
-            new_msg = base_msg.copy()
-            new_msg.update({
-                "email_to": tools.email_normalize(str(bcc_email)),
-                "email_cc": "",
-                "body": (
-                    "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
-                    + base_msg.get("body", "")
-                ),
-            })
-            new_res.append(new_msg)
+            for m in new_res:
+                new_msg = m.copy()
+                new_msg.update({
+                    "email_to": bcc_email,
+                    "email_cc": "",  # BCC gets no CC
+                    "body": (
+                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
+                        + m.get("body", "")
+                    ),
+                })
+                new_res.append(new_msg)
 
+        # Merge recipient list
         self.env.context = {
             **self.env.context,
             "recipients": list(normal_recipients | set(bcc_emails))
         }
 
-        # Deduplicate based on unique TO+CC combo (not just TO)
-        unique_keys = set()
+        # Deduplicate based on `email_to`
         final_res = []
-
+        seen_recipients = set()
         for m in new_res:
-            to = m.get("email_to") or ""
-            cc = m.get("email_cc") or ""
-            key = f"{to}|{cc}"
-            if key not in unique_keys:
-                unique_keys.add(key)
+            email = m.get("email_to")
+            if email and email not in seen_recipients:
+                seen_recipients.add(email)
                 final_res.append(m)
 
         return final_res
