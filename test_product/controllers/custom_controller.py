@@ -15,7 +15,7 @@ class WebsiteCustomController(http.Controller):
     def search_by_sku(self, sku=None, **kwargs):
         product = None
         if sku:
-            product = request.env['product.template'].sudo().search([('default_code', '=', sku)], limit=1)
+            product = request.env['product.product'].sudo().search([('default_code', '=', sku)], limit=1)
 
         return request.render('test_product.custom_page_template', {
             'product': product,
