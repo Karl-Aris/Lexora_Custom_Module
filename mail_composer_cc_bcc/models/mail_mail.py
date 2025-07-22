@@ -54,15 +54,17 @@ class MailMail(models.Model):
                 # Insert X-Odoo-Bcc and visible warning in the body
                 if rcpt_to in email_bcc:
                     m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
-
-                    # Insert visible warning in the email body
+                
                     warning_html = (
                         '<div style="color:red; font-weight:bold; margin-bottom:10px;">'
                         '🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.'
                         '</div>'
                     )
                     if "body" in m and m["body"]:
-                        m["body"] = warning_html + m["body"]
+                        if warning_html not in m["body"]:
+                            m["body"] = warning_html + m["body"]
+                            m["body_html"] = m["body"]  # ensure body_html is also updated
+
 
             elif m.get("email_cc"):
                 rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
