@@ -45,17 +45,9 @@ class MailMail(models.Model):
         recipients = set()
         for m in res:
             rcpt_to = None
-            if m.get("email_to"):
-                rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
-                if rcpt_to in email_bcc:
-                    m["headers"].update(m["email_bcc"][0])
-                    
-            elif m.get("email_cc"):
-                rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
-    
-            if rcpt_to:
-                recipients.add(rcpt_to)
-    
+            if rcpt_to in email_bcc:
+                m["headers"].update(m["email_bcc"][0])
+                     
             m.update(
                 {
                     "email_to": email_to,
