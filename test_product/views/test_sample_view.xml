@@ -4,7 +4,7 @@
     <t t-call="website.layout">
         <div class="container">
             <h1>Sample page</h1>
-            <a class="btn btn-primary" href="/store">Click me</a>
+            <a class="btn btn-primary" href="/custom_test/button">Click me</a>
         </div>
     </t>
 </template>
