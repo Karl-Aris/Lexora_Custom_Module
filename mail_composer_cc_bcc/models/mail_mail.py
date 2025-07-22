@@ -13,7 +13,7 @@ def format_emails(partners):
 
 
 def format_emails_raw(partners):
-    return ", ".join([p.email for p in partners if p.email])
+    return [p.email for p in partners if p.email]
 
 
 class MailMail(models.Model):
@@ -36,7 +36,7 @@ class MailMail(models.Model):
         partner_to = self.env["res.partner"].browse(partner_to_ids)
 
         email_to = format_emails(partner_to)
-        email_to_raw = format_emails_raw(partner_to)
+        email_to_list = format_emails_raw(partner_to)
         email_cc = format_emails(self.recipient_cc_ids)
         bcc_emails = [p.email for p in self.recipient_bcc_ids if p.email]
 
@@ -49,7 +49,7 @@ class MailMail(models.Model):
         # -- 1. Add normal TO + CC message
         base_msg.update({
             "email_to": email_to,
-            "email_to_raw": email_to_raw,
+            "email_to_raw": ", ".join(email_to_list),
             "email_cc": email_cc,
         })
         new_res.append(base_msg)
@@ -69,13 +69,17 @@ class MailMail(models.Model):
             })
             new_res.append(bcc_msg)
 
+        # ✅ THIS IS THE CORRECT WAY: A FLAT LIST OF STRINGS
+        recipients_list = email_to_list + bcc_emails
+
         self.env.context = {
             **self.env.context,
-            "recipients": [email_to_raw] + bcc_emails
+            "recipients": recipients_list,
         }
 
-        _logger.info("Prepared %s normal recipients", email_to_raw)
-        _logger.info("Prepared %s BCC recipients", bcc_emails)
+        _logger.info("TO: %s", email_to_list)
+        _logger.info("CC: %s", email_cc)
+        _logger.info("BCC: %s", bcc_emails)
         _logger.info("Generated %d outgoing messages", len(new_res))
 
         return new_res
