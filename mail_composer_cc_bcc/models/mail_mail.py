@@ -1,8 +1,5 @@
-from odoo import fields, models, tools
+from odoo import models, fields, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
-import logging
-
-_logger = logging.getLogger(__name__)
 
 
 def format_emails(partners):
@@ -10,10 +7,6 @@ def format_emails(partners):
         tools.formataddr((p.name or "", tools.email_normalize(p.email)))
         for p in partners if p.email
     ])
-
-
-def format_emails_raw(partners):
-    return [p.email for p in partners if p.email]
 
 
 class MailMail(models.Model):
@@ -24,57 +17,62 @@ class MailMail(models.Model):
     def _prepare_outgoing_list(self, recipients_follower_status=None):
         res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
 
-        # Only apply to single mail, and only when composing manually
-        if len(self.ids) > 1 or not self.env.context.get("is_from_composer", False):
+        if len(self.ids) != 1 or not self.env.context.get("is_from_composer"):
             return res
 
-        partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
-        partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
-        partner_to = self.env["res.partner"].browse(partner_to_ids)
+        mail = self[0]
+        recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
+        recipient_cc = mail.recipient_cc_ids
+        recipient_bcc = mail.recipient_bcc_ids
 
-        email_to = format_emails(partner_to)
-        email_to_raw = format_emails_raw(partner_to)
-        email_cc = format_emails(self.recipient_cc_ids)
-        email_cc_raw = format_emails_raw(self.recipient_cc_ids)
-        bcc_emails = [p.email for p in self.recipient_bcc_ids if p.email]
+        email_to = format_emails(recipient_to)
+        email_cc = format_emails(recipient_cc)
+        bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
 
-        new_res = []
-        base_msg = res[0] if res else {}
-        body_content = base_msg.get("body") or self.body_html or ""
+        final_msgs = []
+        seen_recipients = set()
 
-        # 1. Main message: TO and CC only
-        to_msg = base_msg.copy()
-        to_msg.update({
-            "email_to": email_to,
-            "email_cc": email_cc,
-            "email_bcc": "",  # explicitly clear bcc
-            "body": body_content,
-        })
-        new_res.append(to_msg)
+        for msg in res:
+            extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
+            msg_to_emails = extract_result[0] if extract_result else []
 
-        # 2. One separate message per BCC recipient
-        for bcc_email in bcc_emails:
-            bcc_msg = base_msg.copy()
-            bcc_msg.update({
-                "email_to": bcc_email,
-                "email_cc": "",
-                "email_bcc": "",
-                "body": (
-                    "<p style='color:gray; font-style:italic;'>"
-                    "🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
-                    + body_content
-                ),
+            if not msg_to_emails:
+                continue
+
+            recipient_email = tools.email_normalize(msg_to_emails[0])
+
+            if recipient_email in bcc_emails:
+                continue  # skip original BCC delivery
+
+            msg.update({
+                "email_to": email_to,
+                "email_cc": email_cc,
+                "email_bcc": False,
             })
-            new_res.append(bcc_msg)
+            final_msgs.append(msg)
 
-        # Update recipients list for SMTP (TO + CC + BCC)
-        self.env.context = {
-            **self.env.context,
-            "recipients": email_to_raw + email_cc_raw + bcc_emails,
-        }
+            seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
+            seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
 
-        _logger.info("Prepared Mail - TO: %s", email_to_raw)
-        _logger.info("Prepared Mail - CC: %s", email_cc_raw)
-        _logger.info("Prepared Mail - BCC: %s", bcc_emails)
+        # Add one email for BCCs with the BCC note
+        for bcc_email in bcc_emails:
+            if bcc_email in seen_recipients:
+                continue
 
-        return new_res
+            for msg in res:
+                new_msg = msg.copy()
+                new_msg.update({
+                    "email_to": bcc_email,
+                    "email_cc": "",
+                    "email_bcc": "",
+                    "body": (
+                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply.</p>"
+                        + msg.get("body", "")
+                    ),
+                })
+                final_msgs.append(new_msg)
+                seen_recipients.add(bcc_email)
+                break
+
+        return final_msgs
