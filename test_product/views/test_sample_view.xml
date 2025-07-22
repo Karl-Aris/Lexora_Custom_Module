@@ -12,12 +12,11 @@
           <div class="row mt-4">
             <!-- Left: Image -->
             <div class="col-md-6 text-center">
-            <p>Image Base64 Length: <t t-esc="product.image_1920 and len(product.image_1920)"/></p>
               <t t-if="product.image_1920">
-                <img t-att-src="'data:image/png;base64,%s' % product.image_1920" 
-                     class="img-fluid rounded shadow-sm"
-                     alt="Product Image"
-                     style="max-height: 300px;"/>
+                <img t-att-src="'data:image/png;base64,%s' % product.image_1920.decode('utf-8')" 
+                class="img-fluid rounded shadow-sm"
+                alt="Product Image"
+                style="max-height: 300px;"/>
               </t>
               <t t-else="">
                 <div class="alert alert-secondary" role="alert">
