@@ -1,0 +1,216 @@
+<odoo>
+
+    <!-- Kits List -->
+    <template id="kits_list_template" name="Kits List">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-4">
+                <h1>Product Kits</h1>
+
+                <t t-if="grouped_kits">
+                    <ul class="list-unstyled">
+                        <t t-foreach="grouped_kits.items()" t-as="item">
+                            <t t-set="group_key" t-value="item[0]" />
+                            <t t-set="kits" t-value="item[1]" />
+                            <li>
+                                <a
+                                    t-att-href="'/product_kits/group?name=%s&amp;color=%s' % (group_key[0], group_key[1] or '')">
+                                    <strong>
+                                        <t t-esc="group_key[0]" />
+                                    </strong>
+                                    / <t t-esc="group_key[1] or 'Each'" /> (<t t-esc="len(kits)" />
+                                    items) </a>
+                            </li>
+                        </t>
+                    </ul>
+                </t>
+                <t t-else="">
+                    <p>
+                        <strong>No kits found.</strong>
+                    </p>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- Kit Builder -->
+    <template id="kit_builder_template" name="Kit Builder">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-4">
+                <h1><t t-esc="name" /> / <t t-esc="color or 'Each'" /></h1>
+
+                <div class="row">
+                    <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']" t-as="category">
+                        <div class="col-md-12 mb-4">
+                            <h4>
+                                <t t-if="category == 'cabinet'">1. Select Cabinet</t>
+                                <t t-if="category == 'counter_top'">2. Select Counter Top</t>
+                                <t t-if="category == 'mirror'">3. Add Mirror (optional)</t>
+                                <t t-if="category == 'faucet'">4. Add Faucet (optional)</t>
+                            </h4>
+
+                            <div class="d-flex flex-wrap">
+                                <t t-foreach="components[category]" t-as="comp">
+                                    <t t-set="params"
+                                        t-value="{
+                                        'cabinet': cabinet if category != 'cabinet' else comp.id,
+                                        'counter_top': counter_top if category != 'counter_top' else comp.id,
+                                        'mirror': mirror if category != 'mirror' else comp.id,
+                                        'faucet': faucet if category != 'faucet' else comp.id
+                                    }" />
+                                    <div class="m-2 text-center">
+                                        <a
+                                            t-att-href="'/product_kits/group_builder?name=%s&amp;color=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
+                                            name, color, params['cabinet'], params['counter_top'], params['mirror'], params['faucet'])"
+                                            class="d-block text-decoration-none">
+                                            <img
+                                                t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''"
+                                                class="img-thumbnail"
+                                                style="width:100px; height:100px; object-fit:cover;" />
+                                            <p class="mt-1">
+                                                <t t-esc="comp.name" /> - <small class="text-muted">
+                                                    <t t-esc="comp.default_code or 'No SKU'" />
+                                                </small>
+                                            </p>
+                                        </a>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+
+                  <div class="col-md-12 mt-4">
+    <h4>Matching Kits:</h4>
+    <t t-if="filtered_kits">
+        <div class="row">
+            <t t-foreach="filtered_kits" t-as="kit">
+                <div class="col-6 col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <img t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
+                             class="card-img-top"
+                             style="height:120px; object-fit:cover;" />
+                        <div class="card-body p-2 text-center">
+                            <h6 class="mb-1"><t t-esc="kit.name" /></h6>
+                            <small class="text-muted d-block">Color: <t t-esc="kit.color or 'Each'" /></small>
+                            <small class="text-muted d-block">Collection: <t t-esc="kit.collection_id.name or 'N/A'" /></small>
+                            <small class="text-muted d-block">SKU: <t t-esc="kit.product_sku or 'No SKU'" /></small>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+    <t t-else="">
+        <p class="text-danger">
+            <strong>Out of stock</strong>
+        </p>
+    </t>
+</div>
+
+
+                    <div class="col-md-12 mt-3">
+                        <a
+                            t-att-href="'/product_kits/group_builder?name=%s&amp;color=%s' % (name, color or '')"
+                            class="btn btn-secondary">Reset Selection</a>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Kit Group Detail -->
+    <template id="kit_group_detail_template" name="Kit Group Detail">
+        <t t-call="website.layout">
+            <div class="container my-5">
+                <h2 class="mb-4">Kit Group: <t t-esc="name" /> <t t-if="color">/ <t t-esc="color" /></t></h2>
+
+                <div class="row">
+                    <!-- Matching Kits -->
+                    <div class="col-md-4">
+    <h4 class="mb-3 border-bottom pb-2">Matching Kits</h4>
+    <t t-if="kits">
+        <div class="d-flex flex-column gap-3">
+            <t t-foreach="kits" t-as="kit">
+                <div class="card shadow-sm p-2">
+                    <img t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
+                         class="card-img-top mb-2"
+                         style="height:120px; object-fit:cover;" />
+                    <div class="text-center">
+                        <h6 class="mb-1"><t t-esc="kit.name" /></h6>
+                        <small class="text-muted d-block">Color: <t t-esc="kit.color or 'Each'" /></small>
+                        <small class="text-muted d-block">SKU: <t t-esc="kit.product_sku or 'No SKU'" /></small>
+
+                        <t t-if="kit.product_id">
+                            <form action="/shop/cart/update" method="post" class="mt-2">
+                                <input type="hidden" name="product_id" t-att-value="kit.product_id.id" />
+                                <input type="hidden" name="add_qty" value="1" />
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                            </form>
+                        </t>
+                        <t t-else="">
+                            <p class="text-danger mt-2">Product not available for sale</p>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>   </div>
+
+
+                    <!-- Components -->
+                    <div class="col-md-8">
+                        <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']"
+                            t-as="category">
+                            <div class="mb-4">
+                                <h4 class="mb-3 border-bottom pb-2">
+                                    <t t-if="category == 'cabinet'">Cabinet</t>
+                                    <t t-if="category == 'counter_top'">Counter Top</t>
+                                    <t t-if="category == 'mirror'">Mirror</t>
+                                    <t t-if="category == 'faucet'">Faucet</t>
+                                </h4>
+
+                                <div class="row g-3">
+                                    <t t-foreach="components[category]" t-as="comp">
+                                        <div class="col-6 col-sm-4 col-lg-3">
+                                            <a
+                                                t-att-href="'/product_kits/group?name=%s&amp;color=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
+                                                name, color or '',
+                                                (comp.id if category == 'cabinet' else cabinet or ''),
+                                                (comp.id if category == 'counter_top' else counter_top or ''),
+                                                (comp.id if category == 'mirror' else mirror or ''),
+                                                (comp.id if category == 'faucet' else faucet or ''))"
+                                                class="text-decoration-none">
+                                                <div
+                                                    t-attf-class="card h-100 shadow-sm #{'border-primary' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else ''}">
+                                                    <img
+                                                        t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''"
+                                                        class="card-img-top"
+                                                        style="height:120px; object-fit:cover;" />
+                                                    <div class="card-body p-2 text-center">
+                                                        <h6 class="mb-1" style="font-size: 0.95rem;">
+                                                            <t t-esc="comp.name" />
+                                                        </h6>
+                                                        <small class="text-muted">
+                                                            <t t-esc="comp.default_code or 'No SKU'" />
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a t-att-href="'/product_kits/group?name=%s&amp;color=%s' % (name, color or '')"
+                        class="btn btn-outline-secondary">Reset Selection</a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
