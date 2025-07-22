@@ -64,12 +64,15 @@ class MailMail(models.Model):
             new_res.append(m)
 
         # Now generate separate emails for each BCC
-        for bcc_email in bcc_emails:
-            for m in res:
+         for bcc_email in bcc_emails:
+            for m in new_res:
+                # Skip if this is already a BCC email
+                if m.get("email_to") == bcc_email:
+                    continue
                 new_msg = m.copy()
                 new_msg.update({
                     "email_to": bcc_email,
-                    "email_cc": "",
+                    "email_cc": "",  # Ensure no CC in BCC email
                     "body": (
                         "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
                         + m.get("body", "")
