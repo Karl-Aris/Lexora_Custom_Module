@@ -25,16 +25,15 @@ class MailMail(models.Model):
     email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
 
     def _prepare_outgoing_list(self, recipients_follower_status=None):
-        # First, return if we're not coming from the Mail Composer
         res = super()._prepare_outgoing_list(
             recipients_follower_status=recipients_follower_status
         )
         is_out_of_scope = len(self.ids) > 1
         is_from_composer = self.env.context.get("is_from_composer", False)
-
+    
         if is_out_of_scope or not is_from_composer:
             return res
-
+    
         # Prepare values for To, Cc headers
         partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
         partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
@@ -43,35 +42,31 @@ class MailMail(models.Model):
         email_to_raw = format_emails_raw(partner_to)
         email_cc = format_emails(self.recipient_cc_ids)
         email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
-
-        # Collect recipients (RCPT TO) and update all emails
+    
+        warning_html = (
+            '<div style="color:red; font-weight:bold; margin-bottom:10px;">'
+            '🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.'
+            '</div>'
+        )
+    
         recipients = set()
         for m in res:
             rcpt_to = None
-            if m["email_to"]:
+            if m.get("email_to"):
                 rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
-
-                # Insert X-Odoo-Bcc and visible warning in the body
                 if rcpt_to in email_bcc:
                     m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
-                
-                    warning_html = (
-                        '<div style="color:red; font-weight:bold; margin-bottom:10px;">'
-                        '🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.'
-                        '</div>'
-                    )
-                    if "body" in m and m["body"]:
-                        if warning_html not in m["body"]:
-                            m["body"] = warning_html + m["body"]
-                            m["body_html"] = m["body"]  # ensure body_html is also updated
-
-
+    
+                    # Inject BCC warning into body
+                    if m.get("body") and warning_html not in m["body"]:
+                        m["body"] = warning_html + m["body"]
+                        m["body_html"] = m["body"]
             elif m.get("email_cc"):
                 rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
-
+    
             if rcpt_to:
                 recipients.add(rcpt_to)
-
+    
             m.update(
                 {
                     "email_to": email_to,
@@ -79,10 +74,10 @@ class MailMail(models.Model):
                     "email_cc": email_cc,
                 }
             )
-
+    
         self.env.context = {**self.env.context, "recipients": list(recipients)}
-
+    
         if len(res) > len(recipients):
             res.pop()
-
+    
         return res
