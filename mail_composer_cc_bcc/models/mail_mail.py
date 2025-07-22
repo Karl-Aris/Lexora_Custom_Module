@@ -4,14 +4,17 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 def format_emails(partners):
     return ", ".join([
         tools.formataddr((p.name or "", tools.email_normalize(p.email)))
         for p in partners if p.email
     ])
 
+
 def format_emails_raw(partners):
     return ", ".join([p.email for p in partners if p.email])
+
 
 class MailMail(models.Model):
     _inherit = "mail.mail"
@@ -23,14 +26,14 @@ class MailMail(models.Model):
             recipients_follower_status=recipients_follower_status
         )
 
-        # Avoid changes if multiple mails or not coming from composer
+        # Skip BCC logic if not from composer or batch email
         is_out_of_scope = len(self.ids) > 1
         is_from_composer = self.env.context.get("is_from_composer", False)
 
         if is_out_of_scope or not is_from_composer:
             return res
 
-        # Prepare TO/CC/BCC headers
+        # Prepare recipient fields
         partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
         partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
         partner_to = self.env["res.partner"].browse(partner_to_ids)
@@ -44,14 +47,16 @@ class MailMail(models.Model):
         new_res = []
 
         for m in res:
-            recipient_email = None
+            recipient_email = ""
             if m.get("email_to"):
-                recipient_email = extract_rfc2822_addresses(m["email_to"])[0]
+                extracted = extract_rfc2822_addresses(m["email_to"])
+                recipient_email = extracted[0] if extracted else ""
             elif m.get("email_cc"):
-                recipient_email = extract_rfc2822_addresses(m["email_cc"])[0]
+                extracted = extract_rfc2822_addresses(m["email_cc"])
+                recipient_email = extracted[0] if extracted else ""
 
             if recipient_email in bcc_emails:
-                # Skip original bcc recipient message; handled separately
+                # Skip original BCC recipient — will create dedicated one below
                 continue
 
             if recipient_email:
@@ -64,7 +69,7 @@ class MailMail(models.Model):
             })
             new_res.append(m)
 
-        # Use first valid message as a template for BCC
+        # Use the first message as a base for generating BCC emails
         template_msg = res[0] if res else {}
 
         for bcc_email in bcc_emails:
@@ -72,7 +77,7 @@ class MailMail(models.Model):
             new_msg.update({
                 "email_to": bcc_email,
                 "email_to_raw": bcc_email,
-                "email_cc": "",  # no CC for BCC
+                "email_cc": "",  # No CC for BCC
                 "body": (
                     "<p style='color:gray; font-style:italic;'>"
                     "🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply."
@@ -81,7 +86,7 @@ class MailMail(models.Model):
             })
             new_res.append(new_msg)
 
-        # Update context to include recipients list
+        # Update context to include all recipients for logging/debug
         self.env.context = {
             **self.env.context,
             "recipients": list(normal_recipients | set(bcc_emails))
