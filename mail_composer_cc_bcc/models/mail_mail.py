@@ -90,10 +90,8 @@ class MailMail(models.Model):
                     continue
 
                 mail = self.create(cleaned_vals)
-                mail.with_context(is_bcc_split=True).send(
-                    auto_commit=auto_commit,
-                    raise_exception=raise_exception
-                )
+                type(self).send(mail.with_context(is_bcc_split=True), auto_commit=auto_commit, raise_exception=raise_exception)
+
             return True
 
         return super().send(auto_commit=auto_commit, raise_exception=raise_exception)
