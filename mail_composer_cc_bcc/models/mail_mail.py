@@ -28,7 +28,10 @@ class MailMail(models.Model):
 
         # Prepare TO/CC headers
         partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
-        partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
+        partner_to_ids = [
+            r.id for r in self.recipient_ids
+            if r.id not in self.recipient_cc_ids.ids and r.id not in self.recipient_bcc_ids.ids
+        ]
         partner_to = self.env["res.partner"].browse(partner_to_ids)
         email_to = format_emails(partner_to)
         email_to_raw = format_emails_raw(partner_to)
