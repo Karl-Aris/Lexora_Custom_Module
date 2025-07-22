@@ -61,9 +61,6 @@ class MailMail(models.Model):
                 #   transmit the Bcc field of a Message object
                 if "email_bcc" in m and m["email_bcc"]:
                     rcpt_to = extract_rfc2822_addresses(m["email_bcc"][0])[0]
-                else:
-                    rcpt_to = None  # or handle as needed
-
 
             # in the absence of self.email_to, Odoo creates one special mail for CC
             # see https://github.com/odoo/odoo/commit/46bad8f0
