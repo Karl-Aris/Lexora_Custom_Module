@@ -1,12 +1,40 @@
 <odoo>
 
 <template id="custom_page_template" name="Custom Page">
-    <t t-call="website.layout">
+    <!-- <t t-call="website.layout">
         <div class="container">
             <h1>Sample page</h1>
             <a class="btn btn-primary" href="/custom_test2/button">Click me</a>
+
+
+
         </div>
+    </t> -->
+    <t t-call="website.layout">
+    <div class="container my-5">
+    <h2>Search Product by SKU</h2>
+
+    <form action="/custom_test2/search_sku" method="get" class="mb-4">
+        <div class="form-group">
+        <label for="sku">Enter SKU:</label>
+        <!-- ✅ FIXED LINE BELOW -->
+        <input type="text" id="sku" name="sku" class="form-control" required="required" t-att-value="sku"/>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Search</button>
+    </form>
+
+    <t t-if="sku">
+        <h3>Search Result for SKU: <t t-esc="sku"/></h3>
+        <t t-if="product">
+        <p><strong>Name:</strong> <t t-esc="product.name"/></p>
+        <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
+        </t>
+        <t t-else="">
+        <p>No product found for SKU "<t t-esc="sku"/>".</p>
+        </t>
     </t>
+    </div>
+</t>
 </template>
     
 
