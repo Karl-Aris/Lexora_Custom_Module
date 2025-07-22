@@ -41,20 +41,21 @@ class MailMail(models.Model):
             rcpt_to = None
             if m.get("email_to"):
                 rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
-            elif m.get("email_cc"):
-                rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
+            else:
+                if m.get("email_cc"):
+                    rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
         
             if rcpt_to in email_bcc:
                 # Inject the real Bcc into headers (for ir.mail_server override to pick up)
                 m["headers"].update({"X-Odoo-Bcc": rcpt_to})
         
-                # 👇 Make it look like a direct email to that Bcc recipient
+                # Make the Bcc recipient appear as the direct recipient
                 m["email_to"] = rcpt_to
                 m["email_cc"] = ""
-                m["email_bcc"] = rcpt_to  # So the field is present and won’t raise KeyError
-        
+                m["email_bcc"] = rcpt_to
             else:
                 m["email_bcc"] = ""
+
 
 
 
