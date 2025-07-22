@@ -1,48 +1,34 @@
-from odoo.addons.mail.models.mail_mail import format_emails, format_emails_raw, extract_rfc2822_addresses
-from odoo import models
+# mail_mail.py
 
+from odoo import models
+from email.utils import formataddr
+from email.header import Header
 
 class MailMail(models.Model):
-    _inherit = "mail.mail"
+    _inherit = 'mail.mail'
 
-    def _prepare_outgoing_list(self, recipients_follower_status=None):
-        res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
-
-        is_out_of_scope = len(self.ids) > 1
-        is_from_composer = self.env.context.get("is_from_composer", False)
-        if is_out_of_scope or not is_from_composer:
-            return res
-
-        partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
-        partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
-        partner_to = self.env["res.partner"].browse(partner_to_ids)
-
-        email_to = format_emails(partner_to)
-        email_to_raw = format_emails_raw(partner_to)
-        email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc_list = [p.email for p in self.recipient_bcc_ids if p.email]
-
-        new_res = []
-        for m in res:
-            if m.get("email_to"):
-                rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
-            elif m.get("email_cc"):
-                rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
-            else:
-                rcpt_to = None
-
-            if not rcpt_to:
+    def _send(self, auto_commit=False, raise_exception=False):
+        # Call original _send but patch msg to include visible BCC
+        for mail in self:
+            if not mail.email_from or (not mail.email_to and not mail.email_cc and not mail.email_bcc):
                 continue
 
-            m.update({
-                "email_to": email_to,
-                "email_to_raw": email_to_raw,
-                "email_cc": email_cc,
-            })
+            # Generate the message before sending
+            msg = mail._prepare_email()
 
-            if rcpt_to in email_bcc_list:
-                m["headers"].update({"Bcc": rcpt_to})
+            # Inject visible BCC (so recipients see it)
+            if mail.email_bcc:
+                bcc_formatted = ', '.join([
+                    formataddr((str(Header(p.split('<')[0].strip(), 'utf-8')), p.split('<')[-1].replace('>', '').strip()))
+                    if '<' in p else p
+                    for p in mail.email_bcc.split(',')
+                ])
+                msg['Bcc'] = bcc_formatted
 
-            new_res.append(m)
-
-        return new_res
+            # Send the email
+            smtp_session = mail._get_smtp_session()
+            try:
+                smtp_session.send_message(msg)
+                mail.write({'state': 'sent'})
+            finally:
+                smtp_session.quit()
