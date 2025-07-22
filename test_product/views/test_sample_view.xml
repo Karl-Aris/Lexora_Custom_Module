@@ -17,7 +17,6 @@
                      class="img-fluid rounded shadow-sm"
                      alt="Product Image"
                      style="max-height: 300px;"/>
-                     <t t-esc="product.image_1920"/>
               </t>
               <t t-else="">
                 <div class="alert alert-secondary" role="alert">
