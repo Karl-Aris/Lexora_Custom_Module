@@ -59,7 +59,7 @@ class MailMail(models.Model):
                 #   to understand why he received a given email
                 # - Also note that in python3, the smtp.send_message method does not
                 #   transmit the Bcc field of a Message object
-                if rcpt_to in email_bcc:
+            if rcpt_to in email_bcc:
                 # Show actual Bcc header to recipient, not just X-Odoo-Bcc
                 m["headers"].update({
                     "Bcc": rcpt_to,
