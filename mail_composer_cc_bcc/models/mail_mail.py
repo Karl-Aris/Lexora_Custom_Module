@@ -1,9 +1,10 @@
-from odoo import fields, models, tools
+# file: mail_mail.py
+
+from odoo import fields, models, tools, api
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 import logging
 
 _logger = logging.getLogger(__name__)
-
 
 def format_emails(partners):
     return ", ".join([
@@ -11,10 +12,8 @@ def format_emails(partners):
         for p in partners if p.email
     ])
 
-
 def format_emails_raw(partners):
     return [p.email for p in partners if p.email]
-
 
 class MailMail(models.Model):
     _inherit = "mail.mail"
@@ -40,11 +39,9 @@ class MailMail(models.Model):
         bcc_emails = [p.email for p in self.recipient_bcc_ids if p.email]
 
         new_res = []
-
         base_msg = res[0] if res else {}
         body_content = base_msg.get("body") or self.body_html or ""
 
-        # 1. TO + CC email (normal)
         base_msg.update({
             "email_to": email_to,
             "email_to_raw": ", ".join(email_to_list),
@@ -52,13 +49,12 @@ class MailMail(models.Model):
         })
         new_res.append(base_msg)
 
-        # 2. True BCC — completely separate email, no CC, no TO list
         for bcc_email in bcc_emails:
             bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "email_to": bcc_email,
                 "email_to_raw": bcc_email,
-                "email_cc": "",  # real BCC should have no visible CC
+                "email_cc": "",
                 "email_from": base_msg.get("email_from", self.email_from),
                 "body": (
                     "<p style='color:gray; font-style:italic;'>"
@@ -68,7 +64,6 @@ class MailMail(models.Model):
             })
             new_res.append(bcc_msg)
 
-        # Safe recipient list
         all_recipients = email_to_list + bcc_emails
         self.env.context = {
             **self.env.context,
@@ -76,3 +71,16 @@ class MailMail(models.Model):
         }
 
         return new_res
+
+    def send(self, auto_commit=False, raise_exception=False):
+        if self.env.context.get("is_from_composer") and len(self.ids) == 1:
+            msg_vals_list = self._prepare_outgoing_list()
+            for msg_vals in msg_vals_list:
+                mail = self.create(msg_vals)
+                mail.with_context(is_bcc_split=True).send(
+                    auto_commit=auto_commit,
+                    raise_exception=raise_exception
+                )
+            return True
+
+        return super().send(auto_commit=auto_commit, raise_exception=raise_exception)
