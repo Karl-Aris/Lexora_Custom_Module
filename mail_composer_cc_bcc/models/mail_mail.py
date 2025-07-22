@@ -32,6 +32,7 @@ class MailMail(models.Model):
         final_msgs = []
         seen_recipients = set()
 
+        # Add normal (To + CC) message once
         for msg in res:
             extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
             msg_to_emails = extract_result[0] if extract_result else []
@@ -40,7 +41,7 @@ class MailMail(models.Model):
 
             recipient_email = tools.email_normalize(msg_to_emails[0])
             if recipient_email in bcc_emails or recipient_email in seen_recipients:
-                continue  # Skip BCCs and duplicates
+                continue  # Skip duplicates
 
             msg.update({
                 "email_to": email_to,
@@ -50,9 +51,12 @@ class MailMail(models.Model):
             final_msgs.append(msg)
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
+            break  # Only need one normal message
 
+        # Add BCC messages separately
+        bcc_sent = set()
         for bcc_email in bcc_emails:
-            if bcc_email in seen_recipients:
+            if bcc_email in seen_recipients or bcc_email in bcc_sent:
                 continue
 
             for msg in res:
@@ -68,7 +72,7 @@ class MailMail(models.Model):
                     ),
                 })
                 final_msgs.append(new_msg)
-                seen_recipients.add(bcc_email)
+                bcc_sent.add(bcc_email)
                 break
 
         return final_msgs
