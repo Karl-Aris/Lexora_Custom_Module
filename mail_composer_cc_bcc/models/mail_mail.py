@@ -33,32 +33,32 @@ class MailMail(models.Model):
         if is_out_of_scope or not is_from_composer:
             return res
     
-        # Prepare values for To, Cc headers
-        partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
-        partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
+        # Collect recipient groups
+        partner_to_ids = [p.id for p in self.recipient_ids if p not in self.recipient_cc_ids + self.recipient_bcc_ids]
         partner_to = self.env["res.partner"].browse(partner_to_ids)
         email_to = format_emails(partner_to)
         email_to_raw = format_emails_raw(partner_to)
         email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc = format_emails(self.recipient_bcc_ids)
+        bcc_emails = [p.email for p in self.recipient_bcc_ids if p.email]
     
-        recipients = set()
+        warning_html = (
+            '<div style="color: red; font-weight: bold; margin-bottom: 10px;">'
+            '⚠️ You received this message as a BCC recipient. Please do not reply.'
+            '</div>'
+        )
+    
         for m in res:
-            rcpt_to = None
-            if rcpt_to in email_bcc:
-                m["headers"].update(m["email_bcc"][0])
-                     
-            m.update(
-                {
-                    "email_to": email_to,
-                    "email_to_raw": email_to_raw,
-                    "email_cc": email_cc,
-                }
-            )
+            rcpt_to = m.get("recipient") or ""
+            if any(bcc in rcpt_to for bcc in bcc_emails):
+                # Still a BCC, but inject visible notice in body
+                if m.get("body") and warning_html not in m["body"]:
+                    m["body"] = warning_html + m["body"]
+                    m["body_html"] = m["body"]
     
-        self.env.context = {**self.env.context, "recipients": list(recipients)}
-    
-        if len(res) > len(recipients):
-            res.pop()
+            m.update({
+                "email_to": email_to,
+                "email_to_raw": email_to_raw,
+                "email_cc": email_cc,
+            })
     
         return res
