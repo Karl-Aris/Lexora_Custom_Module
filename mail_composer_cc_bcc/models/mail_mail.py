@@ -38,27 +38,26 @@ class MailMail(models.Model):
         recipients = set()
         for m in res:
             recipient_email = None
-
-            # Check if this is a BCC recipient
+        
             if m.get("email_to"):
                 recipient_email = extract_rfc2822_addresses(m["email_to"][0])[0]
             elif m.get("email_cc"):
                 recipient_email = extract_rfc2822_addresses(m["email_cc"][0])[0]
-
+        
             if recipient_email:
                 recipients.add(recipient_email)
-
-            # Inject visible notice if this recipient is a BCC
+        
             if recipient_email in bcc_emails:
-                body = m.get("body", "")
+                body = m.get("body_html") or m.get("body") or ""
                 bcc_notice = "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
-                m["body"] = bcc_notice + body  # Prepend to body
-
+                m["body_html"] = bcc_notice + body
+        
             m.update({
                 "email_to": email_to,
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
             })
+
 
         self.env.context = {**self.env.context, "recipients": list(recipients)}
 
