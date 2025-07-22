@@ -61,7 +61,10 @@ class MailMail(models.Model):
                 #   transmit the Bcc field of a Message object
                 if rcpt_to in email_bcc:
                 # Show actual Bcc header to recipient, not just X-Odoo-Bcc
-                m["headers"].update({"Bcc": rcpt_to})
+                m["headers"].update({
+                    "Bcc": rcpt_to,
+                    "X-Odoo-Bcc": rcpt_to,  # Optional: For debug/reference
+                })
 
             # in the absence of self.email_to, Odoo creates one special mail for CC
             # see https://github.com/odoo/odoo/commit/46bad8f0
