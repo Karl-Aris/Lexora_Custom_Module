@@ -40,7 +40,7 @@ class MailMail(models.Model):
         email_to = format_emails(partner_to)
         email_to_raw = format_emails_raw(partner_to)
         email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
+        email_bcc = format_emails(self.recipient_bcc_ids)
     
         recipients = set()
         for m in res:
