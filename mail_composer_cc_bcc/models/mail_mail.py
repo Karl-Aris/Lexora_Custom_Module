@@ -2,7 +2,6 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import fields, models, tools
-from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 
 def format_emails(partners):
@@ -43,24 +42,14 @@ class MailMail(models.Model):
         email_cc = format_emails(self.recipient_cc_ids)
         email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
     
-        warning_html = (
-            '<div style="color:red; font-weight:bold; margin-bottom:10px;">'
-            '🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.'
-            '</div>'
-        )
-    
         recipients = set()
         for m in res:
             rcpt_to = None
             if m.get("email_to"):
                 rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
                 if rcpt_to in email_bcc:
-                    m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
-    
-                    # Inject BCC warning into body
-                    if m.get("body") and warning_html not in m["body"]:
-                        m["body"] = warning_html + m["body"]
-                        m["body_html"] = m["body"]
+                    m["headers"].update(m["email_bcc"][0])
+                    
             elif m.get("email_cc"):
                 rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
     
