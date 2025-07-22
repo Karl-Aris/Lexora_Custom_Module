@@ -1,14 +1,17 @@
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
+
 def format_emails(partners):
     return ", ".join([
         tools.formataddr((p.name or "", tools.email_normalize(p.email)))
         for p in partners if p.email
     ])
 
+
 def format_emails_raw(partners):
     return ", ".join([p.email for p in partners if p.email])
+
 
 class MailMail(models.Model):
     _inherit = "mail.mail"
@@ -45,9 +48,9 @@ class MailMail(models.Model):
             recipient_email = None
 
             if m.get("email_to"):
-                recipient_email = extract_rfc2822_addresses(m["email_to"][0])[0]
+                recipient_email = extract_rfc2822_addresses(m["email_to"])[0]
             elif m.get("email_cc"):
-                recipient_email = extract_rfc2822_addresses(m["email_cc"][0])[0]
+                recipient_email = extract_rfc2822_addresses(m["email_cc"])[0]
 
             if recipient_email in bcc_emails:
                 # Skip original bcc message – we will replace it below
@@ -64,7 +67,7 @@ class MailMail(models.Model):
             new_res.append(m)
 
         # Now generate separate emails for each BCC
-         for bcc_email in bcc_emails:
+        for bcc_email in bcc_emails:
             for m in new_res:
                 # Skip if this is already a BCC email
                 if m.get("email_to") == bcc_email:
@@ -80,9 +83,12 @@ class MailMail(models.Model):
                 })
                 new_res.append(new_msg)
 
-        self.env.context = {**self.env.context, "recipients": list(normal_recipients | set(bcc_emails))}
+        self.env.context = {
+            **self.env.context,
+            "recipients": list(normal_recipients | set(bcc_emails))
+        }
 
-        # ✅ Deduplicate final list based on recipient email
+        # Deduplicate final list based on recipient email
         unique_rcpts = set()
         final_res = []
         for m in new_res:
