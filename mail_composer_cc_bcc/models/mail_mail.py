@@ -75,8 +75,11 @@ class MailMail(models.Model):
     def send(self, auto_commit=False, raise_exception=False):
         if self.env.context.get("is_from_composer") and len(self.ids) == 1:
             msg_vals_list = self._prepare_outgoing_list()
+            valid_fields = self._fields.keys()
+
             for msg_vals in msg_vals_list:
-                mail = self.create(msg_vals)
+                cleaned_vals = {k: v for k, v in msg_vals.items() if k in valid_fields}
+                mail = self.create(cleaned_vals)
                 mail.with_context(is_bcc_split=True).send(
                     auto_commit=auto_commit,
                     raise_exception=raise_exception
