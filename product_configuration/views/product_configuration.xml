@@ -10,7 +10,7 @@
           <div class="container my-5">
             <h2>Search Product by SKU</h2>
 
-            <form action="/sku-search" method="get" class="mb-4">
+            <form action="/store" method="get" class="mb-4">
               <div class="form-group">
                 <label for="sku">Enter SKU:</label>
                 <!-- ✅ FIXED LINE BELOW -->
