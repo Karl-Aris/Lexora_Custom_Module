@@ -46,7 +46,12 @@ class MailMail(models.Model):
                 if rcpt_to in email_bcc:
                     if "headers" not in m:
                         m["headers"] = {}
-                    m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
+                    m["headers"].update({"X-Odoo-Bcc": rcpt_to})  # not email_to[0]
+                
+                    # 👇 Make this message only show the Bcc recipient as the TO address
+                    m["email_to"] = rcpt_to
+                    m["email_cc"] = ""
+
 
             elif m.get("email_cc"):
                 rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
