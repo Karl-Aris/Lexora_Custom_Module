@@ -1,81 +1,30 @@
-from odoo import fields, models, tools
-from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
+# mail_mail.py
+from odoo import models
+from odoo.addons.mail.models.mail_mail import MailMail
 
-def format_emails(partners):
-    emails = [
-        tools.formataddr((p.name or "", tools.email_normalize(p.email)))
-        for p in partners
-        if p.email
-    ]
-    return ", ".join(emails)
-
-def format_emails_raw(partners):
-    emails = [p.email for p in partners if p.email]
-    return ", ".join(emails)
+def format_emails(emails):
+    return ', '.join(emails) if emails else ''
 
 class MailMail(models.Model):
-    _inherit = "mail.mail"
+    _inherit = 'mail.mail'
 
-    email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
+    def send(self, auto_commit=False, raise_exception=False):
+        # Send BCC emails individually so they are visible to each recipient
+        mails_to_send = self.filtered(lambda m: m.state == 'outgoing')
 
-    def _prepare_outgoing_list(self, recipients_follower_status=None):
-        res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
-
-        is_out_of_scope = len(self.ids) > 1
-        is_from_composer = self.env.context.get("is_from_composer", False)
-
-        if is_out_of_scope or not is_from_composer:
-            return res
-
-        # Compute To, Cc, Bcc
-        partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
-        partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
-        partner_to = self.env["res.partner"].browse(partner_to_ids)
-        email_to = format_emails(partner_to)
-        email_to_raw = format_emails_raw(partner_to)
-        email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
-
-        recipients = set()
-        for m in res:
-            rcpt_to = None
-            if m.get("email_to"):
-                rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
+        for mail in mails_to_send:
+            bcc_list = mail.email_bcc.split(',') if mail.email_bcc else []
+            if bcc_list:
+                for bcc_email in bcc_list:
+                    # Create a copy for each BCC recipient
+                    mail_copy = mail.copy({
+                        'email_to': bcc_email.strip(),
+                        'email_bcc': False,  # Prevent recursion
+                        'body_html': f'<p><strong>BCC:</strong> {bcc_email.strip()}</p>' + (mail.body_html or ''),
+                    })
+                    super(MailMail, mail_copy).send(auto_commit=auto_commit, raise_exception=raise_exception)
+                mail.write({'state': 'sent'})
             else:
-                if m.get("email_cc"):
-                    rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
-        
-            if rcpt_to in email_bcc:
-                # Inject the real Bcc into headers (for ir.mail_server override to pick up)
-                m["headers"].update({"X-Odoo-Bcc": rcpt_to})
-        
-                # Make the Bcc recipient appear as the direct recipient
-                m["email_to"] = rcpt_to
-                m["email_cc"] = ""
-                m["email_bcc"] = rcpt_to
-            else:
-                m["email_bcc"] = ""
+                super(MailMail, mail).send(auto_commit=auto_commit, raise_exception=raise_exception)
 
-
-
-
-            elif m.get("email_cc"):
-                rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
-
-            if rcpt_to:
-                recipients.add(rcpt_to)
-
-            m.update(
-                {
-                    "email_to": email_to,
-                    "email_to_raw": email_to_raw,
-                    "email_cc": email_cc,
-                }
-            )
-
-        self.env.context = {**self.env.context, "recipients": list(recipients)}
-
-        if len(res) > len(recipients):
-            res.pop()
-
-        return res
+        return True
