@@ -1,0 +1,70 @@
+<odoo>
+    <record id="view_product_kits_form" model="ir.ui.view">
+        <field name="name">product.kits.form</field>
+        <field name="model">product.kits</field>
+        <field name="arch" type="xml">
+            <form string="Product Kit">
+                <sheet>
+                    <group string="Kit Information">
+                        <field name="product_sku"/>
+                        <field name="name"/>
+
+                        <!-- Display computed product image -->
+                          <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
+
+                        <field name="size"/>
+                        <field name="collection"/>
+                        <field name="color"/>
+                    </group>
+
+                    <group string="Kit Components">
+                        <field name="cabinet_sku"/>
+                        <field name="counter_top_sku"/>
+                        <field name="faucet_sku"/>
+                        <field name="mirror_sku"/>
+                    </group>
+
+                    <group string="Matching Inventory Products" col="2">
+
+                        <field name="product_ids" widget="many2many_avatar" options="{'no_create': True}"/>
+
+                        <field name="cabinet_ids" widget="many2many_avatar" options="{'no_create': True}"/>
+
+                        <field name="counter_top_ids" widget="many2many_avatar" options="{'no_create': True}"/>
+
+                        <field name="faucet_ids" widget="many2many_avatar" options="{'no_create': True}"/>
+
+                        <field name="mirror_ids" widget="many2many_avatar" options="{'no_create': True}"/>
+
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_product_kits_tree" model="ir.ui.view">
+        <field name="name">product.kits.tree</field>
+        <field name="model">product.kits</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="product_image" widget="image" options="{'size': [60, 60]}"/>
+
+                <field name="product_sku"/>
+                <field name="name"/>
+                <field name="size"/>
+                <field name="collection"/>
+                <field name="color"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_product_kits" model="ir.actions.act_window">
+        <field name="name">Product Kits</field>
+        <field name="res_model">product.kits</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_product_kits_root" name="Product Kits" sequence="10"/>
+    <menuitem id="menu_product_kits" name="Manage Kits" parent="menu_product_kits_root" action="action_product_kits"/>
+</odoo>
