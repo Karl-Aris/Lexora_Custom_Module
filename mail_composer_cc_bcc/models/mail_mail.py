@@ -66,15 +66,28 @@ class MailMail(models.Model):
         # Now generate separate emails for each BCC
         for bcc_email in bcc_emails:
             for m in res:
-                # Create a copy to avoid mutating the original
                 new_msg = m.copy()
                 new_msg.update({
                     "email_to": bcc_email,
-                    "email_cc": "",  # No CC for BCC recipients
-                    "body": "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>" + m.get("body", ""),
+                    "email_cc": "",
+                    "body": (
+                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
+                        + m.get("body", "")
+                    ),
                 })
                 new_res.append(new_msg)
 
         self.env.context = {**self.env.context, "recipients": list(normal_recipients | set(bcc_emails))}
 
-        return new_res
+        # ✅ Deduplicate final list based on recipient email
+        unique_rcpts = set()
+        final_res = []
+        for m in new_res:
+            email = m.get("email_to") or m.get("email_cc") or m.get("email_bcc")
+            if isinstance(email, list):
+                email = email[0]
+            if email and email not in unique_rcpts:
+                unique_rcpts.add(email)
+                final_res.append(m)
+
+        return final_res
