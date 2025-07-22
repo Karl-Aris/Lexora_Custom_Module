@@ -1,16 +1,26 @@
-from odoo import models
+from odoo import models, _
+from odoo.exceptions import UserError
 from odoo.tools import html2plaintext
 import copy
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class MailComposeMessage(models.TransientModel):
     _inherit = 'mail.compose.message'
 
     def _prepare_outgoing_list(self):
         self.ensure_one()
-        mail_values = self._get_mail_values([self.id])[self.id]
+
+        # Safely get mail values
+        mail_values_dict = self._get_mail_values([self.id])
+        mail_values = mail_values_dict.get(self.id)
+        if not mail_values:
+            raise UserError(_("Could not generate mail values for this message."))
+
         mail_values_list = []
 
-        # Prepare main (To and Cc) message
+        # Prepare standard email with To and Cc
         standard_mail_values = copy.deepcopy(mail_values)
         standard_mail_values["email_to"] = ','.join(
             p.email for p in self.recipient_ids if p.email
@@ -18,18 +28,18 @@ class MailComposeMessage(models.TransientModel):
         standard_mail_values["email_cc"] = ','.join(
             p.email for p in getattr(self, 'recipient_cc_ids', []) if p.email
         )
-        standard_mail_values["email_bcc"] = ''
+        standard_mail_values["email_bcc"] = ''  # omit sending all BCCs in one mail
 
         mail_values_list.append(standard_mail_values)
 
-        # Handle BCC recipients individually
+        # Send BCCs as individual emails (with visible headers in body)
         for partner in getattr(self, 'recipient_bcc_ids', []):
             if not partner.email:
                 continue
 
             bcc_mail_values = copy.deepcopy(mail_values)
 
-            # Build header block to appear in body
+            # Insert visible email headers in body
             header_note = f"""
             <p style="color:gray; font-size:small;">
               <strong>From:</strong> {self.email_from or 'Lexora'}<br/>
@@ -41,12 +51,11 @@ class MailComposeMessage(models.TransientModel):
             </p>
             """
 
-            # Prepend header block to email body
-            if 'body' in bcc_mail_values:
-                bcc_mail_values["body"] = header_note + bcc_mail_values["body"]
-                bcc_mail_values["body_html"] = bcc_mail_values["body"]
+            original_body = bcc_mail_values.get('body', '')
+            bcc_mail_values["body"] = header_note + original_body
+            bcc_mail_values["body_html"] = bcc_mail_values["body"]
 
-            # Only send to BCC recipient
+            # Ensure only BCC recipient receives it
             bcc_mail_values["email_to"] = partner.email
             bcc_mail_values["email_cc"] = ''
             bcc_mail_values["email_bcc"] = ''
