@@ -79,6 +79,16 @@ class MailMail(models.Model):
 
             for msg_vals in msg_vals_list:
                 cleaned_vals = {k: v for k, v in msg_vals.items() if k in valid_fields}
+
+                if not cleaned_vals.get("model"):
+                    cleaned_vals["model"] = self.model
+                if not cleaned_vals.get("res_id"):
+                    cleaned_vals["res_id"] = self.res_id
+
+                if not cleaned_vals.get("model") or not cleaned_vals.get("res_id"):
+                    _logger.warning("Skipping email without model/res_id: %s", cleaned_vals)
+                    continue
+
                 mail = self.create(cleaned_vals)
                 mail.with_context(is_bcc_split=True).send(
                     auto_commit=auto_commit,
