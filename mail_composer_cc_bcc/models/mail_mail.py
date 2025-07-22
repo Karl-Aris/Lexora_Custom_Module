@@ -30,7 +30,6 @@ class MailMail(models.Model):
             return res
 
         # Prepare TO/CC headers
-        partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
         partner_to_ids = [
             r.id for r in self.recipient_ids
             if r.id not in self.recipient_cc_ids.ids and r.id not in self.recipient_bcc_ids.ids
@@ -42,18 +41,19 @@ class MailMail(models.Model):
         bcc_emails = [p.email for p in self.recipient_bcc_ids if p.email]
 
         normal_recipients = set()
+        base_msg = None
         new_res = []
 
         for m in res:
             recipient_email = None
+            to_addr = m.get("email_to", "")
+            cc_addr = m.get("email_cc", "")
 
-            if m.get("email_to"):
-                recipient_email = extract_rfc2822_addresses(m["email_to"])[0]
-            elif m.get("email_cc"):
-                recipient_email = extract_rfc2822_addresses(m["email_cc"])[0]
+            to_addrs = extract_rfc2822_addresses(to_addr or "")
+            cc_addrs = extract_rfc2822_addresses(cc_addr or "")
+            recipient_email = (to_addrs + cc_addrs)[0] if (to_addrs + cc_addrs) else None
 
             if recipient_email in bcc_emails:
-                # Skip original bcc message – we will replace it below
                 continue
 
             if recipient_email:
@@ -64,39 +64,39 @@ class MailMail(models.Model):
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
             })
+            base_msg = m
             new_res.append(m)
 
-        # Now generate separate emails for each BCC
+        # Generate separate emails for each BCC recipient
         for bcc_email in bcc_emails:
-            for m in new_res:
-                # Skip if this is already a BCC email
-                if m.get("email_to") == bcc_email:
-                    continue
-                new_msg = m.copy()
-                new_msg.update({
-                    "email_to": tools.email_normalize(str(bcc_email)),
-                    "email_cc": "",  # Ensure no CC in BCC email
-                    "body": (
-                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
-                        + m.get("body", "")
-                    ),
-                })
-                new_res.append(new_msg)
+            if not bcc_email:
+                continue
+            new_msg = base_msg.copy()
+            new_msg.update({
+                "email_to": tools.email_normalize(str(bcc_email)),
+                "email_cc": "",
+                "body": (
+                    "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply.</p>"
+                    + base_msg.get("body", "")
+                ),
+            })
+            new_res.append(new_msg)
 
         self.env.context = {
             **self.env.context,
             "recipients": list(normal_recipients | set(bcc_emails))
         }
 
-        # Deduplicate final list based on recipient email
-        unique_rcpts = set()
+        # Deduplicate based on unique TO+CC combo (not just TO)
+        unique_keys = set()
         final_res = []
+
         for m in new_res:
-            email = m.get("email_to") or m.get("email_cc") or m.get("email_bcc")
-            if isinstance(email, list):
-                email = email[0]
-            if email and email not in unique_rcpts:
-                unique_rcpts.add(email)
+            to = m.get("email_to") or ""
+            cc = m.get("email_cc") or ""
+            key = f"{to}|{cc}"
+            if key not in unique_keys:
+                unique_keys.add(key)
                 final_res.append(m)
 
         return final_res
