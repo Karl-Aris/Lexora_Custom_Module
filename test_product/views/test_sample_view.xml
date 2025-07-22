@@ -17,7 +17,6 @@
                      class="img-fluid rounded shadow-sm"
                      alt="Product Image"
                      style="max-height: 300px;"/>
-                     <t t-esc="product.image_1920"/>
               </t>
               <t t-else="">
                 <div class="alert alert-secondary" role="alert">
@@ -31,12 +30,12 @@
               <h3><t t-esc="product.name"/></h3>
               <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
               <p><strong>Price:</strong>
-                <t t-esc="product.list_price"/>
+                <t t-esc="product.lst_price"/> <span t-esc="product.currency_id.symbol"/>
               </p>
               <p><strong>Description:</strong></p>
-              <!-- <div t-if="product.description_sale">
+              <div t-if="product.description_sale">
                 <t t-raw="product.description_sale"/>
-              </div> -->
+              </div>
               <div t-else="">
                 <em>No description provided.</em>
               </div>
