@@ -27,7 +27,6 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Identify actual To recipients (excluding CC and BCC)
         partners_cc_bcc = mail.recipient_cc_ids + mail.recipient_bcc_ids
         partner_to_ids = [r.id for r in mail.recipient_ids if r not in partners_cc_bcc]
         partner_to = self.env["res.partner"].browse(partner_to_ids)
@@ -37,9 +36,9 @@ class MailMail(models.Model):
         email_cc = format_emails(mail.recipient_cc_ids)
 
         base_msg = res[0] if res else {}
-        original_body = base_msg.get("body", "")
+        original_body = res[0].get("body", "") if res else ""
 
-        # Clean message for To/CC
+        # To & CC message (no BCC note)
         clean_msg = base_msg.copy()
         clean_msg.update({
             "email_to": email_to,
@@ -52,7 +51,7 @@ class MailMail(models.Model):
 
         result = [clean_msg]
 
-        # One individual email per BCC recipient
+        # Add one message per BCC recipient
         for partner in mail.recipient_bcc_ids:
             if not partner.email:
                 continue
@@ -63,7 +62,6 @@ class MailMail(models.Model):
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
                 "Please do not reply to all.</p>"
             )
-            bcc_body = bcc_note + original_body
 
             bcc_msg = base_msg.copy()
             bcc_msg.update({
@@ -71,11 +69,11 @@ class MailMail(models.Model):
                     **base_msg.get("headers", {}),
                     "X-Odoo-Bcc": bcc_email
                 },
-                "email_to": email_to_raw,  # ✅ Preserve To header
-                "email_cc": email_cc,      # ✅ Preserve Cc header
-                "email_bcc": "",           # Clear actual BCC
-                "body": bcc_body,          # ✅ Add BCC notice
-                "recipient_ids": [(6, 0, [partner.id])],  # Deliver only to BCC partner
+                "email_to": email_to_raw,   # show original To
+                "email_cc": email_cc,       # show original CC
+                "email_bcc": "",            # hide actual Bcc
+                "body": bcc_note + original_body,  # add BCC note
+                "recipient_ids": [(6, 0, [partner.id])],  # send only to this BCC partner
             })
 
             result.append(bcc_msg)
