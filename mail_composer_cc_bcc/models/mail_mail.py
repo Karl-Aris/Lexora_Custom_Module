@@ -57,8 +57,8 @@ class MailMail(models.Model):
 
         # Custom message for each BCC
         for partner in bcc_partners:
-            if not partner.email:
-                continue
+            if not partner.email or partner in to_partners or partner in cc_partners:
+                continue  # 🔧 FIX: skip if already in To or CC
 
             bcc_email = tools.email_normalize(partner.email)
 
@@ -71,15 +71,4 @@ class MailMail(models.Model):
 
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
-                "email_to": email_to,           # Show original To
-                "email_to_raw": email_to_raw,   # Keep raw version the same
-                "email_cc": email_cc,
-                "email_bcc": "",                # No visible BCC
-                "body": bcc_body,
-                "recipient_ids": [(6, 0, [partner.id])],
-            })
-
-            result.append(bcc_msg)
-
-        return result
+                "headers": {**ba**
