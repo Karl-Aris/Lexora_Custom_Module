@@ -46,15 +46,14 @@ class MailThread(models.AbstractModel):
         if skip_adding_cc_bcc:
             return res
 
-        partners_cc = context.get("partner_cc_ids")
+       partners_cc = context.get("partner_cc_ids")
         if partners_cc:
-            res["email_cc"] = format_emails(partners_cc)
-
+            res["recipient_cc_ids"] = [(6, 0, [p.id for p in partners_cc])]
+        
         partners_bcc = context.get("partner_bcc_ids")
         if partners_bcc:
-            res["email_bcc"] = format_emails(partners_bcc)
+            res["recipient_bcc_ids"] = [(6, 0, [p.id for p in partners_bcc])]
 
-        return res
 
     def _notify_get_recipients(self, message, msg_vals, **kwargs):
         """
