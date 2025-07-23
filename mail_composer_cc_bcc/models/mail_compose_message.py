@@ -1,10 +1,10 @@
 from odoo import models, _
 from odoo.exceptions import UserError
-from odoo.tools import html2plaintext
 import copy
 import logging
 
 _logger = logging.getLogger(__name__)
+
 
 class MailComposeMessage(models.TransientModel):
     _inherit = 'mail.compose.message'
@@ -39,23 +39,28 @@ class MailComposeMessage(models.TransientModel):
 
             bcc_mail_values = copy.deepcopy(mail_values)
 
-            # Insert visible email headers in body
+            # Insert visible email headers in body (Gmail-style)
             header_note = f"""
-            <p style="color:gray; font-size:small;">
-              <strong>From:</strong> {self.email_from or 'Lexora'}<br/>
-              <strong>Reply-To:</strong> {self.reply_to or self.email_from or 'Lexora'}<br/>
-              <strong>To:</strong> {standard_mail_values.get('email_to', '')}<br/>
-              <strong>Cc:</strong> {standard_mail_values.get('email_cc', '')}<br/>
-              <strong>Bcc:</strong> {partner.email}<br/>
-              <em>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply all.</em>
-            </p>
+            <div style="background-color:#f5f5f5; padding:10px; font-family:Arial, sans-serif; font-size:13px;">
+                <p>
+                    <strong>From:</strong> {self.email_from or 'Lexora'}<br/>
+                    <strong>Reply-To:</strong> {self.reply_to or self.email_from or 'Lexora'}<br/>
+                    <strong>To:</strong> {standard_mail_values.get('email_to', '')}<br/>
+                    <strong>Cc:</strong> {standard_mail_values.get('email_cc', '')}<br/>
+                    <strong>Bcc:</strong> {partner.email}<br/>
+                    <strong>Subject:</strong> {self.subject or '(No Subject)'}<br/>
+                </p>
+                <p style="color:gray; font-style:italic;">
+                    🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply all.
+                </p>
+            </div><br/>
             """
 
             original_body = bcc_mail_values.get('body', '')
             bcc_mail_values["body"] = header_note + original_body
             bcc_mail_values["body_html"] = bcc_mail_values["body"]
 
-            # Ensure only BCC recipient receives it
+            # Ensure only the BCC recipient receives this version
             bcc_mail_values["email_to"] = partner.email
             bcc_mail_values["email_cc"] = ''
             bcc_mail_values["email_bcc"] = ''
