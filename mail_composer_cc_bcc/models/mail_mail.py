@@ -34,23 +34,28 @@ class MailMail(models.Model):
         email_to_raw = format_emails_raw(to_partners)
         email_cc = format_emails(cc_partners)
 
-        base_msg = res[0] if res else {}
-        original_body = base_msg.get("body", "")
-
-        # Clean message for To & CC
-        clean_msg = deepcopy(base_msg)
-        clean_msg.update({
-            "email_to": email_to,
-            "email_to_raw": email_to_raw,
+        # Instead of reusing res[0], build a clean base message dict
+        base_msg = {
+            "subject": mail.subject,
+            "body": mail.body_html or "",
+            "email_from": mail.email_from,
+            "reply_to": mail.reply_to,
+            "mail_server_id": mail.mail_server_id.id,
+            "auto_delete": mail.auto_delete,
+            "model": mail.model,
+            "res_id": mail.res_id,
+            "headers": mail.headers or {},
+            "attachments": [(4, att.id) for att in mail.attachment_ids],
+            "scheduled_date": mail.scheduled_date,
             "email_cc": email_cc,
             "email_bcc": "",
-            "body": original_body,
+            "email_to": email_to,
+            "email_to_raw": email_to_raw,
             "recipient_ids": [(6, 0, (to_partners + cc_partners).ids)],
-        })
+        }
 
-        result = [clean_msg]
+        result = [base_msg]
 
-        # Individual messages for each BCC recipient
         for partner in bcc_partners:
             if not partner.email:
                 continue
@@ -63,12 +68,8 @@ class MailMail(models.Model):
 
             bcc_msg = deepcopy(base_msg)
             bcc_msg.update({
-                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": tools.email_normalize(partner.email)},
-                "email_to": email_to,
-                "email_to_raw": email_to_raw,
-                "email_cc": email_cc,
-                "email_bcc": "",
-                "body": bcc_note + original_body,
+                "headers": {**base_msg["headers"], "X-Odoo-Bcc": tools.email_normalize(partner.email)},
+                "body": bcc_note + base_msg["body"],
                 "recipient_ids": [(6, 0, [partner.id])],
             })
 
