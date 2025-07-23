@@ -1,8 +1,11 @@
+# mail_composer_cc_bcc/models/mail_compose_message.py
+
 from odoo import models, _
 from odoo.exceptions import UserError
 from odoo.tools import html2plaintext
 import copy
 import logging
+import html  # To escape user-provided values safely
 
 _logger = logging.getLogger(__name__)
 
@@ -28,11 +31,11 @@ class MailComposeMessage(models.TransientModel):
         standard_mail_values["email_cc"] = ','.join(
             p.email for p in getattr(self, 'recipient_cc_ids', []) if p.email
         )
-        standard_mail_values["email_bcc"] = ''  # omit sending all BCCs in one mail
+        standard_mail_values["email_bcc"] = ''  # No global BCC on standard email
 
         mail_values_list.append(standard_mail_values)
 
-        # Send BCCs as individual emails (with visible headers in body)
+        # Send BCCs as individual emails with full To and Cc (but Bcc hidden)
         for partner in getattr(self, 'recipient_bcc_ids', []):
             if not partner.email:
                 continue
@@ -42,23 +45,23 @@ class MailComposeMessage(models.TransientModel):
             # Insert visible email headers in body
             header_note = f"""
             <p style="color:gray; font-size:small;">
-              <strong>From:</strong> {self.email_from or 'Lexora'}<br/>
-              <strong>Reply-To:</strong> {self.reply_to or self.email_from or 'Lexora'}<br/>
-              <strong>To:</strong> {standard_mail_values.get('email_to', '')}<br/>
-              <strong>Cc:</strong> {standard_mail_values.get('email_cc', '')}<br/>
-              <strong>Bcc:</strong> {partner.email}<br/>
+              <strong>From:</strong> {html.escape(self.email_from or 'Lexora')}<br/>
+              <strong>Reply-To:</strong> {html.escape(self.reply_to or self.email_from or 'Lexora')}<br/>
+              <strong>To:</strong> {html.escape(standard_mail_values.get('email_to', ''))}<br/>
+              <strong>Cc:</strong> {html.escape(standard_mail_values.get('email_cc', ''))}<br/>
               <em>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply all.</em>
             </p>
             """
 
             original_body = bcc_mail_values.get('body', '')
-            bcc_mail_values["body"] = header_note + original_body
-            bcc_mail_values["body_html"] = bcc_mail_values["body"]
+            new_body = header_note + original_body
+            bcc_mail_values["body_html"] = new_body
+            bcc_mail_values["body"] = new_body
 
-            # Ensure only BCC recipient receives it
-            bcc_mail_values["email_to"] = partner.email
-            bcc_mail_values["email_cc"] = ''
-            bcc_mail_values["email_bcc"] = ''
+            # Show original To and Cc in headers
+            bcc_mail_values["email_to"] = standard_mail_values.get("email_to", "")
+            bcc_mail_values["email_cc"] = standard_mail_values.get("email_cc", "")
+            bcc_mail_values["email_bcc"] = partner.email  # Only this BCC partner
 
             mail_values_list.append(bcc_mail_values)
 
