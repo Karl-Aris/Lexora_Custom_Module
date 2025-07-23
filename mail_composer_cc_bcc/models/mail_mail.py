@@ -1,6 +1,7 @@
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
+
 def format_emails(partners):
     emails = [
         tools.formataddr((p.name or "", tools.email_normalize(p.email)))
@@ -8,9 +9,11 @@ def format_emails(partners):
     ]
     return ", ".join(emails)
 
+
 def format_emails_raw(partners):
     emails = [p.email for p in partners if p.email]
     return ", ".join(emails)
+
 
 class MailMail(models.Model):
     _inherit = "mail.mail"
@@ -36,26 +39,26 @@ class MailMail(models.Model):
         email_to_raw = format_emails_raw(partner_to)
         email_cc = format_emails(mail.recipient_cc_ids)
 
-        # 🧹 Filter out any messages already generated for BCC
+        # Keep only one clean base message (To + CC only)
         res = [m for m in res if m.get("email_to") == email_to_raw]
-
         base_msg = res[0] if res else {}
+        base_msg.pop("email_bcc", None)  # Clean any existing bcc field
         original_body = base_msg.get("body", "")
 
-        # Clean message for To/CC (without BCC note)
+        # Clean To + CC message
         clean_msg = base_msg.copy()
         clean_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
             "email_cc": email_cc,
-            "email_bcc": "",
+            "email_bcc": "",  # no visible BCC
             "body": original_body,
             "recipient_ids": [(6, 0, [p.id for p in partner_to + mail.recipient_cc_ids])],
         })
 
         result = [clean_msg]
 
-        # 📩 Generate individual BCC messages
+        # Create separate message per BCC recipient
         for partner in mail.recipient_bcc_ids:
             if not partner.email:
                 continue
@@ -71,10 +74,10 @@ class MailMail(models.Model):
             bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
-                "email_to": email_to,            # show original TO
+                "email_to": email_to,
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
-                "email_bcc": "",                 # no exposure of other BCCs
+                "email_bcc": "",  # intentionally left blank
                 "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
