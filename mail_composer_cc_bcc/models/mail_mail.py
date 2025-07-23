@@ -1,9 +1,7 @@
 # Copyright 2023 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-
 from odoo import fields, models, tools
-
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 
@@ -47,23 +45,24 @@ class MailMail(models.Model):
         email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
 
         # Collect recipients (RCPT TO) and update all emails
-        # with the same To, Cc headers (to be shown by email client as users expect)
         recipients = set()
         for m in res:
             rcpt_to = None
             if m["email_to"]:
                 rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
 
-                # If the recipient is a Bcc, we had an explicit header X-Odoo-Bcc
-                # - It won't be shown by the email client, but can be useful for a recipient # noqa: E501
-                #   to understand why he received a given email
-                # - Also note that in python3, the smtp.send_message method does not
-                #   transmit the Bcc field of a Message object
+                # If recipient is a BCC, add header and message
                 if rcpt_to in email_bcc:
                     m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
 
-            # in the absence of self.email_to, Odoo creates one special mail for CC
-            # see https://github.com/odoo/odoo/commit/46bad8f0
+                    # 🔒 Add BCC notice in the email body
+                    if "body" in m and m["body"]:
+                        m["body"] += (
+                            "<p style='color:gray;font-size:small;'>"
+                            "🔒 You received this email as a BCC (Blind Carbon Copy). "
+                            "Please do not reply to all.</p>"
+                        )
+
             elif m["email_cc"]:
                 rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
 
