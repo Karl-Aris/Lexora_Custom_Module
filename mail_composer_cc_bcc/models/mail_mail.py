@@ -31,30 +31,41 @@ class MailMail(models.Model):
 
         final_msgs = []
 
-        # Step 1: One normal message to visible To/Cc
-        base_msg = res[0].copy()
-        base_msg.update({
-            "email_to": display_to,
-            "email_cc": display_cc,
-            "email_bcc": "",  # important: avoid adding a Bcc field to this message
-        })
-        final_msgs.append(base_msg)
+        seen_recipients = set(bcc_emails)
 
-        # Step 2: One message per BCC recipient with same headers and a note
+        # 1. Send the base message to To + Cc ONLY (exclude Bcc completely)
+        for msg in res:
+            # Parse real To address from the generated message
+            extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
+            msg_to_emails = extract_result[0] if extract_result else []
+
+            if any(tools.email_normalize(e) in seen_recipients for e in msg_to_emails):
+                continue  # skip if accidentally picking a BCC
+
+            msg.update({
+                "email_to": display_to,
+                "email_cc": display_cc,
+                "email_bcc": "",  # Important: don't Bcc anyone in the base message
+            })
+            final_msgs.append(msg)
+            break  # only one base message
+
+        # 2. Send custom message per Bcc recipient
         for bcc_email in bcc_emails:
             if not bcc_email:
                 continue
 
             partner = self.env['res.partner'].search([('email', '=', bcc_email)], limit=1)
-            bcc_msg = base_msg.copy()
+
+            # Create individual message
+            bcc_msg = res[0].copy()
             bcc_msg.update({
-                "email_to": display_to,     # Still show original To
-                "email_cc": display_cc,     # Still show original Cc
-                "email_bcc": "",            # Don't add Bcc header here
+                "email_to": display_to,
+                "email_cc": display_cc,
+                "email_bcc": "",  # Must be blank to avoid "too many To headers" error
                 "body": (
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                    "Please do not reply to all.</p>"
-                    + base_msg.get("body", "")
+                    "Please do not reply to all.</p>" + bcc_msg.get("body", "")
                 ),
                 "recipient_ids": [(6, 0, [partner.id])] if partner else [],
             })
