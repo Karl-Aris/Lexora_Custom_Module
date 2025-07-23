@@ -34,12 +34,12 @@ class MailMail(models.Model):
 
         final_msgs = []
 
-        # 1. Standard message to visible recipients
+        # 1. Visible TO and CC message
         base_msg = res[0].copy()
         base_msg.update({
             "email_to": display_to,
             "email_cc": display_cc,
-            "email_bcc": "",
+            "email_bcc": "",  # Do not use this anymore for sending
         })
         final_msgs.append(base_msg)
 
@@ -49,20 +49,17 @@ class MailMail(models.Model):
                 continue
 
             partner = self.env['res.partner'].search([('email', '=', bcc_email)], limit=1)
-            _logger.info("Creating BCC email for %s (partner: %s)", bcc_email, partner.name if partner else "N/A")
+            _logger.info("Sending BCC to %s (partner: %s)", bcc_email, partner.name if partner else "N/A")
 
             bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "email_to": bcc_email,
-                "email_cc": "",
-                "email_bcc": "",
-                "headers": {
-                    "To": display_to,
-                    "Cc": display_cc,
-                },
+                "email_cc": "",          # Don't include visible cc
+                "email_bcc": "",         # Hide BCC field to avoid duplication
                 "body": (
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                    "Please do not reply to all.</p>" + base_msg.get("body", "")
+                    "Please do not reply to all.</p>"
+                    + base_msg.get("body", "")
                 ),
                 "recipient_ids": [(6, 0, [partner.id])] if partner else [],
             })
