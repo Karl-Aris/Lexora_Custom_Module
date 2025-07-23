@@ -53,7 +53,7 @@ class MailMail(models.Model):
             msg.update({
                 "email_to": email_to,
                 "email_cc": email_cc,
-                "email_bcc": email_bcc,
+                "email_bcc": False,
             })
 
             final_msgs.append(msg)
@@ -61,6 +61,7 @@ class MailMail(models.Model):
             # Track seen emails to prevent duplicates
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
+            seen_recipients.update(extract_rfc2822_addresses(email_bcc)[0])
             break  # Only one "To/Cc" message needed
 
         # Now send individual BCC copies — each gets only their own message
