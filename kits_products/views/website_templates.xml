@@ -1,6 +1,7 @@
 <odoo>
 
     <!-- Kits List -->
+    <!-- Kits List -->
     <template id="kits_list_template" name="Kits List">
         <t t-call="website.layout">
             <div class="container mt-4 mb-4">
@@ -13,11 +14,11 @@
                             <t t-set="kits" t-value="item[1]" />
                             <li>
                                 <a
-                                    t-att-href="'/product_kits/group?name=%s&amp;color=%s' % (group_key[0], group_key[1] or '')">
+                                    t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (group_key[0] or '', group_key[1] or '')">
                                     <strong>
-                                        <t t-esc="group_key[0]" />
+                                        <t t-esc="group_key[0] or 'No Collection'" />
                                     </strong>
-                                    / <t t-esc="group_key[1] or 'Each'" /> (<t t-esc="len(kits)" />
+                                    / <t t-esc="group_key[1] or 'No Size'" /> (<t t-esc="len(kits)" />
                                     items) </a>
                             </li>
                         </t>
@@ -31,6 +32,7 @@
             </div>
         </t>
     </template>
+
 
     <!-- Kit Builder -->
     <template id="kit_builder_template" name="Kit Builder">
@@ -78,33 +80,39 @@
                         </div>
                     </t>
 
-                  <div class="col-md-12 mt-4">
-    <h4>Matching Kits:</h4>
-    <t t-if="filtered_kits">
-        <div class="row">
-            <t t-foreach="filtered_kits" t-as="kit">
-                <div class="col-6 col-md-4 mb-3">
-                    <div class="card h-100 shadow-sm">
-                        <img t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
-                             class="card-img-top"
-                             style="height:120px; object-fit:cover;" />
-                        <div class="card-body p-2 text-center">
-                            <h6 class="mb-1"><t t-esc="kit.name" /></h6>
-                            <small class="text-muted d-block">Color: <t t-esc="kit.color or 'Each'" /></small>
-                            <small class="text-muted d-block">Collection: <t t-esc="kit.collection_id.name or 'N/A'" /></small>
-                            <small class="text-muted d-block">SKU: <t t-esc="kit.product_sku or 'No SKU'" /></small>
-                        </div>
+                    <div class="col-md-12 mt-4">
+                        <h4>Matching Kits:</h4>
+                        <t t-if="filtered_kits">
+                            <div class="row">
+                                <t t-foreach="filtered_kits" t-as="kit">
+                                    <div class="col-6 col-md-4 mb-3">
+                                        <div class="card h-100 shadow-sm">
+                                            <img
+                                                t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
+                                                class="card-img-top"
+                                                style="height:120px; object-fit:cover;" />
+                                            <div class="card-body p-2 text-center">
+                                                <h6 class="mb-1">
+                                                    <t t-esc="kit.name" />
+                                                </h6>
+                                                <small class="text-muted d-block">Color: <t
+                                                        t-esc="kit.color or 'Each'" /></small>
+                                                <small class="text-muted d-block">Collection: <t
+                                                        t-esc="kit.collection_id.name or 'N/A'" /></small>
+                                                <small class="text-muted d-block">SKU: <t
+                                                        t-esc="kit.product_sku or 'No SKU'" /></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <p class="text-danger">
+                                <strong>Out of stock</strong>
+                            </p>
+                        </t>
                     </div>
-                </div>
-            </t>
-        </div>
-    </t>
-    <t t-else="">
-        <p class="text-danger">
-            <strong>Out of stock</strong>
-        </p>
-    </t>
-</div>
 
 
                     <div class="col-md-12 mt-3">
@@ -127,35 +135,51 @@
                 <div class="row">
                     <!-- Matching Kits -->
                     <div class="col-md-4">
-    <h4 class="mb-3 border-bottom pb-2">Matching Kits</h4>
-    <t t-if="kits">
-        <div class="d-flex flex-column gap-3">
-            <t t-foreach="kits" t-as="kit">
-                <div class="card shadow-sm p-2">
-                    <img t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
-                         class="card-img-top mb-2"
-                         style="height:120px; object-fit:cover;" />
-                    <div class="text-center">
-                        <h6 class="mb-1"><t t-esc="kit.name" /></h6>
-                        <small class="text-muted d-block">Color: <t t-esc="kit.color or 'Each'" /></small>
-                        <small class="text-muted d-block">SKU: <t t-esc="kit.product_sku or 'No SKU'" /></small>
+                        <h4 class="mb-3 border-bottom pb-2">Matching Kits</h4>
+                        <t t-if="kit">
+                            <div class="d-flex flex-column gap-3">
+                                <t t-if="kit">
+                                    <div class="card shadow-sm p-2">
+                                        <img
+                                            t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
+                                            class="card-img-top mb-2"
+                                            style="height:120px; object-fit:cover;" />
+                                        <div class="text-center">
+                                            <h6 class="mb-1">
+                                                <t t-esc="kit.name" />
+                                            </h6>
+                                            <small class="text-muted d-block">Color: <t
+                                                    t-esc="kit.color or 'Each'" /></small>
+                                            <small class="text-muted d-block">SKU: <t
+                                                    t-esc="kit.product_sku or 'No SKU'" /></small>
 
-                        <t t-if="kit.product_id">
-                            <form action="/shop/cart/update" method="post" class="mt-2">
-                                <input type="hidden" name="product_id" t-att-value="kit.product_id.id" />
-                                <input type="hidden" name="add_qty" value="1" />
-                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
-                                <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
-                            </form>
-                        </t>
-                        <t t-else="">
-                            <p class="text-danger mt-2">Product not available for sale</p>
+                                            <t t-if="kit.product_id">
+                                                <form action="/shop/cart/update" method="post"
+                                                    class="mt-2">
+                                                    <input type="hidden" name="product_id"
+                                                        t-att-value="kit.product_id.id" />
+                                                    <input type="hidden" name="add_qty" value="1" />
+                                                    <input type="hidden" name="csrf_token"
+                                                        t-att-value="request.csrf_token()" />
+                                                    <button type="submit"
+                                                        class="btn btn-primary btn-sm w-100">Add to
+                                                        Cart</button>
+                                                </form>
+                                            </t>
+                                            <t t-else="">
+                                                <p class="text-danger mt-2">Product not available
+                                                    for sale</p>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <p class="text-muted">No kit found for this selection.</p>
+                                </t>
+
+                            </div>
                         </t>
                     </div>
-                </div>
-            </t>
-        </div>
-    </t>   </div>
 
 
                     <!-- Components -->
@@ -174,8 +198,8 @@
                                     <t t-foreach="components[category]" t-as="comp">
                                         <div class="col-6 col-sm-4 col-lg-3">
                                             <a
-                                                t-att-href="'/product_kits/group?name=%s&amp;color=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-                                                name, color or '',
+                                                t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
+                                                collection, size or '',
                                                 (comp.id if category == 'cabinet' else cabinet or ''),
                                                 (comp.id if category == 'counter_top' else counter_top or ''),
                                                 (comp.id if category == 'mirror' else mirror or ''),
@@ -206,7 +230,8 @@
                 </div>
 
                 <div class="mt-4">
-                    <a t-att-href="'/product_kits/group?name=%s&amp;color=%s' % (name, color or '')"
+                    <a
+                        t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (collection, size or '')"
                         class="btn btn-outline-secondary">Reset Selection</a>
                 </div>
             </div>

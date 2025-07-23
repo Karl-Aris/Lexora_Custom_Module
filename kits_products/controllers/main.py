@@ -4,39 +4,41 @@ from collections import defaultdict
 
 class ProductKitsController(http.Controller):
 
-    def _get_kits(self, name=None, color=None):
-        """Helper to get kits by name and optional color."""
-        domain = [('name', '=', name)]
-        if color:
-            domain.append(('color', '=', color))
+    def _get_kits(self, collection=None, size=None):
+        """Helper to get kits by collection and optional size."""
+        domain = [('collection', '=', collection)]
+        if size:
+            domain.append(('size', '=', size))
         else:
-            domain.append(('color', '=', False))
+            domain.append(('size', '=', False))
         return request.env['product.kits'].sudo().search(domain)
 
     @http.route(['/product_kits'], type='http', auth="public", website=True)
     def list_kits(self, **kwargs):
-        """List all kits grouped by name and color."""
+        """List all kits grouped by collection and size."""
         kits = request.env['product.kits'].sudo().search([])
 
         grouped_kits = defaultdict(list)
         for kit in kits:
-            key = (kit.name, kit.color)
+            key = (kit.collection, kit.size)
             grouped_kits[key].append(kit)
 
         return request.render('kits_products.kits_list_template', {
             'grouped_kits': dict(grouped_kits),
         })
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
-    def group_detail(self, name=None, color=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
-        """Display kits of a specific group (name + color) and list components for filtering."""
-        kits = self._get_kits(name, color)
+    def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
+        """Display a single matching kit (by collection and size) and filterable components."""
 
-    # Group components by category
+        # Step 1: Fetch all kits based on collection + size
+        kits = self._get_kits(collection, size)
+
+        # Step 2: Group available components by category
         components = {
-        'cabinet': set(),
-        'counter_top': set(),
-        'mirror': set(),
-        'faucet': set(),
+            'cabinet': set(),
+            'counter_top': set(),
+            'mirror': set(),
+            'faucet': set(),
         }
 
         for kit in kits:
@@ -45,16 +47,20 @@ class ProductKitsController(http.Controller):
             components['mirror'].update(kit.mirror_ids)
             components['faucet'].update(kit.faucet_ids)
 
-    # Preselect default kit if no selection provided
+        # Step 3: Determine defaults if no component is selected
         default_kit = kits[0] if kits else None
 
-        selected_cabinet = int(cabinet) if cabinet else (default_kit.cabinet_ids[0].id if default_kit and default_kit.cabinet_ids else None)
-        selected_counter_top = int(counter_top) if counter_top else (default_kit.counter_top_ids[0].id if default_kit and default_kit.counter_top_ids else None)
-        selected_mirror = int(mirror) if mirror else (default_kit.mirror_ids[0].id if default_kit and default_kit.mirror_ids else None)
-        selected_faucet = int(faucet) if faucet else (default_kit.faucet_ids[0].id if default_kit and default_kit.faucet_ids else None)
+        selected_cabinet = int(cabinet) if cabinet else (
+            default_kit.cabinet_ids[0].id if default_kit and default_kit.cabinet_ids else None)
+        selected_counter_top = int(counter_top) if counter_top else (
+            default_kit.counter_top_ids[0].id if default_kit and default_kit.counter_top_ids else None)
+        selected_mirror = int(mirror) if mirror else (
+            default_kit.mirror_ids[0].id if default_kit and default_kit.mirror_ids else None)
+        selected_faucet = int(faucet) if faucet else (
+            default_kit.faucet_ids[0].id if default_kit and default_kit.faucet_ids else None)
 
-    # Filter kits based on selected components
-        filtered_kits = []
+        # Step 4: Filter kits that exactly match the selected components
+        matching_kit = None
         for kit in kits:
             if selected_cabinet and selected_cabinet not in kit.cabinet_ids.ids:
                 continue
@@ -64,25 +70,28 @@ class ProductKitsController(http.Controller):
                 continue
             if selected_faucet and selected_faucet not in kit.faucet_ids.ids:
                 continue
-            filtered_kits.append(kit)
+            matching_kit = kit
+            break  # Take the first exact match
 
+        # Step 5: Render the template with data
         return request.render('kits_products.kit_group_detail_template', {
-        'kits': filtered_kits,
-        'name': name,
-        'color': color,
-        'components': components,
-        'cabinet': selected_cabinet,
-        'counter_top': selected_counter_top,
-        'mirror': selected_mirror,
-        'faucet': selected_faucet,
+            'kit': matching_kit,
+            'collection': collection,
+            'size': size,
+            'components': components,
+            'cabinet': selected_cabinet,
+            'counter_top': selected_counter_top,
+            'mirror': selected_mirror,
+            'faucet': selected_faucet,
         })
+
 
         
                 
 
     @http.route(['/product_kits/group_builder'], type='http', auth="public", website=True)
-    def kit_builder(self, name=None, color=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
-        kits = self._get_kits(name, color)
+    def kit_builder(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
+        kits = self._get_kits(collection, size)
 
         # Group components by category
         components = {
@@ -113,8 +122,8 @@ class ProductKitsController(http.Controller):
 
         return request.render('kits_products.kit_builder_template', {
             'kits': kits,
-            'name': name,
-            'color': color,
+            'collection': collection,
+            'size': size,
             'components': components,
             'cabinet': int(cabinet) if cabinet else None,
             'counter_top': int(counter_top) if counter_top else None,
@@ -124,9 +133,9 @@ class ProductKitsController(http.Controller):
         })
 
     @http.route(['/product_kits/filter'], type='http', auth="public", website=True)
-    def filter_kits(self, name=None, color=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
+    def filter_kits(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
         """Filter kits by selected components."""
-        kits = self._get_kits(name, color)
+        kits = self._get_kits(collection, size)
 
         # Convert component ids to integers for comparison
         filters = {
@@ -151,8 +160,8 @@ class ProductKitsController(http.Controller):
 
         return request.render('kits_products.filtered_kits_template', {
             'kits': filtered_kits,
-            'name': name,
-            'color': color,
+            'collection': collection,
+            'size': size,
             **filters,  # Pass component selections back to the template
         })
     http.route(['/product_kits/components'], type='http', auth="public", website=True)
