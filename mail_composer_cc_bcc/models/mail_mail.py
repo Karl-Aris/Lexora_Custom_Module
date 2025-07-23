@@ -1,4 +1,5 @@
 from odoo import fields, models, tools
+from copy import deepcopy
 
 
 def format_emails(partners):
@@ -37,7 +38,7 @@ class MailMail(models.Model):
         original_body = base_msg.get("body", "")
 
         # Clean message for To & CC
-        clean_msg = base_msg.copy()
+        clean_msg = deepcopy(base_msg)
         clean_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
@@ -49,7 +50,7 @@ class MailMail(models.Model):
 
         result = [clean_msg]
 
-        # One email per BCC
+        # Individual messages for each BCC recipient
         for partner in bcc_partners:
             if not partner.email:
                 continue
@@ -60,7 +61,7 @@ class MailMail(models.Model):
                 "Please do not reply to all.</p>"
             )
 
-            bcc_msg = base_msg.copy()
+            bcc_msg = deepcopy(base_msg)
             bcc_msg.update({
                 "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": tools.email_normalize(partner.email)},
                 "email_to": email_to,
