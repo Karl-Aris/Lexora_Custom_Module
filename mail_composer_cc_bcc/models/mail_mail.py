@@ -21,6 +21,8 @@ class MailMail(models.Model):
             return res
 
         mail = self[0]
+
+        # Categorize recipients
         recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
@@ -28,53 +30,34 @@ class MailMail(models.Model):
         email_to = format_emails(recipient_to)
         email_cc = format_emails(recipient_cc)
         bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
-        email_bcc = ", ".join(bcc_emails)
 
         final_msgs = []
-        seen_recipients = set()
 
-        # Add normal (To + CC) message once
-        for msg in res:
-            extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
-            msg_to_emails = extract_result[0] if extract_result else []
-            if not msg_to_emails:
-                continue
+        # Grab the base message structure (the first item)
+        base_msg = res[0].copy()
+        original_body = base_msg.get("body", "")
 
-            recipient_email = tools.email_normalize(msg_to_emails[0])
-            if recipient_email in bcc_emails or recipient_email in seen_recipients:
-                continue  # Skip duplicates
-
-            msg.update({
+        # Send to visible recipients (To + Cc)
+        if email_to or email_cc:
+            base_msg.update({
                 "email_to": email_to,
                 "email_cc": email_cc,
-                "email_bcc": email_bcc,
+                "email_bcc": "",  # No Bcc in headers
             })
-            final_msgs.append(msg)
-            seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
-            seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
-            seen_recipients.update(extract_rfc2822_addresses(email_bcc)[0])
-            break  # Only need one normal message
+            final_msgs.append(base_msg)
 
-        # Add BCC messages separately
-        bcc_sent = set()
+        # Send separate messages to each Bcc recipient
         for bcc_email in bcc_emails:
-            if bcc_email in seen_recipients or bcc_email in bcc_sent:
-                continue
-
-            for msg in res:
-                new_msg = msg.copy()
-                new_msg.update({
-                    "email_to": bcc_email,
-                    "email_cc": "",
-                    "email_bcc": "",
-                    "body": (
-                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                        "Please do not reply.</p>"
-                        + msg.get("body", "")
-                    ),
-                })
-                final_msgs.append(new_msg)
-                bcc_sent.add(bcc_email)
-                break
+            bcc_msg = base_msg.copy()
+            bcc_msg.update({
+                "email_to": bcc_email,
+                "email_cc": email_cc,
+                "email_bcc": "",  # Still hide Bcc header
+                "body": (
+                    "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
+                    "Please do not reply to all.</p>" + original_body
+                ),
+            })
+            final_msgs.append(bcc_msg)
 
         return final_msgs
