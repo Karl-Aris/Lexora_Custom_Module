@@ -25,24 +25,24 @@ class MailMail(models.Model):
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
 
-        email_to = format_emails(recipient_to)
-        email_cc = format_emails(recipient_cc)
+        email_to_header = format_emails(recipient_to)
+        email_cc_header = format_emails(recipient_cc)
         bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
 
         final_msgs = []
         sent_bcc = set()
 
-        # Send normal message to To and Cc without BCC note
+        # Send normal email to To and Cc (no note)
         for msg in res:
             msg.update({
-                "email_to": email_to,
-                "email_cc": email_cc,
+                "email_to": email_to_header,
+                "email_cc": email_cc_header,
                 "email_bcc": False,
             })
             final_msgs.append(msg)
-            break  # only one main message
+            break
 
-        # Send individual BCC messages with note
+        # Send BCC emails (with hidden identity but visible To/Cc headers)
         for bcc_email in bcc_emails:
             if bcc_email in sent_bcc:
                 continue
@@ -50,15 +50,21 @@ class MailMail(models.Model):
             for msg in res:
                 new_msg = msg.copy()
                 new_msg.update({
-                    "email_to": bcc_email,        # only to BCC email
-                    "email_cc": email_cc,         # show CC
-                    "email_bcc": "",              # no visible BCC
+                    "email_to": email_to_header,     # Show original To (for header)
+                    "email_cc": email_cc_header,
+                    "email_bcc": False,
+                    "recipient_ids": False,          # Clear default
                     "body": (
                         "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
                         "Please do not reply.</p>"
                         + msg.get("body", "")
                     ),
                 })
+
+                # Override actual delivery using 'recipient_ids'
+                # Force email to deliver to BCC email
+                new_msg["email_to_real"] = bcc_email  # Custom key, used in send_email
+
                 final_msgs.append(new_msg)
                 sent_bcc.add(bcc_email)
                 break
