@@ -59,27 +59,28 @@ class MailMail(models.Model):
         for partner in bcc_partners:
             if not partner.email:
                 continue
-
+        
             bcc_email = tools.email_normalize(partner.email)
-
+        
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
                 "Please do not reply to all.</p>"
             )
             bcc_body = bcc_note + original_body
-
+        
             bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
-                "email_to": partner.email,
-                "email_to_raw": partner.email,
-                "email_cc": email_cc,
-                "email_bcc": "",
+                "email_to": email_to,           # ✅ keep same To header
+                "email_to_raw": email_to_raw,   # ✅ same raw To
+                "email_cc": email_cc,           # ✅ same CC
+                "email_bcc": "",                # do not reveal other BCCs
                 "body": bcc_body,
-                "recipient_ids": [(6, 0, [partner.id])],
+                "recipient_ids": [(6, 0, [partner.id])],  # ✅ send only to the BCC partner
             })
-
+        
             result.append(bcc_msg)
+
 
         return result
