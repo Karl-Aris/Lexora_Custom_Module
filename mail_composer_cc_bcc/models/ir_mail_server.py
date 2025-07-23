@@ -31,39 +31,28 @@ class MailMail(models.Model):
         bcc_emails = [tools.email_normalize(p.email) for p in bcc_partners]
 
         final_msgs = []
-        seen_recipients = set()
+        standard_sent = False
 
-        # Prepare standard message (To + Cc, no Bcc)
+        # Send ONE clean email to To + Cc
         for msg in res:
-            extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
-            msg_to_emails = extract_result[0] if extract_result else []
-            if not msg_to_emails:
-                continue
-
-            recipient_email = tools.email_normalize(msg_to_emails[0])
-            if recipient_email in bcc_emails or recipient_email in seen_recipients:
-                continue  # Skip duplicates
-
-            msg.update({
+            clean_msg = msg.copy()  # completely isolated
+            clean_msg.update({
                 "email_to": email_to,
                 "email_cc": email_cc,
-                "email_bcc": "",
+                "email_bcc": "",  # don't expose BCC
+                "body": msg.get("body", ""),  # no BCC note
             })
-            final_msgs.append(msg)
-            seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
-            seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
-            break  # Only one standard message needed
+            final_msgs.append(clean_msg)
+            standard_sent = True
+            break
 
-        # Prepare separate BCC messages
+        # Send SEPARATE BCC emails
         for partner in bcc_partners:
             bcc_email = tools.email_normalize(partner.email)
-            if bcc_email in seen_recipients:
-                continue
-
             for msg in res:
                 bcc_msg = msg.copy()
                 bcc_msg.update({
-                    "email_to": email_to,  # original visible TO
+                    "email_to": email_to,
                     "email_cc": email_cc,
                     "email_bcc": "",
                     "headers": {
@@ -76,6 +65,6 @@ class MailMail(models.Model):
                     "recipient_ids": [(6, 0, [partner.id])],
                 })
                 final_msgs.append(bcc_msg)
-                break  # Only one per BCC
+                break
 
         return final_msgs
