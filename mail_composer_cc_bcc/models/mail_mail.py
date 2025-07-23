@@ -52,7 +52,7 @@ class MailMail(models.Model):
 
         result = [clean_msg]
 
-        # Create individual message for each BCC recipient
+        # One individual email per BCC recipient
         for partner in mail.recipient_bcc_ids:
             if not partner.email:
                 continue
@@ -67,12 +67,15 @@ class MailMail(models.Model):
 
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
-                "email_to": bcc_email,  # ✅ Deliver ONLY to this BCC partner
-                "email_cc": email_cc,
-                "email_bcc": "",
-                "body": bcc_body,
-                "recipient_ids": [(6, 0, [partner.id])],
+                "headers": {
+                    **base_msg.get("headers", {}),
+                    "X-Odoo-Bcc": bcc_email
+                },
+                "email_to": email_to_raw,  # ✅ Preserve To header
+                "email_cc": email_cc,      # ✅ Preserve Cc header
+                "email_bcc": "",           # Clear actual BCC
+                "body": bcc_body,          # ✅ Add BCC notice
+                "recipient_ids": [(6, 0, [partner.id])],  # Deliver only to BCC partner
             })
 
             result.append(bcc_msg)
