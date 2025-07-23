@@ -15,10 +15,14 @@ def format_emails_raw(partners):
 
 
 def html_to_text(html):
-    """Basic HTML to plain text conversion."""
-    text = re.sub('<[^<]+?>', '', html)  # Strip tags
-    text = re.sub(r'\s+', ' ', text)  # Collapse whitespace
-    return text.strip()
+    """Robust HTML to plain text."""
+    try:
+        text = re.sub(r'<(br|p|div|li)[^>]*>', '\n', html, flags=re.I)
+        text = re.sub(r'<[^>]+?>', '', text)  # Remove other tags
+        text = re.sub(r'\s+', ' ', text)      # Collapse whitespace
+        return text.strip()
+    except Exception:
+        return "This is a plain-text fallback of the email body."
 
 
 class MailMail(models.Model):
@@ -34,7 +38,6 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Separate partners
         bcc_partners = mail.recipient_bcc_ids
         cc_partners = mail.recipient_cc_ids
         all_cc_bcc = cc_partners + bcc_partners
@@ -47,10 +50,9 @@ class MailMail(models.Model):
         email_to_raw = format_emails_raw(to_partners)
         email_cc = format_emails(cc_partners)
 
-        # Base clean message for To + CC only
         base_msg = res[0] if res else {}
-        original_body = base_msg.get("body", "")
-        original_alt = html_to_text(original_body)
+        original_body = base_msg.get("body", "") or ""
+        original_alt = html_to_text(original_body) or "You received an email."
 
         clean_msg = base_msg.copy()
         clean_msg.update({
@@ -65,7 +67,7 @@ class MailMail(models.Model):
 
         result = [clean_msg]
 
-        # Custom message for each BCC
+        # Build BCC variants
         for partner in bcc_partners:
             if not partner.email:
                 continue
@@ -78,7 +80,7 @@ class MailMail(models.Model):
                 "Please do not reply to all.</p>"
             )
             bcc_body = bcc_note + original_body
-            bcc_alt = html_to_text(bcc_body)
+            bcc_alt = html_to_text(bcc_body) or "You received this email as a BCC."
 
             bcc_msg = base_msg.copy()
             bcc_msg.update({
