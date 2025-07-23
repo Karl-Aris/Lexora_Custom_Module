@@ -69,9 +69,16 @@ class MailMail(models.Model):
             )
             bcc_body = bcc_note + original_body
         
+            # 🛠 Fix: safely get headers dict
+            headers = base_msg.get("headers")
+            if not isinstance(headers, dict):
+                headers = {}
+        
+            headers["X-Odoo-Bcc"] = bcc_email
+        
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "headers": {**(base_msg.get("headers") or {}), "X-Odoo-Bcc": bcc_email},
+                "headers": headers,
                 "email_to": email_to,
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
