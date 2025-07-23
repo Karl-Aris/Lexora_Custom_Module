@@ -26,23 +26,53 @@ class MailMail(models.Model):
 
         email_to = format_emails(recipient_to)
         email_cc = format_emails(recipient_cc)
-        email_bcc = format_emails(recipient_bcc)
+        bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
 
         final_msgs = []
+        seen_recipients = set()
 
-        # Apply To, Cc, and Bcc to the single message
+        # ✉️ Standard message (To + Cc only)
         for msg in res:
+            extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
+            msg_to_emails = extract_result[0] if extract_result else []
+            if not msg_to_emails:
+                continue
+
+            recipient_email = tools.email_normalize(msg_to_emails[0])
+            if recipient_email in bcc_emails or recipient_email in seen_recipients:
+                continue  # Skip duplicates
+
             msg.update({
-                'email_to': email_to,
-                'email_cc': email_cc,
-                'email_bcc': email_bcc,  # ✅ Preserve BCC field
-                'body': (
-                    "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                    "Please do not reply all.</p>"
-                    + msg.get("body", "")
-                )
+                "email_to": email_to,
+                "email_cc": email_cc,
+                "email_bcc": False,
             })
             final_msgs.append(msg)
-            break  # only one outgoing message is enough
+            seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
+            seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
+            break  # Only one main message
+
+        # 📧 BCC messages (one per BCC recipient)
+        bcc_sent = set()
+        for bcc_email in bcc_emails:
+            if bcc_email in seen_recipients or bcc_email in bcc_sent:
+                continue
+
+            for msg in res:
+                new_msg = msg.copy()
+                # BCC email with visible headers
+                new_msg.update({
+                    "email_to": bcc_email,
+                    "email_cc": email_cc,
+                    "email_bcc": "",
+                    "body": (
+                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply all.</p>"
+                        + msg.get("body", "")
+                    ),
+                })
+                final_msgs.append(new_msg)
+                bcc_sent.add(bcc_email)
+                break
 
         return final_msgs
