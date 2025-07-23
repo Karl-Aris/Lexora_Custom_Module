@@ -17,6 +17,7 @@ class MailMail(models.Model):
     def _prepare_outgoing_list(self, recipients_follower_status=None):
         res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
 
+        # Only apply custom logic when sending from mail composer
         if len(self.ids) != 1 or not self.env.context.get("is_from_composer"):
             return res
 
@@ -32,16 +33,17 @@ class MailMail(models.Model):
         final_msgs = []
         seen_recipients = set()
 
-        # Add normal (To + CC) message once
+        # Add the main (To + Cc) message only once
         for msg in res:
             extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
             msg_to_emails = extract_result[0] if extract_result else []
+
             if not msg_to_emails:
-                continue
+                continue  # Skip message with no valid "To" address
 
             recipient_email = tools.email_normalize(msg_to_emails[0])
             if recipient_email in bcc_emails or recipient_email in seen_recipients:
-                continue  # Skip duplicates
+                continue  # Skip duplicates or unwanted BCC in To
 
             msg.update({
                 "email_to": email_to,
@@ -49,11 +51,13 @@ class MailMail(models.Model):
                 "email_bcc": False,
             })
             final_msgs.append(msg)
+
+            # Track already used email addresses to avoid duplication
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
-            break  # Only need one normal message
+            break  # Only one normal message is needed
 
-        # Add BCC messages separately
+        # Add individual BCC messages
         bcc_sent = set()
         for bcc_email in bcc_emails:
             if bcc_email in seen_recipients or bcc_email in bcc_sent:
@@ -67,8 +71,7 @@ class MailMail(models.Model):
                     "email_bcc": "",
                     "body": (
                         "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                        "Please do not reply.</p>"
-                        + msg.get("body", "")
+                        "Please do not reply.</p>" + msg.get("body", "")
                     ),
                 })
                 final_msgs.append(new_msg)
