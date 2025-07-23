@@ -1,5 +1,14 @@
 from odoo import models, fields, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
+from odoo.tools import email_normalize, formataddr
+
+
+def format_emails(partners):
+    return ", ".join([
+        formataddr((p.name or "", email_normalize(p.email)))
+        for p in partners if p.email
+    ])
+
 
 class MailMail(models.Model):
     _inherit = "mail.mail"
@@ -17,14 +26,14 @@ class MailMail(models.Model):
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
 
-        email_to = ", ".join([tools.formataddr((p.name or "", tools.email_normalize(p.email))) for p in recipient_to if p.email])
-        email_cc = ", ".join([tools.formataddr((p.name or "", tools.email_normalize(p.email))) for p in recipient_cc if p.email])
+        email_to = format_emails(recipient_to)
+        email_cc = format_emails(recipient_cc)
         bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
 
         final_msgs = []
         seen_recipients = set()
 
-        # Main message to To + Cc
+        # Add normal (To + CC) message once
         for msg in res:
             extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
             msg_to_emails = extract_result[0] if extract_result else []
@@ -33,7 +42,7 @@ class MailMail(models.Model):
 
             recipient_email = tools.email_normalize(msg_to_emails[0])
             if recipient_email in bcc_emails or recipient_email in seen_recipients:
-                continue  # Prevent duplicates
+                continue
 
             msg.update({
                 "email_to": email_to,
@@ -43,11 +52,12 @@ class MailMail(models.Model):
             final_msgs.append(msg)
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
-            break  # Only one message for To + Cc
+            break  # Only need one normal message
 
-        # Individual messages for Bcc
+        # Add BCC messages separately
+        bcc_sent = set()
         for bcc_email in bcc_emails:
-            if bcc_email in seen_recipients:
+            if bcc_email in seen_recipients or bcc_email in bcc_sent:
                 continue
 
             for msg in res:
@@ -57,11 +67,13 @@ class MailMail(models.Model):
                     "email_cc": "",
                     "email_bcc": "",
                     "body": (
-                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC. "
-                        "Please do not reply all.</p>" + msg.get("body", "")
+                        "<p style='color:gray; font-style:italic;'>\ud83d\udd12 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply all.</p>"
+                        + msg.get("body", "")
                     ),
                 })
                 final_msgs.append(new_msg)
+                bcc_sent.add(bcc_email)
                 break
 
         return final_msgs
