@@ -27,12 +27,11 @@ class MailMail(models.Model):
 
         email_to = format_emails(recipient_to)
         email_cc = format_emails(recipient_cc)
+
         bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
-
         final_msgs = []
-        seen_recipients = set()
 
-        # Main message to To and Cc
+        # 1. Add the main message (To + Cc)
         for msg in res:
             msg.update({
                 "email_to": email_to,
@@ -40,31 +39,30 @@ class MailMail(models.Model):
                 "email_bcc": "",  # hide bcc
             })
             final_msgs.append(msg)
-            seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
-            seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
-            break  # Only send one main message
+            break  # only one standard message
 
-        # Individual BCC messages with visible headers, but directed only to BCC email
+        # 2. Add BCC messages separately
         for bcc_email in bcc_emails:
-            if bcc_email in seen_recipients:
-                continue
-
-            # Copy original message
-            for msg in res:
-                new_msg = msg.copy()
-                # Insert visible header note (optional)
-                new_msg["body"] = (
+            new_msg = {
+                "subject": mail.subject,
+                "body": (
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
                     "Please do not reply-all.</p>"
-                    + msg.get("body", "")
-                )
-
-                new_msg.update({
-                    "email_to": bcc_email,  # deliver directly to BCC recipient
-                    "email_cc": email_cc,   # visible
-                    "email_bcc": "",        # hidden
-                })
-                final_msgs.append(new_msg)
-                break
+                    + mail.body
+                ),
+                "body_html": mail.body,
+                "email_from": mail.email_from,
+                "email_to": bcc_email,     # set direct recipient
+                "email_cc": email_cc,      # visible
+                "email_bcc": "",           # hidden
+                "reply_to": mail.reply_to,
+                "model": mail.model,
+                "res_id": mail.res_id,
+                "mail_server_id": mail.mail_server_id.id,
+                "auto_delete": mail.auto_delete,
+                "headers": mail.headers,
+                "message_id": tools.generate_tracking_message_id('mail.mail'),
+            }
+            final_msgs.append(new_msg)
 
         return final_msgs
