@@ -53,7 +53,7 @@ class MailMail(models.Model):
 
         result = [base_msg]
 
-        # Send one individual mail per BCC recipient
+        # Step 2: One message per BCC recipient
         for partner in mail.recipient_bcc_ids:
             if not partner.email:
                 continue
@@ -71,11 +71,10 @@ class MailMail(models.Model):
                 "Please do not reply to all.</p>"
             )
             bcc_msg["body"] = bcc_note + bcc_msg.get("body", "")
-
-            bcc_msg["email_to"] = partner.email  # Direct to this BCC partner
-            bcc_msg["email_cc"] = ""
-            bcc_msg["email_bcc"] = ""
-            bcc_msg["recipient_ids"] = [(6, 0, [partner.id])]  # Assign recipient explicitly
+            bcc_msg["email_to"] = email_to         # Keep original To
+            bcc_msg["email_cc"] = email_cc         # Keep original Cc
+            bcc_msg["email_bcc"] = ""              # No Bcc in actual sent email
+            bcc_msg["recipient_ids"] = [(6, 0, [partner.id])]
 
             result.append(bcc_msg)
 
