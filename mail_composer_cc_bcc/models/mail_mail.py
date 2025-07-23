@@ -57,34 +57,29 @@ class MailMail(models.Model):
 
         # Custom message for each BCC
         for partner in bcc_partners:
-            if not partner.email or partner in to_partners or partner in cc_partners:
+            if not partner.email:
                 continue
-        
+
             bcc_email = tools.email_normalize(partner.email)
-        
+
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
                 "Please do not reply to all.</p>"
             )
             bcc_body = bcc_note + original_body
-        
-            # 🛠 Fix: safely get headers dict
-            headers = base_msg.get("headers")
-            if not isinstance(headers, dict):
-                headers = {}
-        
-            headers["X-Odoo-Bcc"] = bcc_email
-        
+
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "headers": headers,
-                "email_to": email_to,
-                "email_to_raw": email_to_raw,
+                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
+                "email_to": email_to,           # Show original To
+                "email_to_raw": email_to_raw,   # Keep raw version the same
                 "email_cc": email_cc,
-                "email_bcc": "",
+                "email_bcc": "",                # No visible BCC
                 "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
-        
+
             result.append(bcc_msg)
+
+        return result
