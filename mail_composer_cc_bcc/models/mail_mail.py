@@ -22,7 +22,7 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Categorize recipients
+        # Prepare recipient groups
         recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
@@ -33,26 +33,25 @@ class MailMail(models.Model):
 
         final_msgs = []
 
-        # Grab the base message structure (the first item)
+        # Base message with correct To/Cc headers
         base_msg = res[0].copy()
         original_body = base_msg.get("body", "")
 
         # Send to visible recipients (To + Cc)
-        if email_to or email_cc:
-            base_msg.update({
-                "email_to": email_to,
-                "email_cc": email_cc,
-                "email_bcc": "",  # No Bcc in headers
-            })
-            final_msgs.append(base_msg)
+        base_msg.update({
+            "email_to": email_to,
+            "email_cc": email_cc,
+            "email_bcc": "",  # Don't expose Bcc
+        })
+        final_msgs.append(base_msg)
 
-        # Send separate messages to each Bcc recipient
+        # Send to each Bcc recipient, preserving To/Cc headers
         for bcc_email in bcc_emails:
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "email_to": bcc_email,
+                "email_to": bcc_email,  # Only used as envelope To
                 "email_cc": email_cc,
-                "email_bcc": "",  # Still hide Bcc header
+                "email_bcc": "",  # Bcc should not be visible
                 "body": (
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
                     "Please do not reply to all.</p>" + original_body
