@@ -48,17 +48,22 @@ class MailMail(models.Model):
             r.id for r in mail.recipient_ids if r not in mail.recipient_bcc_ids
         ]
 
-        # Base message: To and CC only
+        # Extract body from base message safely
         base_msg = res[0] if res else {}
-        base_msg.update({
+        original_body = base_msg.get("body", "")
+
+        # Message to To + CC only (no BCCs, no BCC notice)
+        clean_msg = base_msg.copy()
+        clean_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
             "email_cc": email_cc,
             "email_bcc": "",
+            "body": original_body,  # Important: no BCC note here
             "recipient_ids": [(6, 0, filtered_recipient_ids)],
         })
 
-        result = [base_msg]
+        result = [clean_msg]
 
         # Send one individual mail per BCC recipient
         for partner in mail.recipient_bcc_ids:
@@ -66,22 +71,23 @@ class MailMail(models.Model):
                 continue
 
             bcc_email = tools.email_normalize(partner.email)
+
+            # Create a fresh copy of the message
             bcc_msg = base_msg.copy()
 
             # Headers
             bcc_msg["headers"] = bcc_msg.get("headers", {})
             bcc_msg["headers"].update({"X-Odoo-Bcc": bcc_email})
 
-            # BCC body notice
+            # Add BCC notice to the body
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
                 "Please do not reply to all.</p>"
             )
-            original_body = base_msg.get("body", "")
             bcc_msg["body"] = bcc_note + original_body
 
-            # Show To/CC, but send only to BCC
+            # Use original To/CC headers, but send only to this BCC
             bcc_msg["email_to"] = email_to_raw
             bcc_msg["email_cc"] = email_cc
             bcc_msg["email_bcc"] = ""
