@@ -1,8 +1,5 @@
 from odoo import models, fields, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
-import logging
-
-_logger = logging.getLogger(__name__)
 
 
 def format_emails(partners):
@@ -34,28 +31,26 @@ class MailMail(models.Model):
 
         final_msgs = []
 
-        # 1. Visible TO and CC message
+        # Step 1: One normal message to visible To/Cc
         base_msg = res[0].copy()
         base_msg.update({
             "email_to": display_to,
             "email_cc": display_cc,
-            "email_bcc": "",  # Do not use this anymore for sending
+            "email_bcc": "",  # important: avoid adding a Bcc field to this message
         })
         final_msgs.append(base_msg)
 
-        # 2. Individual BCC messages
+        # Step 2: One message per BCC recipient with same headers and a note
         for bcc_email in bcc_emails:
             if not bcc_email:
                 continue
 
             partner = self.env['res.partner'].search([('email', '=', bcc_email)], limit=1)
-            _logger.info("Sending BCC to %s (partner: %s)", bcc_email, partner.name if partner else "N/A")
-
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "email_to": bcc_email,
-                "email_cc": "",          # Don't include visible cc
-                "email_bcc": "",         # Hide BCC field to avoid duplication
+                "email_to": display_to,     # Still show original To
+                "email_cc": display_cc,     # Still show original Cc
+                "email_bcc": "",            # Don't add Bcc header here
                 "body": (
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
                     "Please do not reply to all.</p>"
