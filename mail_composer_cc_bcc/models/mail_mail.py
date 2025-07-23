@@ -32,36 +32,29 @@ class MailMail(models.Model):
 
         final_msgs = []
 
-        # Base msg to visible recipients (To + Cc)
+        # Base visible message (To and Cc)
         base_msg = res[0].copy()
-        original_body = base_msg.get("body", "")
-
-        # Visible group email
         base_msg.update({
             "email_to": display_to,
             "email_cc": display_cc,
-            "email_bcc": "",  # Hide bcc
-            "headers": {
-                "To": display_to,
-                "Cc": display_cc,
-            }
+            "email_bcc": "",  # Hide Bcc
         })
         final_msgs.append(base_msg)
 
-        # Send per Bcc recipient with same To/Cc headers
+        # BCC messages
         for bcc_email in bcc_emails:
             bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "email_to": bcc_email,      # Envelope only
-                "email_cc": "",             # Don't confuse Odoo parser
-                "email_bcc": "",            # Never show
-                "headers": {
-                    "To": display_to,       # Actual visible To header
-                    "Cc": display_cc,       # Actual visible Cc header
+                "email_cc": "",             # Clean envelope
+                "email_bcc": "",            # Never expose
+                "headers": {                # Explicit To/Cc headers for visibility
+                    "To": display_to,
+                    "Cc": display_cc,
                 },
                 "body": (
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                    "Please do not reply to all.</p>" + original_body
+                    "Please do not reply to all.</p>" + base_msg.get("body", "")
                 ),
             })
             final_msgs.append(bcc_msg)
