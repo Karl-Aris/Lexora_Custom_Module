@@ -1,70 +1,65 @@
-from odoo import models, fields, tools
-from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
+from odoo import models, _
+from odoo.exceptions import UserError
+from odoo.tools import html2plaintext
+import copy
+import logging
 
+_logger = logging.getLogger(__name__)
 
-def format_emails(partners):
-    return ", ".join([
-        tools.formataddr((p.name or "", tools.email_normalize(p.email)))
-        for p in partners if p.email
-    ])
+class MailComposeMessage(models.TransientModel):
+    _inherit = 'mail.compose.message'
 
+    def _prepare_outgoing_list(self):
+        self.ensure_one()
 
-class MailMail(models.Model):
-    _inherit = "mail.mail"
+        # Safely get mail values
+        mail_values_dict = self._get_mail_values([self.id])
+        mail_values = mail_values_dict.get(self.id)
+        if not mail_values:
+            raise UserError(_("Could not generate mail values for this message."))
 
-    email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
+        mail_values_list = []
 
-    def _prepare_outgoing_list(self, recipients_follower_status=None):
-        res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
+        # Prepare standard email with To and Cc
+        standard_mail_values = copy.deepcopy(mail_values)
+        standard_mail_values["email_to"] = ','.join(
+            p.email for p in self.recipient_ids if p.email
+        )
+        standard_mail_values["email_cc"] = ','.join(
+            p.email for p in getattr(self, 'recipient_cc_ids', []) if p.email
+        )
+        standard_mail_values["email_bcc"] = ''  # omit sending all BCCs in one mail
 
-        if len(self.ids) != 1 or not self.env.context.get("is_from_composer"):
-            return res
+        mail_values_list.append(standard_mail_values)
 
-        mail = self[0]
-        recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
-        recipient_cc = mail.recipient_cc_ids
-        recipient_bcc = mail.recipient_bcc_ids
-
-        email_to_header = format_emails(recipient_to)
-        email_cc_header = format_emails(recipient_cc)
-        bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
-
-        final_msgs = []
-        added = set()
-
-        # ➤ Step 1: Normal message to To + Cc
-        for msg in res:
-            msg.update({
-                "email_to": email_to_header,
-                "email_cc": email_cc_header,
-                "email_bcc": False,
-            })
-            final_msgs.append(msg)
-            added.update(extract_rfc2822_addresses(email_to_header)[0])
-            added.update(extract_rfc2822_addresses(email_cc_header)[0])
-            break  # Only one message for To/Cc
-
-        # ➤ Step 2: Individual Bcc messages with correct headers
-        for bcc_email in bcc_emails:
-            if not bcc_email or bcc_email in added:
+        # Send BCCs as individual emails (with visible headers in body)
+        for partner in getattr(self, 'recipient_bcc_ids', []):
+            if not partner.email:
                 continue
 
-            for msg in res:
-                bcc_msg = msg.copy()
-                bcc_msg.update({
-                    "email_to": bcc_email,  # for SMTP delivery
-                    "email_cc": email_cc_header,
-                    "email_bcc": False,  # ensure Bcc is hidden
-                    "headers": {
-                        "To": email_to_header,
-                        "Cc": email_cc_header,
-                        # Optional: For debugging or tracking
-                        # "X-Original-To": email_to_header,
-                    },
-                    "body": msg.get("body", ""),  # remove Bcc note for now
-                })
-                final_msgs.append(bcc_msg)
-                added.add(bcc_email)
-                break
+            bcc_mail_values = copy.deepcopy(mail_values)
 
-        return final_msgs
+            # Insert visible email headers in body
+            header_note = f"""
+            <p style="color:gray; font-size:small;">
+              <strong>From:</strong> {self.email_from or 'Lexora'}<br/>
+              <strong>Reply-To:</strong> {self.reply_to or self.email_from or 'Lexora'}<br/>
+              <strong>To:</strong> {standard_mail_values.get('email_to', '')}<br/>
+              <strong>Cc:</strong> {standard_mail_values.get('email_cc', '')}<br/>
+              <strong>Bcc:</strong> {partner.email}<br/>
+              <em>🔒 You received this email as a BCC (Blind Carbon Copy). Please do not reply all.</em>
+            </p>
+            """
+
+            original_body = bcc_mail_values.get('body', '')
+            bcc_mail_values["body"] = header_note + original_body
+            bcc_mail_values["body_html"] = bcc_mail_values["body"]
+
+            # Ensure only BCC recipient receives it
+            bcc_mail_values["email_to"] = partner.email
+            bcc_mail_values["email_cc"] = ''
+            bcc_mail_values["email_bcc"] = ''
+
+            mail_values_list.append(bcc_mail_values)
+
+        return mail_values_list
