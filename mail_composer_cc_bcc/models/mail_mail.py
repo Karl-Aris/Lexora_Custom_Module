@@ -1,5 +1,6 @@
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
+import copy
 
 
 def format_emails(partners):
@@ -43,7 +44,7 @@ class MailMail(models.Model):
         base_msg = res[0] if res else {}
         original_body = base_msg.get("body", "")
 
-        clean_msg = base_msg.copy()
+        clean_msg = copy.deepcopy(base_msg)
         clean_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
@@ -69,13 +70,13 @@ class MailMail(models.Model):
             )
             bcc_body = bcc_note + original_body
 
-            bcc_msg = base_msg.copy()
+            bcc_msg = copy.deepcopy(base_msg)
             bcc_msg.update({
                 "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
-                "email_to": email_to,           # Show original To
-                "email_to_raw": email_to_raw,   # Keep raw version the same
+                "email_to": email_to,
+                "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
-                "email_bcc": "",                # No visible BCC
+                "email_bcc": "",
                 "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
