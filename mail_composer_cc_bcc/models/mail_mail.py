@@ -26,42 +26,40 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Separate partners
         bcc_partners = mail.recipient_bcc_ids
         cc_partners = mail.recipient_cc_ids
-        all_cc_bcc = cc_partners + bcc_partners
 
-        to_partners = self.env["res.partner"].browse([
-            p.id for p in mail.recipient_ids if p not in all_cc_bcc
-        ])
+        # Make sure to exclude CC + BCC from To
+        to_partners = mail.recipient_ids - cc_partners - bcc_partners
 
         email_to = format_emails(to_partners)
         email_to_raw = format_emails_raw(to_partners)
         email_cc = format_emails(cc_partners)
 
-        # Base clean message for To + CC only
         base_msg = res[0] if res else {}
         original_body = base_msg.get("body", "")
 
-        clean_msg = base_msg.copy()
-        clean_msg.update({
-            "email_to": email_to,
-            "email_to_raw": email_to_raw,
-            "email_cc": email_cc,
-            "email_bcc": "",
-            "body": original_body,
-            "recipient_ids": [(6, 0, [p.id for p in to_partners + cc_partners])],
-        })
+        result = []
 
-        result = [clean_msg]
+        # === TO + CC message ===
+        if to_partners or cc_partners:
+            msg_to_cc = base_msg.copy()
+            msg_to_cc.update({
+                "email_to": email_to,
+                "email_to_raw": email_to_raw,
+                "email_cc": email_cc,
+                "email_bcc": "",
+                "body": original_body,
+                "recipient_ids": [(6, 0, (to_partners + cc_partners).ids)],
+            })
+            result.append(msg_to_cc)
 
-        # Custom message for each BCC
+        # === BCC messages ===
         for partner in bcc_partners:
             if not partner.email:
                 continue
 
             bcc_email = tools.email_normalize(partner.email)
-
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
@@ -69,8 +67,8 @@ class MailMail(models.Model):
             )
             bcc_body = bcc_note + original_body
 
-            bcc_msg = base_msg.copy()
-            bcc_msg.update({
+            msg_bcc = base_msg.copy()
+            msg_bcc.update({
                 "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
                 "email_to": partner.email,
                 "email_to_raw": partner.email,
@@ -79,7 +77,6 @@ class MailMail(models.Model):
                 "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
-
-            result.append(bcc_msg)
+            result.append(msg_bcc)
 
         return result
