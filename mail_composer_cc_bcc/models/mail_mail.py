@@ -1,4 +1,4 @@
-from odoo import models, fields, tools
+from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 
@@ -26,19 +26,23 @@ class MailMail(models.Model):
 
         mail = self[0]
 
+        # Separate partners
         bcc_partners = mail.recipient_bcc_ids
         cc_partners = mail.recipient_cc_ids
-        all_cc_bcc = cc_partners | bcc_partners
-        to_partners = mail.recipient_ids - all_cc_bcc
+        all_cc_bcc = cc_partners + bcc_partners
+
+        to_partners = self.env["res.partner"].browse([
+            p.id for p in mail.recipient_ids if p not in all_cc_bcc
+        ])
 
         email_to = format_emails(to_partners)
         email_to_raw = format_emails_raw(to_partners)
         email_cc = format_emails(cc_partners)
 
+        # Base clean message for To + CC only
         base_msg = res[0] if res else {}
         original_body = base_msg.get("body", "")
 
-        # Message for To + CC
         clean_msg = base_msg.copy()
         clean_msg.update({
             "email_to": email_to,
@@ -46,39 +50,36 @@ class MailMail(models.Model):
             "email_cc": email_cc,
             "email_bcc": "",
             "body": original_body,
-            "recipient_ids": [(6, 0, (to_partners | cc_partners).ids)],
+            "recipient_ids": [(6, 0, [p.id for p in to_partners + cc_partners])],
         })
 
         result = [clean_msg]
 
-        # Messages for BCC
+        # Custom message for each BCC
         for partner in bcc_partners:
             if not partner.email:
                 continue
 
             bcc_email = tools.email_normalize(partner.email)
 
+            bcc_note = (
+                "<p style='color:gray; font-size:small;'>"
+                "🔒 You received this email as a BCC (Blind Carbon Copy). "
+                "Please do not reply to all.</p>"
+            )
+            bcc_body = bcc_note + original_body
+
             bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
-                "email_to": bcc_email,
-                "email_to_raw": bcc_email,
+                "email_to": email_to,           # Show original To
+                "email_to_raw": email_to_raw,   # Keep raw version the same
                 "email_cc": email_cc,
-                "email_bcc": "",
+                "email_bcc": "",                # No visible BCC
+                "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
-
-            # Inject body note for BCC
-            bcc_msg["body"] = self.with_context(is_bcc_split_for=True)._add_bcc_body(original_body)
 
             result.append(bcc_msg)
 
         return result
-
-    def _add_bcc_body(self, body):
-        notice = (
-            "<p style='color:gray; font-size:small;'>"
-            "🔒 You received this email as a BCC (Blind Carbon Copy). "
-            "Please do not reply to all.</p>"
-        )
-        return notice + body if body else notice
