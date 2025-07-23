@@ -28,6 +28,7 @@ class MailMail(models.Model):
         email_to = format_emails(recipient_to)
         email_cc = format_emails(recipient_cc)
         bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
+        email_bcc = ", ".join(bcc_emails)
 
         final_msgs = []
         seen_recipients = set()
