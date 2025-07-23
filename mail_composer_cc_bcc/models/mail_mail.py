@@ -25,6 +25,7 @@ class MailMail(models.Model):
     email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
 
     def _prepare_outgoing_list(self, recipients_follower_status=None):
+        # First, return if we're not coming from the Mail Composer
         res = super()._prepare_outgoing_list(
             recipients_follower_status=recipients_follower_status
         )
@@ -41,34 +42,35 @@ class MailMail(models.Model):
         email_to = format_emails(partner_to)
         email_to_raw = format_emails_raw(partner_to)
         email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc = [tools.email_normalize(r.email) for r in self.recipient_bcc_ids if r.email]
+        email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
+
+        # BCC notification note
+        bcc_note = (
+            "<p style='color:gray; font-style:italic;'>"
+            "🔒 You received this email as a BCC (Blind Carbon Copy). "
+            "Please do not reply to all.</p>"
+        )
 
         recipients = set()
-
         for m in res:
             rcpt_to = None
-            recipient_email = ""
+            body_before = m.get("body", "")
+            body_html_before = m.get("body_html", "")
 
             if m["email_to"]:
-                recipient_email = extract_rfc2822_addresses(m["email_to"][0])[0]
-                rcpt_to = recipient_email
-            elif m.get("email_cc"):
-                recipient_email = extract_rfc2822_addresses(m["email_cc"][0])[0]
-                rcpt_to = recipient_email
+                rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
+
+                if rcpt_to in email_bcc:
+                    m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
+                    # Add note to body for BCC
+                    m["body"] = bcc_note + body_before
+                    m["body_html"] = bcc_note + body_html_before
+
+            elif m["email_cc"]:
+                rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
 
             if rcpt_to:
                 recipients.add(rcpt_to)
-
-                if tools.email_normalize(rcpt_to) in email_bcc:
-                    # Inject BCC note in body
-                    bcc_note = (
-                        "<p style='color:gray; font-style:italic;'>"
-                        "🔒 You received this email as a BCC (Blind Carbon Copy). "
-                        "Please do not reply to all.</p>"
-                    )
-                    m["body"] = bcc_note + m.get("body", "")
-                    m["body_html"] = m["body"]
-                    m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
 
             m.update(
                 {
