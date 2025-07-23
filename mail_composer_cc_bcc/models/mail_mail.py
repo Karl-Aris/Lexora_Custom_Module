@@ -22,36 +22,43 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Prepare recipient groups
         recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
 
-        email_to = format_emails(recipient_to)
-        email_cc = format_emails(recipient_cc)
+        display_to = format_emails(recipient_to)
+        display_cc = format_emails(recipient_cc)
         bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
 
         final_msgs = []
 
-        # Base message with correct To/Cc headers
+        # Base msg to visible recipients (To + Cc)
         base_msg = res[0].copy()
         original_body = base_msg.get("body", "")
 
-        # Send to visible recipients (To + Cc)
+        # Visible group email
         base_msg.update({
-            "email_to": email_to,
-            "email_cc": email_cc,
-            "email_bcc": "",  # Don't expose Bcc
+            "email_to": display_to,
+            "email_cc": display_cc,
+            "email_bcc": "",  # Hide bcc
+            "headers": {
+                "To": display_to,
+                "Cc": display_cc,
+            }
         })
         final_msgs.append(base_msg)
 
-        # Send to each Bcc recipient, preserving To/Cc headers
+        # Send per Bcc recipient with same To/Cc headers
         for bcc_email in bcc_emails:
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "email_to": bcc_email,  # Only used as envelope To
-                "email_cc": email_cc,
-                "email_bcc": "",  # Bcc should not be visible
+                "email_to": bcc_email,      # Envelope only
+                "email_cc": "",             # Don't confuse Odoo parser
+                "email_bcc": "",            # Never show
+                "headers": {
+                    "To": display_to,       # Actual visible To header
+                    "Cc": display_cc,       # Actual visible Cc header
+                },
                 "body": (
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
                     "Please do not reply to all.</p>" + original_body
