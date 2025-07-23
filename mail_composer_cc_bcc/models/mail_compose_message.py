@@ -7,8 +7,8 @@ class MailComposeMessage(models.TransientModel):
     bcc_recipient_ids = fields.Many2many(
         comodel_name="res.partner",
         relation="mail_compose_message_res_partner_bcc_rel",
-        column1="compose_id",  # Must match this model
-        column2="partner_id",  # Must match res.partner
+        column1="mail_compose_message_id",  # This is the correct one
+        column2="partner_id",
         string="Bcc",
         help="Partners who will receive a blind carbon copy of the email."
     )
