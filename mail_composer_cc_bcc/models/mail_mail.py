@@ -1,4 +1,6 @@
+import re
 from odoo import fields, models, tools
+from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 
 def format_emails(partners):
@@ -12,76 +14,84 @@ def format_emails_raw(partners):
     return ", ".join([p.email for p in partners if p.email])
 
 
+def html_to_text(html):
+    """Basic HTML to plain text conversion."""
+    text = re.sub('<[^<]+?>', '', html)  # Strip tags
+    text = re.sub(r'\s+', ' ', text)  # Collapse whitespace
+    return text.strip()
+
+
 class MailMail(models.Model):
     _inherit = "mail.mail"
 
     email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
 
     def _prepare_outgoing_list(self, recipients_follower_status=None):
-        base_res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
+        res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
 
-        if len(self.ids) != 1 or not self.env.context.get("is_from_composer", False):
-            return base_res
+        if len(self.ids) > 1 or not self.env.context.get("is_from_composer", False):
+            return res
 
         mail = self[0]
 
-        # Separate partner groups
+        # Separate partners
         bcc_partners = mail.recipient_bcc_ids
         cc_partners = mail.recipient_cc_ids
-        to_partners = mail.recipient_ids - cc_partners - bcc_partners
+        all_cc_bcc = cc_partners + bcc_partners
 
-        # Email headers
+        to_partners = self.env["res.partner"].browse([
+            p.id for p in mail.recipient_ids if p not in all_cc_bcc
+        ])
+
         email_to = format_emails(to_partners)
         email_to_raw = format_emails_raw(to_partners)
         email_cc = format_emails(cc_partners)
 
-        base_msg = base_res[0] if base_res else {}
+        # Base clean message for To + CC only
+        base_msg = res[0] if res else {}
         original_body = base_msg.get("body", "")
-        original_headers = base_msg.get("headers", {}).copy()
+        original_alt = html_to_text(original_body)
 
-        result = []
+        clean_msg = base_msg.copy()
+        clean_msg.update({
+            "email_to": email_to,
+            "email_to_raw": email_to_raw,
+            "email_cc": email_cc,
+            "email_bcc": "",
+            "body": original_body,
+            "body_alternative": original_alt,
+            "recipient_ids": [(6, 0, [p.id for p in to_partners + cc_partners])],
+        })
 
-        # ➤ Message for To + Cc (no BCC note)
-        if to_partners or cc_partners:
-            result.append({
-                "subject": base_msg.get("subject", ""),
-                "body": original_body,
-                "email_to": email_to,
-                "email_to_raw": email_to_raw,
-                "email_cc": email_cc,
-                "email_bcc": "",  # never expose bcc
-                "headers": original_headers.copy(),
-                "recipient_ids": [(6, 0, (to_partners + cc_partners).ids)],
-                "attachments": base_msg.get("attachments", []),
-                "message_id": base_msg.get("message_id", False),
-            })
+        result = [clean_msg]
 
-        # ➤ Separate email for each BCC with BCC note
-        for bcc_partner in bcc_partners:
-            if not bcc_partner.email:
+        # Custom message for each BCC
+        for partner in bcc_partners:
+            if not partner.email:
                 continue
 
-            bcc_email = tools.email_normalize(bcc_partner.email)
+            bcc_email = tools.email_normalize(partner.email)
+
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
                 "Please do not reply to all.</p>"
             )
+            bcc_body = bcc_note + original_body
+            bcc_alt = html_to_text(bcc_body)
 
-            result.append({
-                "subject": base_msg.get("subject", ""),
-                "body": bcc_note + original_body,
-                "email_to": bcc_email,
-                "email_to_raw": bcc_email,
+            bcc_msg = base_msg.copy()
+            bcc_msg.update({
+                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
+                "email_to": partner.email,
+                "email_to_raw": partner.email,
                 "email_cc": email_cc,
-                "email_bcc": "",  # still no real bcc
-                "headers": {
-                    **original_headers,
-                    "X-Odoo-Bcc": bcc_email,
-                },
-                "recipient_ids": [(6, 0, [bcc_partner.id])],
-                "attachments": base_msg.get("attachments", []),
-                "message_id": base_msg.get("message_id", False),
+                "email_bcc": "",
+                "body": bcc_body,
+                "body_alternative": bcc_alt,
+                "recipient_ids": [(6, 0, [partner.id])],
             })
+
+            result.append(bcc_msg)
 
         return result
