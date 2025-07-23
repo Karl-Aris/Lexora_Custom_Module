@@ -1,4 +1,5 @@
 from odoo import fields, models, tools
+from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 def format_emails(partners):
     emails = [
@@ -23,23 +24,18 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Identify recipient groups
         to_partners = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
         cc_partners = mail.recipient_cc_ids
         bcc_partners = mail.recipient_bcc_ids
 
-        # Format headers
         email_to = format_emails(to_partners)
         email_to_raw = format_emails_raw(to_partners)
         email_cc = format_emails(cc_partners)
 
-        base_msg = res[0]
-        original_body = base_msg.get("body", "")  # Keep this immutable
+        original_body = mail.body_html or mail.body or ""
 
-        result = []
-
-        # 1. Clean version for TO + CC (no BCC note)
-        clean_msg = base_msg.copy()
+        # --- Message for TO + CC (no BCC note)
+        clean_msg = res[0].copy()
         clean_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
@@ -48,32 +44,35 @@ class MailMail(models.Model):
             "body": original_body,
             "recipient_ids": [(6, 0, (to_partners | cc_partners).ids)],
         })
-        result.append(clean_msg)
 
-        # 2. BCC version — one per partner
+        result = [clean_msg]
+
+        # --- Individual messages for BCC recipients with BCC note
+        bcc_note = (
+            "<p style='color:gray; font-size:small;'>"
+            "🔒 You received this email as a BCC (Blind Carbon Copy). "
+            "Please do not reply to all.</p>"
+        )
+
         for partner in bcc_partners:
             if not partner.email:
                 continue
 
             bcc_email = tools.email_normalize(partner.email)
-            bcc_note = (
-                "<p style='color:gray; font-size:small;'>"
-                "🔒 You received this email as a BCC (Blind Carbon Copy). "
-                "Please do not reply to all.</p>"
-            )
+            bcc_msg = res[0].copy()
 
-            bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "email_to": email_to_raw,
                 "email_cc": email_cc,
-                "email_bcc": "",  # Don't expose any BCC
+                "email_bcc": "",
                 "headers": {
-                    **base_msg.get("headers", {}),
+                    **bcc_msg.get("headers", {}),
                     "X-Odoo-Bcc": bcc_email
                 },
                 "body": bcc_note + original_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
+
             result.append(bcc_msg)
 
         return result
