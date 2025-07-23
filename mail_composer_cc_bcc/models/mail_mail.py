@@ -32,7 +32,7 @@ class MailMail(models.Model):
         final_msgs = []
         added = set()
 
-        # Step 1: Send To + Cc message
+        # ➤ Step 1: Normal message to To + Cc
         for msg in res:
             msg.update({
                 "email_to": email_to_header,
@@ -42,9 +42,9 @@ class MailMail(models.Model):
             final_msgs.append(msg)
             added.update(extract_rfc2822_addresses(email_to_header)[0])
             added.update(extract_rfc2822_addresses(email_cc_header)[0])
-            break  # Only one message needed for To+Cc
+            break  # Only one message for To/Cc
 
-        # Step 2: Send to each BCC individually with correct headers
+        # ➤ Step 2: Individual Bcc messages with correct headers
         for bcc_email in bcc_emails:
             if not bcc_email or bcc_email in added:
                 continue
@@ -52,18 +52,16 @@ class MailMail(models.Model):
             for msg in res:
                 bcc_msg = msg.copy()
                 bcc_msg.update({
-                    "email_to": bcc_email,  # This ensures actual delivery
-                    "email_cc": email_cc_header,  # Show real CC
-                    "email_bcc": False,  # Hide BCC
+                    "email_to": bcc_email,  # for SMTP delivery
+                    "email_cc": email_cc_header,
+                    "email_bcc": False,  # ensure Bcc is hidden
                     "headers": {
-                        'To': email_to_header,
-                        'Cc': email_cc_header,
+                        "To": email_to_header,
+                        "Cc": email_cc_header,
+                        # Optional: For debugging or tracking
+                        # "X-Original-To": email_to_header,
                     },
-                    "body": (
-                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                        "Please do not reply.</p>"
-                        + msg.get("body", "")
-                    ),
+                    "body": msg.get("body", ""),  # remove Bcc note for now
                 })
                 final_msgs.append(bcc_msg)
                 added.add(bcc_email)
