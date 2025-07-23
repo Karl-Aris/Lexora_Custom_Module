@@ -16,7 +16,7 @@ class MailComposeMessage(models.TransientModel):
         self.ensure_one()
 
         # Safely get mail values
-        mail_values_dict = self._get_mail_values([self.id])
+        mail_values_dict = self.with_context(is_from_composer=True)._get_mail_values([self.id])
         mail_values = mail_values_dict.get(self.id)
         if not mail_values:
             raise UserError(_("Could not generate mail values for this message."))
