@@ -34,7 +34,7 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Build the To, CC, and BCC lists
+        # Separate recipients
         partners_cc_bcc = mail.recipient_cc_ids + mail.recipient_bcc_ids
         partner_to_ids = [r.id for r in mail.recipient_ids if r not in partners_cc_bcc]
         partner_to = self.env["res.partner"].browse(partner_to_ids)
@@ -43,55 +43,54 @@ class MailMail(models.Model):
         email_to_raw = format_emails_raw(partner_to)
         email_cc = format_emails(mail.recipient_cc_ids)
 
-        # Filter out BCC from original recipients
+        # Extract the base message returned by super
+        base_msg = res[0] if res else {}
+        original_body = base_msg.get("body", "")  # Store the unmodified body
+
+        # Filter out BCCs from original recipient list
         filtered_recipient_ids = [
             r.id for r in mail.recipient_ids if r not in mail.recipient_bcc_ids
         ]
 
-        # Extract body from base message safely
-        base_msg = res[0] if res else {}
-        original_body = base_msg.get("body", "")
-
-        # Message to To + CC only (no BCCs, no BCC notice)
+        # Prepare clean message for To + CC only (no note)
         clean_msg = base_msg.copy()
         clean_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
             "email_cc": email_cc,
             "email_bcc": "",
-            "body": original_body,  # Important: no BCC note here
+            "body": original_body,
             "recipient_ids": [(6, 0, filtered_recipient_ids)],
         })
 
         result = [clean_msg]
 
-        # Send one individual mail per BCC recipient
+        # Send one message per BCC recipient, with notice and headers
         for partner in mail.recipient_bcc_ids:
             if not partner.email:
                 continue
 
             bcc_email = tools.email_normalize(partner.email)
-
-            # Create a fresh copy of the message
             bcc_msg = base_msg.copy()
 
-            # Headers
-            bcc_msg["headers"] = bcc_msg.get("headers", {})
-            bcc_msg["headers"].update({"X-Odoo-Bcc": bcc_email})
-
-            # Add BCC notice to the body
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
                 "Please do not reply to all.</p>"
             )
-            bcc_msg["body"] = bcc_note + original_body
+            bcc_body = bcc_note + original_body
 
-            # Use original To/CC headers, but send only to this BCC
-            bcc_msg["email_to"] = email_to_raw
-            bcc_msg["email_cc"] = email_cc
-            bcc_msg["email_bcc"] = ""
-            bcc_msg["recipient_ids"] = [(6, 0, [partner.id])]
+            # Update headers
+            bcc_msg["headers"] = bcc_msg.get("headers", {})
+            bcc_msg["headers"].update({"X-Odoo-Bcc": bcc_email})
+
+            bcc_msg.update({
+                "email_to": email_to_raw,
+                "email_cc": email_cc,
+                "email_bcc": "",
+                "recipient_ids": [(6, 0, [partner.id])],
+                "body": bcc_body,  # Explicitly set the body with BCC notice
+            })
 
             result.append(bcc_msg)
 
