@@ -6,6 +6,9 @@ class MailComposeMessage(models.TransientModel):
 
     bcc_recipient_ids = fields.Many2many(
         comodel_name="res.partner",
+        relation="mail_compose_message_res_partner_bcc_rel",
+        column1="compose_id",  # Must match this model
+        column2="partner_id",  # Must match res.partner
         string="Bcc",
         help="Partners who will receive a blind carbon copy of the email."
     )
@@ -13,10 +16,10 @@ class MailComposeMessage(models.TransientModel):
     def _action_send_mail(self, auto_commit=False):
         res = super()._action_send_mail(auto_commit=auto_commit)
 
-        mail_mail = self.env["mail.mail"]
+        Mail = self.env["mail.mail"]
         for wizard in self:
             if wizard.bcc_recipient_ids:
-                mails = mail_mail.search([
+                mails = Mail.search([
                     ("mail_message_id", "=", wizard.mail_message_id.id)
                 ])
                 for mail in mails:
