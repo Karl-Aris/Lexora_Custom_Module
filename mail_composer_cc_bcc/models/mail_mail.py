@@ -71,7 +71,7 @@ class MailMail(models.Model):
         
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
+                "headers": {**(base_msg.get("headers") or {}), "X-Odoo-Bcc": bcc_email},
                 "email_to": email_to,
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
