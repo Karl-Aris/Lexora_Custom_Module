@@ -1,35 +1,81 @@
-# Copyright 2024 Camptocamp SA
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-
-import logging
-
-from odoo import models
-
-_logger = logging.getLogger(__name__)
+from odoo import models, fields, tools
+from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 
-class IrMailServer(models.Model):
-    _inherit = "ir.mail_server"
+def format_emails(partners):
+    return ", ".join([
+        tools.formataddr((p.name or "", tools.email_normalize(p.email)))
+        for p in partners if p.email
+    ])
 
-    def _prepare_email_message(self, message, smtp_session):
-        """
-        Define smtp_to based on context instead of To+Cc+Bcc
-        """
-        x_odoo_bcc_value = next(
-            (value for key, value in message._headers if key == "X-Odoo-Bcc"), None
-        )
-        # Add Bcc field inside message to pass validation
-        if x_odoo_bcc_value:
-            message["Bcc"] = x_odoo_bcc_value
 
-        smtp_from, smtp_to_list, message = super()._prepare_email_message(
-            message, smtp_session
-        )
+class MailMail(models.Model):
+    _inherit = "mail.mail"
 
-        is_from_composer = self.env.context.get("is_from_composer", False)
-        if is_from_composer and self.env.context.get("recipients", False):
-            smtp_to = self.env.context["recipients"].pop(0)
-            _logger.debug("smtp_to: %s", smtp_to)
-            smtp_to_list = [smtp_to]
+    email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
 
-        return smtp_from, smtp_to_list, message
+    def _prepare_outgoing_list(self, recipients_follower_status=None):
+        res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
+
+        if len(self.ids) != 1 or not self.env.context.get("is_from_composer"):
+            return res
+
+        mail = self[0]
+        recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
+        recipient_cc = mail.recipient_cc_ids
+        recipient_bcc = mail.recipient_bcc_ids
+
+        email_to = format_emails(recipient_to)
+        email_cc = format_emails(recipient_cc)
+        bcc_partners = [p for p in recipient_bcc if p.email]
+        bcc_emails = [tools.email_normalize(p.email) for p in bcc_partners]
+
+        final_msgs = []
+        seen_recipients = set()
+
+        # Prepare standard message (To + Cc, no Bcc)
+        for msg in res:
+            extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
+            msg_to_emails = extract_result[0] if extract_result else []
+            if not msg_to_emails:
+                continue
+
+            recipient_email = tools.email_normalize(msg_to_emails[0])
+            if recipient_email in bcc_emails or recipient_email in seen_recipients:
+                continue  # Skip duplicates
+
+            msg.update({
+                "email_to": email_to,
+                "email_cc": email_cc,
+                "email_bcc": "",
+            })
+            final_msgs.append(msg)
+            seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
+            seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
+            break  # Only one standard message needed
+
+        # Prepare separate BCC messages
+        for partner in bcc_partners:
+            bcc_email = tools.email_normalize(partner.email)
+            if bcc_email in seen_recipients:
+                continue
+
+            for msg in res:
+                bcc_msg = msg.copy()
+                bcc_msg.update({
+                    "email_to": email_to,  # original visible TO
+                    "email_cc": email_cc,
+                    "email_bcc": "",
+                    "headers": {
+                        "X-Odoo-Bcc": bcc_email
+                    },
+                    "body": (
+                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply.</p>" + msg.get("body", "")
+                    ),
+                    "recipient_ids": [(6, 0, [partner.id])],
+                })
+                final_msgs.append(bcc_msg)
+                break  # Only one per BCC
+
+        return final_msgs
