@@ -3,7 +3,7 @@
 
 from odoo import models
 
-from .mail_mail import format_emails
+#from .mail_mail import format_emails
 
 
 class MailThread(models.AbstractModel):
