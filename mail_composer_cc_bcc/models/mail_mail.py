@@ -21,13 +21,13 @@ class MailMail(models.Model):
             return res
 
         mail = self[0]
-        recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
+        recipient_to = mail.recipient_ids
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
 
         email_to = format_emails(recipient_to)
         email_cc = format_emails(recipient_cc)
-        bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
+        email_bcc = format_emails(recipient_bcc)
 
         final_msgs = []
         seen_recipients = set()
@@ -46,11 +46,12 @@ class MailMail(models.Model):
             msg.update({
                 "email_to": email_to,
                 "email_cc": email_cc,
-                "email_bcc": False,
+                "email_bcc": email_bcc,
             })
             final_msgs.append(msg)
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
+            seen_recipients.update(extract_rfc2822_addresses(email_bcc)[0])
             break  # Only need one normal message
 
         # Add BCC messages separately
@@ -62,9 +63,9 @@ class MailMail(models.Model):
             for msg in res:
                 new_msg = msg.copy()
                 new_msg.update({
-                    "email_to": bcc_email,
+                    "email_to": "",
                     "email_cc": "",
-                    "email_bcc": "",
+                    "email_bcc": bcc_email,
                     "body": (
                         "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
                         "Please do not reply.</p>"
