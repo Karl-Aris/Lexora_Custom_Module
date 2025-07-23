@@ -32,7 +32,7 @@ class MailMail(models.Model):
         final_msgs = []
         seen_recipients = set()
 
-        # ✅ Normal (To + CC)
+        # Add normal (To + CC) message once
         for msg in res:
             extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
             msg_to_emails = extract_result[0] if extract_result else []
@@ -41,7 +41,7 @@ class MailMail(models.Model):
 
             recipient_email = tools.email_normalize(msg_to_emails[0])
             if recipient_email in bcc_emails or recipient_email in seen_recipients:
-                continue
+                continue  # Skip duplicates
 
             msg.update({
                 "email_to": email_to,
@@ -51,9 +51,9 @@ class MailMail(models.Model):
             final_msgs.append(msg)
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
-            break  # Send To+Cc email only once
+            break  # Only need one normal message
 
-        # ✅ Individual BCCs (with visible To & Cc)
+        # Add BCC messages separately
         bcc_sent = set()
         for bcc_email in bcc_emails:
             if bcc_email in seen_recipients or bcc_email in bcc_sent:
@@ -62,18 +62,15 @@ class MailMail(models.Model):
             for msg in res:
                 new_msg = msg.copy()
                 new_msg.update({
-                    "email_to": email_to,   # show same To as normal
-                    "email_cc": email_cc,   # show same Cc as normal
-                    "email_bcc": "",        # do not expose Bcc
+                    "email_to": email_to,     # keep original To
+                    "email_cc": email_cc,     # keep original Cc
+                    "email_bcc": bcc_email,   # BCC will be hidden
                     "body": (
                         "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                        "Please do not reply all.</p>"
+                        "Please do not reply.</p>"
                         + msg.get("body", "")
                     ),
                 })
-                # Force actual delivery to BCC email
-                new_msg["recipient_ids"] = False  # avoid confusion
-                new_msg["email_to"] = bcc_email   # send *to* this BCC only, even if To says otherwise
                 final_msgs.append(new_msg)
                 bcc_sent.add(bcc_email)
                 break
