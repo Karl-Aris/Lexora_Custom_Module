@@ -1,14 +1,5 @@
 from odoo import models, fields, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
-import logging
-
-_logger = logging.getLogger(__name__)
-
-def format_emails(partners):
-    return ", ".join([
-        tools.formataddr((p.name or "", tools.email_normalize(p.email)))
-        for p in partners if p.email
-    ])
 
 class MailMail(models.Model):
     _inherit = "mail.mail"
@@ -26,60 +17,51 @@ class MailMail(models.Model):
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
 
-        email_to = format_emails(recipient_to)
-        email_cc = format_emails(recipient_cc)
+        email_to = ", ".join([tools.formataddr((p.name or "", tools.email_normalize(p.email))) for p in recipient_to if p.email])
+        email_cc = ", ".join([tools.formataddr((p.name or "", tools.email_normalize(p.email))) for p in recipient_cc if p.email])
         bcc_emails = [tools.email_normalize(p.email) for p in recipient_bcc if p.email]
 
         final_msgs = []
         seen_recipients = set()
 
-        # Add the standard message with To + Cc
+        # Main message to To + Cc
         for msg in res:
-            if not isinstance(msg, dict):
-                _logger.warning("Skipped non-dict msg: %s", msg)
+            extract_result = extract_rfc2822_addresses(msg.get("email_to", ""))
+            msg_to_emails = extract_result[0] if extract_result else []
+            if not msg_to_emails:
                 continue
 
-            to_emails = extract_rfc2822_addresses(msg.get("email_to", ""))[0]
-            if not to_emails:
-                continue
-
-            recipient_email = tools.email_normalize(to_emails[0])
-            if not recipient_email or recipient_email in bcc_emails or recipient_email in seen_recipients:
-                continue
+            recipient_email = tools.email_normalize(msg_to_emails[0])
+            if recipient_email in bcc_emails or recipient_email in seen_recipients:
+                continue  # Prevent duplicates
 
             msg.update({
                 "email_to": email_to,
                 "email_cc": email_cc,
                 "email_bcc": False,
             })
-
             final_msgs.append(msg)
             seen_recipients.update(extract_rfc2822_addresses(email_to)[0])
             seen_recipients.update(extract_rfc2822_addresses(email_cc)[0])
-            break  # Only send one main message
+            break  # Only one message for To + Cc
 
-        # Add separate BCC messages
+        # Individual messages for Bcc
         for bcc_email in bcc_emails:
             if bcc_email in seen_recipients:
                 continue
 
-            for base_msg in res:
-                if not isinstance(base_msg, dict):
-                    continue
-
-                bcc_msg = base_msg.copy()
-                bcc_msg.update({
+            for msg in res:
+                new_msg = msg.copy()
+                new_msg.update({
                     "email_to": bcc_email,
                     "email_cc": "",
                     "email_bcc": "",
                     "body": (
-                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
-                        "Please do not reply.</p>" + base_msg.get("body", "")
+                        "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC. "
+                        "Please do not reply all.</p>" + msg.get("body", "")
                     ),
                 })
-
-                final_msgs.append(bcc_msg)
-                seen_recipients.add(bcc_email)
+                final_msgs.append(new_msg)
                 break
 
         return final_msgs
