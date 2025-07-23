@@ -1,5 +1,4 @@
 from odoo import fields, models, tools
-from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 
 def format_emails(partners):
@@ -26,12 +25,9 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Separate partners
         bcc_partners = mail.recipient_bcc_ids
         cc_partners = mail.recipient_cc_ids
-        all_cc_bcc = cc_partners | bcc_partners
-
-        to_partners = mail.recipient_ids - all_cc_bcc
+        to_partners = mail.recipient_ids - cc_partners - bcc_partners
 
         email_to = format_emails(to_partners)
         email_to_raw = format_emails_raw(to_partners)
@@ -40,7 +36,7 @@ class MailMail(models.Model):
         base_msg = res[0] if res else {}
         original_body = base_msg.get("body", "")
 
-        # Clean message for To and CC
+        # Clean message for To & CC
         clean_msg = base_msg.copy()
         clean_msg.update({
             "email_to": email_to,
@@ -48,32 +44,30 @@ class MailMail(models.Model):
             "email_cc": email_cc,
             "email_bcc": "",
             "body": original_body,
-            "recipient_ids": [(6, 0, (to_partners | cc_partners).ids)],
+            "recipient_ids": [(6, 0, (to_partners + cc_partners).ids)],
         })
 
         result = [clean_msg]
 
-        # Message per BCC
+        # One email per BCC
         for partner in bcc_partners:
             if not partner.email:
                 continue
 
-            bcc_email = tools.email_normalize(partner.email)
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
                 "Please do not reply to all.</p>"
             )
-            bcc_body = bcc_note + original_body
 
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
+                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": tools.email_normalize(partner.email)},
                 "email_to": email_to,
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
                 "email_bcc": "",
-                "body": bcc_body,
+                "body": bcc_note + original_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
 
