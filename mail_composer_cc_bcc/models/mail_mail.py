@@ -1,5 +1,8 @@
 from odoo import models, fields, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 def format_emails(partners):
@@ -21,7 +24,6 @@ class MailMail(models.Model):
             return res
 
         mail = self[0]
-
         recipient_to = mail.recipient_ids - mail.recipient_cc_ids - mail.recipient_bcc_ids
         recipient_cc = mail.recipient_cc_ids
         recipient_bcc = mail.recipient_bcc_ids
@@ -32,23 +34,29 @@ class MailMail(models.Model):
 
         final_msgs = []
 
-        # Base visible message (To and Cc)
+        # Base message (To + Cc)
         base_msg = res[0].copy()
         base_msg.update({
             "email_to": display_to,
             "email_cc": display_cc,
-            "email_bcc": "",  # Hide Bcc
+            "email_bcc": "",  # Never expose BCC in headers
         })
         final_msgs.append(base_msg)
 
-        # BCC messages
+        # Generate BCC emails
         for bcc_email in bcc_emails:
+            if not bcc_email:
+                continue
+
+            # Find matching partner (optional)
+            partner = self.env['res.partner'].search([('email', '=', bcc_email)], limit=1)
+
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "email_to": bcc_email,      # Envelope only
-                "email_cc": "",             # Clean envelope
-                "email_bcc": "",            # Never expose
-                "headers": {                # Explicit To/Cc headers for visibility
+                "email_to": bcc_email,  # Envelope
+                "email_cc": "",         # No visible CC
+                "email_bcc": "",        # No visible BCC
+                "headers": {            # Visual headers
                     "To": display_to,
                     "Cc": display_cc,
                 },
@@ -56,7 +64,10 @@ class MailMail(models.Model):
                     "<p style='color:gray; font-style:italic;'>🔒 You received this email as a BCC (Blind Carbon Copy). "
                     "Please do not reply to all.</p>" + base_msg.get("body", "")
                 ),
+                "recipient_ids": [(6, 0, [partner.id])] if partner else [],
             })
             final_msgs.append(bcc_msg)
+
+            _logger.info("Prepared BCC email to %s with headers To: %s | Cc: %s", bcc_email, display_to, display_cc)
 
         return final_msgs
