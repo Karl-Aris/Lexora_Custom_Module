@@ -20,10 +20,10 @@ class MailMail(models.Model):
     email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
 
     def _prepare_outgoing_list(self, recipients_follower_status=None):
-        res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
+        super_res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
 
         if len(self.ids) > 1 or not self.env.context.get("is_from_composer", False):
-            return res
+            return super_res
 
         mail = self[0]
 
@@ -40,23 +40,23 @@ class MailMail(models.Model):
         email_to_raw = format_emails_raw(to_partners)
         email_cc = format_emails(cc_partners)
 
-        # Base clean message for To + CC only
-        base_msg = res[0] if res else {}
+        base_msg = super_res[0] if super_res else {}
         original_body = base_msg.get("body", "")
 
-        clean_msg = copy.deepcopy(base_msg)
-        clean_msg.update({
+        # Clean To+CC version
+        to_cc_msg = copy.deepcopy(base_msg)
+        to_cc_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
             "email_cc": email_cc,
-            "email_bcc": "",
+            "email_bcc": "",  # Hidden
             "body": original_body,
             "recipient_ids": [(6, 0, [p.id for p in to_partners + cc_partners])],
         })
 
-        result = [clean_msg]
+        result = [to_cc_msg]
 
-        # Custom message for each BCC
+        # BCC messages
         for partner in bcc_partners:
             if not partner.email:
                 continue
@@ -72,11 +72,11 @@ class MailMail(models.Model):
 
             bcc_msg = copy.deepcopy(base_msg)
             bcc_msg.update({
-                "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
+                "headers": {**copy.deepcopy(base_msg.get("headers", {})), "X-Odoo-Bcc": bcc_email},
                 "email_to": email_to,
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
-                "email_bcc": "",
+                "email_bcc": "",  # Hide actual bcc
                 "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
