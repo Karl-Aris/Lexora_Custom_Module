@@ -67,8 +67,11 @@ class MailMail(models.Model):
             )
 
             bcc_msg = deepcopy(base_msg)
-            bcc_msg.update({
-                "headers": {**base_msg["headers"], "X-Odoo-Bcc": tools.email_normalize(partner.email)},
+           bcc_msg.update({
+                "headers": {
+                    **(base_msg.get("headers") if isinstance(base_msg.get("headers"), dict) else {}),
+                    "X-Odoo-Bcc": tools.email_normalize(partner.email),
+                },
                 "body": bcc_note + base_msg["body"],
                 "recipient_ids": [(6, 0, [partner.id])],
             })
