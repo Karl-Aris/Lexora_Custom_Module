@@ -1,0 +1,13 @@
+<odoo>
+    <record id="view_mail_compose_message_form_inherit_bcc" model="ir.ui.view">
+        <field name="name">mail.compose.message.form.inherit.bcc</field>
+        <field name="model">mail.compose.message</field>
+        <field name="inherit_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="arch" type="xml">
+            <!-- Insert after the 'recipient_ids' field -->
+            <xpath expr="//field[@name='recipient_ids']" position="after">
+                <field name="bcc_recipient_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
