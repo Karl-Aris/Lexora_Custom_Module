@@ -1,16 +1,17 @@
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
+
 def format_emails(partners):
-    emails = [
+    return ", ".join([
         tools.formataddr((p.name or "", tools.email_normalize(p.email)))
         for p in partners if p.email
-    ]
-    return ", ".join(emails)
+    ])
+
 
 def format_emails_raw(partners):
-    emails = [p.email for p in partners if p.email]
-    return ", ".join(emails)
+    return ", ".join([p.email for p in partners if p.email])
+
 
 class MailMail(models.Model):
     _inherit = "mail.mail"
@@ -19,27 +20,29 @@ class MailMail(models.Model):
 
     def _prepare_outgoing_list(self, recipients_follower_status=None):
         res = super()._prepare_outgoing_list(recipients_follower_status=recipients_follower_status)
-        is_out_of_scope = len(self.ids) > 1
-        is_from_composer = self.env.context.get("is_from_composer", False)
 
-        if is_out_of_scope or not is_from_composer:
+        if len(self.ids) > 1 or not self.env.context.get("is_from_composer", False):
             return res
 
         mail = self[0]
 
-        # Identify actual To recipients (excluding CC and BCC)
-        partners_cc_bcc = mail.recipient_cc_ids + mail.recipient_bcc_ids
-        partner_to_ids = [r.id for r in mail.recipient_ids if r not in partners_cc_bcc]
-        partner_to = self.env["res.partner"].browse(partner_to_ids)
+        # Separate partners
+        bcc_partners = mail.recipient_bcc_ids
+        cc_partners = mail.recipient_cc_ids
+        all_cc_bcc = cc_partners + bcc_partners
 
-        email_to = format_emails(partner_to)
-        email_to_raw = format_emails_raw(partner_to)
-        email_cc = format_emails(mail.recipient_cc_ids)
+        to_partners = self.env["res.partner"].browse([
+            p.id for p in mail.recipient_ids if p not in all_cc_bcc
+        ])
 
+        email_to = format_emails(to_partners)
+        email_to_raw = format_emails_raw(to_partners)
+        email_cc = format_emails(cc_partners)
+
+        # Base clean message for To + CC only
         base_msg = res[0] if res else {}
         original_body = base_msg.get("body", "")
 
-        # Clean message for To/CC
         clean_msg = base_msg.copy()
         clean_msg.update({
             "email_to": email_to,
@@ -47,17 +50,18 @@ class MailMail(models.Model):
             "email_cc": email_cc,
             "email_bcc": "",
             "body": original_body,
-            "recipient_ids": [(6, 0, [p.id for p in partner_to + mail.recipient_cc_ids])],
+            "recipient_ids": [(6, 0, [p.id for p in to_partners + cc_partners])],
         })
 
         result = [clean_msg]
 
-        # Create individual message for each BCC recipient
-        for partner in mail.recipient_bcc_ids:
+        # Custom message for each BCC
+        for partner in bcc_partners:
             if not partner.email:
                 continue
 
             bcc_email = tools.email_normalize(partner.email)
+
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
                 "🔒 You received this email as a BCC (Blind Carbon Copy). "
@@ -68,7 +72,8 @@ class MailMail(models.Model):
             bcc_msg = base_msg.copy()
             bcc_msg.update({
                 "headers": {**base_msg.get("headers", {}), "X-Odoo-Bcc": bcc_email},
-                "email_to": bcc_email,  # ✅ Deliver ONLY to this BCC partner
+                "email_to": partner.email,
+                "email_to_raw": partner.email,
                 "email_cc": email_cc,
                 "email_bcc": "",
                 "body": bcc_body,
