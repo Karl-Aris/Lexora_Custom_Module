@@ -34,29 +34,29 @@ class MailMail(models.Model):
 
         final_msgs = []
 
-        # Base message (To + Cc)
+        # 1. Standard message to visible recipients
         base_msg = res[0].copy()
         base_msg.update({
             "email_to": display_to,
             "email_cc": display_cc,
-            "email_bcc": "",  # Never expose BCC in headers
+            "email_bcc": "",
         })
         final_msgs.append(base_msg)
 
-        # Generate BCC emails
+        # 2. Individual BCC messages
         for bcc_email in bcc_emails:
             if not bcc_email:
                 continue
 
-            # Find matching partner (optional)
             partner = self.env['res.partner'].search([('email', '=', bcc_email)], limit=1)
+            _logger.info("Creating BCC email for %s (partner: %s)", bcc_email, partner.name if partner else "N/A")
 
             bcc_msg = base_msg.copy()
             bcc_msg.update({
-                "email_to": bcc_email,  # Envelope
-                "email_cc": "",         # No visible CC
-                "email_bcc": "",        # No visible BCC
-                "headers": {            # Visual headers
+                "email_to": bcc_email,
+                "email_cc": "",
+                "email_bcc": "",
+                "headers": {
                     "To": display_to,
                     "Cc": display_cc,
                 },
@@ -67,7 +67,5 @@ class MailMail(models.Model):
                 "recipient_ids": [(6, 0, [partner.id])] if partner else [],
             })
             final_msgs.append(bcc_msg)
-
-            _logger.info("Prepared BCC email to %s with headers To: %s | Cc: %s", bcc_email, display_to, display_cc)
 
         return final_msgs
