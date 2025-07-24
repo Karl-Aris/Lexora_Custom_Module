@@ -134,7 +134,7 @@
                         </t>
                     </t>
                     <t t-else="">
-                      <div class="alert alert-info">No sizes available in this collection.</div>
+                      <div class="alert alert-info">No countertops available in this collection.</div>
                     </t>
                   </div>
                 </div>  
