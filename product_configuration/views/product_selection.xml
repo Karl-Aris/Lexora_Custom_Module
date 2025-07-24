@@ -17,7 +17,7 @@
                 <img t-att-src="'data:image/png;base64,%s' % product.image_1920.decode('utf-8')" 
                 class="img-fluid rounded shadow-sm"
                 alt="Product Image"
-                style="max-height: 300px;"/>
+                style="max-height: 500px;"/>
               </t>
               <t t-else="">
                 <div class="alert alert-secondary" role="alert">
@@ -53,11 +53,14 @@
                   <p><strong>Select Sizes for <t t-esc="collection_name"/> Collection</strong></p>
                   <div class="row">
                     <t t-if="related_sizes">
-                      <t t-foreach="related_sizes" t-as="variant">
-                        <div class="col-6 col-md-4 mb-3"> <!-- 3 columns -->
-                          <a t-att-href="'/store/cabinet?sku=' + variant.default_code" class="text-decoration-none text-dark">
+                      <div class="overflow-auto" style="white-space: nowrap;">
+                      <div class="d-flex flex-row" style="gap: 1rem;">
 
-                            <!-- Highlight if this is the current SKU -->
+                        <t t-foreach="related_sizes" t-as="variant">
+                          <a t-att-href="'/store/cabinet?sku=' + variant.default_code" 
+                            class="text-decoration-none text-dark" 
+                            style="flex: 0 0 auto; width: 200px;"> <!-- Fixed width to control card size -->
+
                             <t t-set="is_active" t-value="variant.default_code == product.default_code"/>
                             <div t-attf-class="card shadow-sm text-center hover-shadow #{'border border-primary' if is_active else ''}">
 
@@ -71,18 +74,19 @@
                               </t>
 
                               <div class="card-body p-2">
-                                <!-- Display only the size number -->
                                 <t t-set="size_tag" 
                                   t-value="variant.product_tmpl_id.product_tag_ids.filtered(lambda tag: tag.name.isdigit())"/>
-                                <h5 class="card-title mb-0">
+                                <h4 class="card-title fw-semibold mb-0" style="font-size: 1.5rem;">
                                   <t t-esc="' / '.join(size_tag.mapped('name')) if size_tag else 'N/A'"/>
-                                </h5>
+                                </h4>
                               </div>
 
                             </div>
                           </a>
-                        </div>
-                      </t>
+                        </t>
+
+                      </div>
+                    </div>
                     </t>
                     <t t-else="">
                       <div class="alert alert-info">No sizes available in this collection.</div>
