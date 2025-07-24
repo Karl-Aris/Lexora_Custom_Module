@@ -25,50 +25,64 @@ class ProductConfigurationController(http.Controller):
                 template = product.product_tmpl_id
                 tag_names = template.product_tag_ids.mapped('name')
 
-                # Define tag filters
-                excluded_tags = ['Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)', 'Single', 'Double', 'Sink', 'Countertops']
-                fixed_tags = ['Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)']
+                # Define excluded tags to find collection and color
+                excluded_tags = [
+                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)',
+                    'Single', 'Double', 'Sink', 'Countertops', 'Top'
+                ]
 
-                # Get collection (first non-numeric, non-excluded tag)
+                # Get collection (non-digit, not excluded)
                 collection_tag = next(
                     (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags),
                     None
                 )
 
-                # Get color (next non-numeric, non-excluded, not collection tag)
+                # Get color (next non-digit, not in excluded + not the collection)
                 excluded_tags_for_color = excluded_tags + [collection_tag]
                 color_tag = next(
                     (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags_for_color),
                     None
                 )
 
-                if collection_tag and color_tag:
-                    # -------------------------------
-                    # Get SIZE variants (vanity only)
-                    # -------------------------------
-                    size_required_tags = request.env['product.tag'].sudo().search([
-                        ('name', 'in', fixed_tags + [collection_tag, color_tag])
-                    ])
-                    if len(size_required_tags) == 4:
-                        size_templates = request.env['product.template'].sudo().search([])
-                        size_templates = size_templates.filtered(
-                            lambda tmpl: set(size_required_tags.ids).issubset(set(tmpl.product_tag_ids.ids))
-                        )
-                        related_sizes = request.env['product.product'].sudo().search([
-                            ('product_tmpl_id', 'in', size_templates.ids)
-                        ])
+                # --- Tag objects ---
+                tag_model = request.env['product.tag'].sudo()
+                vanity_only_tag = tag_model.search([('name', '=', 'Vanity Only')])
+                bv_tag = tag_model.search([('name', '=', 'Bathroom Vanities')])
+                bv_cabinet_tag = tag_model.search([('name', '=', 'Bathroom Vanities (Cabinet)')])
+                collection_tag_obj = tag_model.search([('name', '=', collection_tag)]) if collection_tag else None
+                color_tag_obj = tag_model.search([('name', '=', color_tag)]) if color_tag else None
 
-                    # -------------------------------
-                    # Get COUNTERTOP variants
-                    # -------------------------------
-                    countertop_required_tags = request.env['product.tag'].sudo().search([
-                        ('name', 'in', ['Countertops', collection_tag, color_tag])
-                    ])
-                    if len(countertop_required_tags) == 3:
-                        top_templates = request.env['product.template'].sudo().search([])
-                        top_templates = top_templates.filtered(
-                            lambda tmpl: set(countertop_required_tags.ids).issubset(set(tmpl.product_tag_ids.ids))
+                # --- Related Sizes Logic ---
+                if vanity_only_tag and (bv_tag or bv_cabinet_tag) and collection_tag_obj and color_tag_obj:
+                    candidate_templates = request.env['product.template'].sudo().search([])
+
+                    def matches_required_tags(template):
+                        tags = template.product_tag_ids
+                        return (
+                            vanity_only_tag in tags and
+                            (bv_tag in tags or bv_cabinet_tag in tags) and
+                            collection_tag_obj in tags and
+                            color_tag_obj in tags
                         )
+
+                    size_templates = candidate_templates.filtered(matches_required_tags)
+                    related_sizes = request.env['product.product'].sudo().search([
+                        ('product_tmpl_id', 'in', size_templates.ids)
+                    ])
+
+                # --- Related Countertops Logic ---
+                if collection_tag:
+                    countertop_tag = tag_model.search([('name', '=', 'Countertops')])
+                    collection_tag_obj = tag_model.search([('name', '=', collection_tag)])
+
+                    if countertop_tag and collection_tag_obj:
+                        candidate_templates = request.env['product.template'].sudo().search([])
+
+                        def matches_countertop_tags(template):
+                            tags = template.product_tag_ids
+                            return countertop_tag in tags and collection_tag_obj in tags
+
+                        top_templates = candidate_templates.filtered(matches_countertop_tags)
                         related_countertops = request.env['product.product'].sudo().search([
                             ('product_tmpl_id', 'in', top_templates.ids)
                         ])
