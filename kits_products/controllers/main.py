@@ -93,20 +93,23 @@ class ProductKitsController(http.Controller):
             if selected_faucet is not None and selected_faucet not in kit.faucet_ids.ids:
                 continue
             matching_kit = kit
+            matching_product = kit.product_id
             break
 
 
     # ✅ Step 5: Return response
         return request.render('kits_products.kit_group_detail_template', {
-        'kit': matching_kit,
-        'collection': collection,
-        'size': size,
-        'components': components,
-        'cabinet': selected_cabinet,
-        'counter_top': selected_counter_top,
-        'mirror': selected_mirror,
-        'faucet': selected_faucet,
+            'kit': matching_kit,
+            'product': matching_product,
+            'collection': collection,
+            'size': size,
+            'components': components,
+            'cabinet': selected_cabinet,
+            'counter_top': selected_counter_top,
+            'mirror': selected_mirror,
+            'faucet': selected_faucet,
         })
+
 
 
 

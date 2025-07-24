@@ -1,0 +1,23 @@
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="menu_product_kits_root" name="Product Kits"
+              web_icon="base,static/description/icon.png"
+              sequence="10"/>
+
+    <!-- Manage Kits -->
+    <menuitem id="menu_product_kits" name="Manage Kits"
+              parent="menu_product_kits_root"
+              action="action_product_kits"/>
+
+    <!-- Import Kits -->
+    <menuitem id="menu_import_product_kits" name="Import Kits"
+              parent="menu_product_kits_root"
+              action="action_import_product_kits"
+              sequence="10"/>
+
+    <!-- Export Kits -->
+    <menuitem id="menu_kits_export" name="Export Kits"
+              parent="menu_product_kits_root"
+              action="action_product_kit_export"
+              sequence="20"/>
+</odoo>

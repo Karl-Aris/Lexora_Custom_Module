@@ -82,31 +82,95 @@
 
                     <div class="col-md-12 mt-4">
                         <h4>Matching Kits:</h4>
-                        <t t-if="filtered_kits">
-                            <div class="row">
-                                <t t-foreach="filtered_kits" t-as="kit">
-                                    <div class="col-6 col-md-4 mb-3">
-                                        <div class="card h-100 shadow-sm">
-                                            <img
-                                                t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
-                                                class="card-img-top"
-                                                style="height:120px; object-fit:cover;" />
-                                            <div class="card-body p-2 text-center">
-                                                <h6 class="mb-1">
-                                                    <t t-esc="kit.name" />
-                                                </h6>
-                                                <small class="text-muted d-block">Color: <t
-                                                        t-esc="kit.color or 'Each'" /></small>
-                                                <small class="text-muted d-block">Collection: <t
-                                                        t-esc="kit.collection_id.name or 'N/A'" /></small>
-                                                <small class="text-muted d-block">SKU: <t
-                                                        t-esc="kit.product_sku or 'No SKU'" /></small>
+                        <t t-foreach="filtered_kits" t-as="kit">
+                            <div class="col-12 col-md-6 mb-4">
+                                <div class="card shadow-sm h-100">
+                                    <img
+                                        t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
+                                        class="card-img-top"
+                                        style="height:150px; object-fit:cover;" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <t t-esc="kit.name" />
+                                        </h5>
+                                        <p class="mb-1">
+                                            <strong>SKU:</strong>
+                                            <t t-esc="kit.product_sku or 'N/A'" />
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong>Collection:</strong>
+                                            <t t-esc="kit.collection or 'N/A'" />
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong>Size:</strong>
+                                            <t t-esc="kit.size or 'N/A'" />
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong>Color:</strong>
+                                            <t t-esc="kit.color or 'N/A'" />
+                                        </p>
+
+                                        <t t-if="kit.product_id">
+                                            <div class="border-top pt-2 mt-2">
+                                                <h6>Main Product Info:</h6>
+                                                <ul class="list-unstyled small mb-2">
+                                                    <li>📦 <strong>Name:</strong> <t
+                                                            t-esc="kit.product_id.name" /></li>
+                                                    <li>🔖 <strong>SKU:</strong> <t
+                                                            t-esc="kit.product_id.default_code" /></li>
+                                                    <li>💰 <strong>Price:</strong> <t
+                                                            t-esc="kit.product_id.list_price" /> <t
+                                                            t-if="kit.product_id.currency_id">
+                                                            <t
+                                                                t-esc="kit.product_id.currency_id.symbol" />
+                                                        </t></li>
+                                                    <li>📊 <strong>Stock:</strong> <t
+                                                            t-esc="kit.product_id.qty_available" /></li>
+                                                </ul>
+                                                <form action="/shop/cart/update" method="post"
+                                                    class="mt-2">
+                                                    <input type="hidden" name="product_id"
+                                                        t-att-value="kit.product_id.id" />
+                                                    <input type="hidden" name="add_qty" value="1" />
+                                                    <input type="hidden" name="csrf_token"
+                                                        t-att-value="request.csrf_token()" />
+                                                    <button type="submit"
+                                                        class="btn btn-primary btn-sm w-100">Add to
+                                                        Cart</button>
+                                                </form>
                                             </div>
-                                        </div>
+                                        </t>
+
+                                        <t t-elif="kit.product_ids">
+                                            <div class="border-top pt-2 mt-2">
+                                                <h6>Matched Products:</h6>
+                                                <ul class="list-unstyled small">
+                                                    <t t-foreach="kit.product_ids" t-as="prod">
+                                                        <li> 🔹 <strong>
+                                                                <t t-esc="prod.name" />
+                                                            </strong>
+                                                            — SKU: <t
+                                                                t-esc="prod.default_code or 'N/A'" />
+                                                            | Price: <t t-esc="prod.list_price" /> <t
+                                                                t-if="prod.currency_id">
+                                                                <t t-esc="prod.currency_id.symbol" />
+                                                            </t>
+                                                            | Stock: <t t-esc="prod.qty_available" />
+                                                        </li>
+                                                    </t>
+                                                </ul>
+                                            </div>
+                                        </t>
+
+                                        <t t-else="">
+                                            <p class="text-danger mt-2">No product matched by SKU or
+                                                ID.</p>
+                                        </t>
                                     </div>
-                                </t>
+                                </div>
                             </div>
                         </t>
+
                         <t t-else="">
                             <p class="text-danger">
                                 <strong>Out of stock</strong>
@@ -135,49 +199,66 @@
                 <div class="row">
                     <!-- Matching Kits -->
                     <div class="col-md-4">
-                        <h4 class="mb-3 border-bottom pb-2">Matching Kits</h4>
+                        <h4 class="mb-3 border-bottom pb-2">Matching Kit</h4>
                         <t t-if="kit">
-                            <div class="d-flex flex-column gap-3">
-                                <t t-if="kit">
-                                    <div class="card shadow-sm p-2">
-                                        <img
-                                            t-att-src="kit.image_1920 and '/web/image/product.product/' + str(kit.id) + '/image_1920' or ''"
-                                            class="card-img-top mb-2"
-                                            style="height:120px; object-fit:cover;" />
-                                        <div class="text-center">
-                                            <h6 class="mb-1">
-                                                <t t-esc="kit.name" />
-                                            </h6>
-                                            <small class="text-muted d-block">Color: <t
-                                                    t-esc="kit.color or 'Each'" /></small>
-                                            <small class="text-muted d-block">SKU: <t
-                                                    t-esc="kit.product_sku or 'No SKU'" /></small>
+                            <div class="card shadow-sm p-3">
+                                <t t-if="product">
+                                    <img
+                                        t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'"
+                                        alt="Product Image"
+                                        class="card-img-top mb-3"
+                                        style="height:300px; width:100%; object-fit:cover;" />
 
-                                            <t t-if="kit.product_id">
-                                                <form action="/shop/cart/update" method="post"
-                                                    class="mt-2">
-                                                    <input type="hidden" name="product_id"
-                                                        t-att-value="kit.product_id.id" />
-                                                    <input type="hidden" name="add_qty" value="1" />
-                                                    <input type="hidden" name="csrf_token"
-                                                        t-att-value="request.csrf_token()" />
-                                                    <button type="submit"
-                                                        class="btn btn-primary btn-sm w-100">Add to
-                                                        Cart</button>
-                                                </form>
-                                            </t>
-                                            <t t-else="">
-                                                <p class="text-danger mt-2">Product not available
-                                                    for sale</p>
-                                            </t>
+                                    <h5 class="text-center mb-2">
+                                        <t t-esc="product.name" />
+                                    </h5>
+                                    <p class="text-muted small text-center mb-3">
+                                        <t t-esc="product.description_sale" />
+                                    </p>
+                                    <p class="text-center fw-semibold fs-5"> Price: <t
+                                            t-esc="product.lst_price and ('%.2f' % product.lst_price) or 'N/A'" />
+                                    </p>
+                                </t>
+
+                                <t t-if="kit.product_id">
+                                    <form action="/shop/cart/update" method="post" class="mt-3">
+                                        <input type="hidden" name="product_id"
+                                            t-att-value="kit.product_id.id" />
+                                        <input type="hidden" name="csrf_token"
+                                            t-att-value="request.csrf_token()" />
+
+                                        <div class="mb-3 text-center">
+                                            <label class="form-label fw-semibold">Quantity</label>
+                                            <div class="input-group justify-content-center"
+                                                style="max-width:160px; margin: 0 auto;">
+                                                <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    data-qty-delta="-1">−</button>
+                                                <input name="add_qty" type="number"
+                                                    class="form-control text-center" value="1"
+                                                    min="1" style="max-width: 60px;" />
+                                                <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    data-qty-delta="1">+</button>
+                                            </div>
+
                                         </div>
-                                    </div>
-                                </t>
-                                <t t-else="">
-                                    <p class="text-muted">No kit found for this selection.</p>
+
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fa fa-cart-plus me-1"></i> Add to Cart </button>
+                                        </div>
+                                    </form>
                                 </t>
 
+                                <t t-else="">
+                                    <p class="text-danger text-center mt-3">Product not available
+                                        for sale</p>
+                                </t>
                             </div>
+                        </t>
+                        <t t-else="">
+                            <p class="text-muted">No matching kit found for this selection.</p>
                         </t>
                     </div>
 
@@ -195,20 +276,18 @@
                                             <t t-if="category == 'mirror'">Mirror</t>
                                             <t t-if="category == 'faucet'">Faucet</t>
                                         </h4>
-                                        <!-- Unselect Button -->
                                         <t
                                             t-if="(category == 'cabinet' and cabinet) or (category == 'counter_top' and counter_top) or (category == 'mirror' and mirror) or (category == 'faucet' and faucet)">
                                             <a
                                                 t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-            collection, size or '',
-            ('0' if category == 'cabinet' else cabinet or '0'),
-            ('0' if category == 'counter_top' else counter_top or '0'),
-            ('0' if category == 'mirror' else mirror or '0'),
-            ('0' if category == 'faucet' else faucet or '0')
-        )"
+                                                collection, size or '',
+                                                ('0' if category == 'cabinet' else cabinet or '0'),
+                                                ('0' if category == 'counter_top' else counter_top or '0'),
+                                                ('0' if category == 'mirror' else mirror or '0'),
+                                                ('0' if category == 'faucet' else faucet or '0')
+                                            )"
                                                 class="btn btn-sm btn-outline-danger">Unselect</a>
                                         </t>
-
                                     </div>
 
                                     <div class="row g-3">
@@ -216,12 +295,12 @@
                                             <div class="col-6 col-sm-4 col-lg-3">
                                                 <a
                                                     t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-                                    collection, size or '',
-                                    (comp.id if category == 'cabinet' else cabinet or '0'),
-                                    (comp.id if category == 'counter_top' else counter_top or '0'),
-                                    (comp.id if category == 'mirror' else mirror or '0'),
-                                    (comp.id if category == 'faucet' else faucet or '0')
-                                )"
+                                                    collection, size or '',
+                                                    (comp.id if category == 'cabinet' else cabinet or '0'),
+                                                    (comp.id if category == 'counter_top' else counter_top or '0'),
+                                                    (comp.id if category == 'mirror' else mirror or '0'),
+                                                    (comp.id if category == 'faucet' else faucet or '0')
+                                                )"
                                                     class="text-decoration-none">
                                                     <div
                                                         t-attf-class="card h-100 shadow-sm #{'border-primary' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else ''}">
@@ -248,7 +327,6 @@
                             </t>
                         </t>
                     </div>
-
                 </div>
 
                 <div class="mt-4">
@@ -257,7 +335,33 @@
                         class="btn btn-outline-secondary">Reset Selection</a>
                 </div>
             </div>
+
+            <!-- ✅ Add quantity adjustment script safely -->
+            <t t-set="scripts">
+  <t t-raw="0">
+    <![CDATA[
+    <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('button[data-qty-delta]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            const input = button.parentNode.querySelector('input[name="add_qty"]');
+            if (!input) return;
+            let value = parseInt(input.value) || 1;
+            value = Math.max(1, value + parseInt(button.dataset.qtyDelta));
+            input.value = value;
+          });
+        });
+      });
+    </script>
+    ]]>
+  </t>
+</t>
+
+
         </t>
+
+
     </template>
+
 
 </odoo>

@@ -6,7 +6,6 @@
             <form string="Import Product Kits">
                 <group>
                     <field name="file" filename="filename"/>
-                    <field name="filename"/>
                 </group>
                 <footer>
                     <button string="Import" type="object" name="import_product_kits" class="btn-primary"/>
@@ -22,10 +21,4 @@
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
-
-    <menuitem id="menu_import_product_kits"
-              name="Import Kits"
-              parent="menu_product_kits_root"
-              action="action_import_product_kits"
-              sequence="20"/>
 </odoo>

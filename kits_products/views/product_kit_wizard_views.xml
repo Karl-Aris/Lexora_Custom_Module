@@ -38,28 +38,20 @@
         </record>
 
         <!-- === PRODUCT KIT TREE VIEW === -->
-      <record id="view_product_kits_tree" model="ir.ui.view">
-    <field name="name">product.kits.tree</field>
-    <field name="model">product.kits</field>
-    <field name="arch" type="xml">
-        <tree import="1">
-            <!-- Hidden ID field -->
-            <field name="id" invisible="1"/>
-
-            <!-- Visible fields -->
-            <field name="product_sku"/>
-            <field name="name"/>
-            <field name="size"/>
-            <field name="collection"/>
-            <field name="color"/>
-            <field name="cabinet_sku"/>
-            <field name="counter_top_sku"/>  
-            <field name="faucet_sku"/>
-            <field name="mirror_sku"/>
-        </tree>
-    </field>
-</record>
-
+        <record id="view_product_kits_tree" model="ir.ui.view">
+            <field name="name">product.kits.tree</field>
+            <field name="model">product.kits</field>
+            <field name="arch" type="xml">
+                <tree import="1">
+                    <field name="image_128" widget="image" options="{'size': [60, 60]}"/>
+                    <field name="product_sku"/>
+                    <field name="name"/>
+                    <field name="size"/>
+                    <field name="collection"/>
+                    <field name="color"/>
+                </tree>
+            </field>
+        </record>
 
         <!-- === PRODUCT KIT ACTION === -->
         <record id="action_product_kits" model="ir.actions.act_window">

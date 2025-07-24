@@ -1,5 +1,3 @@
-# kits_products/wizards/product_kit_export_wizard.py
-
 from odoo import models, fields
 import io
 import base64
@@ -7,37 +5,42 @@ import csv
 
 class ProductKitExportWizard(models.TransientModel):
     _name = 'product.kit.export.wizard'
-    _description = 'Export Product Kits Wizard'
+    _description = 'Product Kit Export Wizard'
 
-    file = fields.Binary('Exported File', readonly=True)
-    filename = fields.Char('Filename', default='kits_export.csv')
+    file = fields.Binary('Exported CSV', readonly=True)
+    filename = fields.Char('Filename', readonly=True)
 
     def export_kits(self):
+        kits = self.env['product.kits'].search([])
+
         output = io.StringIO()
         writer = csv.writer(output)
+        writer.writerow([
+            'id', 'product_sku', 'name', 'size', 'collection', 'color',
+            'cabinet_sku', 'counter_top_sku', 'faucet_sku', 'mirror_sku'
+        ])
 
-        # Header
-        writer.writerow(['SKU', 'Name', 'Size', 'Collection', 'Color'])
-
-        # Fetch kit data (adjust model/fields as needed)
-        kits = self.env['product.kits'].search([])
         for kit in kits:
             writer.writerow([
-                kit.product_sku or '',
-                kit.name or '',
+                kit.id,
+                kit.product_sku,
+                kit.name,
                 kit.size or '',
                 kit.collection or '',
                 kit.color or '',
+                kit.cabinet_sku or '',
+                kit.counter_top_sku or '',
+                kit.faucet_sku or '',
+                kit.mirror_sku or '',
             ])
 
-        output.seek(0)
         self.file = base64.b64encode(output.getvalue().encode('utf-8'))
-        output.close()
+        self.filename = 'product_kits_export.csv'
 
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'product.kit.export.wizard',
             'view_mode': 'form',
             'res_id': self.id,
-            'target': 'new'
+            'target': 'new',
         }
