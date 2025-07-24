@@ -40,25 +40,37 @@ class IrMailServer(models.Model):
                 for part in message.walk():
                     ctype = part.get_content_type()
                     charset = part.get_content_charset() or "utf-8"
+            
+                    try:
+                        payload = part.get_payload(decode=True).decode(charset)
+                    except (UnicodeDecodeError, LookupError):
+                        payload = part.get_payload(decode=True).decode("utf-8", errors="replace")
+                        charset = "utf-8"
+            
                     if ctype == "text/html":
-                        payload = part.get_payload(decode=True).decode(charset)
                         part.set_payload(payload + bcc_html_notice)
-                        part.set_charset(charset)
+                        part.set_charset("utf-8")
                     elif ctype == "text/plain":
-                        payload = part.get_payload(decode=True).decode(charset)
                         part.set_payload(payload + bcc_text_notice)
-                        part.set_charset(charset)
+                        part.set_charset("utf-8")
             else:
-                # Single-part message (not multipart)
+                # Single-part message
                 ctype = message.get_content_type()
                 charset = message.get_content_charset() or "utf-8"
-                payload = message.get_payload(decode=True).decode(charset)
+            
+                try:
+                    payload = message.get_payload(decode=True).decode(charset)
+                except (UnicodeDecodeError, LookupError):
+                    payload = message.get_payload(decode=True).decode("utf-8", errors="replace")
+                    charset = "utf-8"
+            
                 if ctype == "text/html":
                     message.set_payload(payload + bcc_html_notice)
-                    message.set_charset(charset)
+                    message.set_charset("utf-8")
                 else:
                     message.set_payload(payload + bcc_text_notice)
-                    message.set_charset(charset)
+                    message.set_charset("utf-8")
+
 
             _logger.info("BCC footer injected for BCC: %s", x_odoo_bcc_value)
 
