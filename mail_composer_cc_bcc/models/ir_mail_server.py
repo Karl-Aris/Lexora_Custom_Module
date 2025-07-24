@@ -30,10 +30,9 @@ class IrMailServer(models.Model):
                 if content_type == "text/html":
                     html = part.get_payload(decode=True).decode(charset)
                     html += (
-                        "<br><hr><small style=\"color:gray\">"
-                        "Note: You are receiving this email as a Bcc recipient. "
-                        "Please do not reply directly to this message."
-                        "</small>"
+                        "<p style='color:gray; font-size:small;'>"
+                        "🔒 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply to all.</p>"
                     )
                     part.set_payload(html.encode(charset))
                     if "Content-Transfer-Encoding" in part:
@@ -42,8 +41,9 @@ class IrMailServer(models.Model):
                 elif content_type == "text/plain":
                     text = part.get_payload(decode=True).decode(charset)
                     text += (
-                        "\n\nNote: You are receiving this email as a Bcc recipient. "
-                        "Please do not reply directly to this message."
+                        "<p style='color:gray; font-size:small;'>"
+                        "🔒 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply to all.</p>"
                     )
                     part.set_payload(text.encode(charset))
                     if "Content-Transfer-Encoding" in part:
