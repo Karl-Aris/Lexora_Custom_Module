@@ -28,8 +28,9 @@ class ProductConfigurationController(http.Controller):
 
                 # Define excluded tags to find collection and color
                 excluded_tags = [
-                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)',
-                    'Single', 'Double', 'Sink', 'Countertops', 'Top'
+                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)', 'Vanity, Countertop, Sink, and Mirror', 'Vanity, Countertop, and Sink', 'Vanity, Countertop, Sink, and Faucet',
+                    'Vanity, Countertop, Sink, Mirror, and Faucet',
+                    'Single', 'Double', 'Sink', 'Countertops', 'Top', 'Acrylic', 'Frameless'
                 ]
 
                 # Get collection (non-digit, not excluded)
