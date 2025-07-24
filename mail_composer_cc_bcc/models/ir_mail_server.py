@@ -37,12 +37,16 @@ class IrMailServer(models.Model):
                                  "Please do not reply directly to this message." 
                                  "</small>")
                         part.set_payload(html.encode(charset))
+                        if "Content-Transfer-Encoding" in part:
+                            del part["Content-Transfer-Encoding"]
                         encoders.encode_base64(part)
                     elif content_type == "text/plain":
                         text = part.get_payload(decode=True).decode(charset)
                         text += ("\n\nNote: You are receiving this email as a Bcc recipient. "
                                  "Please do not reply directly to this message.")
                         part.set_payload(text.encode(charset))
+                        if "Content-Transfer-Encoding" in part:
+                            del part["Content-Transfer-Encoding"]
                         encoders.encode_base64(part)
             else:
                 # Single-part email
@@ -55,12 +59,16 @@ class IrMailServer(models.Model):
                              "Please do not reply directly to this message." 
                              "</small>")
                     message.set_payload(html.encode(charset))
+                    if "Content-Transfer-Encoding" in message:
+                        del message["Content-Transfer-Encoding"]
                     encoders.encode_base64(message)
                 elif content_type == "text/plain":
                     text = message.get_payload(decode=True).decode(charset)
                     text += ("\n\nNote: You are receiving this email as a Bcc recipient. "
                              "Please do not reply directly to this message.")
                     message.set_payload(text.encode(charset))
+                    if "Content-Transfer-Encoding" in message:
+                        del message["Content-Transfer-Encoding"]
                     encoders.encode_base64(message)
 
         smtp_from, smtp_to_list, message = super()._prepare_email_message(
