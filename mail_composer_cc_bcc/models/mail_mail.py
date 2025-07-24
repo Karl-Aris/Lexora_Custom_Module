@@ -63,6 +63,20 @@ class MailMail(models.Model):
                     "email_cc": email_cc,
                     "email_bcc": "",
                 })
+                # Move note to top of message body
+                if "body_html" in m:
+                    m["body_html"] = (
+                        "<p style=\"color:gray;font-size:smaller\">"
+                        "<strong>Note:</strong> You are receiving this email as a Bcc recipient. "
+                        "Please do not reply directly to this message." 
+                        "</p><hr>"
+                    ) + m["body_html"]
+                if "body" in m:
+                    m["body"] = (
+                        "Note: You are receiving this email as a Bcc recipient. "
+                        "Please do not reply directly to this message.\n\n"
+                    ) + m["body"]
+
                 filtered_res.append(m)
                 recipients.add(rcpt_to_email)
 
