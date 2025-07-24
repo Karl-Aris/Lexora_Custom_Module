@@ -122,6 +122,48 @@
                     </t>
                   </div>
                 </t>
+
+               <!-- Select Mirror -->
+              <t t-if="related_mirrors">
+              <hr class="my-2"/>
+              <div class="d-flex align-items-center mb-2">
+                <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2"
+                      style="width:28px;height:28px;font-size:0.9rem;">3</span>
+                <p class="mb-0"><strong>Select Mirror</strong></p>
+              </div>
+              <div class="row">
+                <t t-foreach="related_mirrors" t-as="mirror">
+                  <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
+                    <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&amp;mirror=' + mirror.default_code"
+                      class="text-decoration-none text-dark">
+                      <t t-set="is_active_mirror" t-value="mirror.default_code == request.params.get('mirror')"/>
+                      <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_mirror else ''}">
+                        <t t-if="mirror.image_1920">
+                          <img t-att-src="'data:image/png;base64,%s' % mirror.image_1920.decode('utf-8')"
+                              class="card-img-top img-fluid"
+                              alt="Mirror Image"
+                              style="padding:10px;max-height:130px;object-fit:contain;"/>
+                        </t>
+                        <t t-else="">
+                          <img t-att-src="'/web/static/src/img/placeholder.png'"
+                              class="card-img-top img-fluid"
+                              alt="No image"
+                              style="padding:10px;max-height:130px;object-fit:contain;"/>
+                        </t>
+                        <div class="card-body p-2">
+                          <h5 class="card-title fw-semibold mb-0" style="font-size:1.2rem;">
+                            <t t-esc="mirror.name"/>
+                          </h5>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </t>
+              </div>
+            </t>
+
+
+
               </div>
             </div>
           </div>
