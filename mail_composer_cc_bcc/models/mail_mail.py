@@ -77,7 +77,7 @@ class MailMail(models.Model):
         for partner in bcc_partners:
             if not partner.email:
                 continue
-
+        
             bcc_email = tools.email_normalize(partner.email)
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
@@ -85,24 +85,22 @@ class MailMail(models.Model):
                 "Please do not reply to all.</p>"
             )
             bcc_body = bcc_note + original_body
-
+        
             bcc_msg = copy.deepcopy(base_msg)
             bcc_msg.update({
-                # Actual envelope send-to
-                "email_to": bcc_email,
+                "email_to": bcc_email,  # Only the BCC partner
                 "email_to_raw": bcc_email,
-                "email_cc": "",
-                "email_bcc": "",
-
+                "email_cc": "",         # Clear CC
+                "email_bcc": "",        # Hidden
+        
                 "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
+        
                 "headers": {
+                    # 🚨 Avoid setting 'To' header explicitly
                     **original_headers,
-                    "To": email_to,  # optional: preserve To header for appearance
-                    "Cc": email_cc,
-                    "X-Odoo-Bcc": bcc_email,
+                    "Cc": email_cc,               # Optional: include visible CC
+                    "X-Odoo-Bcc": bcc_email,      # Diagnostic
                 },
             })
             result.append(bcc_msg)
-
-        return result
