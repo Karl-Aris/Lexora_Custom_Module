@@ -33,6 +33,7 @@
               
               <h3><t t-esc="product.name"/></h3>
               <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
+              <p><strong>Color:</strong> <t t-esc="color_name"/></p>
               <p><strong>Price:</strong>
                 <t t-esc="product.lst_price"/> <span t-esc="product.currency_id.symbol"/>
               </p>
