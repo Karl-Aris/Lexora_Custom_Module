@@ -39,7 +39,7 @@ class MailMail(models.Model):
         email_to = format_emails(partner_to)
         email_to_raw = format_emails_raw(partner_to)
         email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
+        email_bcc_list = [r.email for r in self.recipient_bcc_ids if r.email]
 
         recipients = set()
         filtered_res = []
@@ -50,18 +50,24 @@ class MailMail(models.Model):
             if rcpt_to_full:
                 rcpt_to_email = parseaddr(rcpt_to_full)[1]
 
-            if rcpt_to_email in email_bcc:
-                m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
+            is_bcc = rcpt_to_email in email_bcc_list if rcpt_to_email else False
+
+            if is_bcc:
+                # Bcc-targeted message only
                 m.update({
+                    "headers": {"X-Odoo-Bcc": rcpt_to_full},
                     "email_to": rcpt_to_full,
                     "email_to_raw": rcpt_to_email,
                     "email_cc": "",
+                    "email_bcc": "",
                 })
             else:
+                # Normal message for To/Cc
                 m.update({
                     "email_to": email_to,
                     "email_to_raw": email_to_raw,
                     "email_cc": email_cc,
+                    "email_bcc": "",
                 })
 
             filtered_res.append(m)
