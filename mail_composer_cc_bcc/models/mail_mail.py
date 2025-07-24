@@ -66,7 +66,7 @@ class MailMail(models.Model):
         for partner in bcc_partners:
             if not partner.email:
                 continue
-
+        
             bcc_email = tools.email_normalize(partner.email)
             bcc_note = (
                 "<p style='color:gray; font-size:small;'>"
@@ -74,13 +74,14 @@ class MailMail(models.Model):
                 "Please do not reply to all.</p>"
             )
             bcc_body = bcc_note + original_body
-
+        
             bcc_msg = copy.deepcopy(base_msg)
             bcc_msg.update({
-                "email_to": email_to,  # keep to/cc addresses visible
-                "email_to_raw": email_to_raw,
-                "email_cc": email_cc,
-                "email_bcc": "",  # hidden in headers
+                # 🚨 Only send to the BCC partner directly
+                "email_to": bcc_email,
+                "email_to_raw": bcc_email,
+                "email_cc": "",
+                "email_bcc": "",  # Hide bcc field
                 "body": bcc_body,
                 "headers": {
                     **original_headers,
@@ -89,5 +90,3 @@ class MailMail(models.Model):
                 "recipient_ids": [(6, 0, [partner.id])],
             })
             result.append(bcc_msg)
-
-        return result
