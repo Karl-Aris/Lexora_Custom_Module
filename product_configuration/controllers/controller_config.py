@@ -17,14 +17,14 @@ class ProductConfigurationController(http.Controller):
                 tag_names = template.product_tag_ids.mapped('name')
 
                 # Extract collection tag: the first non-numeric tag NOT in exclusion list
-                filter_out = ['Single', 'Vanity Only', 'Bathroom Vanities']
+                filter_out = ['Vanity Only', 'Bathroom Vanities']
                 collection_tag = next((tag for tag in tag_names if not tag.isdigit() and tag not in filter_out), None)
 
                 if collection_tag:
                     collection_tag_rec = request.env['product.tag'].sudo().search([('name', '=', collection_tag)], limit=1)
 
                     # Required filtering tags
-                    filter_tag_names = ['Single', 'Vanity Only', 'Bathroom Vanities']
+                    filter_tag_names = ['Vanity Only', 'Bathroom Vanities']
                     filter_tags = request.env['product.tag'].sudo().search([('name', 'in', filter_tag_names)])
 
                     # Search product templates that:
