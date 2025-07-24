@@ -43,6 +43,7 @@ class MailMail(models.Model):
 
         recipients = set()
         filtered_res = []
+        general_sent = False
 
         for m in res:
             rcpt_to_email = None
@@ -53,7 +54,6 @@ class MailMail(models.Model):
             is_bcc = rcpt_to_email in email_bcc_list if rcpt_to_email else False
 
             if is_bcc:
-                # Bcc-targeted message only
                 m.update({
                     "headers": {"X-Odoo-Bcc": rcpt_to_full},
                     "email_to": rcpt_to_full,
@@ -61,17 +61,19 @@ class MailMail(models.Model):
                     "email_cc": "",
                     "email_bcc": "",
                 })
-            else:
-                # Normal message for To/Cc
+                filtered_res.append(m)
+                recipients.add(rcpt_to_email)
+
+            elif not general_sent:
                 m.update({
                     "email_to": email_to,
                     "email_to_raw": email_to_raw,
                     "email_cc": email_cc,
                     "email_bcc": "",
                 })
-
-            filtered_res.append(m)
-            recipients.add(rcpt_to_email or "general")
+                filtered_res.append(m)
+                recipients.add("general")
+                general_sent = True
 
         self.env.context = {**self.env.context, "recipients": list(recipients)}
         return filtered_res
