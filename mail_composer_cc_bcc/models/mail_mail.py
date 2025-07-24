@@ -1,81 +1,73 @@
-from odoo import fields, models, tools
-from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
+# Copyright 2024 Camptocamp SA
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
+import logging
+from odoo import models
+from email.charset import Charset, QP
+from email.message import EmailMessage
+
+_logger = logging.getLogger(__name__)
 
 
-def format_emails(partners):
-    emails = [
-        tools.formataddr((p.name or "", tools.email_normalize(p.email)))
-        for p in partners
-        if p.email
-    ]
-    return ", ".join(emails)
+class IrMailServer(models.Model):
+    _inherit = "ir.mail_server"
 
-
-def format_emails_raw(partners):
-    emails = [p.email for p in partners if p.email]
-    return ", ".join(emails)
-
-
-class MailMail(models.Model):
-    _inherit = "mail.mail"
-
-    email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
-
-    def _prepare_outgoing_list(self, recipients_follower_status=None):
-        res = super()._prepare_outgoing_list(
-            recipients_follower_status=recipients_follower_status
+    def _prepare_email_message(self, message: EmailMessage, smtp_session):
+        """
+        Define smtp_to based on context instead of To+Cc+Bcc.
+        Also inject BCC notice into body for BCC recipients.
+        """
+        # Grab BCC recipient from header
+        x_odoo_bcc_value = next(
+            (value for key, value in message._headers if key == "X-Odoo-Bcc"), None
         )
 
-        # Limit scope only to single-message calls (not bulk)
-        if len(self.ids) > 1 or not self.env.context.get("is_from_composer", False):
-            return res
+        if x_odoo_bcc_value:
+            message["Bcc"] = x_odoo_bcc_value
 
-        # Prepare values for To, Cc headers
-        all_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
-        to_partners = [r for r in self.recipient_ids if r not in all_cc_bcc]
+        # Inject BCC footer *before* sending
+        if x_odoo_bcc_value:
+            bcc_html_footer = (
+                "<br/><br/><hr/><p><strong>🔒 You received this email as a BCC "
+                "(Blind Carbon Copy). Please do not reply to all.</strong></p>"
+            )
+            bcc_text_footer = (
+                "\n\n---\n🔒 You received this email as a BCC "
+                "(Blind Carbon Copy). Please do not reply to all."
+            )
+            utf8_charset = Charset("utf-8")
+            utf8_charset.body_encoding = QP
 
-        email_to = format_emails(to_partners)
-        email_to_raw = format_emails_raw(to_partners)
-        email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc_list = [r.email for r in self.recipient_bcc_ids if r.email]
+            if message.is_multipart():
+                for part in message.walk():
+                    content_type = part.get_content_type()
+                    if content_type == "text/html":
+                        payload = part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8", errors="replace")
+                        part.set_payload((payload + bcc_html_footer).encode("utf-8"))
+                        part.set_charset(utf8_charset)
+                    elif content_type == "text/plain":
+                        payload = part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8", errors="replace")
+                        part.set_payload((payload + bcc_text_footer).encode("utf-8"))
+                        part.set_charset(utf8_charset)
+            else:
+                content_type = message.get_content_type()
+                payload = message.get_payload(decode=True).decode(message.get_content_charset() or "utf-8", errors="replace")
+                if content_type == "text/html":
+                    message.set_payload((payload + bcc_html_footer).encode("utf-8"))
+                    message.set_charset(utf8_charset)
+                elif content_type == "text/plain":
+                    message.set_payload((payload + bcc_text_footer).encode("utf-8"))
+                    message.set_charset(utf8_charset)
 
-        recipients = set()
-        for m in res:
-            rcpt_to = None
-            if m.get("email_to"):
-                rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
-            elif m.get("email_cc"):
-                rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
+        # Use original logic to set SMTP target
+        smtp_from, smtp_to_list, message = super()._prepare_email_message(
+            message, smtp_session
+        )
 
-            if rcpt_to:
-                recipients.add(rcpt_to)
+        is_from_composer = self.env.context.get("is_from_composer", False)
+        if is_from_composer and self.env.context.get("recipients", False):
+            smtp_to = self.env.context["recipients"].pop(0)
+            _logger.debug("smtp_to: %s", smtp_to)
+            smtp_to_list = [smtp_to]
 
-            # Identify BCC message and add note
-            if rcpt_to in email_bcc_list:
-                m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
-                bcc_html_note = (
-                    "<br/><br/><hr/><p><strong>🔒 You received this email as a BCC "
-                    "(Blind Carbon Copy). Please do not reply to all.</strong></p>"
-                )
-                bcc_text_note = (
-                    "\n\n---\n🔒 You received this email as a BCC "
-                    "(Blind Carbon Copy). Please do not reply to all."
-                )
-                if "body_html" in m and m["body_html"]:
-                    m["body_html"] += bcc_html_note
-                elif "body" in m and m["body"]:
-                    m["body"] += bcc_text_note
-
-            # Set standard headers (all recipients see same To/CC headers)
-            m.update({
-                "email_to": email_to,
-                "email_to_raw": email_to_raw,
-                "email_cc": email_cc,
-            })
-
-        self.env.context = {**self.env.context, "recipients": list(recipients)}
-
-        if len(res) > len(recipients):
-            res = res[:len(recipients)]
-
-        return res
+        return smtp_from, smtp_to_list, message
