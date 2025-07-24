@@ -4,7 +4,7 @@
 
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
-from email.utils import parseaddr, getaddresses
+from email.utils import parseaddr
 
 def format_emails(partners):
     emails = [
@@ -41,10 +41,6 @@ class MailMail(models.Model):
         email_cc = format_emails(self.recipient_cc_ids)
         email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
 
-        # Normalize all recipient emails
-        raw_all = email_to_raw + ", " + email_cc + ", " + ", ".join(email_bcc)
-        to_cc_bcc_emails = {email for name, email in getaddresses([raw_all])}
-
         recipients = set()
         filtered_res = []
 
@@ -54,17 +50,20 @@ class MailMail(models.Model):
             if rcpt_to_full:
                 rcpt_to_email = parseaddr(rcpt_to_full)[1]
 
-            if rcpt_to_email and rcpt_to_email in to_cc_bcc_emails:
-                if rcpt_to_email in email_bcc:
-                    m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
+            is_bcc = rcpt_to_email in email_bcc if rcpt_to_email else False
 
-                m.update({
-                    "email_to": email_to,
-                    "email_to_raw": email_to_raw,
-                    "email_cc": email_cc,
-                })
-                filtered_res.append(m)
-                recipients.add(rcpt_to_email)
+            if is_bcc:
+                m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
+
+            # Apply To/Cc headers to all
+            m.update({
+                "email_to": email_to,
+                "email_to_raw": email_to_raw,
+                "email_cc": email_cc,
+            })
+
+            filtered_res.append(m)
+            recipients.add(rcpt_to_email or "general")
 
         self.env.context = {**self.env.context, "recipients": list(recipients)}
         return filtered_res
