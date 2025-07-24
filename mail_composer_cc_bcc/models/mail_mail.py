@@ -27,7 +27,6 @@ class MailMail(models.Model):
 
         mail = self[0]
 
-        # Separate partners
         bcc_partners = mail.recipient_bcc_ids
         cc_partners = mail.recipient_cc_ids
         all_cc_bcc = cc_partners + bcc_partners
@@ -43,20 +42,21 @@ class MailMail(models.Model):
         base_msg = super_res[0] if super_res else {}
         original_body = base_msg.get("body", "")
 
-        # Clean To+CC version
+        result = []
+
+        # TO + CC message (clean)
         to_cc_msg = copy.deepcopy(base_msg)
         to_cc_msg.update({
             "email_to": email_to,
             "email_to_raw": email_to_raw,
             "email_cc": email_cc,
-            "email_bcc": "",  # Hidden
+            "email_bcc": "",  # Hide BCC from headers
             "body": original_body,
             "recipient_ids": [(6, 0, [p.id for p in to_partners + cc_partners])],
         })
+        result.append(to_cc_msg)
 
-        result = [to_cc_msg]
-
-        # BCC messages
+        # Individual BCC messages
         for partner in bcc_partners:
             if not partner.email:
                 continue
@@ -72,15 +72,17 @@ class MailMail(models.Model):
 
             bcc_msg = copy.deepcopy(base_msg)
             bcc_msg.update({
-                "headers": {**copy.deepcopy(base_msg.get("headers", {})), "X-Odoo-Bcc": bcc_email},
+                "headers": {
+                    **copy.deepcopy(base_msg.get("headers", {})),
+                    "X-Odoo-Bcc": bcc_email,
+                },
                 "email_to": email_to,
                 "email_to_raw": email_to_raw,
                 "email_cc": email_cc,
-                "email_bcc": "",  # Hide actual bcc
+                "email_bcc": "",  # Do not expose
                 "body": bcc_body,
                 "recipient_ids": [(6, 0, [partner.id])],
             })
-
             result.append(bcc_msg)
 
         return result
