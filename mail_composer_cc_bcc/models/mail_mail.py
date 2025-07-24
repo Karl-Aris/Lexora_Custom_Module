@@ -4,14 +4,18 @@ import copy
 
 
 def format_emails(partners):
+    if not partners:
+        return ""
     return ", ".join([
         tools.formataddr((p.name or "", tools.email_normalize(p.email)))
         for p in partners if p.email
     ])
 
-
 def format_emails_raw(partners):
+    if not partners:
+        return ""
     return ", ".join([p.email for p in partners if p.email])
+
 
 
 class MailMail(models.Model):
