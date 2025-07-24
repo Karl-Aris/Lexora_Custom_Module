@@ -4,7 +4,7 @@
 
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
-from email.utils import parseaddr
+from email.utils import parseaddr, getaddresses
 
 def format_emails(partners):
     emails = [
@@ -41,7 +41,10 @@ class MailMail(models.Model):
         email_cc = format_emails(self.recipient_cc_ids)
         email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
 
-        to_cc_bcc_emails = set(email_to_raw.split(", ") + email_cc.split(", ") + email_bcc)
+        # Normalize all recipient emails
+        raw_all = email_to_raw + ", " + email_cc + ", " + ", ".join(email_bcc)
+        to_cc_bcc_emails = {email for name, email in getaddresses([raw_all])}
+
         recipients = set()
         filtered_res = []
 
@@ -51,7 +54,6 @@ class MailMail(models.Model):
             if rcpt_to_full:
                 rcpt_to_email = parseaddr(rcpt_to_full)[1]
 
-            # Only keep if real recipient
             if rcpt_to_email and rcpt_to_email in to_cc_bcc_emails:
                 if rcpt_to_email in email_bcc:
                     m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
