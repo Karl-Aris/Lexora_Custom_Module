@@ -25,24 +25,29 @@ class ProductConfigurationController(http.Controller):
                 template = product.product_tmpl_id
                 tag_names = template.product_tag_ids.mapped('name')
 
-                # Determine collection (non-numeric, not one of the fixed tags)
-                fixed_tags = ['Vanity Only', 'Bathroom Vanities', 'Countertops', 'Top', 'Sink']
+                # Define tag filters
+                excluded_tags = ['Vanity Only', 'Bathroom Vanities', 'Single', 'Double', 'Sink', 'Countertops']
+                fixed_tags = ['Vanity Only', 'Bathroom Vanities']
+
+                # Get collection (first non-numeric, non-excluded tag)
                 collection_tag = next(
-                    (tag for tag in tag_names if not tag.isdigit() and tag not in fixed_tags),
+                    (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags),
                     None
                 )
 
-                # Determine color (another tag not digit and not in excluded + not collection)
-                excluded_for_color = fixed_tags + [collection_tag]
+                # Get color (next non-numeric, non-excluded, not collection tag)
+                excluded_tags_for_color = excluded_tags + [collection_tag]
                 color_tag = next(
-                    (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_for_color),
+                    (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags_for_color),
                     None
                 )
 
-                # ---------- Related Sizes ----------
                 if collection_tag and color_tag:
+                    # -------------------------------
+                    # Get SIZE variants (vanity only)
+                    # -------------------------------
                     size_required_tags = request.env['product.tag'].sudo().search([
-                        ('name', 'in', ['Vanity Only', 'Bathroom Vanities', collection_tag, color_tag])
+                        ('name', 'in', fixed_tags + [collection_tag, color_tag])
                     ])
                     if len(size_required_tags) == 4:
                         size_templates = request.env['product.template'].sudo().search([])
@@ -53,18 +58,19 @@ class ProductConfigurationController(http.Controller):
                             ('product_tmpl_id', 'in', size_templates.ids)
                         ])
 
-                # ---------- Related Countertops ----------
-                if collection_tag:
+                    # -------------------------------
+                    # Get COUNTERTOP variants
+                    # -------------------------------
                     countertop_required_tags = request.env['product.tag'].sudo().search([
-                        ('name', 'in', ['Countertops', collection_tag])
+                        ('name', 'in', ['Countertops', collection_tag, color_tag])
                     ])
-                    if len(countertop_required_tags) == 2:
-                        countertop_templates = request.env['product.template'].sudo().search([])
-                        countertop_templates = countertop_templates.filtered(
+                    if len(countertop_required_tags) == 3:
+                        top_templates = request.env['product.template'].sudo().search([])
+                        top_templates = top_templates.filtered(
                             lambda tmpl: set(countertop_required_tags.ids).issubset(set(tmpl.product_tag_ids.ids))
                         )
                         related_countertops = request.env['product.product'].sudo().search([
-                            ('product_tmpl_id', 'in', countertop_templates.ids)
+                            ('product_tmpl_id', 'in', top_templates.ids)
                         ])
 
         return request.render('product_configuration.template_product_configuration', {
