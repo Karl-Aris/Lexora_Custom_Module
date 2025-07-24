@@ -1,3 +1,7 @@
+# mail_mail.py
+# Copyright 2023 Camptocamp SA
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 from email.utils import parseaddr
@@ -37,28 +41,28 @@ class MailMail(models.Model):
         email_cc = format_emails(self.recipient_cc_ids)
         email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
 
+        to_cc_bcc_emails = set(email_to_raw.split(", ") + email_cc.split(", ") + email_bcc)
         recipients = set()
+        filtered_res = []
+
         for m in res:
             rcpt_to_email = None
             rcpt_to_full = m.get("email_to") and m["email_to"][0]
             if rcpt_to_full:
                 rcpt_to_email = parseaddr(rcpt_to_full)[1]
 
-            if rcpt_to_email and rcpt_to_email in email_bcc:
-                m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
+            # Only keep if real recipient
+            if rcpt_to_email and rcpt_to_email in to_cc_bcc_emails:
+                if rcpt_to_email in email_bcc:
+                    m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
 
-            if rcpt_to_email:
+                m.update({
+                    "email_to": email_to,
+                    "email_to_raw": email_to_raw,
+                    "email_cc": email_cc,
+                })
+                filtered_res.append(m)
                 recipients.add(rcpt_to_email)
 
-            m.update({
-                "email_to": email_to,
-                "email_to_raw": email_to_raw,
-                "email_cc": email_cc,
-            })
-
         self.env.context = {**self.env.context, "recipients": list(recipients)}
-
-        if len(res) > len(recipients):
-            res.pop()
-
-        return res
+        return filtered_res
