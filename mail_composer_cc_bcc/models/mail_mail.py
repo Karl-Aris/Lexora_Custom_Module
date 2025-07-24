@@ -67,14 +67,14 @@ class MailMail(models.Model):
                 if "body_html" in m:
                     m["body_html"] = (
                         "<p style=\"color:gray;font-size:smaller\">"
-                        "<strong>Note:</strong> You are receiving this email as a Bcc recipient. "
-                        "Please do not reply directly to this message." 
+                        "<strong>Note:</strong> "🔒 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply to all.</p>" 
                         "</p><hr>"
                     ) + m["body_html"]
                 if "body" in m:
                     m["body"] = (
-                        "Note: You are receiving this email as a Bcc recipient. "
-                        "Please do not reply directly to this message.\n\n"
+                       "🔒 You received this email as a BCC (Blind Carbon Copy). "
+                        "Please do not reply to all.</p>"
                     ) + m["body"]
 
                 filtered_res.append(m)
