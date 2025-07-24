@@ -45,7 +45,12 @@
 
               <div>
                 <!-- Select Size -->
-                <p><strong>Select Size</strong> (required)</p>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2" style="width: 28px; height: 28px; font-size: 0.9rem;">
+                    1
+                  </span>
+                  <p class="mb-0"><strong>Select Size</strong> (required)</p>
+                </div>
                 <div class="row">
                   <t t-if="related_sizes">
                     <t t-foreach="related_sizes" t-as="variant">
@@ -81,10 +86,15 @@
                 <!-- Select Countertops -->
                 <t t-if="related_countertops">
                   <hr class="my-2"/>
-                  <p><strong>Select Countertop</strong></p>
+                  <div class="d-flex align-items-center mb-2">
+                    <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2" style="width: 28px; height: 28px; font-size: 0.9rem;">
+                      2
+                    </span>
+                    <p class="mb-0"><strong>Select Countertop</strong></p>
+                  </div>
                   <div class="row">
                     <t t-foreach="related_countertops" t-as="countertop">
-                      <div class="col-6 col-md-3 mb-3">
+                      <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
                         <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&amp;countertop=' + countertop.default_code" class="text-decoration-none text-dark">
                           <t t-set="is_active_top" t-value="countertop.default_code == request.params.get('countertop')"/>
                           <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_top else ''}">
