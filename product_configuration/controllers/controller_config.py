@@ -71,13 +71,17 @@ class ProductConfigurationController(http.Controller):
                         ('product_tmpl_id', 'in', size_templates.ids)
                     ])
 
-                # --- Related Countertops Logic ---
+                
                 if collection_tag:
-                    countertop_tag = tag_model.search([('name', '=', 'Countertops')])
+                    
+                   
                     collection_tag_obj = tag_model.search([('name', '=', collection_tag)])
 
                     # Find size tags (digits only)
                     size_tags = product.product_tmpl_id.product_tag_ids.filtered(lambda t: t.name.isdigit())
+                    
+                    # --- Related Countertops Logic ---
+                    countertop_tag = tag_model.search([('name', '=', 'Countertops')])
 
                     if countertop_tag and collection_tag_obj and size_tags:
                         candidate_templates = request.env['product.template'].sudo().search([])
@@ -97,8 +101,8 @@ class ProductConfigurationController(http.Controller):
 
                 # --- Related Mirrors Logic ---
                 mirror_tag = tag_model.search([('name', '=', 'Mirrors')])
-                if mirror_tag and collection_tag_obj:
-                    size_tags = product.product_tmpl_id.product_tag_ids.filtered(lambda t: t.name.isdigit())
+                
+                if mirror_tag and collection_tag_obj and size_tags:
 
                     candidate_templates = request.env['product.template'].sudo().search([])
 
