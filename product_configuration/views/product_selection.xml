@@ -84,14 +84,14 @@
                 </div>
 
                 <!-- Select Countertops -->
+                <hr class="my-2"/>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2" style="width: 28px; height: 28px; font-size: 0.9rem;">
+                    2
+                  </span>
+                  <p class="mb-0"><strong>Select Countertop</strong></p>
+                </div>
                 <t t-if="related_countertops">
-                  <hr class="my-2"/>
-                  <div class="d-flex align-items-center mb-2">
-                    <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2" style="width: 28px; height: 28px; font-size: 0.9rem;">
-                      2
-                    </span>
-                    <p class="mb-0"><strong>Select Countertop</strong></p>
-                  </div>
                   <div class="row">
                     <t t-foreach="related_countertops" t-as="countertop">
                       <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
@@ -123,17 +123,17 @@
                   </div>
                 </t>
                 <t t-else="">
-                  <div class="alert alert-info">No mirrors available in this configuration.</div>
+                  <div class="alert alert-info">No counter available in this configuration.</div>
                 </t>
 
                <!-- Select Mirror -->
-              <t t-if="related_mirrors">
               <hr class="my-2"/>
               <div class="d-flex align-items-center mb-2">
                 <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2"
                       style="width:28px;height:28px;font-size:0.9rem;">3</span>
                 <p class="mb-0"><strong>Select Mirror</strong></p>
               </div>
+              <t t-if="related_mirrors">
               <div class="row">
                 <t t-foreach="related_mirrors" t-as="mirror">
                   <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
