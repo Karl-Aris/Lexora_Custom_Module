@@ -83,6 +83,8 @@ class ProductKitsController(http.Controller):
 
     # ✅ Step 4: Find exact match for selected components
         matching_kit = None
+        matching_product = None  # ✅ Ensure this is always defined
+
         for kit in kits:
             if selected_cabinet is not None and selected_cabinet not in kit.cabinet_ids.ids:
                 continue
@@ -93,11 +95,9 @@ class ProductKitsController(http.Controller):
             if selected_faucet is not None and selected_faucet not in kit.faucet_ids.ids:
                 continue
             matching_kit = kit
-            matching_product = kit.product_id
+            matching_product = kit.product_id  # ✅ Now this is safe
             break
 
-
-    # ✅ Step 5: Return response
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
             'product': matching_product,
@@ -109,6 +109,8 @@ class ProductKitsController(http.Controller):
             'mirror': selected_mirror,
             'faucet': selected_faucet,
         })
+
+
 
 
 

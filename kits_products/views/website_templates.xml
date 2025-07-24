@@ -135,8 +135,10 @@
                                                     <input type="hidden" name="csrf_token"
                                                         t-att-value="request.csrf_token()" />
                                                     <button type="submit"
-                                                        class="btn btn-primary btn-sm w-100">Add to
-                                                        Cart</button>
+                                                        class="btn btn-dark btn-sm w-100 h-50 text-white">
+                                                        <i class="fa fa-cart-plus me-1"></i> Add to
+                                                        Cart </button>
+
                                                 </form>
                                             </div>
                                         </t>
@@ -221,35 +223,44 @@
                                 </t>
 
                                 <t t-if="kit.product_id">
-                                    <form action="/shop/cart/update" method="post" class="mt-3">
+                                    <form action="/shop/cart/update" method="post" class="mt-4">
                                         <input type="hidden" name="product_id"
                                             t-att-value="kit.product_id.id" />
                                         <input type="hidden" name="csrf_token"
                                             t-att-value="request.csrf_token()" />
 
-                                        <div class="mb-3 text-center">
-                                            <label class="form-label fw-semibold">Quantity</label>
-                                            <div class="input-group justify-content-center"
-                                                style="max-width:160px; margin: 0 auto;">
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary"
-                                                    data-qty-delta="-1">−</button>
-                                                <input name="add_qty" type="number"
-                                                    class="form-control text-center" value="1"
-                                                    min="1" style="max-width: 60px;" />
-                                                <button type="button"
-                                                    class="btn btn-outline-secondary"
-                                                    data-qty-delta="1">+</button>
+                                        <!-- Quantity Selector -->
+
+
+                                        <!-- Add to Cart Button -->
+                                        <div
+                                            class="d-flex flex-column align-items-center text-center">
+                                            <div class="mb-4 w-100 text-center">
+                                                <label class="form-label fw-semibold mb-2">Quantity</label>
+                                                <div
+                                                    class="input-group justify-content-center mx-auto"
+                                                    style="max-width: 180px;">
+                                                    <button type="button"
+                                                        class="btn btn-outline-dark"
+                                                        data-qty-delta="-1">−</button>
+                                                    <input name="add_qty" type="number"
+                                                        class="form-control text-center" value="1"
+                                                        min="1" />
+                                                    <button type="button"
+                                                        class="btn btn-outline-dark"
+                                                        data-qty-delta="1">+</button>
+                                                </div>
                                             </div>
 
+                                            <button type="submit"
+                                                class="btn btn-dark text-white fw-semibold px-4 py-3 rounded shadow-sm"
+                                                style="width: 260px;">
+                                                <i class="fa fa-cart-plus me-2"></i> Add to Cart </button>
                                         </div>
 
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="fa fa-cart-plus me-1"></i> Add to Cart </button>
-                                        </div>
                                     </form>
                                 </t>
+
 
                                 <t t-else="">
                                     <p class="text-danger text-center mt-3">Product not available
@@ -280,12 +291,12 @@
                                             t-if="(category == 'cabinet' and cabinet) or (category == 'counter_top' and counter_top) or (category == 'mirror' and mirror) or (category == 'faucet' and faucet)">
                                             <a
                                                 t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-                                                collection, size or '',
-                                                ('0' if category == 'cabinet' else cabinet or '0'),
-                                                ('0' if category == 'counter_top' else counter_top or '0'),
-                                                ('0' if category == 'mirror' else mirror or '0'),
-                                                ('0' if category == 'faucet' else faucet or '0')
-                                            )"
+      collection, size or '',
+      ('' if category == 'cabinet' else cabinet or ''),
+      ('' if category == 'counter_top' else counter_top or ''),
+      ('' if category == 'mirror' else mirror or ''),
+      ('' if category == 'faucet' else faucet or '')
+  )"
                                                 class="btn btn-sm btn-outline-danger">Unselect</a>
                                         </t>
                                     </div>
@@ -295,12 +306,12 @@
                                             <div class="col-6 col-sm-4 col-lg-3">
                                                 <a
                                                     t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-                                                    collection, size or '',
-                                                    (comp.id if category == 'cabinet' else cabinet or '0'),
-                                                    (comp.id if category == 'counter_top' else counter_top or '0'),
-                                                    (comp.id if category == 'mirror' else mirror or '0'),
-                                                    (comp.id if category == 'faucet' else faucet or '0')
-                                                )"
+    collection, size or '',
+    ('' if category == 'cabinet' and cabinet == comp.id else (comp.id if category == 'cabinet' else cabinet or '')),
+    ('' if category == 'counter_top' and counter_top == comp.id else (comp.id if category == 'counter_top' else counter_top or '')),
+    ('' if category == 'mirror' and mirror == comp.id else (comp.id if category == 'mirror' else mirror or '')),
+    ('' if category == 'faucet' and faucet == comp.id else (comp.id if category == 'faucet' else faucet or ''))
+  )"
                                                     class="text-decoration-none">
                                                     <div
                                                         t-attf-class="card h-100 shadow-sm #{'border-primary' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else ''}">
@@ -338,13 +349,13 @@
 
             <!-- ✅ Add quantity adjustment script safely -->
             <t t-set="scripts">
-  <t t-raw="0">
+                <t t-raw="0">
     <![CDATA[
     <script type="text/javascript">
       document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('button[data-qty-delta]').forEach(function (button) {
           button.addEventListener('click', function () {
-            const input = button.parentNode.querySelector('input[name="add_qty"]');
+            const input = button.parentElement.querySelector('input[name="add_qty"]');
             if (!input) return;
             let value = parseInt(input.value) || 1;
             value = Math.max(1, value + parseInt(button.dataset.qtyDelta));
@@ -355,9 +366,7 @@
     </script>
     ]]>
   </t>
-</t>
-
-
+            </t>
         </t>
 
 
