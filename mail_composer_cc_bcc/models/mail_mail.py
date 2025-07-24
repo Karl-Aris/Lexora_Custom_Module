@@ -1,5 +1,10 @@
+# mail_mail.py
+# Copyright 2023 Camptocamp SA
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
+from email.utils import parseaddr
 
 def format_emails(partners):
     emails = [
@@ -38,31 +43,29 @@ class MailMail(models.Model):
 
         recipients = set()
         for m in res:
-            rcpt_to = None
-            if m["email_to"]:
-                rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
-                if rcpt_to in email_bcc:
-                    m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
+            rcpt_to_email = None
+            rcpt_to_full = m.get("email_to") and m["email_to"][0]
+            if rcpt_to_full:
+                rcpt_to_email = parseaddr(rcpt_to_full)[1]
 
-                    # Inject Bcc notice in HTML body if present
-                    if "body_html" in m:
-                        m["body_html"] += (
-                            "<br><hr><small style=\"color:gray\">"
-                            "Note: You are receiving this email as a Bcc recipient. "
-                            "Please do not reply directly to this message."
-                            "</small>"
-                        )
-                    if "body" in m:
-                        m["body"] += (
-                            "\n\nNote: You are receiving this email as a Bcc recipient. "
-                            "Please do not reply directly to this message."
-                        )
+            if rcpt_to_email and rcpt_to_email in email_bcc:
+                m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
 
-            elif m["email_cc"]:
-                rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
+                if "body_html" in m:
+                    m["body_html"] += (
+                        "<br><hr><small style=\"color:gray\">"
+                        "Note: You are receiving this email as a Bcc recipient. "
+                        "Please do not reply directly to this message."
+                        "</small>"
+                    )
+                if "body" in m:
+                    m["body"] += (
+                        "\n\nNote: You are receiving this email as a Bcc recipient. "
+                        "Please do not reply directly to this message."
+                    )
 
-            if rcpt_to:
-                recipients.add(rcpt_to)
+            if rcpt_to_email:
+                recipients.add(rcpt_to_email)
 
             m.update({
                 "email_to": email_to,
