@@ -31,9 +31,9 @@
                 <h3><t t-esc="product.name"/></h3>
                 <!-- <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p> -->
                 <!-- <p><strong>Color:</strong> <t t-esc="color_name"/></p> -->
-                <!-- <p><strong>Price:</strong>
-                  <t t-esc="product.lst_price"/> <span t-esc="product.currency_id.symbol"/>
-                </p> -->
+                <p><strong>Price:</strong>
+                  <t t-esc="product.standard_price"/> <span t-esc="product.currency_id.symbol"/>
+                </p>
                 <p><strong>Description:</strong></p>
                 <div t-if="product.description_sale">
                   <t t-raw="product.description_sale"/>
@@ -123,7 +123,7 @@
                   </div>
                 </t>
                 <t t-else="">
-                  <div class="alert alert-info">No counter available in this configuration.</div>
+                  <div class="alert alert-info">No countertop available in this configuration.</div>
                 </t>
 
                <!-- Select Mirror -->
