@@ -50,17 +50,19 @@ class MailMail(models.Model):
             if rcpt_to_full:
                 rcpt_to_email = parseaddr(rcpt_to_full)[1]
 
-            is_bcc = rcpt_to_email in email_bcc if rcpt_to_email else False
-
-            if is_bcc:
+            if rcpt_to_email in email_bcc:
                 m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
-
-            # Apply To/Cc headers to all
-            m.update({
-                "email_to": email_to,
-                "email_to_raw": email_to_raw,
-                "email_cc": email_cc,
-            })
+                m.update({
+                    "email_to": rcpt_to_full,
+                    "email_to_raw": rcpt_to_email,
+                    "email_cc": "",
+                })
+            else:
+                m.update({
+                    "email_to": email_to,
+                    "email_to_raw": email_to_raw,
+                    "email_cc": email_cc,
+                })
 
             filtered_res.append(m)
             recipients.add(rcpt_to_email or "general")
