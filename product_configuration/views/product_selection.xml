@@ -95,9 +95,6 @@
                   <div class="row">
                     <t t-if="related_countertops">
                         <t t-if="related_countertops">
-                          <hr class="my-5"/>
-                          <p><strong>Select Countertops for <t t-esc="collection_name"/> Collection</strong></p>
-
                           <div class="row">
                             <t t-foreach="related_countertops" t-as="countertop">
                               <div class="col-6 col-md-2 mb-3">
