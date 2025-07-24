@@ -91,8 +91,8 @@
                   <div class="row">
                     <t t-foreach="related_countertops" t-as="countertop">
                       <div class="col-6 col-md-2 mb-3">
-                        <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&countertop=' + countertop.default_code"
-                           class="text-decoration-none text-dark">
+                        <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&amp;countertop=' + countertop.default_code"
+                        class="text-decoration-none text-dark">
 
                           <!-- Match selected countertop via controller -->
                           <t t-set="is_active_top" t-value="selected_countertop and countertop.default_code == selected_countertop.default_code"/>
