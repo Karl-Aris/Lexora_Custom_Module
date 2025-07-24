@@ -1,7 +1,3 @@
-# mail_mail.py
-# Copyright 2023 Camptocamp SA
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-
 from odoo import fields, models, tools
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 from email.utils import parseaddr
@@ -50,19 +46,6 @@ class MailMail(models.Model):
 
             if rcpt_to_email and rcpt_to_email in email_bcc:
                 m["headers"].update({"X-Odoo-Bcc": rcpt_to_full})
-
-                if "body_html" in m:
-                    m["body_html"] += (
-                        "<br><hr><small style=\"color:gray\">"
-                        "Note: You are receiving this email as a Bcc recipient. "
-                        "Please do not reply directly to this message."
-                        "</small>"
-                    )
-                if "body" in m:
-                    m["body"] += (
-                        "\n\nNote: You are receiving this email as a Bcc recipient. "
-                        "Please do not reply directly to this message."
-                    )
 
             if rcpt_to_email:
                 recipients.add(rcpt_to_email)
