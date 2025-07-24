@@ -122,6 +122,9 @@
                     </t>
                   </div>
                 </t>
+                <t t-else="">
+                  <div class="alert alert-info">No mirrors available in this configuration.</div>
+                </t>
 
                <!-- Select Mirror -->
               <t t-if="related_mirrors">
@@ -160,6 +163,9 @@
                   </div>
                 </t>
               </div>
+            </t>
+            <t t-else="">
+              <div class="alert alert-info">No mirrors available in this configuration.</div>
             </t>
 
 
