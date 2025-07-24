@@ -16,29 +16,30 @@ class ProductConfigurationController(http.Controller):
                 template = product.product_tmpl_id
                 tag_names = template.product_tag_ids.mapped('name')
 
-                # Extract collection tag: the first non-numeric tag NOT in exclusion list
-                filter_out = ['Vanity Only', 'Bathroom Vanities']
-                collection_tag = next((tag for tag in tag_names if not tag.isdigit() and tag not in filter_out), None)
+                # Define required tags (collection + type filters)
+                base_filter_tags = ['Bathroom Vanities', 'Vanity Only']
+                # Extract collection tag — must be non-numeric and not in the base list
+                collection_tag = next((tag for tag in tag_names if not tag.isdigit() and tag not in base_filter_tags), None)
 
                 if collection_tag:
-                    collection_tag_rec = request.env['product.tag'].sudo().search([('name', '=', collection_tag)], limit=1)
+                    # Get all required tag records
+                    all_required_tag_names = base_filter_tags + [collection_tag]
+                    tag_recs = request.env['product.tag'].sudo().search([('name', 'in', all_required_tag_names)])
 
-                    # Required filtering tags
-                    filter_tag_names = ['Vanity Only', 'Bathroom Vanities']
-                    filter_tags = request.env['product.tag'].sudo().search([('name', 'in', filter_tag_names)])
+                    if len(tag_recs) == 3:
+                        # Find product templates that have *all 3* required tags
+                        matching_templates = request.env['product.template'].sudo().search([])
 
-                    # Search product templates that:
-                    # - Have the same collection tag
-                    # - AND have at least one of the required tags
-                    matching_templates = request.env['product.template'].sudo().search([
-                        ('product_tag_ids', 'in', collection_tag_rec.id),
-                        ('product_tag_ids', 'in', filter_tags.ids),
-                    ])
+                        # Only keep templates that have all 3 tag IDs
+                        required_tag_ids = set(tag_recs.ids)
+                        matching_templates = matching_templates.filtered(
+                            lambda tmpl: required_tag_ids.issubset(set(tmpl.product_tag_ids.ids))
+                        )
 
-                    # Get all variants of those templates
-                    related_sizes = request.env['product.product'].sudo().search([
-                        ('product_tmpl_id', 'in', matching_templates.ids)
-                    ])
+                        # Get related variants
+                        related_sizes = request.env['product.product'].sudo().search([
+                            ('product_tmpl_id', 'in', matching_templates.ids)
+                        ])
 
         return request.render('product_configuration.template_product_configuration', {
             'product': product,
