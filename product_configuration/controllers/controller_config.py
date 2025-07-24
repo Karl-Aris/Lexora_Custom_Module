@@ -27,7 +27,7 @@ class ProductConfigurationController(http.Controller):
 
                 # Define tag filters
                 excluded_tags = ['Vanity Only', 'Bathroom Vanities', 'Single', 'Double', 'Sink', 'Countertops']
-                fixed_tags = ['Vanity Only', 'Bathroom Vanities', 'Countertops']
+                fixed_tags = ['Vanity Only', 'Bathroom Vanities']
 
                 # Get collection (first non-numeric, non-excluded tag)
                 collection_tag = next(
