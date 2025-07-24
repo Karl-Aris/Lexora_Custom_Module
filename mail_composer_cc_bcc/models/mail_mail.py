@@ -1,5 +1,4 @@
 from odoo import fields, models, tools
-
 from odoo.addons.base.models.ir_mail_server import extract_rfc2822_addresses
 
 
@@ -23,60 +22,60 @@ class MailMail(models.Model):
     email_bcc = fields.Char("Bcc", help="Blind Cc message recipients")
 
     def _prepare_outgoing_list(self, recipients_follower_status=None):
-        # First, return if we're not coming from the Mail Composer
         res = super()._prepare_outgoing_list(
             recipients_follower_status=recipients_follower_status
         )
-        is_out_of_scope = len(self.ids) > 1
-        is_from_composer = self.env.context.get("is_from_composer", False)
 
-        if is_out_of_scope or not is_from_composer:
+        # Limit scope only to single-message calls (not bulk)
+        if len(self.ids) > 1 or not self.env.context.get("is_from_composer", False):
             return res
 
         # Prepare values for To, Cc headers
-        partners_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
-        partner_to_ids = [r.id for r in self.recipient_ids if r not in partners_cc_bcc]
-        partner_to = self.env["res.partner"].browse(partner_to_ids)
-        email_to = format_emails(partner_to)
-        email_to_raw = format_emails_raw(partner_to)
-        email_cc = format_emails(self.recipient_cc_ids)
-        email_bcc = [r.email for r in self.recipient_bcc_ids if r.email]
+        all_cc_bcc = self.recipient_cc_ids + self.recipient_bcc_ids
+        to_partners = [r for r in self.recipient_ids if r not in all_cc_bcc]
 
-        # Collect recipients (RCPT TO) and update all emails
-        # with the same To, Cc headers (to be shown by email client as users expect)
+        email_to = format_emails(to_partners)
+        email_to_raw = format_emails_raw(to_partners)
+        email_cc = format_emails(self.recipient_cc_ids)
+        email_bcc_list = [r.email for r in self.recipient_bcc_ids if r.email]
+
         recipients = set()
         for m in res:
             rcpt_to = None
-            if m["email_to"]:
+            if m.get("email_to"):
                 rcpt_to = extract_rfc2822_addresses(m["email_to"][0])[0]
-
-                # If the recipient is a Bcc, we had an explicit header X-Odoo-Bcc
-                # - It won't be shown by the email client, but can be useful for a recipient # noqa: E501
-                #   to understand why he received a given email
-                # - Also note that in python3, the smtp.send_message method does not
-                #   transmit the Bcc field of a Message object
-                if rcpt_to in email_bcc:
-                    m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
-
-            # in the absence of self.email_to, Odoo creates one special mail for CC
-            # see https://github.com/odoo/odoo/commit/46bad8f0
-            elif m["email_cc"]:
+            elif m.get("email_cc"):
                 rcpt_to = extract_rfc2822_addresses(m["email_cc"][0])[0]
 
             if rcpt_to:
                 recipients.add(rcpt_to)
 
-            m.update(
-                {
-                    "email_to": email_to,
-                    "email_to_raw": email_to_raw,
-                    "email_cc": email_cc,
-                }
-            )
+            # Identify BCC message and add note
+            if rcpt_to in email_bcc_list:
+                m["headers"].update({"X-Odoo-Bcc": m["email_to"][0]})
+                bcc_html_note = (
+                    "<br/><br/><hr/><p><strong>🔒 You received this email as a BCC "
+                    "(Blind Carbon Copy). Please do not reply to all.</strong></p>"
+                )
+                bcc_text_note = (
+                    "\n\n---\n🔒 You received this email as a BCC "
+                    "(Blind Carbon Copy). Please do not reply to all."
+                )
+                if "body_html" in m and m["body_html"]:
+                    m["body_html"] += bcc_html_note
+                elif "body" in m and m["body"]:
+                    m["body"] += bcc_text_note
+
+            # Set standard headers (all recipients see same To/CC headers)
+            m.update({
+                "email_to": email_to,
+                "email_to_raw": email_to_raw,
+                "email_cc": email_cc,
+            })
 
         self.env.context = {**self.env.context, "recipients": list(recipients)}
 
         if len(res) > len(recipients):
-            res.pop()
+            res = res[:len(recipients)]
 
         return res
