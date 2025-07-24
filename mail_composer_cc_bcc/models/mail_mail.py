@@ -58,9 +58,9 @@ class MailMail(models.Model):
             if is_bcc:
                 m.update({
                     "headers": {"X-Odoo-Bcc": rcpt_to_full},
-                    "email_to": rcpt_to_full,
-                    "email_to_raw": rcpt_to_email,
-                    "email_cc": "",
+                    "email_to": email_to,
+                    "email_to_raw": email_to_raw,
+                    "email_cc": email_cc,
                     "email_bcc": "",
                 })
                 filtered_res.append(m)
