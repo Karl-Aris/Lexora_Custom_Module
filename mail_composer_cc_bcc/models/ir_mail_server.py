@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import logging
+import json
 from odoo import models
 from email.charset import Charset, QP
 from email.message import EmailMessage
@@ -14,29 +15,31 @@ class IrMailServer(models.Model):
 
     def _prepare_email_message(self, message: EmailMessage, smtp_session):
         """
-        Define smtp_to based on context instead of To+Cc+Bcc.
-        Inject BCC notice into body for BCC-only recipients only.
+        Use custom X-Odoo-Bcc to inject note into the email body
+        only for Bcc recipients (without changing headers).
         """
-        # Extract custom BCC header
-        x_odoo_bcc_value = next(
-            (value for key, value in message._headers if key == "X-Odoo-Bcc"), None
-        )
+        headers = message.get("X-Odoo-Header")
+        bcc_recipient = None
 
-        # Add standard Bcc header to avoid SMTP rejection
-        if x_odoo_bcc_value:
-            message["Bcc"] = x_odoo_bcc_value
+        try:
+            headers_dict = json.loads(headers) if headers else {}
+            bcc_recipient = headers_dict.get("X-Odoo-Bcc")
+        except Exception as e:
+            _logger.warning("Failed to parse X-Odoo-Header: %s", e)
 
-        # Inject body footer ONLY if this is the BCC-personalized message
-        if x_odoo_bcc_value and message.get("To") == x_odoo_bcc_value:
-            bcc_html_footer = (
+        if bcc_recipient:
+            # Add Bcc for compliance (even though not shown)
+            message["Bcc"] = bcc_recipient
+
+            # Inject notice in body
+            bcc_html_note = (
                 "<br/><br/><hr/><p><strong>🔒 You received this email as a BCC "
                 "(Blind Carbon Copy). Please do not reply to all.</strong></p>"
             )
-            bcc_text_footer = (
+            bcc_text_note = (
                 "\n\n---\n🔒 You received this email as a BCC "
                 "(Blind Carbon Copy). Please do not reply to all."
             )
-
             utf8_charset = Charset("utf-8")
             utf8_charset.body_encoding = QP
 
@@ -46,40 +49,37 @@ class IrMailServer(models.Model):
                     charset = part.get_content_charset() or "utf-8"
                     try:
                         payload = part.get_payload(decode=True).decode(charset, errors="replace")
-                    except Exception as e:
-                        _logger.warning("Failed to decode payload for BCC footer: %s", e)
+                    except Exception:
                         continue
 
                     if content_type == "text/html":
-                        part.set_payload((payload + bcc_html_footer).encode("utf-8"))
+                        part.set_payload((payload + bcc_html_note).encode("utf-8"))
                         part.set_charset(utf8_charset)
                     elif content_type == "text/plain":
-                        part.set_payload((payload + bcc_text_footer).encode("utf-8"))
+                        part.set_payload((payload + bcc_text_note).encode("utf-8"))
                         part.set_charset(utf8_charset)
             else:
                 content_type = message.get_content_type()
                 charset = message.get_content_charset() or "utf-8"
                 try:
                     payload = message.get_payload(decode=True).decode(charset, errors="replace")
-                    if content_type == "text/html":
-                        message.set_payload((payload + bcc_html_footer).encode("utf-8"))
-                        message.set_charset(utf8_charset)
-                    elif content_type == "text/plain":
-                        message.set_payload((payload + bcc_text_footer).encode("utf-8"))
-                        message.set_charset(utf8_charset)
-                except Exception as e:
-                    _logger.warning("Failed to decode non-multipart payload for BCC: %s", e)
+                except Exception:
+                    payload = ""
 
-        # Use Odoo logic to finalize SMTP fields
+                if content_type == "text/html":
+                    message.set_payload((payload + bcc_html_note).encode("utf-8"))
+                    message.set_charset(utf8_charset)
+                elif content_type == "text/plain":
+                    message.set_payload((payload + bcc_text_note).encode("utf-8"))
+                    message.set_charset(utf8_charset)
+
         smtp_from, smtp_to_list, message = super()._prepare_email_message(
             message, smtp_session
         )
 
-        # Pick only 1 recipient from context to send one email at a time
-        is_from_composer = self.env.context.get("is_from_composer", False)
-        if is_from_composer and self.env.context.get("recipients", False):
+        # Preserve custom single-recipient behavior if enabled
+        if self.env.context.get("is_from_composer") and self.env.context.get("recipients"):
             smtp_to = self.env.context["recipients"].pop(0)
-            _logger.debug("smtp_to: %s", smtp_to)
             smtp_to_list = [smtp_to]
 
         return smtp_from, smtp_to_list, message
