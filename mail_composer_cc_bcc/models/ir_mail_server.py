@@ -14,67 +14,53 @@ class IrMailServer(models.Model):
 
     def _prepare_email_message(self, message: EmailMessage, smtp_session):
         """
-        Define smtp_to based on context instead of To+Cc+Bcc.
-        Inject BCC footer only for BCC recipients before delivery.
+        Inject BCC footer for BCC recipients only.
+        Keep header unchanged for To and Cc.
         """
+        # Restore original Bcc from X-Odoo-Bcc if set
+        x_odoo_bcc = next((v for k, v in message._headers if k == "X-Odoo-Bcc"), None)
+        if x_odoo_bcc:
+            message["Bcc"] = x_odoo_bcc
 
-        # Read the X-Odoo-Bcc header
-        x_odoo_bcc_value = next(
-            (value for key, value in message._headers if key == "X-Odoo-Bcc"), None
-        )
-
-        # Inject BCC footer into body only when BCC recipient is being sent to
-        is_from_composer = self.env.context.get("is_from_composer", False)
-        if is_from_composer and self.env.context.get("recipients", False):
-            smtp_to = self.env.context["recipients"][0]
-            if x_odoo_bcc_value and smtp_to in x_odoo_bcc_value:
-                # Prepare BCC footers
-                bcc_html_footer = (
-                    "<br/><br/><hr/><p><strong>🔒 You received this email as a BCC "
-                    "(Blind Carbon Copy). Please do not reply to all.</strong></p>"
-                )
-                bcc_text_footer = (
-                    "\n\n---\n🔒 You received this email as a BCC "
-                    "(Blind Carbon Copy). Please do not reply to all."
-                )
-
-                utf8_charset = Charset("utf-8")
-                utf8_charset.body_encoding = QP
-
-                if message.is_multipart():
-                    for part in message.walk():
-                        content_type = part.get_content_type()
-                        charset = part.get_content_charset() or "utf-8"
-                        if content_type == "text/html":
-                            payload = part.get_payload(decode=True).decode(charset, errors="replace")
-                            part.set_payload((payload + bcc_html_footer).encode("utf-8"))
-                            part.set_charset(utf8_charset)
-                        elif content_type == "text/plain":
-                            payload = part.get_payload(decode=True).decode(charset, errors="replace")
-                            part.set_payload((payload + bcc_text_footer).encode("utf-8"))
-                            part.set_charset(utf8_charset)
-                else:
-                    content_type = message.get_content_type()
-                    charset = message.get_content_charset() or "utf-8"
-                    payload = message.get_payload(decode=True).decode(charset, errors="replace")
-                    if content_type == "text/html":
-                        message.set_payload((payload + bcc_html_footer).encode("utf-8"))
-                        message.set_charset(utf8_charset)
-                    elif content_type == "text/plain":
-                        message.set_payload((payload + bcc_text_footer).encode("utf-8"))
-                        message.set_charset(utf8_charset)
-
-        # Restore the original BCC header before sending
-        if x_odoo_bcc_value:
-            message["Bcc"] = x_odoo_bcc_value
-
-        # Call super to finalize SMTP envelope (does not affect headers)
         smtp_from, smtp_to_list, message = super()._prepare_email_message(message, smtp_session)
 
-        # Override SMTP recipient if from composer context
-        if is_from_composer and self.env.context.get("recipients", False):
-            smtp_to = self.env.context["recipients"].pop(0)
-            _logger.debug("smtp_to: %s", smtp_to)
-            smtp_to_list = [smtp_to]
+        # Check if we're sending to a BCC recipient
+        bcc_recipients = []
+        if x_odoo_bcc:
+            bcc_recipients = [e.strip() for e in x_odoo_bcc.split(",")]
+
+        if any(rcpt in bcc_recipients for rcpt in smtp_to_list):
+            # Add BCC note to body
+            bcc_html_footer = (
+                "<br/><br/><hr/><p><strong>🔒 You received this email as a BCC "
+                "(Blind Carbon Copy). Please do not reply to all.</strong></p>"
+            )
+            bcc_text_footer = (
+                "\n\n---\n🔒 You received this email as a BCC "
+                "(Blind Carbon Copy). Please do not reply to all."
+            )
+            utf8_charset = Charset("utf-8")
+            utf8_charset.body_encoding = QP
+
+            if message.is_multipart():
+                for part in message.walk():
+                    content_type = part.get_content_type()
+                    if content_type == "text/html":
+                        payload = part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8", errors="replace")
+                        part.set_payload((payload + bcc_html_footer).encode("utf-8"))
+                        part.set_charset(utf8_charset)
+                    elif content_type == "text/plain":
+                        payload = part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8", errors="replace")
+                        part.set_payload((payload + bcc_text_footer).encode("utf-8"))
+                        part.set_charset(utf8_charset)
+            else:
+                content_type = message.get_content_type()
+                payload = message.get_payload(decode=True).decode(message.get_content_charset() or "utf-8", errors="replace")
+                if content_type == "text/html":
+                    message.set_payload((payload + bcc_html_footer).encode("utf-8"))
+                    message.set_charset(utf8_charset)
+                elif content_type == "text/plain":
+                    message.set_payload((payload + bcc_text_footer).encode("utf-8"))
+                    message.set_charset(utf8_charset)
 
         return smtp_from, smtp_to_list, message
