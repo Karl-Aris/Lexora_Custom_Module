@@ -13,6 +13,7 @@ class ProductConfigurationController(http.Controller):
         product = None
         related_sizes = []
         related_countertops = []
+        related_mirrors = []
         collection_tag = ''
         color_tag = ''
 
@@ -70,7 +71,7 @@ class ProductConfigurationController(http.Controller):
                         ('product_tmpl_id', 'in', size_templates.ids)
                     ])
 
-                # --- Related Countertops Logic (Match by collection and size only) ---
+                # --- Related Countertops Logic ---
                 if collection_tag:
                     countertop_tag = tag_model.search([('name', '=', 'Countertops')])
                     collection_tag_obj = tag_model.search([('name', '=', collection_tag)])
@@ -94,10 +95,31 @@ class ProductConfigurationController(http.Controller):
                             ('product_tmpl_id', 'in', top_templates.ids)
                         ])
 
+                # --- Related Mirrors Logic ---
+                mirror_tag = tag_model.search([('name', '=', 'Mirrors')])
+                if mirror_tag and collection_tag_obj:
+                    size_tags = product.product_tmpl_id.product_tag_ids.filtered(lambda t: t.name.isdigit())
+
+                    candidate_templates = request.env['product.template'].sudo().search([])
+
+                    def matches_mirror_tags(template):
+                        tags = template.product_tag_ids
+                        return (
+                            mirror_tag in tags and
+                            collection_tag_obj in tags and
+                            any(tag in tags for tag in size_tags)
+                        )
+
+                    mirror_templates = candidate_templates.filtered(matches_mirror_tags)
+                    related_mirrors = request.env['product.product'].sudo().search([
+                        ('product_tmpl_id', 'in', mirror_templates.ids)
+                    ])
+
         return request.render('product_configuration.template_product_configuration', {
             'product': product,
             'related_sizes': related_sizes,
             'related_countertops': related_countertops,
+            'related_mirrors': related_mirrors,
             'collection_name': collection_tag,
             'color_name': color_tag,
         })
