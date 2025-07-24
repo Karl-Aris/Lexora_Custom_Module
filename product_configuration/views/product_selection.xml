@@ -14,7 +14,7 @@
             <!-- Left: Image -->
             <div class="col-md-6 text-center">
               <t t-if="product.image_1920">
-                <img t-att-src="'data:image/png;base64,%s' % product.image_1920.decode('utf-8')" 
+                <img t-att-src="'data:image/png;base64,%s' % product.image_1920.decode('utf-8')"
                      class="img-fluid rounded shadow-sm"
                      alt="Product Image"
                      style="max-height: 500px;"/>
@@ -28,7 +28,6 @@
 
             <!-- Right: Details -->
             <div class="col-md-6">
-
               <div class="mb-4">
                 <h3><t t-esc="product.name"/></h3>
                 <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
@@ -41,12 +40,9 @@
                 <div t-else="">
                   <em>No description provided.</em>
                 </div>
-
-                <t t-if="selected_countertop">
-                  <p><strong>Selected Countertop:</strong> <t t-esc="selected_countertop.name"/> (<t t-esc="selected_countertop.default_code"/>)</p>
-                </t>
               </div>
 
+              <!-- Configuration Section -->
               <div>
                 <!-- Select Sizes -->
                 <p><strong>Select Sizes for <t t-esc="collection_name"/> Collection</strong></p>
@@ -54,7 +50,8 @@
                   <t t-if="related_sizes">
                     <t t-foreach="related_sizes" t-as="variant">
                       <div class="col-6 col-md-2 mb-3">
-                        <a t-att-href="'/store/cabinet?sku=' + variant.default_code" class="text-decoration-none text-dark">
+                        <a t-att-href="'/store/cabinet?sku=' + variant.default_code + (('&amp;countertop=' + request.params.get('countertop')) if request.params.get('countertop') else '')"
+                           class="text-decoration-none text-dark">
                           <t t-set="is_active" t-value="variant.default_code == product.default_code"/>
                           <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active else ''}">
                             <t t-if="variant.image_1920">
@@ -87,17 +84,13 @@
                 <t t-if="related_countertops">
                   <hr class="my-5"/>
                   <p><strong>Select Countertops for <t t-esc="collection_name"/> Collection</strong></p>
-
                   <div class="row">
                     <t t-foreach="related_countertops" t-as="countertop">
                       <div class="col-6 col-md-2 mb-3">
                         <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&amp;countertop=' + countertop.default_code"
-                        class="text-decoration-none text-dark">
-
-                          <!-- Match selected countertop via controller -->
-                          <t t-set="is_active_top" t-value="selected_countertop and countertop.default_code == selected_countertop.default_code"/>
+                           class="text-decoration-none text-dark">
+                          <t t-set="is_active_top" t-value="countertop.default_code == request.params.get('countertop')"/>
                           <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_top else ''}">
-
                             <t t-if="countertop.image_1920">
                               <img t-att-src="'data:image/png;base64,%s' % countertop.image_1920.decode('utf-8')"
                                    class="card-img-top img-fluid"
@@ -107,7 +100,6 @@
                             <t t-else="">
                               <div class="p-3 text-muted">No image</div>
                             </t>
-
                             <div class="card-body p-2">
                               <t t-set="size_tag" 
                                  t-value="countertop.product_tmpl_id.product_tag_ids.filtered(lambda tag: tag.name.isdigit())"/>
@@ -115,20 +107,18 @@
                                 <t t-esc="' / '.join(size_tag.mapped('name')) if size_tag else 'N/A'"/>
                               </h5>
                             </div>
-
                           </div>
                         </a>
                       </div>
                     </t>
                   </div>
                 </t>
-
               </div>
-
             </div>
           </div>
         </t>
 
+        <!-- If no product -->
         <t t-else="">
           <div class="alert alert-warning mt-4">
             No product data to display.
