@@ -10,6 +10,7 @@
 
         <t t-if="product">
           <div class="row mt-4">
+
             <!-- Left: Image -->
             <div class="col-md-6 text-center">
               <t t-if="product.image_1920">
@@ -27,6 +28,9 @@
 
             <!-- Right: Details -->
             <div class="col-md-6">
+
+              <div> <!--Container for product details-->
+              
               <h3><t t-esc="product.name"/></h3>
               <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
               <p><strong>Price:</strong>
@@ -39,8 +43,50 @@
               <div t-else="">
                 <em>No description provided.</em>
               </div>
+
+              </div>
+
+              <div> <!--Container for configuration-->
+
+              <div> <!--Select Size Container-->
+              <p><strong>Select Size</strong></p>
+              <div class="row">
+                <t t-if="related_sizes">
+                  <t t-foreach="related_sizes" t-as="variant">
+                    <div class="col-6 col-md-4 mb-3">
+                      <div class="card shadow-sm text-center">
+                        <t t-if="variant.image_1920">
+                          <img t-att-src="'data:image/png;base64,%s' % variant.image_1920.decode('utf-8')" 
+                              class="card-img-top img-fluid" 
+                              alt="Variant Image" style="height: 150px; object-fit: cover;"/>
+                        </t>
+                        <t t-else="">
+                          <div class="p-3 text-muted">No image</div>
+                        </t>
+                        <div class="card-body p-2">
+                          <p class="card-text">
+                            <strong>Size:</strong> 
+                            <t t-esc="variant.product_template_attribute_value_ids.filtered(lambda a: a.attribute_id.name == 'Size')[0].name if variant.product_template_attribute_value_ids.filtered(lambda a: a.attribute_id.name == 'Size') else 'N/A'"/>
+                          </p>
+                          <p class="card-text"><strong>SKU:</strong> <t t-esc="variant.default_code"/></p>
+                        </div>
+                      </div>
+                    </div>
+                  </t>
+                </t>
+                <t t-else="">
+                  <div class="alert alert-info">No sizes available in this collection.</div>
+                </t>
+              </div>
             </div>
+
+              
+              </div>
+
+            </div>
+
           </div>
+
         </t>
 
         <t t-else="">
