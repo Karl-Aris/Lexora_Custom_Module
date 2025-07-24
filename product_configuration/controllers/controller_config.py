@@ -9,13 +9,12 @@ class ProductConfigurationController(http.Controller):
         return request.render('product_configuration.template_product_configuration')
 
     @http.route(['/store/cabinet'], type='http', auth='public', website=True)
-    def search_by_sku(self, sku=None, countertop=None, **kwargs):
+    def search_by_sku(self, sku=None, **kwargs):
         product = None
         related_sizes = []
         related_countertops = []
         collection_tag = ''
         color_tag = ''
-        size_tag_value = None
 
         if sku:
             product = request.env['product.product'].sudo().search([
@@ -26,39 +25,37 @@ class ProductConfigurationController(http.Controller):
                 template = product.product_tmpl_id
                 tag_names = template.product_tag_ids.mapped('name')
 
-                # Define excluded tags
+                # Define excluded tags to find collection and color
                 excluded_tags = [
-                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)', 'Vanity, Countertop, Sink, and Mirror', 'Vanity, Countertop, and Sink', 'Vanity, Countertop, Sink, and Faucet',
-                    'Vanity, Countertop, Sink, Mirror, and Faucet',
-                    'Single', 'Double', 'Sink', 'Countertops', 'Top', 'Acrylic', 'Frameless'
+                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)',
+                    'Single', 'Double', 'Sink', 'Countertops', 'Top'
                 ]
 
-                # Extract collection and color
+                # Get collection (non-digit, not excluded)
                 collection_tag = next(
                     (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags),
                     None
                 )
+
+                # Get color (next non-digit, not in excluded + not the collection)
                 excluded_tags_for_color = excluded_tags + [collection_tag]
                 color_tag = next(
                     (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags_for_color),
                     None
                 )
 
-                # Get size (numeric tag)
-                size_tag_value = next((tag for tag in tag_names if tag.isdigit()), None)
-
-                # Prepare tag records
+                # --- Tag objects ---
                 tag_model = request.env['product.tag'].sudo()
                 vanity_only_tag = tag_model.search([('name', '=', 'Vanity Only')])
                 bv_tag = tag_model.search([('name', '=', 'Bathroom Vanities')])
                 bv_cabinet_tag = tag_model.search([('name', '=', 'Bathroom Vanities (Cabinet)')])
                 collection_tag_obj = tag_model.search([('name', '=', collection_tag)]) if collection_tag else None
                 color_tag_obj = tag_model.search([('name', '=', color_tag)]) if color_tag else None
-                size_tag_obj = tag_model.search([('name', '=', size_tag_value)]) if size_tag_value else None
 
-                # --- Related Sizes ---
+                # --- Related Sizes Logic ---
                 if vanity_only_tag and (bv_tag or bv_cabinet_tag) and collection_tag_obj and color_tag_obj:
                     candidate_templates = request.env['product.template'].sudo().search([])
+
                     def matches_required_tags(template):
                         tags = template.product_tag_ids
                         return (
@@ -67,24 +64,31 @@ class ProductConfigurationController(http.Controller):
                             collection_tag_obj in tags and
                             color_tag_obj in tags
                         )
+
                     size_templates = candidate_templates.filtered(matches_required_tags)
                     related_sizes = request.env['product.product'].sudo().search([
                         ('product_tmpl_id', 'in', size_templates.ids)
                     ])
 
-                # --- Related Countertops ---
-                if collection_tag and color_tag and size_tag_value:
+                # --- Related Countertops Logic (Match by collection and size only) ---
+                if collection_tag:
                     countertop_tag = tag_model.search([('name', '=', 'Countertops')])
-                    if countertop_tag and collection_tag_obj and color_tag_obj and size_tag_obj:
+                    collection_tag_obj = tag_model.search([('name', '=', collection_tag)])
+
+                    # Find size tags (digits only)
+                    size_tags = product.product_tmpl_id.product_tag_ids.filtered(lambda t: t.name.isdigit())
+
+                    if countertop_tag and collection_tag_obj and size_tags:
                         candidate_templates = request.env['product.template'].sudo().search([])
+
                         def matches_countertop_tags(template):
                             tags = template.product_tag_ids
                             return (
                                 countertop_tag in tags and
                                 collection_tag_obj in tags and
-                                color_tag_obj in tags and
-                                size_tag_obj in tags
+                                any(tag in tags for tag in size_tags)
                             )
+
                         top_templates = candidate_templates.filtered(matches_countertop_tags)
                         related_countertops = request.env['product.product'].sudo().search([
                             ('product_tmpl_id', 'in', top_templates.ids)
