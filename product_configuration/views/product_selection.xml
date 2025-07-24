@@ -29,9 +29,9 @@
             <div class="col-md-6">
               <div class="mb-4">
                 <h3><t t-esc="product.name"/></h3>
-                <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
-                <p><strong>Color:</strong> <t t-esc="color_name"/></p>
-                <p><strong>Price:</strong>
+                <!-- <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p> -->
+                <!-- <p><strong>Color:</strong> <t t-esc="color_name"/></p> -->
+                <!-- <p><strong>Price:</strong> -->
                   <t t-esc="product.lst_price"/> <span t-esc="product.currency_id.symbol"/>
                 </p>
                 <p><strong>Description:</strong></p>
@@ -45,7 +45,7 @@
 
               <div>
                 <!-- Select Size -->
-                <p><strong>Select Sizes for <t t-esc="collection_name"/> Collection</strong></p>
+                <p><strong>Select Size</strong> (required)</p>
                 <div class="row">
                   <t t-if="related_sizes">
                     <t t-foreach="related_sizes" t-as="variant">
@@ -81,7 +81,7 @@
                 <!-- Select Countertops -->
                 <t t-if="related_countertops">
                   <hr class="my-2"/>
-                  <p><strong>Select Countertops for <t t-esc="collection_name"/> Collection</strong></p>
+                  <p><strong>Select Countertop</strong></p>
                   <div class="row">
                     <t t-foreach="related_countertops" t-as="countertop">
                       <div class="col-6 col-md-3 mb-3">
