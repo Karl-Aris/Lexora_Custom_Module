@@ -52,19 +52,21 @@ class MailMail(models.Model):
                 rcpt_to_email = parseaddr(rcpt_to_full)[1]
 
             is_bcc = rcpt_to_email in email_bcc_list if rcpt_to_email else False
+            is_cc = rcpt_to_email in [parseaddr(e)[1] for e in email_cc.split(", ")] if rcpt_to_email else False
+            is_to = rcpt_to_email in [parseaddr(e)[1] for e in email_to_raw.split(", ")] if rcpt_to_email else False
 
             if is_bcc:
                 m.update({
                     "headers": {"X-Odoo-Bcc": rcpt_to_full},
                     "email_to": rcpt_to_full,
                     "email_to_raw": rcpt_to_email,
-                    "email_cc": email_cc,
+                    "email_cc": "",
                     "email_bcc": "",
                 })
                 filtered_res.append(m)
                 recipients.add(rcpt_to_email)
 
-            elif not general_sent:
+            elif not general_sent and (is_cc or is_to):
                 m.update({
                     "email_to": email_to,
                     "email_to_raw": email_to_raw,
