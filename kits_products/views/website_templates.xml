@@ -181,52 +181,74 @@
                         </t>
                     </div>
 
-
                     <!-- Components -->
                     <div class="col-md-8">
                         <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']"
                             t-as="category">
-                            <div class="mb-4">
-                                <h4 class="mb-3 border-bottom pb-2">
-                                    <t t-if="category == 'cabinet'">Cabinet</t>
-                                    <t t-if="category == 'counter_top'">Counter Top</t>
-                                    <t t-if="category == 'mirror'">Mirror</t>
-                                    <t t-if="category == 'faucet'">Faucet</t>
-                                </h4>
-
-                                <div class="row g-3">
-                                    <t t-foreach="components[category]" t-as="comp">
-                                        <div class="col-6 col-sm-4 col-lg-3">
+                            <t t-if="components[category]">
+                                <div class="mb-4">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                        <h4 class="mb-0">
+                                            <t t-if="category == 'cabinet'">Cabinet</t>
+                                            <t t-if="category == 'counter_top'">Counter Top</t>
+                                            <t t-if="category == 'mirror'">Mirror</t>
+                                            <t t-if="category == 'faucet'">Faucet</t>
+                                        </h4>
+                                        <!-- Unselect Button -->
+                                        <t
+                                            t-if="(category == 'cabinet' and cabinet) or (category == 'counter_top' and counter_top) or (category == 'mirror' and mirror) or (category == 'faucet' and faucet)">
                                             <a
                                                 t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-                                                collection, size or '',
-                                                (comp.id if category == 'cabinet' else cabinet or ''),
-                                                (comp.id if category == 'counter_top' else counter_top or ''),
-                                                (comp.id if category == 'mirror' else mirror or ''),
-                                                (comp.id if category == 'faucet' else faucet or ''))"
-                                                class="text-decoration-none">
-                                                <div
-                                                    t-attf-class="card h-100 shadow-sm #{'border-primary' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else ''}">
-                                                    <img
-                                                        t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''"
-                                                        class="card-img-top"
-                                                        style="height:120px; object-fit:cover;" />
-                                                    <div class="card-body p-2 text-center">
-                                                        <h6 class="mb-1" style="font-size: 0.95rem;">
-                                                            <t t-esc="comp.name" />
-                                                        </h6>
-                                                        <small class="text-muted">
-                                                            <t t-esc="comp.default_code or 'No SKU'" />
-                                                        </small>
+            collection, size or '',
+            ('0' if category == 'cabinet' else cabinet or '0'),
+            ('0' if category == 'counter_top' else counter_top or '0'),
+            ('0' if category == 'mirror' else mirror or '0'),
+            ('0' if category == 'faucet' else faucet or '0')
+        )"
+                                                class="btn btn-sm btn-outline-danger">Unselect</a>
+                                        </t>
+
+                                    </div>
+
+                                    <div class="row g-3">
+                                        <t t-foreach="components[category]" t-as="comp">
+                                            <div class="col-6 col-sm-4 col-lg-3">
+                                                <a
+                                                    t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
+                                    collection, size or '',
+                                    (comp.id if category == 'cabinet' else cabinet or '0'),
+                                    (comp.id if category == 'counter_top' else counter_top or '0'),
+                                    (comp.id if category == 'mirror' else mirror or '0'),
+                                    (comp.id if category == 'faucet' else faucet or '0')
+                                )"
+                                                    class="text-decoration-none">
+                                                    <div
+                                                        t-attf-class="card h-100 shadow-sm #{'border-primary' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else ''}">
+                                                        <img
+                                                            t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''"
+                                                            class="card-img-top"
+                                                            style="height:70px; width:70px; object-fit:cover;" />
+                                                        <div class="card-body p-2 text-center">
+                                                            <h6 class="mb-1"
+                                                                style="font-size: 0.95rem;">
+                                                                <t t-esc="comp.name" />
+                                                            </h6>
+                                                            <small class="text-muted">
+                                                                <t
+                                                                    t-esc="comp.default_code or 'No SKU'" />
+                                                            </small>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </t>
+                                                </a>
+                                            </div>
+                                        </t>
+                                    </div>
                                 </div>
-                            </div>
+                            </t>
                         </t>
                     </div>
+
                 </div>
 
                 <div class="mt-4">

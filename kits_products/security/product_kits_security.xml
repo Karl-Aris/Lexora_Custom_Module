@@ -1,0 +1,18 @@
+<odoo>
+    <!-- Register Product Kits model -->
+    <record id="model_product_kits" model="ir.model">
+        <field name="name">Product Kits</field>
+        <field name="model">product.kits</field>
+        <field name="state">base</field>
+    </record>
+
+    <!-- Register Import Wizard -->
+
+    <record id="model_product_kit_import_wizard" model="ir.model">
+        <field name="name">product.kit.import.wizard</field>
+        <field name="model">product.kit.import.wizard</field>
+        <field name="state">base</field>
+    </record>
+
+
+</odoo>

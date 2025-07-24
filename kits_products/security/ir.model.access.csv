@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_product_kits,product.kits,model_product_kits,,1,1,1,1
+access_product_kit_import_wizard,product.kit.import.wizard,model_product_kit_import_wizard,base.group_user,1,1,1,0

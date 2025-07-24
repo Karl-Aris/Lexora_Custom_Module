@@ -1,0 +1,32 @@
+<!-- kits_products/views/product_kit_export_views.xml -->
+
+<odoo>
+  <record id="view_product_kit_export_wizard" model="ir.ui.view">
+    <field name="name">product.kit.export.wizard.form</field>
+    <field name="model">product.kit.export.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Export Product Kits">
+        <group>
+          <field name="file" filename="filename"/>
+          <field name="filename" readonly="1"/>
+        </group>
+        <footer>
+          <button name="export_kits" type="object" string="Export Kits" class="btn-primary"/>
+          <button string="Close" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_product_kit_export" model="ir.actions.act_window">
+    <field name="name">Export Product Kits</field>
+    <field name="res_model">product.kit.export.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+  <menuitem id="menu_kits_export"
+            name="Export Kits"
+            parent="kits_products.menu_kits_root"
+            action="action_product_kit_export"/>
+</odoo>

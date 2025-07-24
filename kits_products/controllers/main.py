@@ -30,64 +30,85 @@ class ProductKitsController(http.Controller):
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
         """Display a single matching kit (by collection and size) and filterable components."""
 
-        # Step 1: Fetch all kits based on collection + size
+    # ✅ Step 0: Ensure collection and size are provided
+        if not collection or not size:
+            return request.render('kits_products.kit_group_detail_template', {
+            'kit': None,
+            'collection': collection,
+            'size': size,
+            'components': {},
+            'cabinet': None,
+            'counter_top': None,
+            'mirror': None,
+            'faucet': None,
+            })
+
+    # ✅ Step 1: Fetch kits based on collection and size
         kits = self._get_kits(collection, size)
+        if not kits:
+            return request.render('kits_products.kit_group_detail_template', {
+            'kit': None,
+            'collection': collection,
+            'size': size,
+            'components': {},
+            'cabinet': None,
+            'counter_top': None,
+            'mirror': None,
+            'faucet': None,
+            })
 
-        # Step 2: Group available components by category
+    # ✅ Step 2: Group components from kits
         components = {
-            'cabinet': set(),
-            'counter_top': set(),
-            'mirror': set(),
-            'faucet': set(),
+        'cabinet': set(),
+        'counter_top': set(),
+        'mirror': set(),
+        'faucet': set(),
         }
-
         for kit in kits:
             components['cabinet'].update(kit.cabinet_ids)
             components['counter_top'].update(kit.counter_top_ids)
             components['mirror'].update(kit.mirror_ids)
             components['faucet'].update(kit.faucet_ids)
 
-        # Step 3: Determine defaults if no component is selected
-        default_kit = kits[0] if kits else None
-
+    # ✅ Step 3: Determine selected components
+        default_kit = kits[0]
         selected_cabinet = int(cabinet) if cabinet else (
-            default_kit.cabinet_ids[0].id if default_kit and default_kit.cabinet_ids else None)
+            default_kit.cabinet_ids[0].id if default_kit.cabinet_ids else None)
         selected_counter_top = int(counter_top) if counter_top else (
-            default_kit.counter_top_ids[0].id if default_kit and default_kit.counter_top_ids else None)
+            default_kit.counter_top_ids[0].id if default_kit.counter_top_ids else None)
         selected_mirror = int(mirror) if mirror else (
-            default_kit.mirror_ids[0].id if default_kit and default_kit.mirror_ids else None)
+            default_kit.mirror_ids[0].id if default_kit.mirror_ids else None)
         selected_faucet = int(faucet) if faucet else (
-            default_kit.faucet_ids[0].id if default_kit and default_kit.faucet_ids else None)
+            default_kit.faucet_ids[0].id if default_kit.faucet_ids else None)
 
-        # Step 4: Filter kits that exactly match the selected components
+    # ✅ Step 4: Find exact match for selected components
         matching_kit = None
         for kit in kits:
-            if selected_cabinet and selected_cabinet not in kit.cabinet_ids.ids:
+            if selected_cabinet is not None and selected_cabinet not in kit.cabinet_ids.ids:
                 continue
-            if selected_counter_top and selected_counter_top not in kit.counter_top_ids.ids:
+            if selected_counter_top is not None and selected_counter_top not in kit.counter_top_ids.ids:
                 continue
-            if selected_mirror and selected_mirror not in kit.mirror_ids.ids:
+            if selected_mirror is not None and selected_mirror not in kit.mirror_ids.ids:
                 continue
-            if selected_faucet and selected_faucet not in kit.faucet_ids.ids:
+            if selected_faucet is not None and selected_faucet not in kit.faucet_ids.ids:
                 continue
             matching_kit = kit
-            break  # Take the first exact match
+            break
 
-        # Step 5: Render the template with data
+
+    # ✅ Step 5: Return response
         return request.render('kits_products.kit_group_detail_template', {
-            'kit': matching_kit,
-            'collection': collection,
-            'size': size,
-            'components': components,
-            'cabinet': selected_cabinet,
-            'counter_top': selected_counter_top,
-            'mirror': selected_mirror,
-            'faucet': selected_faucet,
+        'kit': matching_kit,
+        'collection': collection,
+        'size': size,
+        'components': components,
+        'cabinet': selected_cabinet,
+        'counter_top': selected_counter_top,
+        'mirror': selected_mirror,
+        'faucet': selected_faucet,
         })
 
 
-        
-                
 
     @http.route(['/product_kits/group_builder'], type='http', auth="public", website=True)
     def kit_builder(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
