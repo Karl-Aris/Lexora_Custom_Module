@@ -9,8 +9,9 @@ class ProductConfigurationController(http.Controller):
         return request.render('product_configuration.template_product_configuration')
 
     @http.route(['/store/cabinet'], type='http', auth='public', website=True)
-    def search_by_sku(self, sku=None, **kwargs):
+    def search_by_sku(self, sku=None, countertop=None, **kwargs):
         product = None
+        selected_countertop = None
         related_sizes = []
         related_countertops = []
         collection_tag = ''
@@ -27,8 +28,9 @@ class ProductConfigurationController(http.Controller):
 
                 # Define excluded tags to find collection and color
                 excluded_tags = [
-                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)',
-                    'Single', 'Double', 'Sink', 'Countertops', 'Top'
+                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)', 'Vanity, Countertop, Sink, and Mirror', 'Vanity, Countertop, and Sink', 'Vanity, Countertop, Sink, and Faucet',
+                    'Vanity, Countertop, Sink, Mirror, and Faucet',
+                    'Single', 'Double', 'Sink', 'Countertops', 'Top', 'Acrylic', 'Frameless'
                 ]
 
                 # Get collection (non-digit, not excluded)
@@ -87,10 +89,17 @@ class ProductConfigurationController(http.Controller):
                             ('product_tmpl_id', 'in', top_templates.ids)
                         ])
 
+        # --- Selected Countertop (from query param) ---
+        if countertop:
+            selected_countertop = request.env['product.product'].sudo().search([
+                ('default_code', '=', countertop)
+            ], limit=1)
+
         return request.render('product_configuration.template_product_configuration', {
             'product': product,
             'related_sizes': related_sizes,
             'related_countertops': related_countertops,
             'collection_name': collection_tag,
             'color_name': color_tag,
+            'selected_countertop': selected_countertop,
         })
