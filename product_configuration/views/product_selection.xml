@@ -29,7 +29,7 @@
             <!-- Right: Details -->
             <div class="col-md-6">
 
-              <div> <!--Container for product details-->
+              <div class="mb-4"> <!--Container for product details-->
               
               <h3><t t-esc="product.name"/></h3>
               <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p>
@@ -89,6 +89,55 @@
                     </t>
                   </div>
                 </div>
+
+               <div> <!--Select Countertop-->
+                  <p><strong>Select Countertop for <t t-esc="collection_name"/> Collection</strong></p>
+                  <div class="row">
+                    <t t-if="related_countertops">
+                        <t t-if="related_countertops">
+                          <hr class="my-5"/>
+                          <p><strong>Select Countertops for <t t-esc="collection_name"/> Collection</strong></p>
+
+                          <div class="row">
+                            <t t-foreach="related_countertops" t-as="countertop">
+                              <div class="col-6 col-md-2 mb-3">
+                                <a t-att-href="'/store/cabinet?sku=' + countertop.default_code" class="text-decoration-none text-dark">
+
+                                  <!-- Highlight current selection -->
+                                  <t t-set="is_active_top" t-value="countertop.default_code == product.default_code"/>
+                                  <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_top else ''}">
+
+                                    <t t-if="countertop.image_1920">
+                                      <img t-att-src="'data:image/png;base64,%s' % countertop.image_1920.decode('utf-8')"
+                                          class="card-img-top img-fluid"
+                                          alt="Countertop Image"
+                                          style="padding: 10px; max-height: 130px; object-fit: contain;"/>
+                                    </t>
+                                    <t t-else="">
+                                      <div class="p-3 text-muted">No image</div>
+                                    </t>
+
+                                    <div class="card-body p-2">
+                                      <!-- Display size number only -->
+                                      <t t-set="size_tag" 
+                                        t-value="countertop.product_tmpl_id.product_tag_ids.filtered(lambda tag: tag.name.isdigit())"/>
+                                      <h5 class="card-title fw-semibold mb-0" style="font-size: 1.4rem;">
+                                        <t t-esc="' / '.join(size_tag.mapped('name')) if size_tag else 'N/A'"/>
+                                      </h5>
+                                    </div>
+
+                                  </div>
+                                </a>
+                              </div>
+                            </t>
+                          </div>
+                        </t>
+                    </t>
+                    <t t-else="">
+                      <div class="alert alert-info">No sizes available in this collection.</div>
+                    </t>
+                  </div>
+                </div>  
 
               
               </div>
