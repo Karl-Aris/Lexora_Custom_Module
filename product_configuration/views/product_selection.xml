@@ -80,11 +80,11 @@
 
                 <!-- Select Countertops -->
                 <t t-if="related_countertops">
-                  <hr class="my-5"/>
+                  <hr class="my-2"/>
                   <p><strong>Select Countertops for <t t-esc="collection_name"/> Collection</strong></p>
                   <div class="row">
                     <t t-foreach="related_countertops" t-as="countertop">
-                      <div class="col-6 col-md-2 mb-3">
+                      <div class="col-6 col-md-3 mb-3">
                         <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&amp;countertop=' + countertop.default_code" class="text-decoration-none text-dark">
                           <t t-set="is_active_top" t-value="countertop.default_code == request.params.get('countertop')"/>
                           <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_top else ''}">
