@@ -6,6 +6,7 @@ import logging
 from odoo import models
 from email import encoders
 from email.message import EmailMessage
+from email.utils import parseaddr
 
 _logger = logging.getLogger(__name__)
 
@@ -14,9 +15,7 @@ class IrMailServer(models.Model):
 
     def _prepare_email_message(self, message, smtp_session):
         """
-        Define smtp_to based on context instead of To+Cc+Bcc.
-        Append a note for Bcc recipients inside email body (MIME safe).
-        Ensure Bcc recipient is added to smtp_to_list for actual delivery.
+        Ensure Bcc recipient is handled properly: adds footer + correct smtp_to.
         """
         x_odoo_bcc_value = next(
             (value for key, value in message._headers if key == "X-Odoo-Bcc"), None
@@ -53,7 +52,7 @@ class IrMailServer(models.Model):
 
             if message.is_multipart():
                 for part in message.walk():
-                    if part.get_content_maintype() in ["text"]:
+                    if part.get_content_maintype() == "text":
                         inject_bcc_footer(part)
             else:
                 inject_bcc_footer(message)
@@ -62,15 +61,10 @@ class IrMailServer(models.Model):
             message, smtp_session
         )
 
-        is_from_composer = self.env.context.get("is_from_composer", False)
-        if is_from_composer and self.env.context.get("recipients", False):
-            smtp_to = self.env.context["recipients"].pop(0)
-            _logger.debug("smtp_to: %s", smtp_to)
-            smtp_to_list = [smtp_to]
-
-            # Ensure Bcc recipient is in smtp_to_list if not already
-            if x_odoo_bcc_value and smtp_to != x_odoo_bcc_value:
-                smtp_to_list.append(x_odoo_bcc_value)
-                _logger.debug("Appended Bcc smtp_to: %s", x_odoo_bcc_value)
+        # Override smtp_to only if this is a Bcc-specific message
+        if x_odoo_bcc_value:
+            bcc_email = parseaddr(x_odoo_bcc_value)[1]
+            smtp_to_list = [bcc_email]
+            _logger.debug("smtp_to set to Bcc only: %s", bcc_email)
 
         return smtp_from, smtp_to_list, message
