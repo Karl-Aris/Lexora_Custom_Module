@@ -54,9 +54,9 @@
                   <div class="row">
                     <t t-if="related_sizes">
                       <t t-foreach="related_sizes" t-as="variant">
-                        <div class="col-6 col-md-3 mb-3"> <!-- 4 columns -->
+                        <div class="col-6 col-md-4 mb-3"> <!-- 3 columns -->
                           <a t-att-href="'/store/cabinet?sku=' + variant.default_code" class="text-decoration-none text-dark">
-                            
+
                             <!-- Highlight if this is the current SKU -->
                             <t t-set="is_active" t-value="variant.default_code == product.default_code"/>
                             <div t-attf-class="card shadow-sm text-center hover-shadow #{'border border-primary' if is_active else ''}">
@@ -71,14 +71,14 @@
                               </t>
 
                               <div class="card-body p-2">
-                                <p class="card-text">
-                                  <strong>Size:</strong>
-                                  <t t-set="size_tag" 
-                                    t-value="variant.product_tmpl_id.product_tag_ids.filtered(lambda tag: tag.name.isdigit())"/>
+                                <!-- Display only the size number -->
+                                <t t-set="size_tag" 
+                                  t-value="variant.product_tmpl_id.product_tag_ids.filtered(lambda tag: tag.name.isdigit())"/>
+                                <h5 class="card-title mb-0">
                                   <t t-esc="' / '.join(size_tag.mapped('name')) if size_tag else 'N/A'"/>
-                                </p>
-                                <p class="card-text"><strong>SKU:</strong> <t t-esc="variant.default_code"/></p>
+                                </h5>
                               </div>
+
                             </div>
                           </a>
                         </div>
