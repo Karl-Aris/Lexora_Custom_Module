@@ -18,7 +18,7 @@ class ProductConfigurationController(http.Controller):
         color_tag = ''
 
         if sku:
-            product = request.env['product.product'].sudo().search([
+            product = request.env['product.kits'].sudo().search([
                 ('default_code', '=', sku)
             ], limit=1)
 
@@ -96,7 +96,7 @@ class ProductConfigurationController(http.Controller):
                             )
 
                         top_templates = candidate_templates.filtered(matches_countertop_tags)
-                        related_countertops = request.env['product.product'].sudo().search([
+                        related_countertops = request.env['product.kits'].sudo().search([
                             ('product_tmpl_id', 'in', top_templates.ids)
                         ])
 
@@ -116,7 +116,7 @@ class ProductConfigurationController(http.Controller):
                         )
 
                     mirror_templates = candidate_templates.filtered(matches_mirror_tags)
-                    related_mirrors = request.env['product.product'].sudo().search([
+                    related_mirrors = request.env['product.kits'].sudo().search([
                         ('product_tmpl_id', 'in', mirror_templates.ids)
                     ])
 
