@@ -19,7 +19,7 @@ class ProductConfigurationController(http.Controller):
 
         if sku:
             product = request.env['product.kits'].sudo().search([
-                ('default_code', '=', sku)
+                ('product_sku', '=', sku)
             ], limit=1)
 
             if product:
