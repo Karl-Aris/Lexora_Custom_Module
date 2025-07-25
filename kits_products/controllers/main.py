@@ -26,6 +26,35 @@ class ProductKitsController(http.Controller):
         return request.render('kits_products.kits_list_template', {
             'grouped_kits': dict(grouped_kits),
         })
+    
+
+    @http.route(['/all_products'], type='http', auth="public", website=True)
+    def list_all_products(self, **kwargs):
+        # You can pass these via query string or hardcode for now
+        collection = kwargs.get('collection')
+        size = kwargs.get('size')
+
+        tag_names = ['Bathroom Vanities']
+        if collection:
+            tag_names.append(collection)
+        if size:
+            tag_names.append(size)
+
+        # Search for product templates with matching tags
+        tags = request.env['product.tag'].sudo().search([('name', 'in', tag_names)])
+        product_templates = request.env['product.template'].sudo().search([
+            ('product_tag_ids', 'in', tags.ids)
+        ])
+
+        # Now get products linked to those templates
+        products = request.env['product.product'].sudo().search([
+            ('product_tmpl_id', 'in', product_templates.ids)
+        ])
+
+        return request.render('kits_products.all_products_template', {
+            'products': products,
+        })
+
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
         """Display a single matching kit (by collection and size) and filterable components."""
@@ -157,4 +186,4 @@ class ProductKitsController(http.Controller):
 
 
         
-     
+    

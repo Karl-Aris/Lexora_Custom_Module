@@ -34,8 +34,70 @@
     </template>
 
 
- 
- 
+<template id="all_products_template" name="All Products">
+    <t t-call="website.layout">
+        <div class="container mt-4 mb-4">
+            <h1>All Products</h1>
+
+            <t t-if="products">
+                <div class="row">
+                    <t t-foreach="products" t-as="product">
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card p-2 border h-100">
+
+                                <!-- ✅ Product Image -->
+                                <t t-if="product.product_tmpl_id.image_1920">
+                                    <img t-att-src="'data:image/png;base64,%s' % product.product_tmpl_id.image_1920.decode('utf-8')"
+                                         class="card-img-top mb-2"
+                                         alt="Product Image"/>
+                                </t>
+                                <t t-else="">
+                                    <img src="/web/static/src/img/placeholder.png"
+                                         class="card-img-top mb-2"
+                                         alt="No Image"/>
+                                </t>
+
+                                <h4>
+                                    <t t-esc="product.name" />
+                                </h4>
+                                <p>
+                                    <t t-esc="product.default_code or 'No Code'" />
+                                </p>
+                                <p>
+                                    <strong>Price:</strong>
+                                    <t t-esc="product.list_price or 'N/A'" />
+                                </p>
+                                <p>
+                                    <strong>ID:</strong>
+                                    <t t-esc="product.id" />
+                                </p>
+
+                                <!-- ✅ Tags -->
+                                <p>
+                                    <strong>Tags:</strong>
+                                    <t t-if="product.product_tmpl_id and product.product_tmpl_id.product_tag_ids">
+                                        <t t-foreach="product.product_tmpl_id.product_tag_ids" t-as="tag">
+                                            <span class="badge bg-secondary me-1">
+                                                <t t-esc="tag.name" />
+                                            </span>
+                                        </t>
+                                    </t>
+                                    <t t-else="">No Tags</t>
+                                </p>
+
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <t t-else="">
+                <p>No products found.</p>
+            </t>
+        </div>
+    </t>
+</template>
+
+
 
 
 </odoo>
