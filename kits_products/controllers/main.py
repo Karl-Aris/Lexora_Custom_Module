@@ -26,8 +26,6 @@ class ProductKitsController(http.Controller):
         return request.render('kits_products.kits_list_template', {
             'grouped_kits': dict(grouped_kits),
         })
-    
-
     @http.route(['/all_products'], type='http', auth="public", website=True)
     def list_all_products(self, **kwargs):
         collection = kwargs.get('collection')
@@ -153,26 +151,7 @@ class ProductKitsController(http.Controller):
             matching_kit = kit
             matching_product = kit.product_id
             break
-         # ✅ Step 5: Find related products with same tags and color
-                # ✅ Step 5: Find related products using collection and color as tag names
-                # ✅ Step 5: Find related products using collection and color as tag names
-        related_products = []
-        if matching_product:
-            tag_model = request.env['product.tag'].sudo()
-            collection_tag_obj = tag_model.search([('name', '=', collection)]) if collection else None
-            color_tag_obj = tag_model.search([('name', '=', matching_kit.color)]) if matching_kit.color else None
 
-            tag_ids = []
-            if collection_tag_obj:
-                tag_ids.append(collection_tag_obj.id)
-            if color_tag_obj:
-                tag_ids.append(color_tag_obj.id)
-
-            if tag_ids:
-                related_products = request.env['product.product'].sudo().search([
-                    ('id', '!=', matching_product.id),
-                    ('o_product_tags', 'in', tag_ids),
-                ])
 
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
@@ -184,9 +163,133 @@ class ProductKitsController(http.Controller):
             'counter_top': selected_counter_top,
             'mirror': selected_mirror,
             'faucet': selected_faucet,
-            'related_products': related_products,
         })
 
 
-        
+    
+
+
+
+    @http.route(['/product_kits/group_builder'], type='http', auth="public", website=True)
+    def kit_builder(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
+        kits = self._get_kits(collection, size)
+
+        # Group components by category
+        components = {
+            'cabinet': set(),
+            'counter_top': set(),
+            'mirror': set(),
+            'faucet': set(),
+        }
+
+        for kit in kits:
+            components['cabinet'].update(kit.cabinet_ids)
+            components['counter_top'].update(kit.counter_top_ids)
+            components['mirror'].update(kit.mirror_ids)
+            components['faucet'].update(kit.faucet_ids)
+
+        # Filter kits based on selected components
+        filtered_kits = []
+        for kit in kits:
+            if cabinet and int(cabinet) not in kit.cabinet_ids.ids:
+                continue
+            if counter_top and int(counter_top) not in kit.counter_top_ids.ids:
+                continue
+            if mirror and int(mirror) not in kit.mirror_ids.ids:
+                continue
+            if faucet and int(faucet) not in kit.faucet_ids.ids:
+                continue
+            filtered_kits.append(kit)
+
+        return request.render('kits_products.kit_builder_template', {
+            'kits': kits,
+            'collection': collection,
+            'size': size,
+            'components': components,
+            'cabinet': int(cabinet) if cabinet else None,
+            'counter_top': int(counter_top) if counter_top else None,
+            'mirror': int(mirror) if mirror else None,
+            'faucet': int(faucet) if faucet else None,
+            'filtered_kits': filtered_kits,
+        })
+
+    @http.route(['/product_kits/filter'], type='http', auth="public", website=True)
+    def filter_kits(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
+        """Filter kits by selected components."""
+        kits = self._get_kits(collection, size)
+
+        # Convert component ids to integers for comparison
+        filters = {
+            'cabinet': int(cabinet) if cabinet else None,
+            'counter_top': int(counter_top) if counter_top else None,
+            'mirror': int(mirror) if mirror else None,
+            'faucet': int(faucet) if faucet else None,
+        }
+
+        filtered_kits = []
+
+        for kit in kits:
+            if filters['cabinet'] and filters['cabinet'] not in kit.cabinet_ids.ids:
+                continue
+            if filters['counter_top'] and filters['counter_top'] not in kit.counter_top_ids.ids:
+                continue
+            if filters['mirror'] and filters['mirror'] not in kit.mirror_ids.ids:
+                continue
+            if filters['faucet'] and filters['faucet'] not in kit.faucet_ids.ids:
+                continue
+            filtered_kits.append(kit)
+
+        return request.render('kits_products.filtered_kits_template', {
+            'kits': filtered_kits,
+            'collection': collection,
+            'size': size,
+            **filters,  # Pass component selections back to the template
+        })
+    http.route(['/product_kits/components'], type='http', auth="public", website=True)
+    def kit_components(self, **kwargs):
+        """List all kit components grouped by category."""
+
+        kits = request.env['product.kits'].sudo().search([])
+
+        components = {
+            'cabinet': set(),
+            'counter_top': set(),
+            'mirror': set(),
+            'faucet': set(),
+        }
+
+        for kit in kits:
+            components['cabinet'].update(kit.cabinet_ids)
+            components['counter_top'].update(kit.counter_top_ids)
+            components['mirror'].update(kit.mirror_ids)
+            components['faucet'].update(kit.faucet_ids)
+
+        return request.render('kits_products.kit_components_template', {
+            'components': components,
+        })
+
+    @http.route(['/product_kits/component_filter'], type='http', auth="public", website=True)
+    def component_filter(self, category=None, comp_id=None, **kwargs):
+        """Filter kits based on a single component selection."""
+
+        kits = request.env['product.kits'].sudo().search([])
+
+        matched_kits = []
+        comp_id = int(comp_id)
+
+        for kit in kits:
+            if category == 'cabinet' and comp_id in kit.cabinet_ids.ids:
+                matched_kits.append(kit)
+            elif category == 'counter_top' and comp_id in kit.counter_top_ids.ids:
+                matched_kits.append(kit)
+            elif category == 'mirror' and comp_id in kit.mirror_ids.ids:
+                matched_kits.append(kit)
+            elif category == 'faucet' and comp_id in kit.faucet_ids.ids:
+                matched_kits.append(kit)
+
+        return request.render('kits_products.filtered_kits_template', {
+            'kits': matched_kits,
+            'category': category,
+            'comp_id': comp_id,
+        })
     
