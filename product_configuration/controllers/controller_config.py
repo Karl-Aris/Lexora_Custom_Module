@@ -41,6 +41,18 @@ class ProductKitsController(http.Controller):
         seen_countertops = set()
         seen_mirrors = set()
         seen_faucets = set()
+        
+        colors_by_group = {}
+        if selected_collection:
+            for kit in kits:
+                color = getattr(kit, 'color', False) or getattr(kit, 'color_sku', False)
+                group = getattr(kit, 'color_group', 'Default')  # 'color_group' should be a new or existing field
+                if color:
+                    colors_by_group.setdefault(group, set()).add(color)
+
+            # Convert sets to sorted lists
+            for group in colors_by_group:
+                colors_by_group[group] = sorted(colors_by_group[group])
 
         # Filter kits by color if selected
         if selected_color:
@@ -108,4 +120,5 @@ class ProductKitsController(http.Controller):
             'counter_top_cards': counter_top_cards,
             'mirror_cards': mirror_cards,
             'faucet_cards': faucet_cards,
+            'colors_by_group': colors_by_group,
         })
