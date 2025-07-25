@@ -68,8 +68,8 @@ class ProductConfigurationController(http.Controller):
                         )
 
                     size_templates = candidate_templates.filtered(matches_required_tags)
-                    related_sizes = request.env['product.product'].sudo().search([
-                        ('product_tmpl_id', 'in', size_templates.ids)
+                    related_sizes = request.env['product.kits'].sudo().search([
+                        ('cabinet_sku', 'in', size_templates.ids)
                     ])
 
                 
@@ -97,7 +97,7 @@ class ProductConfigurationController(http.Controller):
 
                         top_templates = candidate_templates.filtered(matches_countertop_tags)
                         related_countertops = request.env['product.kits'].sudo().search([
-                            ('product_tmpl_id', 'in', top_templates.ids)
+                            ('counter_top_sku', 'in', top_templates.ids)
                         ])
 
                 # --- Related Mirrors Logic ---
@@ -117,7 +117,7 @@ class ProductConfigurationController(http.Controller):
 
                     mirror_templates = candidate_templates.filtered(matches_mirror_tags)
                     related_mirrors = request.env['product.kits'].sudo().search([
-                        ('product_tmpl_id', 'in', mirror_templates.ids)
+                        ('mirror_sku', 'in', mirror_templates.ids)
                     ])
 
         return request.render('product_configuration.template_product_configuration', {
