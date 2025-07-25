@@ -1,0 +1,29 @@
+<odoo>
+    <record id="view_order_form_inherit_vendor_bills" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.vendor.bills</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Vendor Bills">
+                    <field name="vendor_bill_ids">
+                        <form>
+                            <group>
+                                <field name="company_id"/>
+                                <field name="partner_id"/>
+                                <field name="invoice_date"/>
+                                <field name="amount_total" readonly="1"/>
+                            </group>
+                        </form>
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="invoice_date"/>
+                            <field name="amount_total" readonly="1"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
