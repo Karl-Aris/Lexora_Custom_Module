@@ -22,7 +22,7 @@
                 <label class="fw-bold mb-2">Select Color:</label>
                 <div class="d-flex flex-wrap gap-2">
                     <t t-foreach="color_tags" t-as="color">
-                        <a t-att-href="'/store?collection=%s&color=%s' % (collection, color)"
+                        <a t-att-href="'/store?collection=%s&amp;color=%s' % (collection, color)"
                           class="badge px-3 py-2 rounded-pill text-decoration-none t-attf-class='{{ 'bg-primary text-white' if color == selected_color else 'bg-light text-dark' }}'">
                             <t t-esc="color"/>
                         </a>
