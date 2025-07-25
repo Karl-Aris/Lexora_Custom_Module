@@ -7,14 +7,26 @@
     <field name="arch" type="xml">
       <xpath expr="//page[@name='order_lines']" position="after">
         <page name="vendor_bills" string="Vendor Bills">
-          <field name="vendor_bill_ids" context="{'default_company_id': company_id}">
-            <tree editable="bottom">
+          <field name="vendor_bill_ids" context="{'default_company_id': company_id, 'default_x_sale_order_id': active_id}">
+            <tree>
               <field name="name"/>
               <field name="date"/>
               <field name="amount_total"/>
               <field name="state"/>
-              <field name="company_id" invisible="1"/>
             </tree>
+            <form string="Vendor Bill">
+              <sheet>
+                <group>
+                  <field name="name"/>
+                  <field name="move_type" readonly="1"/>
+                  <field name="partner_id"/>
+                  <field name="invoice_date"/>
+                  <field name="amount_total" readonly="1"/>
+                  <field name="state"/>
+                  <field name="company_id"/>
+                </group>
+              </sheet>
+            </form>
           </field>
         </page>
       </xpath>
