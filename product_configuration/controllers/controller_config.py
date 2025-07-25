@@ -1,219 +1,100 @@
-<odoo>
-  <template id="template_product_configuration" name="Product Configuration">
-    <t t-call="website.layout">
-      <div class="container my-4">
+from odoo import http
+from odoo.http import request
 
-        <!-- COLLECTION DROPDOWN -->
-        <div class="mb-3">
-            <select class="form-select" onchange="window.location.href = this.value">
-                <option disabled="disabled" t-if="not collection" selected="selected">Select collection</option>
-                <t t-foreach="all_collections" t-as="col">
-                    <option t-att-value="'/store?collection=%s' % col"
-                            t-att-selected="'selected' if col == collection else None">
-                        <t t-esc="col"/>
-                    </option>
-                </t>
-            </select>
-        </div>
+class ProductKitsController(http.Controller):
 
-        <!-- COLOR TAGS -->
-        <t t-if="collection">
-            <div class="mb-4">
-                <label class="fw-bold mb-2">Select Color:</label>
-                <div class="d-flex flex-wrap gap-2">
-                    <t t-foreach="color_tags" t-as="color">
-                        <a t-att-href="'/store?collection=%s&amp;color=%s' % (collection, color)"
-                          class="badge px-3 py-2 rounded-pill text-decoration-none t-attf-class='{{ 'bg-primary text-white' if color == selected_color else 'bg-light text-dark' }}'">
-                            <t t-esc="color"/>
-                        </a>
-                    </t>
-                </div>
-            </div>
-        </t>
+    @http.route('/store', type='http', auth='public', website=True)
+    def store_by_collection(self, **kwargs):
+        collection = kwargs.get('collection')
+        selected_color = kwargs.get('color')
+        selected_sku = kwargs.get('cabinet_sku')
+        selected_countertop = kwargs.get('counter_top_sku')
+        selected_mirror = kwargs.get('mirror_sku')
+        selected_faucet = kwargs.get('faucet_sku')
 
-        <!-- Show rest only if collection selected -->
-        <t t-if="selected_color">
+        # Get all collections (for dropdown)
+        all_collections = request.env['product.kits'].sudo().search([]).mapped('collection')
+        all_collections = sorted(set(all_collections))
 
-          <h2>Collection: <t t-esc="selected_collection"/></h2>
+        color_tags = []
+        size_cards = []
+        counter_top_cards = []
+        mirror_cards = []
+        faucet_cards = []
 
-          <div class="row">
-            <!-- LEFT COLUMN: Sample image -->
-            <div class="col-md-6">
-              <img src="/web/image/res.company/1/logo" class="img-fluid border rounded" alt="Sample Image" />
-            </div>
+        if collection:
+            # Colors for the selected collection
+            kits_in_collection = request.env['product.kits'].sudo().search([('collection', '=', collection)])
+            seen_colors = set()
+            for kit in kits_in_collection:
+                if kit.color and kit.color not in seen_colors:
+                    seen_colors.add(kit.color)
+                    color_tags.append(kit.color)
 
-            <!-- RIGHT COLUMN: Size cards -->
-            <div class="col-md-6">
+            if selected_color:
+                kits = kits_in_collection.filtered(lambda k: k.color == selected_color)
 
-              <!-- Step Title -->
-              <div class="d-flex align-items-center mb-3">
-                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                  <strong>1</strong>
-                </div>
-                <h4 class="mb-0">Select Sizes</h4>
-              </div>
+                seen_sizes = set()
+                seen_countertops = set()
+                seen_mirrors = set()
+                seen_faucets = set()
 
-              <!-- Size Cards Grid -->
-              <div class="row">
-                <t t-foreach="size_cards" t-as="card">
-                  <div class="col-3 mb-3">
-                    <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
-                            selected_collection,
-                            '&amp;color=' + selected_color if selected_color else '',
-                            '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
-                            '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
-                            '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                            '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                          )"
-                       class="text-decoration-none">
-                      <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
-                        <t t-if="card['image']">
-                          <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                               class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Product Image"/>
-                        </t>
-                        <t t-else="">
-                          <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                            <span class="text-muted">No Image</span>
-                          </div>
-                        </t>
-                        <div class="card-body text-center">
-                          <strong><t t-esc="card['size']"/></strong><br/>
-                          <small class="text-muted"><t t-esc="card['cabinet_sku']"/></small>
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                </t>
-              </div>
+                for kit in kits:
+                    # Size cards
+                    size = kit.size
+                    cabinet_sku = kit.cabinet_sku
+                    if size not in seen_sizes:
+                        seen_sizes.add(size)
+                        product = request.env['product.product'].sudo().search([('default_code', '=', cabinet_sku)], limit=1)
+                        size_cards.append({
+                            'size': size,
+                            'cabinet_sku': cabinet_sku,
+                            'image': product.image_1920.decode('utf-8') if product.image_1920 else None,
+                        })
 
-              <!-- Step 2: Countertop -->
-              <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                    <strong>2</strong>
-                  </div>
-                  <h4 class="mb-0">Select Countertop</h4>
-                </div>
+                    # Countertop cards
+                    counter_sku = kit.counter_top_sku
+                    if counter_sku and counter_sku not in seen_countertops:
+                        seen_countertops.add(counter_sku)
+                        product = request.env['product.product'].sudo().search([('default_code', '=', counter_sku)], limit=1)
+                        counter_top_cards.append({
+                            'counter_top_sku': counter_sku,
+                            'image': product.image_1920.decode('utf-8') if product.image_1920 else None,
+                        })
 
-                <div class="row">
-                  <t t-foreach="counter_top_cards" t-as="card">
-                    <div class="col-3 mb-3">
-                      <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
-                              selected_collection,
-                              '&amp;color=' + selected_color if selected_color else '',
-                              '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                              '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
-                              '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                              '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                            )"
-                         class="text-decoration-none">
-                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
-                          <t t-if="card['image']">
-                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
-                          </t>
-                          <t t-else="">
-                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                              <span class="text-muted">No Image</span>
-                            </div>
-                          </t>
-                          <div class="card-body text-center">
-                            <strong><t t-esc="card['counter_top_sku']"/></strong>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
-                </div>
-              </t>
+                    # Mirror cards
+                    mirror_sku = kit.mirror_sku
+                    if mirror_sku and mirror_sku not in seen_mirrors:
+                        seen_mirrors.add(mirror_sku)
+                        product = request.env['product.product'].sudo().search([('default_code', '=', mirror_sku)], limit=1)
+                        mirror_cards.append({
+                            'mirror_sku': mirror_sku,
+                            'image': product.image_1920.decode('utf-8') if product.image_1920 else None,
+                        })
 
-              <!-- Step 3: Mirror -->
-              <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                    <strong>3</strong>
-                  </div>
-                  <h4 class="mb-0">Select Mirror</h4>
-                </div>
+                    # Faucet cards
+                    faucet_sku = kit.faucet_sku
+                    if faucet_sku and faucet_sku not in seen_faucets:
+                        seen_faucets.add(faucet_sku)
+                        product = request.env['product.product'].sudo().search([('default_code', '=', faucet_sku)], limit=1)
+                        faucet_cards.append({
+                            'faucet_sku': faucet_sku,
+                            'image': product.image_1920.decode('utf-8') if product.image_1920 else None,
+                        })
 
-                <div class="row">
-                  <t t-foreach="mirror_cards" t-as="card">
-                    <div class="col-3 mb-3">
-                      <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
-                              selected_collection,
-                              '&amp;color=' + selected_color if selected_color else '',
-                              '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                              '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
-                              '&amp;mirror_sku=' + card['mirror_sku'] if selected_mirror != card['mirror_sku'] else '',
-                              '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                            )"
-                         class="text-decoration-none">
-                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['mirror_sku'] == selected_mirror else ''}">
-                          <t t-if="card['image']">
-                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Mirror Image"/>
-                          </t>
-                          <t t-else="">
-                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                              <span class="text-muted">No Image</span>
-                            </div>
-                          </t>
-                          <div class="card-body text-center">
-                            <strong><t t-esc="card['mirror_sku']"/></strong>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
-                </div>
-              </t>
+                size_cards.sort(key=lambda x: float(x['size']))
 
-              <!-- Step 4: Faucet -->
-              <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                    <strong>4</strong>
-                  </div>
-                  <h4 class="mb-0">Select Faucet</h4>
-                </div>
-
-                <div class="row">
-                  <t t-foreach="faucet_cards" t-as="card">
-                    <div class="col-3 mb-3">
-                      <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
-                              selected_collection,
-                              '&amp;color=' + selected_color if selected_color else '',
-                              '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                              '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
-                              '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                              '&amp;faucet_sku=' + card['faucet_sku'] if selected_faucet != card['faucet_sku'] else ''
-                            )"
-                         class="text-decoration-none">
-                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['faucet_sku'] == selected_faucet else ''}">
-                          <t t-if="card['image']">
-                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Faucet Image"/>
-                          </t>
-                          <t t-else="">
-                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                              <span class="text-muted">No Image</span>
-                            </div>
-                          </t>
-                          <div class="card-body text-center">
-                            <strong><t t-esc="card['faucet_sku']"/></strong>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
-                </div>
-              </t>
-
-            </div>
-          </div>
-        </t>
-
-      </div>
-    </t>
-  </template>
-</odoo>
+        return request.render('product_configuration.template_product_configuration', {
+            'collection': collection,
+            'selected_color': selected_color,
+            'selected_sku': selected_sku,
+            'selected_countertop': selected_countertop,
+            'selected_mirror': selected_mirror,
+            'selected_faucet': selected_faucet,
+            'all_collections': all_collections,
+            'color_tags': color_tags,
+            'size_cards': size_cards,
+            'counter_top_cards': counter_top_cards,
+            'mirror_cards': mirror_cards,
+            'faucet_cards': faucet_cards,
+        })
