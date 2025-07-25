@@ -32,6 +32,8 @@ class ProductKitsController(http.Controller):
                 'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
             })
 
+            size_cards.sort(key=lambda x: float(x['size']))
+
         return request.render('product_configuration.template_product_configuration', {
             'collection': collection,
             'selected_sku': selected_sku,
