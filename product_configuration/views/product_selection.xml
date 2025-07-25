@@ -24,10 +24,7 @@
                     <div class="row">
                         <t t-foreach="size_cards" t-as="card">
                           <div class="col-3 mb-3">
-                              <a t-att-href="'/store?collection=%s%s' % (
-                                      collection,
-                                      '&amp;cabinet_sku=' + selected_sku if selected_sku else ''
-                                  )"
+                              <a t-att-href="'/store?collection=%s&amp;cabinet_sku=%s' % (collection, card['cabinet_sku'])"
                                 class="text-decoration-none">
                                   <div class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
                                       <t t-if="card['image']">
@@ -46,7 +43,7 @@
                                   </div>
                               </a>
                           </div>
-                      </t>
+                        </t>
                     </div>
 
                     <!-- Step 2: Countertop -->
