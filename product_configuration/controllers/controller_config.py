@@ -8,6 +8,7 @@ class ProductKitsController(http.Controller):
         collection = kwargs.get('collection')
         selected_sku = kwargs.get('cabinet_sku')
         selected_countertop = kwargs.get('counter_top_sku')
+        selected_mirror = kwargs.get('mirror_sku')
 
         if not collection:
             return request.not_found()
@@ -67,6 +68,7 @@ class ProductKitsController(http.Controller):
             'collection': collection,
             'selected_sku': selected_sku,
             'selected_countertop': selected_countertop,
+            'selected_mirror': selected_mirror,
             'size_cards': size_cards,
             'counter_top_cards': counter_top_cards,
             'mirror_cards': mirror_cards,
