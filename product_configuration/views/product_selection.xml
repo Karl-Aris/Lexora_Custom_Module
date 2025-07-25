@@ -42,7 +42,7 @@
               </div>
 
               <div>
-                <!-- Select Size -->
+                <!-- Select Size (Cabinet) -->
                 <div class="d-flex align-items-center mb-2">
                   <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2" style="width: 28px; height: 28px; font-size: 0.9rem;">
                     1
@@ -51,8 +51,8 @@
                 </div>
                 <div class="row">
                   <t t-if="related_sizes">
-                    <t t-foreach="related_sizes" t-as="variant" t-key="variant.id">
-                      <t t-set="kit" t-value="related_size_kits[loop.index0]"/>
+                    <t t-foreach="related_sizes" t-as="variant">
+                      <t t-set="kit" t-value="next((k for k in related_size_kits if k.cabinet_sku == variant.default_code), None)"/>
                       <div class="col-6 col-md-2 mb-3">
                         <a t-att-href="'/store/cabinet?cabinet_sku=' + variant.default_code" class="text-decoration-none text-dark">
                           <t t-set="is_active" t-value="variant.default_code == product.default_code"/>
@@ -93,11 +93,11 @@
                 </div>
                 <t t-if="related_countertops">
                   <div class="row">
-                    <t t-foreach="related_countertops" t-as="countertop" t-key="countertop.id">
-                      <t t-set="kit" t-value="related_countertop_kits[loop.index0]"/>
+                    <t t-foreach="related_countertops" t-as="countertop">
+                      <t t-set="kit" t-value="next((k for k in related_countertop_kits if k.counter_top_sku == countertop.default_code), None)"/>
                       <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
-                        <a t-att-href="'/store/cabinet?cabinet_sku=' + product.default_code + '&amp;countertop_sku=' + countertop.default_code" class="text-decoration-none text-dark">
-                          <t t-set="is_active_top" t-value="countertop.default_code == request.params.get('countertop_sku')"/>
+                        <a t-att-href="'/store/cabinet?cabinet_sku=' + product.default_code + '&amp;counter_top_sku=' + countertop.default_code" class="text-decoration-none text-dark">
+                          <t t-set="is_active_top" t-value="countertop.default_code == request.params.get('counter_top_sku')"/>
                           <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_top else ''}">
                             <t t-if="countertop.image_1920">
                               <img t-att-src="'data:image/png;base64,%s' % countertop.image_1920.decode('utf-8')"
@@ -136,8 +136,8 @@
                 </div>
                 <t t-if="related_mirrors">
                   <div class="row">
-                    <t t-foreach="related_mirrors" t-as="mirror" t-key="mirror.id">
-                      <t t-set="kit" t-value="related_mirror_kits[loop.index0]"/>
+                    <t t-foreach="related_mirrors" t-as="mirror">
+                      <t t-set="kit" t-value="next((k for k in related_mirror_kits if k.mirror_sku == mirror.default_code), None)"/>
                       <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
                         <a t-att-href="'/store/cabinet?cabinet_sku=' + product.default_code + '&amp;mirror_sku=' + mirror.default_code"
                           class="text-decoration-none text-dark">
@@ -180,8 +180,8 @@
                 </div>
                 <t t-if="related_faucets">
                   <div class="row">
-                    <t t-foreach="related_faucets" t-as="faucet" t-key="faucet.id">
-                      <t t-set="kit" t-value="related_faucet_kits[loop.index0]"/>
+                    <t t-foreach="related_faucets" t-as="faucet">
+                      <t t-set="kit" t-value="next((k for k in related_faucet_kits if k.faucet_sku == faucet.default_code), None)"/>
                       <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
                         <a t-att-href="'/store/cabinet?cabinet_sku=' + product.default_code + '&amp;faucet_sku=' + faucet.default_code"
                           class="text-decoration-none text-dark">
@@ -214,15 +214,18 @@
                 <t t-else="">
                   <div class="alert alert-info">No faucets available in this configuration.</div>
                 </t>
-
               </div>
-            </div>
-          </div>
+
+            </div> <!-- /.col-md-6 -->
+          </div> <!-- /.row -->
         </t>
         <t t-else="">
-          <div class="alert alert-warning">Product not found.</div>
+          <div class="alert alert-warning">
+            Product not found.
+          </div>
         </t>
-      </div>
+
+      </div> <!-- /.container -->
     </t>
   </template>
 </odoo>
