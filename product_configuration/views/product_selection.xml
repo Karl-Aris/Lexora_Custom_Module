@@ -37,24 +37,31 @@
         <t t-if="selected_color">
 
           <div class="row">
-          <!-- LEFT COLUMN: Combined SKU Image -->
-          <div class="col-md-6">
-            <t t-if="configured_product and configured_product.image_1920">
-              <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                  alt="Configured Product"
-                  class="img-thumbnail"
-                  style="width: 100%; height: 500px; object-fit: contain;" />
-              <div class="mt-2 text-center">
-                <strong><t t-esc="configured_product.name or configured_kit.product_sku or 'Unnamed Product'"/></strong>
-              </div>
-            </t>
-            <t t-else="">
-              <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center text-center"
-                  style="width: 100%; height: 500px; padding: 20px;">
-                No available SKU combination
-              </div>
-            </t>
-          </div>
+          <!-- LEFT: Configured Image -->
+            <div class="col-md-6">
+              <t t-if="configured_product and configured_product.image_1920">
+                <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
+                    alt="Configured Product"
+                    class="img-thumbnail"
+                    style="width: 100%; height: 500px; object-fit: contain;" />
+                <div class="mt-2 text-center">
+                  <strong><t t-esc="configured_product.name or configured_kit.product_sku"/></strong>
+                </div>
+              </t>
+              <t t-else="">
+                <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center text-center"
+                    style="width: 100%; height: 500px; padding: 20px;">
+                  <t t-if="selected_sku and selected_countertop">
+                    No available SKU combination
+                  </t>
+                  <t t-elif="selected_sku">
+                    <t t-esc="selected_sku"/> (Base Cabinet)</t>
+                  <t t-else="">
+                    Please select a size (cabinet)
+                  </t>
+                </div>
+              </t>
+            </div>
 
             <!-- RIGHT COLUMN: Size cards -->
             <div class="col-md-6">
