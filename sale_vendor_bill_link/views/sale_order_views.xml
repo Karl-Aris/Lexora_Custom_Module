@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="Vendor Bills">
-                    <field name="vendor_bill_ids" mode="tree,form">
+                    <field name="vendor_bill_ids" mode="tree,form" context="{'default_move_type': 'in_invoice'}">
                         <tree>
                             <field name="name"/>
                             <field name="invoice_date"/>
@@ -16,6 +16,7 @@
                             <sheet>
                                 <group>
                                     <field name="name"/>
+                                    <field name="move_type" invisible="1"/>
                                     <field name="invoice_date"/>
                                     <field name="amount_total"/>
                                     <field name="sale_order_id"/>
