@@ -37,25 +37,26 @@
         <t t-if="selected_color">
 
           <div class="row">
-          <!-- LEFT COLUMN: Product Image -->
+          <!-- LEFT COLUMN: Configured Image -->
           <div class="col-md-6">
             <t t-if="selected_sku">
               <t t-if="configured_product and configured_product.image_1920">
                 <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
                     class="img-thumbnail"
-                    style="width: 100%; height: 500px; object-fit: contain;"/>
+                    style="width:100%; height:500px; object-fit:contain;"/>
                 <div class="mt-2 text-center">
-                  <strong><t t-esc="configured_product.name"/></strong>
+                  <strong><t t-esc="configured_product.name"/></strong><br/>
+                  <small class="text-muted">SKU: <t t-esc="configured_product.default_code"/></small>
                 </div>
               </t>
               <t t-else="">
                 <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
                     style="width:100%; height:500px;">
                   <t t-if="configured_kit">
-                    No image found for the configured kit
+                    No image found for configured SKU
                   </t>
                   <t t-else="">
-                    <t t-esc="selected_sku"/> (Base cabinet selected)
+                    <t t-esc="selected_sku"/> (Base cabinet)
                   </t>
                 </div>
               </t>
@@ -66,12 +67,30 @@
                 Please select a size (cabinet)
               </div>
             </t>
-            <t t-if="selected_countertop and not configured_kit">
-              <div class="text-danger text-center mt-2">
-                No available SKU combination
-              </div>
+
+            <t t-if="selected_countertop or selected_mirror or selected_faucet">
+              <t t-if="not configured_kit">
+                <div class="text-danger text-center mt-2">
+                  No available SKU combination
+                </div>
+              </t>
             </t>
           </div>
+
+          <!-- EXAMPLE of link-building logic (within size cards template) to auto-clear dependent selections -->
+          <t t-foreach="size_cards" t-as="card">
+            <a t-att-href="'/store?collection=%s&amp;color=%s&amp;cabinet_sku=%s' % (selected_collection, selected_color, card['cabinet_sku'])">
+              ... size card ...
+            </a>
+          </t>
+
+          <!-- For countertop/mirror/faucet cards, link still preserves only relevant selections -->
+          <t t-foreach="counter_top_cards" t-as="card">
+            <a t-att-href="'/store?collection=%s&amp;color=%s&amp;cabinet_sku=%s&amp;counter_top_sku=%s' % (selected_collection, selected_color, selected_sku, card['counter_top_sku'])">
+              ... countertop card ...
+            </a>
+          </t>
+          <!-- Similarly mirror and faucet -->
 
             <!-- RIGHT COLUMN: Size cards -->
             <div class="col-md-6">
