@@ -34,7 +34,7 @@
         </t>
 
         <!-- Show rest only if collection selected -->
-        <t t-if="selected_collection">
+        <t t-if="selected_color">
 
           <h2>Collection: <t t-esc="selected_collection"/></h2>
 
