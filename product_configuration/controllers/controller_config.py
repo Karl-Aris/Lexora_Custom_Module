@@ -120,15 +120,41 @@ class ProductConfigurationController(http.Controller):
                             ('product_tmpl_id', 'in', faucet_templates.ids)
                         ])
 
+                            # After fetching related_sizes, related_countertops, related_mirrors, related_faucets
+                    # Fetch related kits for each product by their default_code
+
+                    def get_kit_by_product(product):
+                        if not product:
+                            return None
+                        return request.env['product.kits'].sudo().search([
+                            '|',
+                            ('cabinet_sku', '=', product.default_code),
+                            '|',
+                            ('counter_top_sku', '=', product.default_code),
+                            '|',
+                            ('mirror_sku', '=', product.default_code),
+                            ('faucet_sku', '=', product.default_code),
+                        ], limit=1)
+
+                    related_size_kits = [get_kit_by_product(prod) for prod in related_sizes]
+                    related_countertop_kits = [get_kit_by_product(prod) for prod in related_countertops]
+                    related_mirror_kits = [get_kit_by_product(prod) for prod in related_mirrors]
+                    related_faucet_kits = [get_kit_by_product(prod) for prod in related_faucets]
+
+        # Pass these lists to template
         return request.render('product_configuration.template_product_configuration', {
             'product': product,
             'related_sizes': related_sizes,
+            'related_size_kits': related_size_kits,
             'related_countertops': related_countertops,
+            'related_countertop_kits': related_countertop_kits,
             'related_mirrors': related_mirrors,
+            'related_mirror_kits': related_mirror_kits,
             'related_faucets': related_faucets,
+            'related_faucet_kits': related_faucet_kits,
             'collection_name': collection_tag,
             'color_name': color_tag,
-            'selected_countertop': selected_countertop,
-            'selected_mirror': selected_mirror,
-            'selected_faucet': selected_faucet,
+            'selected_countertop_sku': request.params.get('countertop_sku'),
+            'selected_mirror_sku': request.params.get('mirror_sku'),
+            'selected_faucet_sku': request.params.get('faucet_sku'),
         })
