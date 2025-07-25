@@ -18,17 +18,18 @@ class ProductKitsController(http.Controller):
 
         for kit in kits:
             size = kit.size
-            sku = kit.cabinet_sku  # adjust field name if needed
+            cabinet_sku = kit.cabinet_sku  # adjust field name if needed
 
             if size in seen_sizes:
                 continue
             seen_sizes.add(size)
 
-            product = request.env['product.product'].sudo().search([('default_code', '=', sku)], limit=1)
+            product = request.env['product.product'].sudo().search([('default_code', '=', cabinet_sku)], limit=1)
 
             size_cards.append({
                 'size': size,
-                'image': product.image_1920 if product else None
+                'cabinet_sku': cabinet_sku,
+                'image': product.image_1920 if product else None,
             })
 
         return request.render('product_configuration.template_product_configuration', {
