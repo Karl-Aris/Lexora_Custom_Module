@@ -6,7 +6,7 @@
     "category": "Sales",
     "description": "Adds a Vendor Bills tab to the Sale Order form linking account.move",
     "data": [
-        "views/sale_order_form_inherit.xml",
+        "views/sale_order_view.xml",
     ],
     "installable": True,
     "application": False,
