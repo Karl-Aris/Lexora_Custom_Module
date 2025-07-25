@@ -16,9 +16,11 @@ class ProductKitsController(http.Controller):
 
         size_cards = []
         counter_top_cards = []
+        mirror_cards = []
 
         seen_sizes = set()
         seen_countertops = set()
+        seen_mirrors = set()
 
         # Prepare size cards (always)
         for kit in kits:
@@ -40,6 +42,7 @@ class ProductKitsController(http.Controller):
             # Filter kits to those matching selected size SKU
             filtered_kits = [kit for kit in kits if kit.cabinet_sku == selected_sku]
 
+            # Load countertop
             for kit in filtered_kits:
                 countertop_sku = kit.counter_top_sku
                 if countertop_sku and countertop_sku not in seen_countertops:
@@ -49,6 +52,16 @@ class ProductKitsController(http.Controller):
                         'counter_top_sku': countertop_sku,
                         'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
                     })
+            # Load mirrors
+            for kit in filtered_kits:
+                mirror_sku = kit.mirror_sku
+                if mirror_sku and mirror_sku not in seen_mirrors:
+                    seen_mirrors.add(mirror_sku)
+                    product = request.env['product.product'].sudo().search([('default_code', '=', mirror_sku)], limit=1)
+                    mirror_cards.append({
+                        'mirror_sku': mirror_sku,
+                        'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
+                    })
 
         return request.render('product_configuration.template_product_configuration', {
             'collection': collection,
@@ -56,4 +69,5 @@ class ProductKitsController(http.Controller):
             'selected_countertop': selected_countertop,
             'size_cards': size_cards,
             'counter_top_cards': counter_top_cards,
+            'mirror_cards': mirror_cards,
         })
