@@ -6,19 +6,19 @@ class ProductKitsController(http.Controller):
     @http.route('/store', type='http', auth='public', website=True)
     def store_by_collection(self, **kwargs):
         collection = kwargs.get('collection')
+        selected_sku = kwargs.get('cabinet_sku')
+
         if not collection:
             return request.not_found()
 
-        # Fetch kits in the collection
         kits = request.env['product.kits'].sudo().search([('collection', '=', collection)])
 
-        # Build list of sizes with associated product image from product.product via SKU
         size_cards = []
         seen_sizes = set()
 
         for kit in kits:
             size = kit.size
-            cabinet_sku = kit.cabinet_sku  # adjust field name if needed
+            cabinet_sku = kit.cabinet_sku
 
             if size in seen_sizes:
                 continue
@@ -34,5 +34,6 @@ class ProductKitsController(http.Controller):
 
         return request.render('product_configuration.template_product_configuration', {
             'collection': collection,
+            'selected_sku': selected_sku,
             'size_cards': size_cards,
         })
