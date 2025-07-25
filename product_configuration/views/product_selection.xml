@@ -40,50 +40,33 @@
           <!-- LEFT COLUMN: Product Image -->
           <div class="col-md-6">
             <t t-if="selected_sku">
-
-              <!-- Show Configured Product Image (if a matching combination exists) -->
               <t t-if="configured_product and configured_product.image_1920">
                 <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                    alt="Configured Product"
                     class="img-thumbnail"
-                    style="width: 100%; height: 500px; object-fit: contain;" />
+                    style="width: 100%; height: 500px; object-fit: contain;"/>
                 <div class="mt-2 text-center">
-                  <strong><t t-esc="configured_product.name or 'Unnamed Product'"/></strong>
+                  <strong><t t-esc="configured_product.name"/></strong>
                 </div>
               </t>
-
-              <!-- No configured product found, but cabinet SKU exists -->
-              <t t-elif="not configured_product and selected_sku">
-                <t t-set="cabinet_product" t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
-                <t t-if="cabinet_product and cabinet_product.image_1920">
-                  <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
-                      alt="Cabinet Product"
-                      class="img-thumbnail"
-                      style="width: 100%; height: 500px; object-fit: contain;" />
-                  <div class="mt-2 text-center">
-                    <strong><t t-esc="cabinet_product.name or 'Unnamed Cabinet'"/></strong>
-                  </div>
-                </t>
-                <t t-else="">
-                  <!-- Cabinet SKU has no image -->
-                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                      style="width: 100%; height: 500px;">
-                    No image for cabinet
-                  </div>
-                </t>
+              <t t-else="">
+                <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                    style="width:100%; height:500px;">
+                  <t t-if="configured_kit">
+                    No image found for the configured kit
+                  </t>
+                  <t t-else="">
+                    <t t-esc="selected_sku"/> (Base cabinet selected)
+                  </t>
+                </div>
               </t>
-
             </t>
             <t t-else="">
-              <!-- No cabinet SKU selected -->
               <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                  style="width: 100%; height: 500px;">
-                No cabinet selected
+                  style="width:100%; height:500px;">
+                Please select a size (cabinet)
               </div>
             </t>
-
-            <!-- If cabinet is selected but combination is invalid -->
-            <t t-if="selected_sku and not configured_product and (selected_countertop or selected_mirror or selected_faucet)">
+            <t t-if="selected_countertop and not configured_kit">
               <div class="text-danger text-center mt-2">
                 No available SKU combination
               </div>
