@@ -1,186 +1,40 @@
 <odoo>
-  <template id="template_product_configuration" name="Product Configuration">
+  <!-- templates.xml -->
+<template id="template_product_configuration" name="Product Configuration">
     <t t-call="website.layout">
-      <div class="container my-5">
-        <div class="row">
-          <div class="col-12">
-            <h2>Product Information</h2>
-          </div>
+        <div class="container my-4">
+            <h2>Kits for Collection: <t t-esc="collection"/></h2>
+
+            <t t-foreach="grouped_kits.items()" t-as="kit_group">
+                <div class="my-4">
+                    <h4>Size: <t t-esc="kit_group[0]"/></h4>
+
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                        <t t-foreach="kit_group[1]" t-as="kit">
+                            <div class="col">
+                                <div class="card h-100">
+                                    <!-- Image placeholder or image -->
+                                    <t t-if="kit.image_1920">
+                                        <img t-att-src="'data:image/png;base64,%s' % kit.image_1920" class="card-img-top" alt="Kit Image"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="card-img-top bg-light text-center" style="height: 200px; line-height: 200px;">
+                                            <span class="text-muted">No Image</span>
+                                        </div>
+                                    </t>
+
+                                    <!-- Card Body -->
+                                    <div class="card-body">
+                                        <h5 class="card-title">Size: <t t-esc="kit.size"/></h5>
+                                        <!-- Add more fields here if needed -->
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
         </div>
-
-        <t t-if="product">
-          <div class="row mt-4">
-            <!-- Left: Image -->
-            <div class="col-md-6 text-center">
-              <t t-if="product.image_1920">
-                <img t-att-src="'data:image/png;base64,%s' % product.image_1920.decode('utf-8')" 
-                     class="img-fluid rounded shadow-sm"
-                     alt="Product Image"
-                     style="max-height: 500px;"/>
-              </t>
-              <t t-else="">
-                <div class="alert alert-secondary" role="alert">
-                  No image available.
-                </div>
-              </t>
-            </div>
-
-            <!-- Right: Details -->
-            <div class="col-md-6">
-              <div class="mb-4">
-                <h3><t t-esc="product.name"/></h3>
-                <!-- <p><strong>SKU:</strong> <t t-esc="product.default_code"/></p> -->
-                <!-- <p><strong>Color:</strong> <t t-esc="color_name"/></p> -->
-                <p><strong>Price:</strong>
-                  <t t-esc="product.standard_price"/> <span t-esc="product.currency_id.symbol"/>
-                </p>
-                <p><strong>Description:</strong></p>
-                <div t-if="product.description_sale">
-                  <t t-raw="product.description_sale"/>
-                </div>
-                <div t-else="">
-                  <em>No description provided.</em>
-                </div>
-              </div>
-
-              <div>
-                <!-- Select Size -->
-                <div class="d-flex align-items-center mb-2">
-                  <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2" style="width: 28px; height: 28px; font-size: 0.9rem;">
-                    1
-                  </span>
-                  <p class="mb-0"><strong>Select Size</strong> (required)</p>
-                </div>
-                <div class="row">
-                  <t t-if="related_sizes">
-                    <t t-foreach="related_sizes" t-as="variant">
-                      <div class="col-6 col-md-2 mb-3">
-                        <a t-att-href="'/store/cabinet?sku=' + variant.default_code" class="text-decoration-none text-dark">
-                          <t t-set="is_active" t-value="variant.default_code == product.default_code"/>
-                          <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active else ''}">
-                            <t t-if="variant.image_1920">
-                              <img t-att-src="'data:image/png;base64,%s' % variant.image_1920.decode('utf-8')"
-                                   class="card-img-top img-fluid"
-                                   alt="Variant Image"
-                                   style="padding: 10px; max-height: 130px; object-fit: contain;"/>
-                            </t>
-                            <t t-else="">
-                              <div class="p-3 text-muted">No image</div>
-                            </t>
-                            <div class="card-body p-2">
-                              <t t-set="size_tag" t-value="variant.product_tmpl_id.product_tag_ids.filtered(lambda tag: tag.name.isdigit())"/>
-                              <h5 class="card-title fw-semibold mb-0" style="font-size: 1.4rem;">
-                                <t t-esc="' / '.join(size_tag.mapped('name')) if size_tag else 'N/A'"/>
-                              </h5>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </t>
-                  </t>
-                  <t t-else="">
-                    <div class="alert alert-info">No sizes available in this collection.</div>
-                  </t>
-                </div>
-
-                <!-- Select Countertops -->
-                <hr class="my-2"/>
-                <div class="d-flex align-items-center mb-2">
-                  <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2" style="width: 28px; height: 28px; font-size: 0.9rem;">
-                    2
-                  </span>
-                  <p class="mb-0"><strong>Select Countertop</strong></p>
-                </div>
-                <t t-if="related_countertops">
-                  <div class="row">
-                    <t t-foreach="related_countertops" t-as="countertop">
-                      <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
-                        <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&amp;countertop=' + countertop.default_code" class="text-decoration-none text-dark">
-                          <t t-set="is_active_top" t-value="countertop.default_code == request.params.get('countertop')"/>
-                          <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_top else ''}">
-                            <t t-if="countertop.image_1920">
-                              <img t-att-src="'data:image/png;base64,%s' % countertop.image_1920.decode('utf-8')"
-                                   class="card-img-top img-fluid"
-                                   alt="Countertop Image"
-                                   style="padding: 10px; max-height: 130px; object-fit: contain;"/>
-                            </t>
-                            <t t-else="">
-                              <!-- Use a static placeholder image (adjust path to your needs) -->
-                              <img t-att-src="'/web/static/src/img/placeholder.png'"
-                                   class="card-img-top img-fluid"
-                                   alt="Default Image"
-                                   style="padding: 10px; max-height: 130px; object-fit: contain;"/>
-                            </t>
-                            <div class="card-body p-2">
-                              <h5 class="card-title fw-semibold mb-0" style="font-size: 1.2rem;">
-                                <t t-esc="countertop.name"/>
-                              </h5>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </t>
-                  </div>
-                </t>
-                <t t-else="">
-                  <div class="alert alert-info">No countertop available in this configuration.</div>
-                </t>
-
-               <!-- Select Mirror -->
-              <hr class="my-2"/>
-              <div class="d-flex align-items-center mb-2">
-                <span class="d-inline-flex justify-content-center align-items-center rounded-circle bg-secondary text-white me-2"
-                      style="width:28px;height:28px;font-size:0.9rem;">3</span>
-                <p class="mb-0"><strong>Select Mirror</strong></p>
-              </div>
-              <t t-if="related_mirrors">
-              <div class="row">
-                <t t-foreach="related_mirrors" t-as="mirror">
-                  <div class="col-6 col-sm-4 col-md-3 col-lg-3 mb-3">
-                    <a t-att-href="'/store/cabinet?sku=' + product.default_code + '&amp;mirror=' + mirror.default_code"
-                      class="text-decoration-none text-dark">
-                      <t t-set="is_active_mirror" t-value="mirror.default_code == request.params.get('mirror')"/>
-                      <div t-attf-class="card size-card shadow-sm text-center #{'border border-primary' if is_active_mirror else ''}">
-                        <t t-if="mirror.image_1920">
-                          <img t-att-src="'data:image/png;base64,%s' % mirror.image_1920.decode('utf-8')"
-                              class="card-img-top img-fluid"
-                              alt="Mirror Image"
-                              style="padding:10px;max-height:130px;object-fit:contain;"/>
-                        </t>
-                        <t t-else="">
-                          <img t-att-src="'/web/static/src/img/placeholder.png'"
-                              class="card-img-top img-fluid"
-                              alt="No image"
-                              style="padding:10px;max-height:130px;object-fit:contain;"/>
-                        </t>
-                        <div class="card-body p-2">
-                          <h5 class="card-title fw-semibold mb-0" style="font-size:1.2rem;">
-                            <t t-esc="mirror.name"/>
-                          </h5>
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                </t>
-              </div>
-            </t>
-            <t t-else="">
-              <div class="alert alert-info">No mirrors available in this configuration.</div>
-            </t>
-
-
-
-              </div>
-            </div>
-          </div>
-        </t>
-
-        <t t-else="">
-          <div class="alert alert-warning mt-4">
-            No product data to display.
-          </div>
-        </t>
-      </div>
     </t>
-  </template>
+</template>
 </odoo>
