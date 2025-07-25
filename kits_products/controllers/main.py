@@ -31,21 +31,18 @@ class ProductKitsController(http.Controller):
         collection = kwargs.get('collection')
         size = kwargs.get('size')
 
-        tag_names = ['Bathroom Vanity']
+        # Domain for product.template based on Specifications (not tags)
+        domain = [('x_product_type', '=', 'Bathroom Vanity')]  # Always filter on Product Type
+
         if collection:
-            tag_names.append(collection)
+            domain.append(('x_collection', '=', collection))
         if size:
-            tag_names.append(size)
+            domain.append(('x_size', '=', size))
 
-        tags = request.env['product.tag'].sudo().search([('name', 'in', tag_names)])
-
-        # Build domain that requires ALL tags to be present
-        domain = []
-        for tag in tags:
-            domain.append(('product_tag_ids', 'in', [tag.id]))
-
+        # Get matching templates
         product_templates = request.env['product.template'].sudo().search(domain)
 
+        # Get product variants from the matching templates
         products = request.env['product.product'].sudo().search([
             ('product_tmpl_id', 'in', product_templates.ids)
         ])
@@ -53,8 +50,6 @@ class ProductKitsController(http.Controller):
         return request.render('kits_products.all_products_template', {
             'products': products,
         })
-
-
 
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):

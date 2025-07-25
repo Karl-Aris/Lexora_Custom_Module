@@ -65,17 +65,18 @@
                                     <t t-esc="product.id" />
                                 </p>
 
-                                <!-- ✅ Tags -->
+                                <!-- ✅ Specifications -->
                                 <p>
-                                    <strong>Tags:</strong>
-                                    <t t-if="product.product_tmpl_id and product.product_tmpl_id.product_tag_ids">
-                                        <t t-foreach="product.product_tmpl_id.product_tag_ids" t-as="tag">
-                                            <span class="badge bg-secondary me-1">
-                                                <t t-esc="tag.name" />
-                                            </span>
-                                        </t>
-                                    </t>
-                                    <t t-else="">No Tags</t>
+                                    <strong>Product Type:</strong>
+                                    <t t-esc="product.product_tmpl_id.x_product_type or 'N/A'" />
+                                </p>
+                                <p>
+                                    <strong>Collection:</strong>
+                                    <t t-esc="product.product_tmpl_id.x_collection or 'N/A'" />
+                                </p>
+                                <p>
+                                    <strong>Size:</strong>
+                                    <t t-esc="product.product_tmpl_id.x_size or 'N/A'" />
                                 </p>
 
                             </div>
@@ -89,6 +90,7 @@
         </div>
     </t>
 </template>
+
 
 
 
