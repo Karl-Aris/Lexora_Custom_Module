@@ -18,7 +18,7 @@ class ProductKitsController(http.Controller):
 
         for kit in kits:
             size = kit.size
-            sku = kit.product_sku  # adjust field name if needed
+            sku = kit.cabinet_sku  # adjust field name if needed
 
             if size in seen_sizes:
                 continue
