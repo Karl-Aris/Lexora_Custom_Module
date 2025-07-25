@@ -38,25 +38,25 @@
 
           <div class="row">
             <!-- LEFT COLUMN: Sample image -->
-            <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <div class="col-md-6" style="width: 400px; height: 400px;">
               <t t-if="selected_sku">
                 <t t-set="selected_product" t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
                 <t t-if="selected_product and selected_product.image_1920">
                   <img t-att-src="'data:image/png;base64,%s' % selected_product.image_1920.decode('utf-8')"
                       alt="Selected Cabinet"
                       class="img-thumbnail"
-                      style="width: 400px; height: 400px; object-fit: contain;" />
+                      style="width: 100%; height: 100%; object-fit: contain;" />
                 </t>
                 <t t-else="">
-                  <div class="border rounded d-flex align-items-center justify-content-center bg-light text-muted"
-                      style="width: 400px; height: 400px;">
+                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                      style="width: 100%; height: 100%;">
                     No Image
                   </div>
                 </t>
               </t>
               <t t-if="not selected_sku">
-                <div class="border rounded d-flex align-items-center justify-content-center bg-light text-muted"
-                    style="width: 400px; height: 400px;">
+                <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                    style="width: 100%; height: 100%;">
                   No Image
                 </div>
               </t>
