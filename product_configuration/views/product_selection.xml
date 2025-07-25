@@ -8,8 +8,7 @@
             <div class="row">
                 <!-- Left Column: Image or Placeholder -->
                 <div class="col-md-6">
-                    <t t-set="has_image" t-value="kits and kits[0].image_1920"/>
-                    <t t-if="has_image">
+                    <t t-if="kits and kits[0].image_1920">
                         <img t-att-src="'data:image/png;base64,%s' % kits[0].image_1920" class="img-fluid" alt="Kit Image"/>
                     </t>
                     <t t-else="">
@@ -21,9 +20,17 @@
 
                 <!-- Right Column: Sizes -->
                 <div class="col-md-6">
-                    <h5>Select Sizes</h5>
+                    <!-- Step Title with Circular Number -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                            <strong>1</strong>
+                        </div>
+                        <h5 class="mb-0">Select Sizes</h5>
+                    </div>
+
+                    <!-- Grid of Sizes -->
                     <div class="row">
-                        <t t-foreach="sizes" t-as="size" t-index="i">
+                        <t t-foreach="sizes" t-as="size">
                             <div class="col-3 mb-2">
                                 <div class="border p-2 text-center">
                                     <t t-esc="size"/>
@@ -36,4 +43,5 @@
         </div>
     </t>
 </template>
+
 </odoo>
