@@ -1,0 +1,251 @@
+<odoo>
+    <!-- Kit Group Detail -->
+    <template id="kit_group_detail_template" name="Kit Group Detail">
+        <t t-call="website.layout">
+            <div class="container my-5">
+
+                <div class="row">
+                    <!-- Matching Kits -->
+                    <div class="col-md-5 ">
+
+                        <t t-if="kit">
+                            <div class="     ">
+                                <t t-if="product">
+                                    <p class=" text-muted">/ <t t-esc="product.name" />
+                                    </p>
+                                    <img
+                                        t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'"
+                                        alt="Product Image"
+                                        class="card-img-top mb-3"
+                                        style="height:500px; width:500px; object-fit:cover;" />
+
+                                    <h5 class="text-start mb-2">
+                                        <t t-esc="product.name" />
+                                    </h5>
+                                    <p class="text-muted small text-center mb-3">
+                                        <t t-esc="product.description_sale" />
+                                    </p>
+                                    <p class="text-start  fw-semibold fs-5"> Price: <t
+                                            t-esc="product.lst_price and ('%.2f' % product.lst_price) or 'N/A'" />
+                                    </p>
+                                </t>
+
+                                <t t-if="kit.product_id">
+                                    <form action="/shop/cart/update" method="post" class="mt-4">
+                                        <input type="hidden" name="product_id"
+                                            t-att-value="kit.product_id.id" />
+                                        <input type="hidden" name="csrf_token"
+                                            t-att-value="request.csrf_token()" />
+
+                                        <!-- Quantity Selector -->
+
+
+                                        <!-- Add to Cart Button -->
+                                        <div
+                                            class="   flex-column-2 align-items-center text-center">
+                                            <div class="mb-4 w-100 text-center align-items-center">
+                                                <div
+                                                    class="input-group justify-content-center mx-auto my-auto"
+                                                    style="max-width: 180px;">
+                                                    <button type="button"
+                                                        class="btn btn-outline-dark"
+                                                        data-qty-delta="-1">−</button>
+                                                    <input name="add_qty" type="number"
+                                                        class="form-control text-center" value="1"
+                                                        min="1" />
+                                                    <button type="button"
+                                                        class="btn btn-outline-dark"
+                                                        data-qty-delta="1">+</button>
+                                                </div>
+                                            </div>
+
+                                            <button type="submit"
+                                                class="btn btn-dark text-white fw-semibold px-4 py-3 rounded shadow-sm"
+                                                style="width: 200px; height:50px ">
+                                                <i class="fa fa-cart-plus me-2"></i> Add to Cart </button>
+                                        </div>
+
+                                    </form>
+                                </t>
+
+
+                                <t t-else="">
+                                    <p class="text-danger text-center mt-3">Product not available
+                                        for sale</p>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <p class="text-muted">No matching kit found for this selection.</p>
+                        </t>
+                    </div>
+
+                    <!-- Components -->
+                    <div class="col-md-7">
+                        <t t-if="related_products">
+                            <div class="container mt-5 pt-4 border-top">
+                                <h4 class="mb-4">Related Bathroom Vanities</h4>
+                                <div class="row g-3">
+                                    <t t-foreach="related_products" t-as="rel_prod">
+                                        <div class="col-6 col-md-4 col-lg-3">
+                                            <a t-att-href="'/shop/product/%s' % rel_prod.id"
+                                                class="text-decoration-none text-dark">
+                                                <div
+                                                    class="card h-100 shadow-sm border-0 hover-shadow"
+                                                    style="transition: transform 0.2s;"
+                                                    onmouseover="this.style.transform='scale(1.03)';"
+                                                    onmouseout="this.style.transform='scale(1)';">
+                                                    <img
+                                                        t-att-src="'/web/image/product.product/%s/image_1920' % rel_prod.id"
+                                                        class="card-img-top"
+                                                        style="height: 180px; object-fit: cover;" />
+                                                    <div class="card-body text-center">
+                                                        <h6 class="card-title mb-1">
+                                                            <t t-esc="rel_prod.name" />
+                                                        </h6>
+                                                        <small class="text-muted d-block mb-2">
+                                                            <t
+                                                                t-esc="rel_prod.default_code or 'No SKU'" />
+                                                        </small>
+                                                        <strong>
+                                                            <t t-esc="'$%.2f' % rel_prod.lst_price" />
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']"
+                            t-as="category">
+                            <t t-if="components[category]">
+                                <div class="mb-4">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                        <h4 class="mb-0">
+                                            <t t-if="category == 'cabinet'">Cabinet</t>
+                                            <t t-if="category == 'counter_top'">Counter Top</t>
+                                            <t t-if="category == 'mirror'">Mirror</t>
+                                            <t t-if="category == 'faucet'">Faucet</t>
+                                        </h4>
+                                        <t
+                                            t-if="(category == 'cabinet' and cabinet) or (category == 'counter_top' and counter_top) or (category == 'mirror' and mirror) or (category == 'faucet' and faucet)">
+                                            <a
+                                                t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
+      collection, size or '',
+      ('' if category == 'cabinet' else cabinet or ''),
+      ('' if category == 'counter_top' else counter_top or ''),
+      ('' if category == 'mirror' else mirror or ''),
+      ('' if category == 'faucet' else faucet or '')
+  )"
+                                                class="btn btn-sm btn-outline-danger">Unselect</a>
+                                        </t>
+                                    </div>
+
+                                    <div class="row g-3">
+                                        <t t-foreach="components[category]" t-as="comp">
+                                            <div class="col-6 col-sm-4 col-lg-3">
+                                                <a
+                                                    t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
+    collection, size or '',
+    ('' if category == 'cabinet' and cabinet == comp.id else (comp.id if category == 'cabinet' else cabinet or '')),
+    ('' if category == 'counter_top' and counter_top == comp.id else (comp.id if category == 'counter_top' else counter_top or '')),
+    ('' if category == 'mirror' and mirror == comp.id else (comp.id if category == 'mirror' else mirror or '')),
+    ('' if category == 'faucet' and faucet == comp.id else (comp.id if category == 'faucet' else faucet or ''))
+  )"
+                                                    class="text-decoration-none">
+                                                    <div
+                                                        t-attf-class="card h-100 w-100 rounded-3 #{'border border-2 border-primary shadow-lg' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else 'border border-light shadow-sm'}"
+                                                        style="transition: transform 0.2s; cursor: pointer;"
+                                                        onmouseover="this.style.transform='scale(1.03)';"
+                                                        onmouseout="this.style.transform='scale(1)';"
+                                                    >
+                                                        <div
+                                                            class="d-flex justify-content-center align-items-center p-2"
+                                                            style="height: 120px;">
+                                                            <img
+                                                                t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''"
+                                                                class="img-fluid rounded"
+                                                                style="max-height: 100px; object-fit: cover;"
+                                                            />
+                                                        </div>
+                                                        <div class="card-body p-2 text-center">
+                                                            <small class="text-muted d-block">
+                                                                <t
+                                                                    t-esc="comp.default_code or 'No SKU'" />
+                                                            </small>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold mb-4">Related Products</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <t t-foreach="related_products" t-as="related">
+                            <div class="border rounded-lg p-3 shadow-sm hover:shadow-md transition">
+                                <a t-att-href="'/shop/product/%s' % related.id"
+                                    class="block text-center">
+                                    <img t-if="related.image_128"
+                                        t-att-src="'data:image/png;base64,%s' % related.image_128"
+                                        alt="Product Image"
+                                        class="w-full h-32 object-contain mb-2 rounded" />
+                                    <div t-if="not related.image_128"
+                                        class="w-full h-32 flex items-center justify-center bg-gray-100 text-gray-400 mb-2 rounded">
+                                        No Image
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-700 truncate">
+                                        <t t-esc="related.name" />
+                                    </p>
+                                </a>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+
+                <div class="mt-4">
+                    <a
+                        t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (collection, size or '')"
+                        class="btn btn-outline-secondary">Reset Selection</a>
+                </div>
+            </div>
+
+            <!-- ✅ Add quantity adjustment script safely -->
+            <t t-set="scripts">
+                <t t-raw="0">
+    <![CDATA[
+    <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('button[data-qty-delta]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            const input = button.parentElement.querySelector('input[name="add_qty"]');
+            if (!input) return;
+            let value = parseInt(input.value) || 1;
+            value = Math.max(1, value + parseInt(button.dataset.qtyDelta));
+            input.value = value;
+          });
+        });
+      });
+    </script>
+    ]]>
+  </t>
+            </t>
+        </t>
+
+
+    </template>
+
+
+</odoo>

@@ -1,0 +1,41 @@
+<odoo>
+
+    <!-- Kits List -->
+    <!-- Kits List -->
+    <template id="kits_list_template" name="Kits List">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-4">
+                <h1>Product Kits</h1>
+
+                <t t-if="grouped_kits">
+                    <ul class="list-unstyled">
+                        <t t-foreach="grouped_kits.items()" t-as="item">
+                            <t t-set="group_key" t-value="item[0]" />
+                            <t t-set="kits" t-value="item[1]" />
+                            <li>
+                                <a
+                                    t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (group_key[0] or '', group_key[1] or '')">
+                                    <strong>
+                                        <t t-esc="group_key[0] or 'No Collection'" />
+                                    </strong>
+                                    / <t t-esc="group_key[1] or 'No Size'" /> (<t t-esc="len(kits)" />
+                                    items) </a>
+                            </li>
+                        </t>
+                    </ul>
+                </t>
+                <t t-else="">
+                    <p>
+                        <strong>No kits found.</strong>
+                    </p>
+                </t>
+            </div>
+        </t>
+    </template>
+
+
+ 
+ 
+
+
+</odoo>
