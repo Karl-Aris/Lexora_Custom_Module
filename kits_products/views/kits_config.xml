@@ -45,17 +45,10 @@
                         <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card p-2 border h-100">
 
-                                <!-- ✅ Product Image -->
-                                <t t-if="product.product_tmpl_id.image_1920">
-                                    <img t-att-src="'data:image/png;base64,%s' % product.product_tmpl_id.image_1920.decode('utf-8')"
-                                         class="card-img-top mb-2"
-                                         alt="Product Image"/>
-                                </t>
-                                <t t-else="">
-                                    <img src="/web/static/src/img/placeholder.png"
-                                         class="card-img-top mb-2"
-                                         alt="No Image"/>
-                                </t>
+                                <!-- ✅ Optimized Image via Odoo route -->
+                                <img t-att-src="'/web/image/product.template/%s/image_1920' % product.product_tmpl_id.id"
+                                     class="card-img-top mb-2"
+                                     alt="Product Image"/>
 
                                 <h4>
                                     <t t-esc="product.name" />
@@ -96,6 +89,7 @@
         </div>
     </t>
 </template>
+
 
 
 

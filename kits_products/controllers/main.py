@@ -30,23 +30,20 @@ class ProductKitsController(http.Controller):
 
     @http.route(['/all_products'], type='http', auth="public", website=True)
     def list_all_products(self, **kwargs):
-        # You can pass these via query string or hardcode for now
-        collection = kwargs.get('collection')
-        size = kwargs.get('size')
+        # Hardcoded required tags for filtering
+        required_tag_names = ['Bathroom Vanity', 'Geneva', '24']
 
-        tag_names = ['Bathroom Vanities']
-        if collection:
-            tag_names.append(collection)
-        if size:
-            tag_names.append(size)
+        # Find all matching tags
+        tags = request.env['product.tag'].sudo().search([('name', 'in', required_tag_names)])
+        if len(tags) != len(required_tag_names):
+            return request.render('kits_products.all_products_template', {'products': []})
 
-        # Search for product templates with matching tags
-        tags = request.env['product.tag'].sudo().search([('name', 'in', tag_names)])
+        # Find product templates that have ALL 3 tags
         product_templates = request.env['product.template'].sudo().search([
-            ('product_tag_ids', 'in', tags.ids)
+            ('product_tag_ids', 'all_elements', tags.ids)
         ])
 
-        # Now get products linked to those templates
+        # Find variants of those templates
         products = request.env['product.product'].sudo().search([
             ('product_tmpl_id', 'in', product_templates.ids)
         ])
@@ -54,6 +51,7 @@ class ProductKitsController(http.Controller):
         return request.render('kits_products.all_products_template', {
             'products': products,
         })
+
 
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
