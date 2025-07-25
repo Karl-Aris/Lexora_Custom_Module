@@ -2,7 +2,7 @@
     "name": "Sale Vendor Bill Link",
     "version": "1.0",
     "depends": ["sale", "account"],
-    "author": "ChatGPT",
+    "author": "Karl Areglado",
     "category": "Custom",
     "description": "Link vendor bills to sale orders via One2many relation.",
     "data": [
