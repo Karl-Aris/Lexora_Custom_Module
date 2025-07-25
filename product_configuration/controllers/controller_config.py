@@ -1,6 +1,5 @@
 from odoo import http
 from odoo.http import request
-from collections import defaultdict
 
 class ProductKitsController(http.Controller):
 
@@ -10,15 +9,14 @@ class ProductKitsController(http.Controller):
         if not collection:
             return request.not_found()
 
-        # Fetch kits by collection
+        # Get all kits in this collection
         kits = request.env['product.kits'].sudo().search([('collection', '=', collection)])
 
-        # Group kits by size
-        grouped_kits = defaultdict(list)
-        for kit in kits:
-            grouped_kits[kit.size].append(kit)
+        # Extract unique sizes
+        sizes = sorted(set(kits.mapped('size')))
 
         return request.render('product_configuration.template_product_configuration', {
             'collection': collection,
-            'grouped_kits': grouped_kits,
+            'sizes': sizes,
+            'kits': kits,
         })
