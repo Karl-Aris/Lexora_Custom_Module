@@ -3,36 +3,38 @@
     <t t-call="website.layout">
       <div class="container my-4">
 
-        <!-- COLLECTION DROPDOWN -->
-        <div class="mb-3">
-            <select class="form-select" onchange="window.location.href = this.value">
-                <option disabled="disabled" t-if="not collection" selected="selected">Select collection</option>
-                <t t-foreach="all_collections" t-as="col">
-                    <option t-att-value="'/store?collection=%s' % col"
-                            t-att-selected="'selected' if col == collection else None">
-                        <t t-esc="col"/>
-                    </option>
-                </t>
-            </select>
+        <!-- Collection Dropdown -->
+        <div class="mb-4">
+          <label for="collection_select" class="form-label">Select Collection</label>
+          <select id="collection_select" class="form-select" name="collection" onchange="location = this.value;">
+            <option t-if="not selected_collection" selected="selected" disabled="disabled">Select collection</option>
+            <t t-foreach="collections" t-as="col">
+              <option t-att-value="'/store?collection=%s' % col" t-att-selected="col == selected_collection">
+                <t t-esc="col"/>
+              </option>
+            </t>
+          </select>
         </div>
 
-        <!-- COLOR TAGS -->
-        <t t-if="collection">
-            <div class="mb-4">
-                <label class="fw-bold mb-2">Select Color:</label>
-                <div class="d-flex flex-wrap gap-2">
-                    <t t-foreach="color_tags" t-as="color">
-                        <a t-att-href="'/store?collection=%s&amp;color=%s' % (collection, color)"
-                          class="badge px-3 py-2 rounded-pill text-decoration-none t-attf-class='{{ 'bg-primary text-white' if color == selected_color else 'bg-light text-dark' }}'">
-                            <t t-esc="color"/>
-                        </a>
-                    </t>
-                </div>
-            </div>
+        <!-- Color Badges -->
+        <t t-if="colors">
+          <div class="mb-4">
+            <strong>Colors:</strong>
+            <t t-foreach="colors" t-as="color">
+              <a t-att-href="'/store?collection=%s%s' % (
+                      selected_collection,
+                      '&amp;color=' + color if selected_color != color else ''
+                    )"
+                 t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
+                 style="cursor:pointer;">
+                <t t-esc="color"/>
+              </a>
+            </t>
+          </div>
         </t>
 
         <!-- Show rest only if collection selected -->
-        <t t-if="selected_color">
+        <t t-if="selected_collection">
 
           <h2>Collection: <t t-esc="selected_collection"/></h2>
 
