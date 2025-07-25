@@ -1,5 +1,3 @@
-# controllers/main.py
-
 from odoo import http
 from odoo.http import request
 
@@ -14,19 +12,18 @@ class ProductKitsController(http.Controller):
         # Fetch kits in the collection
         kits = request.env['product.kits'].sudo().search([('collection', '=', collection)])
 
-        # Build list of sizes with associated product image
+        # Build list of sizes with associated product image from product.product via SKU
         size_cards = []
         seen_sizes = set()
 
         for kit in kits:
             size = kit.size
-            sku = kit.product_sku  # Adjust this field if your SKU field has a different name
+            sku = kit.product_sku  # adjust field name if needed
 
             if size in seen_sizes:
                 continue
             seen_sizes.add(size)
 
-            # Try to fetch matching product by default_code (SKU)
             product = request.env['product.product'].sudo().search([('default_code', '=', sku)], limit=1)
 
             size_cards.append({
