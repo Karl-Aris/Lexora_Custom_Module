@@ -1,7 +1,6 @@
 from odoo import http
 from odoo.http import request
 
-
 class ProductConfigurationController(http.Controller):
 
     @http.route(['/store'], type='http', auth='public', website=True)
@@ -9,81 +8,81 @@ class ProductConfigurationController(http.Controller):
         return request.render('product_configuration.template_product_configuration')
 
     @http.route(['/store/cabinet'], type='http', auth='public', website=True)
-    def search_by_sku(self, sku=None, **kwargs):
+    def search_by_sku(self, cabinet_sku=None, counter_top_sku=None, mirror_sku=None, **kwargs):
         product = None
         related_sizes = []
         related_countertops = []
         related_mirrors = []
         collection_tag = ''
         color_tag = ''
+        selected_countertop = None
+        selected_mirror = None
 
-        if sku:
-            product = request.env['product.product'].sudo().search([
-                ('default_code', '=', sku)
-            ], limit=1)
+        if cabinet_sku:
+            # Step 1: Search product.kits using cabinet_sku
+            kit = request.env['product.kits'].sudo().search([('cabinet_sku', '=', cabinet_sku)], limit=1)
 
-            if product:
-                template = product.product_tmpl_id
-                tag_names = template.product_tag_ids.mapped('name')
+            if kit:
+                # Step 2: Find cabinet product.product by default_code
+                product = request.env['product.product'].sudo().search([('default_code', '=', kit.cabinet_sku)], limit=1)
 
-                # Define excluded tags to find collection and color
-                excluded_tags = [
-                    'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)', 'Vanity, Countertop, Sink, and Mirror', 'Vanity, Countertop, and Sink', 'Vanity, Countertop, Sink, and Faucet',
-                    'Vanity, Countertop, Sink, Mirror, and Faucet',
-                    'Single', 'Double', 'Sink', 'Countertops', 'Top', 'Acrylic', 'Frameless'
-                ]
+                # Optionally: load selected countertop and mirror
+                if counter_top_sku:
+                    selected_countertop = request.env['product.product'].sudo().search([('default_code', '=', counter_top_sku)], limit=1)
+                if mirror_sku:
+                    selected_mirror = request.env['product.product'].sudo().search([('default_code', '=', mirror_sku)], limit=1)
 
-                # Get collection (non-digit, not excluded)
-                collection_tag = next(
-                    (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags),
-                    None
-                )
+                if product:
+                    template = product.product_tmpl_id
+                    tag_names = template.product_tag_ids.mapped('name')
 
-                # Get color (next non-digit, not in excluded + not the collection)
-                excluded_tags_for_color = excluded_tags + [collection_tag]
-                color_tag = next(
-                    (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags_for_color),
-                    None
-                )
+                    excluded_tags = [
+                        'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)', 'Vanity, Countertop, Sink, and Mirror', 'Vanity, Countertop, and Sink',
+                        'Vanity, Countertop, Sink, and Faucet', 'Vanity, Countertop, Sink, Mirror, and Faucet',
+                        'Single', 'Double', 'Sink', 'Countertops', 'Top', 'Acrylic', 'Frameless'
+                    ]
 
-                # --- Tag objects ---
-                tag_model = request.env['product.tag'].sudo()
-                vanity_only_tag = tag_model.search([('name', '=', 'Vanity Only')])
-                bv_tag = tag_model.search([('name', '=', 'Bathroom Vanities')])
-                bv_cabinet_tag = tag_model.search([('name', '=', 'Bathroom Vanities (Cabinet)')])
-                collection_tag_obj = tag_model.search([('name', '=', collection_tag)]) if collection_tag else None
-                color_tag_obj = tag_model.search([('name', '=', color_tag)]) if color_tag else None
+                    # Get collection
+                    collection_tag = next(
+                        (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags),
+                        None
+                    )
 
-                # --- Related Sizes Logic ---
-                if vanity_only_tag and (bv_tag or bv_cabinet_tag) and collection_tag_obj and color_tag_obj:
-                    candidate_templates = request.env['product.template'].sudo().search([])
+                    # Get color
+                    excluded_for_color = excluded_tags + [collection_tag]
+                    color_tag = next(
+                        (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_for_color),
+                        None
+                    )
 
-                    def matches_required_tags(template):
-                        tags = template.product_tag_ids
-                        return (
-                            vanity_only_tag in tags and
-                            (bv_tag in tags or bv_cabinet_tag in tags) and
-                            collection_tag_obj in tags and
-                            color_tag_obj in tags
-                        )
+                    tag_model = request.env['product.tag'].sudo()
+                    vanity_only_tag = tag_model.search([('name', '=', 'Vanity Only')])
+                    bv_tag = tag_model.search([('name', '=', 'Bathroom Vanities')])
+                    bv_cabinet_tag = tag_model.search([('name', '=', 'Bathroom Vanities (Cabinet)')])
+                    collection_tag_obj = tag_model.search([('name', '=', collection_tag)]) if collection_tag else None
+                    color_tag_obj = tag_model.search([('name', '=', color_tag)]) if color_tag else None
 
-                    size_templates = candidate_templates.filtered(matches_required_tags)
-                    related_sizes = request.env['product.product'].sudo().search([
-                        ('product_tmpl_id', 'in', size_templates.ids)
-                    ])
+                    # --- Related Sizes ---
+                    if vanity_only_tag and (bv_tag or bv_cabinet_tag) and collection_tag_obj and color_tag_obj:
+                        candidate_templates = request.env['product.template'].sudo().search([])
 
-                
-                if collection_tag:
-                    
-                   
-                    collection_tag_obj = tag_model.search([('name', '=', collection_tag)])
+                        def matches_required_tags(template):
+                            tags = template.product_tag_ids
+                            return (
+                                vanity_only_tag in tags and
+                                (bv_tag in tags or bv_cabinet_tag in tags) and
+                                collection_tag_obj in tags and
+                                color_tag_obj in tags
+                            )
 
-                    # Find size tags (digits only)
-                    size_tags = product.product_tmpl_id.product_tag_ids.filtered(lambda t: t.name.isdigit())
-                    
-                    # --- Related Countertops Logic ---
+                        size_templates = candidate_templates.filtered(matches_required_tags)
+                        related_sizes = request.env['product.product'].sudo().search([
+                            ('product_tmpl_id', 'in', size_templates.ids)
+                        ])
+
+                    # --- Related Countertops ---
+                    size_tags = template.product_tag_ids.filtered(lambda t: t.name.isdigit())
                     countertop_tag = tag_model.search([('name', '=', 'Countertops')])
-
                     if countertop_tag and collection_tag_obj and size_tags:
                         candidate_templates = request.env['product.template'].sudo().search([])
 
@@ -100,25 +99,23 @@ class ProductConfigurationController(http.Controller):
                             ('product_tmpl_id', 'in', top_templates.ids)
                         ])
 
-                # --- Related Mirrors Logic ---
-                mirror_tag = tag_model.search([('name', '=', 'Mirrors')])
-                
-                if mirror_tag and collection_tag_obj and size_tags:
+                    # --- Related Mirrors ---
+                    mirror_tag = tag_model.search([('name', '=', 'Mirrors')])
+                    if mirror_tag and collection_tag_obj and size_tags:
+                        candidate_templates = request.env['product.template'].sudo().search([])
 
-                    candidate_templates = request.env['product.template'].sudo().search([])
+                        def matches_mirror_tags(template):
+                            tags = template.product_tag_ids
+                            return (
+                                mirror_tag in tags and
+                                collection_tag_obj in tags and
+                                any(tag in tags for tag in size_tags)
+                            )
 
-                    def matches_mirror_tags(template):
-                        tags = template.product_tag_ids
-                        return (
-                            mirror_tag in tags and
-                            collection_tag_obj in tags and
-                            any(tag in tags for tag in size_tags)
-                        )
-
-                    mirror_templates = candidate_templates.filtered(matches_mirror_tags)
-                    related_mirrors = request.env['product.product'].sudo().search([
-                        ('product_tmpl_id', 'in', mirror_templates.ids)
-                    ])
+                        mirror_templates = candidate_templates.filtered(matches_mirror_tags)
+                        related_mirrors = request.env['product.product'].sudo().search([
+                            ('product_tmpl_id', 'in', mirror_templates.ids)
+                        ])
 
         return request.render('product_configuration.template_product_configuration', {
             'product': product,
@@ -127,4 +124,6 @@ class ProductConfigurationController(http.Controller):
             'related_mirrors': related_mirrors,
             'collection_name': collection_tag,
             'color_name': color_tag,
+            'selected_countertop': selected_countertop,
+            'selected_mirror': selected_mirror,
         })
