@@ -4,26 +4,19 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook" position="inside">
+            <notebook position="inside">
                 <page string="Vendor Bills">
-                    <field name="vendor_bill_ids">
-                        <form>
-                            <group>
-                                <field name="company_id"/>
-                                <field name="partner_id"/>
-                                <field name="invoice_date"/>
-                                <field name="amount_total" readonly="1"/>
-                            </group>
-                        </form>
-                        <tree editable="bottom">
+                    <field name="vendor_bill_ids" readonly="1">
+                        <tree string="Vendor Bills" editable="bottom">
                             <field name="name"/>
                             <field name="partner_id"/>
                             <field name="invoice_date"/>
-                            <field name="amount_total" readonly="1"/>
+                            <field name="amount_total"/>
+                            <field name="state"/>
                         </tree>
                     </field>
                 </page>
-            </xpath>
+            </notebook>
         </field>
     </record>
 </odoo>
