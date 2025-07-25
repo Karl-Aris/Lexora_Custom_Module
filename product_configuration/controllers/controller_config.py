@@ -20,7 +20,7 @@ class ProductKitsController(http.Controller):
 
         for kit in kits:
             size = kit.size
-            sku = kit.sku  # Adjust this field if your SKU field has a different name
+            sku = kit.product_sku  # Adjust this field if your SKU field has a different name
 
             if size in seen_sizes:
                 continue
