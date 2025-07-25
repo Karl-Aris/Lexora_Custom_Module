@@ -196,28 +196,29 @@
     <template id="kit_group_detail_template" name="Kit Group Detail">
         <t t-call="website.layout">
             <div class="container my-5">
-                <h2 class="mb-4">Kit Group: <t t-esc="name" /> <t t-if="color">/ <t t-esc="color" /></t></h2>
 
                 <div class="row">
                     <!-- Matching Kits -->
-                    <div class="col-md-4">
-                        <h4 class="mb-3 border-bottom pb-2">Matching Kit</h4>
+                    <div class="col-md-5 " >
+
                         <t t-if="kit">
-                            <div class="card shadow-sm p-3">
+                            <div class="     "       >
                                 <t t-if="product">
+                                    <p class=" text-muted">/ <t t-esc="product.name" />
+                                    </p>
                                     <img
                                         t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'"
                                         alt="Product Image"
                                         class="card-img-top mb-3"
-                                        style="height:300px; width:100%; object-fit:cover;" />
+                                        style="height:500px; width:500px; object-fit:cover;" />
 
-                                    <h5 class="text-center mb-2">
+                                    <h5 class="text-start mb-2">
                                         <t t-esc="product.name" />
                                     </h5>
                                     <p class="text-muted small text-center mb-3">
                                         <t t-esc="product.description_sale" />
                                     </p>
-                                    <p class="text-center fw-semibold fs-5"> Price: <t
+                                    <p class="text-start  fw-semibold fs-5"> Price: <t
                                             t-esc="product.lst_price and ('%.2f' % product.lst_price) or 'N/A'" />
                                     </p>
                                 </t>
@@ -234,11 +235,10 @@
 
                                         <!-- Add to Cart Button -->
                                         <div
-                                            class="d-flex flex-column align-items-center text-center">
-                                            <div class="mb-4 w-100 text-center">
-                                                <label class="form-label fw-semibold mb-2">Quantity</label>
+                                            class="  flex-column-2 align-items-center text-center">
+                                            <div class="mb-4 w-100 text-center align-items-center">
                                                 <div
-                                                    class="input-group justify-content-center mx-auto"
+                                                    class="input-group justify-content-center mx-auto my-auto"
                                                     style="max-width: 180px;">
                                                     <button type="button"
                                                         class="btn btn-outline-dark"
@@ -254,7 +254,7 @@
 
                                             <button type="submit"
                                                 class="btn btn-dark text-white fw-semibold px-4 py-3 rounded shadow-sm"
-                                                style="width: 260px;">
+                                                style="width: 300px; height:50px ">
                                                 <i class="fa fa-cart-plus me-2"></i> Add to Cart </button>
                                         </div>
 
@@ -274,7 +274,7 @@
                     </div>
 
                     <!-- Components -->
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']"
                             t-as="category">
                             <t t-if="components[category]">
@@ -314,22 +314,28 @@
   )"
                                                     class="text-decoration-none">
                                                     <div
-                                                        t-attf-class="card h-100 shadow-sm #{'border-primary' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else ''}">
-                                                        <img
-                                                            t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''"
-                                                            class="card-img-top"
-                                                            style="height:70px; width:70px; object-fit:cover;" />
+                                                        t-attf-class="card h-100 w-100 rounded-3 #{'border border-2 border-primary shadow-lg' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else 'border border-light shadow-sm'}"
+                                                        style="transition: transform 0.2s; cursor: pointer;"
+                                                        onmouseover="this.style.transform='scale(1.03)';"
+                                                        onmouseout="this.style.transform='scale(1)';"
+                                                    >
+                                                        <div
+                                                            class="d-flex justify-content-center align-items-center p-2"
+                                                            style="height: 120px;">
+                                                            <img
+                                                                t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''"
+                                                                class="img-fluid rounded"
+                                                                style="max-height: 100px; object-fit: cover;"
+                                                            />
+                                                        </div>
                                                         <div class="card-body p-2 text-center">
-                                                            <h6 class="mb-1"
-                                                                style="font-size: 0.95rem;">
-                                                                <t t-esc="comp.name" />
-                                                            </h6>
-                                                            <small class="text-muted">
+                                                            <small class="text-muted d-block">
                                                                 <t
                                                                     t-esc="comp.default_code or 'No SKU'" />
                                                             </small>
                                                         </div>
                                                     </div>
+
                                                 </a>
                                             </div>
                                         </t>

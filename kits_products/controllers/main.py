@@ -71,21 +71,33 @@ class ProductKitsController(http.Controller):
             components['faucet'].update(kit.faucet_ids)
 
     # ✅ Step 3: Determine selected components
-        default_kit = kits[0]
+        default_kit = kits[0]  # Always define default kit
+
+        # Determine if it's the first load (no selections at all)
+        is_first_load = not any([cabinet, counter_top, mirror, faucet])
+
+        # Use default values only if it's the first load
         selected_cabinet = int(cabinet) if cabinet else (
-            default_kit.cabinet_ids[0].id if default_kit.cabinet_ids else None)
+            default_kit.cabinet_ids[0].id if default_kit.cabinet_ids and is_first_load else None
+        )
         selected_counter_top = int(counter_top) if counter_top else (
-            default_kit.counter_top_ids[0].id if default_kit.counter_top_ids else None)
+            default_kit.counter_top_ids[0].id if default_kit.counter_top_ids and is_first_load else None
+        )
         selected_mirror = int(mirror) if mirror else (
-            default_kit.mirror_ids[0].id if default_kit.mirror_ids else None)
+            default_kit.mirror_ids[0].id if default_kit.mirror_ids and is_first_load else None
+        )
         selected_faucet = int(faucet) if faucet else (
-            default_kit.faucet_ids[0].id if default_kit.faucet_ids else None)
+            default_kit.faucet_ids[0].id if default_kit.faucet_ids and is_first_load else None
+        )
+
 
     # ✅ Step 4: Find exact match for selected components
+        # ✅ Step 4: Find exact match for selected components ONLY
         matching_kit = None
-        matching_product = None  # ✅ Ensure this is always defined
+        matching_product = None
 
         for kit in kits:
+            # Skip if selected component is not in the kit
             if selected_cabinet is not None and selected_cabinet not in kit.cabinet_ids.ids:
                 continue
             if selected_counter_top is not None and selected_counter_top not in kit.counter_top_ids.ids:
@@ -94,9 +106,22 @@ class ProductKitsController(http.Controller):
                 continue
             if selected_faucet is not None and selected_faucet not in kit.faucet_ids.ids:
                 continue
+
+            # ✅ NEW: skip kits that have extra components not selected
+            if selected_cabinet is None and kit.cabinet_ids:
+                continue
+            if selected_counter_top is None and kit.counter_top_ids:
+                continue
+            if selected_mirror is None and kit.mirror_ids:
+                continue
+            if selected_faucet is None and kit.faucet_ids:
+                continue
+
+            # ✅ This kit exactly matches the selected components (and no extras)
             matching_kit = kit
-            matching_product = kit.product_id  # ✅ Now this is safe
+            matching_product = kit.product_id
             break
+
 
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
@@ -111,7 +136,7 @@ class ProductKitsController(http.Controller):
         })
 
 
-
+    
 
 
 
@@ -237,3 +262,4 @@ class ProductKitsController(http.Controller):
             'category': category,
             'comp_id': comp_id,
         })
+    
