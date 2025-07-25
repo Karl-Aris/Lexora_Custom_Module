@@ -1,14 +1,18 @@
 <odoo>
-<!-- templates.xml -->
 <template id="template_product_configuration" name="Product Configuration">
     <t t-call="website.layout">
         <div class="container my-4">
             <h2>Collection: <t t-esc="collection"/></h2>
 
             <div class="row">
-                <!-- Left column omitted for now -->
-
+                <!-- LEFT COLUMN: Sample image -->
                 <div class="col-md-6">
+                    <img src="/web/image/res.company/1/logo" class="img-fluid border rounded" alt="Sample Image" />
+                </div>
+
+                <!-- RIGHT COLUMN: Size cards -->
+                <div class="col-md-6">
+                    <!-- Step Title -->
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
                             <strong>1</strong>
@@ -16,6 +20,7 @@
                         <h4 class="mb-0">Select Sizes</h4>
                     </div>
 
+                    <!-- Size Cards Grid -->
                     <div class="row">
                         <t t-foreach="size_cards" t-as="card">
                             <div class="col-3 mb-3">
@@ -37,7 +42,6 @@
                         </t>
                     </div>
                 </div>
-
             </div>
         </div>
     </t>
