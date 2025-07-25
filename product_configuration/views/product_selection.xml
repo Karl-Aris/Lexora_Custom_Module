@@ -26,16 +26,16 @@
                           <div class="col-3 mb-3">
                               <a t-att-href="'/store?collection=%s%s' % (
                                       collection,
-                                      '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else ''
+                                      '&cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else ''
                                   )"
                                 class="text-decoration-none">
-                                  <div class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
+                                  <div t-attf-class="card h-100 p-4 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
                                       <t t-if="card['image']">
                                           <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                              class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Product Image"/>
+                                              class="card-img-top" style="height: 100px; object-fit: cover;" alt="Product Image"/>
                                       </t>
                                       <t t-else="">
-                                          <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
+                                          <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center" style="height: 100px;">
                                               <span class="text-muted">No Image</span>
                                           </div>
                                       </t>
@@ -49,46 +49,53 @@
                       </t>
                     </div>
 
-                    <!-- Step 2: Countertop -->
-                    <div class="d-flex align-items-center mb-3 mt-5">
-                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                            <strong>2</strong>
+                    <!-- Countertop Section -->
+                    <div class="mt-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                                <strong>2</strong>
+                            </div>
+                            <h4 class="mb-0">Select Countertop</h4>
                         </div>
-                        <h4 class="mb-0">Select Countertop</h4>
-                    </div>
 
-                    <div class="row">
-                        <t t-foreach="counter_top_cards" t-as="card">
-                            <div class="col-3 mb-3">
-                                <a t-att-href="'/store?collection=%s%s%s' % (
-                                        collection,
-                                        '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                                        '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else ''
-                                    )"
-                                    class="text-decoration-none">
-                                    <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
-                                        <t t-if="card['image']">
-                                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                                class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
-                                        </t>
-                                        <t t-else="">
-                                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                                                <span class="text-muted">No Image</span>
-                                            </div>
-                                        </t>
-                                        <div class="card-body text-center">
-                                            <strong><t t-esc="card['counter_top_sku']"/></strong>
-                                        </div>
-                                    </div>
-                                </a>
+                        <t t-if="selected_sku">
+                            <div class="row">
+                                <t t-foreach="counter_top_cards" t-as="card">
+                                  <div class="col-3 mb-3">
+                                      <a t-att-href="'/store?collection=%s&cabinet_sku=%s%s' % (
+                                              collection,
+                                              selected_sku,
+                                              '&counter_top_sku=' + card['counter_top_sku'] if selected_countertop_sku != card['counter_top_sku'] else ''
+                                          )"
+                                        class="text-decoration-none">
+                                          <div t-attf-class="card h-100 p-4 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop_sku else ''}">
+                                              <t t-if="card['image']">
+                                                  <img t-att-src="'data:image/png;base64,%s' % card['image']"
+                                                      class="card-img-top" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
+                                              </t>
+                                              <t t-else="">
+                                                  <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center" style="height: 100px;">
+                                                      <span class="text-muted">No Image</span>
+                                                  </div>
+                                              </t>
+                                              <div class="card-body text-center">
+                                                  <small class="text-muted"><t t-esc="card['counter_top_sku']"/></small>
+                                              </div>
+                                          </div>
+                                      </a>
+                                  </div>
+                              </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-info">
+                                Please select a cabinet size first to see available countertops.
                             </div>
                         </t>
                     </div>
-
                 </div>
             </div>
         </div>
     </t>
 </template>
-
 </odoo>
