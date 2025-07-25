@@ -29,7 +29,8 @@
                                         </div>
                                     </t>
                                     <div class="card-body text-center">
-                                        <strong><t t-esc="card['size']"/></strong>
+                                        <strong><t t-esc="card['size']"/></strong><br/>
+                                        <small class="text-muted"><t t-esc="card['cabinet_sku']"/></small>
                                     </div>
                                 </div>
                             </div>
