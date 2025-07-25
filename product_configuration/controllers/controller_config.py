@@ -29,7 +29,7 @@ class ProductKitsController(http.Controller):
             size_cards.append({
                 'size': size,
                 'cabinet_sku': cabinet_sku,
-                'image': product.image_1920 if product else None,
+                'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
             })
 
         return request.render('product_configuration.template_product_configuration', {
