@@ -11,14 +11,19 @@ class SaleOrder(models.Model):
     )
 
     def action_view_vendor_bills(self):
+        self.ensure_one()
+        form_view = self.env.ref('account.view_move_form')  # Default vendor bill form view
         return {
             'name': 'Vendor Bills',
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
             'view_mode': 'tree,form',
+            'views': [(False, 'tree'), (form_view.id, 'form')],
             'domain': [('id', 'in', self.vendor_bill_ids.ids)],
             'context': {
                 'default_sale_order_id': self.id,
                 'default_move_type': 'in_invoice',
-            }
+            },
+            'target': 'current'
         }
+
