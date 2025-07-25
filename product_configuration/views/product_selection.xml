@@ -46,6 +46,7 @@
                           </t>
                     </div>
 
+                <t t-if="selected_sku">
                     <!-- Step 2: Countertop -->
                 <div class="d-flex align-items-center mb-3 mt-5">
                     <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
@@ -81,6 +82,7 @@
                         </div>
                     </t>
                 </div>
+                </t>
 
                 </div>
             </div>
