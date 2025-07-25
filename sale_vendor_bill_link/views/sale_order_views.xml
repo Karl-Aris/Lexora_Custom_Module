@@ -1,9 +1,20 @@
 <odoo>
+    <!-- Inherit the Sale Order form to add the Vendor Bills page and button -->
     <record id="view_order_form_inherit_vendor_bills" model="ir.ui.view">
         <field name="name">sale.order.form.inherit.vendor.bills</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- Add button in the header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_view_vendor_bills"
+                        type="object"
+                        string="Vendor Bills"
+                        class="oe_stat_button"
+                        icon="fa-file-invoice-dollar"/>
+            </xpath>
+
+            <!-- Add page with inline One2many (optional summary view) -->
             <xpath expr="//notebook" position="inside">
                 <page string="Vendor Bills">
                     <field name="vendor_bill_ids" mode="tree,form" context="{'default_move_type': 'in_invoice'}">
