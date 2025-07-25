@@ -9,6 +9,7 @@ class ProductKitsController(http.Controller):
         selected_sku = kwargs.get('cabinet_sku')
         selected_countertop = kwargs.get('counter_top_sku')
         selected_mirror = kwargs.get('mirror_sku')
+        selected_faucet = kwargs.get('faucet_sku')
 
         if not collection:
             return request.not_found()
@@ -18,10 +19,13 @@ class ProductKitsController(http.Controller):
         size_cards = []
         counter_top_cards = []
         mirror_cards = []
+        faucet_cards = []
+
 
         seen_sizes = set()
         seen_countertops = set()
         seen_mirrors = set()
+        seen_faucets = set()
 
         # Prepare size cards (always)
         for kit in kits:
@@ -63,13 +67,26 @@ class ProductKitsController(http.Controller):
                         'mirror_sku': mirror_sku,
                         'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
                     })
+                    
+             # Load faucets
+            for kit in filtered_kits:
+                faucet_sku = kit.faucet_sku
+                if faucet_sku and faucet_sku not in seen_faucets:
+                    seen_faucets.add(faucet_sku)
+                    product = request.env['product.product'].sudo().search([('default_code', '=', faucet_sku)], limit=1)
+                    faucet_cards.append({
+                        'faucet_sku': faucet_sku,
+                        'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
+                    })
 
         return request.render('product_configuration.template_product_configuration', {
             'collection': collection,
             'selected_sku': selected_sku,
             'selected_countertop': selected_countertop,
             'selected_mirror': selected_mirror,
+            'selected_faucet': selected_faucet,
             'size_cards': size_cards,
             'counter_top_cards': counter_top_cards,
             'mirror_cards': mirror_cards,
+            'faucet_cards': faucet_cards,
         })
