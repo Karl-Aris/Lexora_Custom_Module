@@ -26,7 +26,7 @@
                           <div class="col-3 mb-3">
                               <a t-att-href="'/store?collection=%s%s' % (
                                       collection,
-                                      '&cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else ''
+                                      '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else ''
                                   )"
                                 class="text-decoration-none">
                                   <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
