@@ -30,20 +30,24 @@ class ProductKitsController(http.Controller):
 
     @http.route(['/all_products'], type='http', auth="public", website=True)
     def list_all_products(self, **kwargs):
-        # Hardcoded required tags for filtering
-        required_tag_names = ['Bathroom Vanity', 'Geneva', '24']
+        collection = kwargs.get('collection')
+        size = kwargs.get('size')
 
-        # Find all matching tags
-        tags = request.env['product.tag'].sudo().search([('name', 'in', required_tag_names)])
-        if len(tags) != len(required_tag_names):
-            return request.render('kits_products.all_products_template', {'products': []})
+        tag_names = ['Bathroom Vanity']
+        if collection:
+            tag_names.append(collection)
+        if size:
+            tag_names.append(size)
 
-        # Find product templates that have ALL 3 tags
-        product_templates = request.env['product.template'].sudo().search([
-            ('product_tag_ids', 'all_elements', tags.ids)
-        ])
+        tags = request.env['product.tag'].sudo().search([('name', 'in', tag_names)])
 
-        # Find variants of those templates
+        # Build domain that requires ALL tags to be present
+        domain = []
+        for tag in tags:
+            domain.append(('product_tag_ids', 'in', [tag.id]))
+
+        product_templates = request.env['product.template'].sudo().search(domain)
+
         products = request.env['product.product'].sudo().search([
             ('product_tmpl_id', 'in', product_templates.ids)
         ])
@@ -51,6 +55,7 @@ class ProductKitsController(http.Controller):
         return request.render('kits_products.all_products_template', {
             'products': products,
         })
+
 
 
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
