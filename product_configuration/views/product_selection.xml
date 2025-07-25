@@ -7,7 +7,7 @@
         <div class="mb-4">
           <label for="collection_select" class="form-label">Select Collection</label>
           <select id="collection_select" class="form-select" name="collection" onchange="location = this.value;">
-            <option t-if="not selected_collection" selected="selected" disabled>Select collection</option>
+            <option t-if="not selected_collection" selected="selected" disabled="disabled">Select collection</option>
             <t t-foreach="collections" t-as="col">
               <option t-att-value="'/store?collection=%s' % col" t-att-selected="col == selected_collection">
                 <t t-esc="col"/>
