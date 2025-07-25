@@ -37,34 +37,34 @@
         <t t-if="selected_color">
 
           <div class="row">
-            <!-- LEFT COLUMN: Sample image -->
-            <div class="col-md-6">
-              <t t-if="selected_sku">
-                <t t-set="selected_product" t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
-                <t t-if="selected_product and selected_product.image_1920">
-                  <img t-att-src="'data:image/png;base64,%s' % selected_product.image_1920.decode('utf-8')"
-                      alt="Selected Cabinet"
-                      class="img-thumbnail"
-                      style="width: 100%; height: 100%; object-fit: contain;" />
-                </t>
-                <t t-else="">
-                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                      style="width: 100%; height: 100%;">
-                    No Image
-                  </div>
-                </t>
-                <!-- Product Name below -->
-                <div class="mt-2 text-center">
-                  <strong><t t-esc="selected_product.name or 'Unnamed Product'"/></strong>
-                </div>
+          <!-- LEFT COLUMN: Sample image -->
+          <div class="col-md-6">
+            <t t-if="selected_sku">
+              <t t-set="selected_product" t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
+              <t t-if="selected_product and selected_product.image_1920">
+                <img t-att-src="'data:image/png;base64,%s' % selected_product.image_1920.decode('utf-8')"
+                    alt="Selected Cabinet"
+                    class="img-thumbnail"
+                    style="width: 100%; height: 500px; object-fit: contain;" />
               </t>
-              <t t-if="not selected_sku">
+              <t t-else="">
                 <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                    style="width: 100%; height: 100%;">
+                    style="width: 100%; height: 500px;">
                   No Image
                 </div>
               </t>
-            </div>
+              <!-- Product Name below -->
+              <div class="mt-2 text-center">
+                <strong><t t-esc="selected_product.name or 'Unnamed Product'"/></strong>
+              </div>
+            </t>
+            <t t-if="not selected_sku">
+              <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                  style="width: 100%; height: 500px;">
+                No Image
+              </div>
+            </t>
+          </div>
 
             <!-- RIGHT COLUMN: Size cards -->
             <div class="col-md-6">
