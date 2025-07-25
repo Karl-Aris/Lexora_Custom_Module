@@ -13,7 +13,7 @@
                         <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
                             <strong>1</strong>
                         </div>
-                        <h3 class="mb-0">Select Sizes</h3>
+                        <h4 class="mb-0">Select Sizes</h4>
                     </div>
 
                     <div class="row">
