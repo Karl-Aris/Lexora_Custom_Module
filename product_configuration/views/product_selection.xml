@@ -17,26 +17,29 @@
         </div>
 
         <!-- Color Badges -->
-        <t t-if="colors">
+        <t t-if="colors_by_group">
           <div class="mb-4">
             <strong>Colors:</strong>
-            <t t-foreach="colors" t-as="color">
-              <a t-att-href="'/store?collection=%s%s' % (
-                      selected_collection,
-                      '&amp;color=' + color if selected_color != color else ''
-                    )"
-                 t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
-                 style="cursor:pointer;">
-                <t t-esc="color"/>
-              </a>
+            <t t-foreach="colors_by_group.items()" t-as="group_pair">
+              <div class="mt-2">
+                <h6 class="mb-2"><t t-esc="group_pair[0]"/></h6>
+                <t t-foreach="group_pair[1]" t-as="color">
+                  <a t-att-href="'/store?collection=%s%s' % (
+                          selected_collection,
+                          '&amp;color=' + color if selected_color != color else ''
+                        )"
+                    t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
+                    style="cursor:pointer;">
+                    <t t-esc="color"/>
+                  </a>
+                </t>
+              </div>
             </t>
           </div>
         </t>
 
         <!-- Show rest only if collection selected -->
         <t t-if="selected_color">
-
-          <h2>Collection: <t t-esc="selected_collection"/></h2>
 
           <div class="row">
             <!-- LEFT COLUMN: Sample image -->
