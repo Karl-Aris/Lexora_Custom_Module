@@ -6,11 +6,9 @@
             <h2>Collection: <t t-esc="collection"/></h2>
 
             <div class="row">
-                <!-- Skipping Left Column for now -->
+                <!-- Left column omitted for now -->
 
-                <!-- Right Column: Sizes -->
                 <div class="col-md-6">
-                    <!-- Step Title with Circular Number -->
                     <div class="d-flex align-items-center mb-3">
                         <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
                             <strong>1</strong>
@@ -18,30 +16,27 @@
                         <h3 class="mb-0">Select Sizes</h3>
                     </div>
 
-                    <!-- Grid of Size Cards -->
                     <div class="row">
                         <t t-foreach="size_cards" t-as="card">
                             <div class="col-3 mb-3">
                                 <div class="card h-100">
-                                    <!-- Image -->
-                                    <t t-if="card.image_1920">
-                                        <img t-att-src="'data:image/png;base64,%s' % card.image_1920" class="card-img-top" style="height: 100px; object-fit: cover;" alt="Product Image"/>
+                                    <t t-if="card['image']">
+                                        <img t-att-src="'data:image/png;base64,%s' % card['image']" class="card-img-top" style="height: 100px; object-fit: cover;" alt="Product Image"/>
                                     </t>
                                     <t t-else="">
                                         <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center" style="height: 100px;">
                                             <span class="text-muted">No Image</span>
                                         </div>
                                     </t>
-
-                                    <!-- Size Label -->
                                     <div class="card-body text-center">
-                                        <strong><t t-esc="card.size"/></strong>
+                                        <strong><t t-esc="card['size']"/></strong>
                                     </div>
                                 </div>
                             </div>
                         </t>
                     </div>
                 </div>
+
             </div>
         </div>
     </t>
