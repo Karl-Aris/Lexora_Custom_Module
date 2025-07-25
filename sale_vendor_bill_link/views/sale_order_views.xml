@@ -6,8 +6,8 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="Vendor Bills">
-                    <field name="vendor_bill_ids">
-                        <tree editable="bottom">
+                    <field name="vendor_bill_ids" mode="tree,form">
+                        <tree>
                             <field name="name"/>
                             <field name="invoice_date"/>
                             <field name="amount_total"/>
