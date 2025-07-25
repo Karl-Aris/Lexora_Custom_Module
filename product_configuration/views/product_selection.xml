@@ -24,11 +24,11 @@
                     <div class="row">
                         <t t-foreach="size_cards" t-as="card">
                           <div class="col-3 mb-3">
-                              <a t-att-href="'/store?collection=%s%s' % (
-                                      collection,
-                                      '&cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else ''
-                                  )"
-                                class="text-decoration-none">
+                             <t t-att-href="'/store?collection=%s%s' % (
+                                  collection,
+                                  '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else ''
+                              )"
+                              class="text-decoration-none">
                                   <div t-attf-class="card h-100 p-4 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
                                       <t t-if="card['image']">
                                           <img t-att-src="'data:image/png;base64,%s' % card['image']"
@@ -62,11 +62,11 @@
                             <div class="row">
                                 <t t-foreach="counter_top_cards" t-as="card">
                                   <div class="col-3 mb-3">
-                                      <a t-att-href="'/store?collection=%s&cabinet_sku=%s%s' % (
-                                              collection,
-                                              selected_sku,
-                                              '&counter_top_sku=' + card['counter_top_sku'] if selected_countertop_sku != card['counter_top_sku'] else ''
-                                          )"
+                                      <t t-att-href="'/store?collection=%s&amp;cabinet_sku=%s%s' % (
+                                            collection,
+                                            selected_sku,
+                                            '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop_sku != card['counter_top_sku'] else ''
+                                        )"
                                         class="text-decoration-none">
                                           <div t-attf-class="card h-100 p-4 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop_sku else ''}">
                                               <t t-if="card['image']">
