@@ -17,23 +17,18 @@
         </div>
 
         <!-- Color Badges -->
-        <t t-if="colors_by_group">
+        <t t-if="colors">
           <div class="mb-4">
             <strong>Colors:</strong>
-            <t t-foreach="colors_by_group.items()" t-as="group_pair">
-              <div class="mt-2">
-                <h6 class="mb-2"><t t-esc="group_pair[0]"/></h6>
-                <t t-foreach="group_pair[1]" t-as="color">
-                  <a t-att-href="'/store?collection=%s%s' % (
-                          selected_collection,
-                          '&amp;color=' + color if selected_color != color else ''
-                        )"
-                    t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
-                    style="cursor:pointer;">
-                    <t t-esc="color"/>
-                  </a>
-                </t>
-              </div>
+            <t t-foreach="colors" t-as="color">
+              <a t-att-href="'/store?collection=%s%s' % (
+                      selected_collection,
+                      '&amp;color=' + color if selected_color != color else ''
+                    )"
+                 t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
+                 style="cursor:pointer;">
+                <t t-esc="color"/>
+              </a>
             </t>
           </div>
         </t>
@@ -43,8 +38,28 @@
 
           <div class="row">
             <!-- LEFT COLUMN: Sample image -->
-            <div class="col-md-6">
-              <img src="/web/image/res.company/1/logo" class="img-fluid border rounded" alt="Sample Image" />
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+              <t t-if="selected_sku">
+                <t t-set="selected_product" t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
+                <t t-if="selected_product and selected_product.image_1920">
+                  <img t-att-src="'data:image/png;base64,%s' % selected_product.image_1920.decode('utf-8')"
+                      alt="Selected Cabinet"
+                      class="img-thumbnail"
+                      style="width: 400px; height: 400px; object-fit: contain;" />
+                </t>
+                <t t-else="">
+                  <div class="border rounded d-flex align-items-center justify-content-center bg-light text-muted"
+                      style="width: 400px; height: 400px;">
+                    No Image
+                  </div>
+                </t>
+              </t>
+              <t t-if="not selected_sku">
+                <div class="border rounded d-flex align-items-center justify-content-center bg-light text-muted"
+                    style="width: 400px; height: 400px;">
+                  No Image
+                </div>
+              </t>
             </div>
 
             <!-- RIGHT COLUMN: Size cards -->
