@@ -12,18 +12,20 @@ class ProductKitsController(http.Controller):
         selected_mirror = kwargs.get('mirror_sku')
         selected_faucet = kwargs.get('faucet_sku')
 
-        # Initialize to prevent UnboundLocalError
+        # Start empty
         configured_kit = None
         configured_product = None
 
+        # Load collections
         collections = request.env['product.kits'].sudo().search([]).mapped('collection')
         unique_collections = sorted(list(set(collections)))
 
-        if selected_collection:
-            kits = request.env['product.kits'].sudo().search([('collection', '=', selected_collection)])
-        else:
-            kits = request.env['product.kits'].sudo().search([])
+        # Filter kits by collection
+        kits = request.env['product.kits'].sudo().search(
+            [('collection', '=', selected_collection)] if selected_collection else []
+        )
 
+        # Get colors
         colors = []
         if selected_collection:
             seen_colors = set()
@@ -34,19 +36,13 @@ class ProductKitsController(http.Controller):
                     colors.append(color_val)
             colors.sort()
 
-        size_cards = []
-        counter_top_cards = []
-        mirror_cards = []
-        faucet_cards = []
-
-        seen_sizes = set()
-        seen_countertops = set()
-        seen_mirrors = set()
-        seen_faucets = set()
-
+        # Filter kits by color
         if selected_color:
             kits = [kit for kit in kits if getattr(kit, 'color', False) == selected_color or getattr(kit, 'color_sku', False) == selected_color]
 
+        # Generate size cards (cabinet_sku)
+        seen_sizes = set()
+        size_cards = []
         for kit in kits:
             size = kit.size
             cabinet_sku = kit.cabinet_sku
@@ -58,44 +54,43 @@ class ProductKitsController(http.Controller):
                     'cabinet_sku': cabinet_sku,
                     'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
                 })
-
         size_cards.sort(key=lambda x: float(x['size']))
 
-        if selected_sku:
-            filtered_kits = [kit for kit in kits if kit.cabinet_sku == selected_sku]
+        # If cabinet selected, show related options
+        counter_top_cards, mirror_cards, faucet_cards = [], [], []
+        seen_countertops, seen_mirrors, seen_faucets = set(), set(), set()
 
-            for kit in filtered_kits:
-                # Countertop
-                countertop_sku = kit.counter_top_sku
-                if countertop_sku and countertop_sku not in seen_countertops:
-                    seen_countertops.add(countertop_sku)
-                    product = request.env['product.product'].sudo().search([('default_code', '=', countertop_sku)], limit=1)
-                    counter_top_cards.append({
-                        'counter_top_sku': countertop_sku,
-                        'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
-                    })
+        filtered_kits = [kit for kit in kits if kit.cabinet_sku == selected_sku] if selected_sku else []
 
-                # Mirror
-                mirror_sku = kit.mirror_sku
-                if mirror_sku and mirror_sku not in seen_mirrors:
-                    seen_mirrors.add(mirror_sku)
-                    product = request.env['product.product'].sudo().search([('default_code', '=', mirror_sku)], limit=1)
-                    mirror_cards.append({
-                        'mirror_sku': mirror_sku,
-                        'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
-                    })
+        for kit in filtered_kits:
+            # Countertop
+            if kit.counter_top_sku and kit.counter_top_sku not in seen_countertops:
+                seen_countertops.add(kit.counter_top_sku)
+                product = request.env['product.product'].sudo().search([('default_code', '=', kit.counter_top_sku)], limit=1)
+                counter_top_cards.append({
+                    'counter_top_sku': kit.counter_top_sku,
+                    'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
+                })
 
-                # Faucet
-                faucet_sku = kit.faucet_sku
-                if faucet_sku and faucet_sku not in seen_faucets:
-                    seen_faucets.add(faucet_sku)
-                    product = request.env['product.product'].sudo().search([('default_code', '=', faucet_sku)], limit=1)
-                    faucet_cards.append({
-                        'faucet_sku': faucet_sku,
-                        'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
-                    })
+            # Mirror
+            if kit.mirror_sku and kit.mirror_sku not in seen_mirrors:
+                seen_mirrors.add(kit.mirror_sku)
+                product = request.env['product.product'].sudo().search([('default_code', '=', kit.mirror_sku)], limit=1)
+                mirror_cards.append({
+                    'mirror_sku': kit.mirror_sku,
+                    'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
+                })
 
-        # Move configuration resolution outside conditional block to avoid crash
+            # Faucet
+            if kit.faucet_sku and kit.faucet_sku not in seen_faucets:
+                seen_faucets.add(kit.faucet_sku)
+                product = request.env['product.product'].sudo().search([('default_code', '=', kit.faucet_sku)], limit=1)
+                faucet_cards.append({
+                    'faucet_sku': kit.faucet_sku,
+                    'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
+                })
+
+        # 💡 Resolve configured product based on available combination
         domain = []
         if selected_sku:
             domain.append(('cabinet_sku', '=', selected_sku))
@@ -112,6 +107,12 @@ class ProductKitsController(http.Controller):
                 configured_product = request.env['product.product'].sudo().search([
                     ('default_code', '=', configured_kit.product_sku)
                 ], limit=1)
+
+        # Fallback: if no combo found, but cabinet exists, use cabinet image
+        if not configured_product and selected_sku:
+            configured_product = request.env['product.product'].sudo().search([
+                ('default_code', '=', selected_sku)
+            ], limit=1)
 
         return request.render('product_configuration.template_product_configuration', {
             'collections': unique_collections,
