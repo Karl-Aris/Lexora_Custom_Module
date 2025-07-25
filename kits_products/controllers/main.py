@@ -29,54 +29,38 @@ class ProductKitsController(http.Controller):
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
         """Display a single matching kit (by collection and size) and filterable components."""
+        related_sizes = []
+        collection_tag = ''
+        color_tag = ''
+        matching_product = None
 
-    # ✅ Step 0: Ensure collection and size are provided
+        # ✅ Step 0: Ensure collection and size are provided
         if not collection or not size:
             return request.render('kits_products.kit_group_detail_template', {
-            'kit': None,
-            'collection': collection,
-            'size': size,
-            'components': {},
-            'cabinet': None,
-            'counter_top': None,
-            'mirror': None,
-            'faucet': None,
+                'kit': None, 'collection': collection, 'size': size,
+                'components': {}, 'cabinet': None, 'counter_top': None,
+                'mirror': None, 'faucet': None, 'related_sizes': []
             })
 
-    # ✅ Step 1: Fetch kits based on collection and size
+        # ✅ Step 1: Fetch kits based on collection and size
         kits = self._get_kits(collection, size)
         if not kits:
             return request.render('kits_products.kit_group_detail_template', {
-            'kit': None,
-            'collection': collection,
-            'size': size,
-            'components': {},
-            'cabinet': None,
-            'counter_top': None,
-            'mirror': None,
-            'faucet': None,
+                'kit': None, 'collection': collection, 'size': size,
+                'components': {}, 'cabinet': None, 'counter_top': None,
+                'mirror': None, 'faucet': None, 'related_sizes': []
             })
 
-    # ✅ Step 2: Group components from kits
-        components = {
-        'cabinet': set(),
-        'counter_top': set(),
-        'mirror': set(),
-        'faucet': set(),
-        }
+        # ✅ Step 2: Group components from kits
+        components = {'cabinet': set(), 'counter_top': set(), 'mirror': set(), 'faucet': set()}
         for kit in kits:
             components['cabinet'].update(kit.cabinet_ids)
             components['counter_top'].update(kit.counter_top_ids)
             components['mirror'].update(kit.mirror_ids)
             components['faucet'].update(kit.faucet_ids)
 
-    # ✅ Step 3: Determine selected components
-        default_kit = kits[0]  # Always define default kit
-
-        # Determine if it's the first load (no selections at all)
+        default_kit = kits[0]
         is_first_load = not any([cabinet, counter_top, mirror, faucet])
-
-        # Use default values only if it's the first load
         selected_cabinet = int(cabinet) if cabinet else (
             default_kit.cabinet_ids[0].id if default_kit.cabinet_ids and is_first_load else None
         )
@@ -90,24 +74,17 @@ class ProductKitsController(http.Controller):
             default_kit.faucet_ids[0].id if default_kit.faucet_ids and is_first_load else None
         )
 
-
-    # ✅ Step 4: Find exact match for selected components
-        # ✅ Step 4: Find exact match for selected components ONLY
+        # ✅ Step 4: Find exact match for selected components
         matching_kit = None
-        matching_product = None
-
         for kit in kits:
-            # Skip if selected component is not in the kit
-            if selected_cabinet is not None and selected_cabinet not in kit.cabinet_ids.ids:
+            if selected_cabinet and selected_cabinet not in kit.cabinet_ids.ids:
                 continue
-            if selected_counter_top is not None and selected_counter_top not in kit.counter_top_ids.ids:
+            if selected_counter_top and selected_counter_top not in kit.counter_top_ids.ids:
                 continue
-            if selected_mirror is not None and selected_mirror not in kit.mirror_ids.ids:
+            if selected_mirror and selected_mirror not in kit.mirror_ids.ids:
                 continue
-            if selected_faucet is not None and selected_faucet not in kit.faucet_ids.ids:
+            if selected_faucet and selected_faucet not in kit.faucet_ids.ids:
                 continue
-
-            # ✅ NEW: skip kits that have extra components not selected
             if selected_cabinet is None and kit.cabinet_ids:
                 continue
             if selected_counter_top is None and kit.counter_top_ids:
@@ -117,11 +94,59 @@ class ProductKitsController(http.Controller):
             if selected_faucet is None and kit.faucet_ids:
                 continue
 
-            # ✅ This kit exactly matches the selected components (and no extras)
             matching_kit = kit
             matching_product = kit.product_id
             break
 
+        if matching_product:
+            template = matching_product.product_tmpl_id
+            tag_names = template.product_tag_ids.mapped('name')
+
+            excluded_tags = [
+                'Vanity Only', 'Bathroom Vanities', 'Bathroom Vanities (Cabinet)',
+                'Vanity, Countertop, Sink, and Mirror', 'Vanity, Countertop, and Sink',
+                'Vanity, Countertop, Sink, and Faucet', 'Vanity, Countertop, Sink, Mirror, and Faucet',
+                'Single', 'Double', 'Sink', 'Countertops', 'Top', 'Acrylic', 'Frameless'
+            ]
+
+            # Get collection tag
+            collection_tag = next(
+                (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags),
+                None
+            )
+            color_tag = next(
+                (tag for tag in tag_names if not tag.isdigit() and tag not in excluded_tags + [collection_tag]),
+                None
+            )
+
+            tag_model = request.env['product.tag'].sudo()
+            vanity_only_tag = tag_model.search([('name', '=', 'Vanity Only')])
+            bv_tag = tag_model.search([('name', '=', 'Bathroom Vanities')])
+            bv_cabinet_tag = tag_model.search([('name', '=', 'Bathroom Vanities (Cabinet)')])
+            collection_tag_obj = tag_model.search([('name', '=', collection_tag)]) if collection_tag else None
+            color_tag_obj = tag_model.search([('name', '=', color_tag)]) if color_tag else None
+
+            # ✅ Fetch related sizes
+            if vanity_only_tag and (bv_tag or bv_cabinet_tag) and collection_tag_obj and color_tag_obj:
+                candidate_templates = request.env['product.template'].sudo().search([
+                    ('product_tag_ids', 'in', [
+                        vanity_only_tag.id, collection_tag_obj.id, color_tag_obj.id
+                    ])
+                ])
+
+                def matches_required_tags(template):
+                    tags = template.product_tag_ids
+                    return (
+                        vanity_only_tag in tags and
+                        (bv_tag in tags or bv_cabinet_tag in tags) and
+                        collection_tag_obj in tags and
+                        color_tag_obj in tags
+                    )
+
+                size_templates = candidate_templates.filtered(matches_required_tags)
+                related_sizes = request.env['product.product'].sudo().search([
+                    ('product_tmpl_id', 'in', size_templates.ids)
+                ])
 
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
@@ -133,12 +158,8 @@ class ProductKitsController(http.Controller):
             'counter_top': selected_counter_top,
             'mirror': selected_mirror,
             'faucet': selected_faucet,
+            'related_sizes': related_sizes,
         })
-
-
-    
-
-
 
     @http.route(['/product_kits/group_builder'], type='http', auth="public", website=True)
     def kit_builder(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
@@ -262,4 +283,6 @@ class ProductKitsController(http.Controller):
             'category': category,
             'comp_id': comp_id,
         })
-    
+     
+
+

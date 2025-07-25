@@ -199,10 +199,10 @@
 
                 <div class="row">
                     <!-- Matching Kits -->
-                    <div class="col-md-5 " >
+                    <div class="col-md-5 ">
 
                         <t t-if="kit">
-                            <div class="     "       >
+                            <div class="     ">
                                 <t t-if="product">
                                     <p class=" text-muted">/ <t t-esc="product.name" />
                                     </p>
@@ -275,6 +275,82 @@
 
                     <!-- Components -->
                     <div class="col-md-7">
+                        <t t-if="related_products">
+                            <t t-if="related_sizes">
+                                <div class="container mt-5 pt-4 border-top">
+                                    <h4 class="mb-4">Other Available Sizes</h4>
+                                    <div class="row g-3">
+                                        <t t-foreach="related_sizes" t-as="size_variant">
+                                            <div class="col-6 col-md-4 col-lg-3">
+                                                <a
+                                                    t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (collection, size_variant.default_code or size_variant.id)"
+                                                    class="text-decoration-none text-dark">
+                                                    <div
+                                                        class="card h-100 shadow-sm border-0 hover-shadow"
+                                                        style="transition: transform 0.2s;"
+                                                        onmouseover="this.style.transform='scale(1.03)';"
+                                                        onmouseout="this.style.transform='scale(1)';">
+                                                        <img
+                                                            t-att-src="'/web/image/product.product/%s/image_1920' % size_variant.id"
+                                                            class="card-img-top"
+                                                            style="height: 180px; object-fit: cover;" />
+                                                        <div class="card-body text-center">
+                                                            <h6 class="card-title mb-1">
+                                                                <t t-esc="size_variant.name" />
+                                                            </h6>
+                                                            <small class="text-muted d-block mb-2">
+                                                                <t
+                                                                    t-esc="size_variant.default_code or 'No SKU'" />
+                                                            </small>
+                                                            <strong>
+                                                                <t
+                                                                    t-esc="'$%.2f' % size_variant.lst_price" />
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <div class="container mt-5 pt-4 border-top">
+                                <h4 class="mb-4">Related Bathroom Vanities</h4>
+                                <div class="row g-3">
+                                    <t t-foreach="related_products" t-as="rel_prod">
+                                        <div class="col-6 col-md-4 col-lg-3">
+                                            <a t-att-href="'/shop/product/%s' % rel_prod.id"
+                                                class="text-decoration-none text-dark">
+                                                <div
+                                                    class="card h-100 shadow-sm border-0 hover-shadow"
+                                                    style="transition: transform 0.2s;"
+                                                    onmouseover="this.style.transform='scale(1.03)';"
+                                                    onmouseout="this.style.transform='scale(1)';">
+                                                    <img
+                                                        t-att-src="'/web/image/product.product/%s/image_1920' % rel_prod.id"
+                                                        class="card-img-top"
+                                                        style="height: 180px; object-fit: cover;" />
+                                                    <div class="card-body text-center">
+                                                        <h6 class="card-title mb-1">
+                                                            <t t-esc="rel_prod.name" />
+                                                        </h6>
+                                                        <small class="text-muted d-block mb-2">
+                                                            <t
+                                                                t-esc="rel_prod.default_code or 'No SKU'" />
+                                                        </small>
+                                                        <strong>
+                                                            <t t-esc="'$%.2f' % rel_prod.lst_price" />
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
                         <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']"
                             t-as="category">
                             <t t-if="components[category]">
