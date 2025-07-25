@@ -30,7 +30,7 @@ class ProductKitsController(http.Controller):
         if selected_collection:
             seen_colors = set()
             for kit in kits:
-                color_val = getattr(kit, 'color', False) or getattr(kit, 'color_sku', False)
+                color_val = getattr(kit, 'color', False) or getattr(kit, 'color', False)
                 if color_val and color_val not in seen_colors:
                     seen_colors.add(color_val)
                     colors.append(color_val)
@@ -38,7 +38,7 @@ class ProductKitsController(http.Controller):
 
         # Filter kits by color if selected
         if selected_color:
-            kits = [kit for kit in kits if kit.color == selected_color or kit.color_sku == selected_color]
+            kits = [kit for kit in kits if kit.color == selected_color or kit.color == selected_color]
 
         # Build size cards
         size_cards = []
