@@ -41,18 +41,6 @@ class ProductKitsController(http.Controller):
         seen_countertops = set()
         seen_mirrors = set()
         seen_faucets = set()
-        
-        colors_by_group = {}
-        if selected_collection:
-            for kit in kits:
-                color = getattr(kit, 'color', False) or getattr(kit, 'color_sku', False)
-                group = getattr(kit, 'color_group', 'Default')  # 'color_group' should be a new or existing field
-                if color:
-                    colors_by_group.setdefault(group, set()).add(color)
-
-            # Convert sets to sorted lists
-            for group in colors_by_group:
-                colors_by_group[group] = sorted(colors_by_group[group])
 
         # Filter kits by color if selected
         if selected_color:
@@ -106,6 +94,38 @@ class ProductKitsController(http.Controller):
                         'faucet_sku': faucet_sku,
                         'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
                     })
+                    
+                # Determine final configured kit based on all selected components
+                configured_kit = None
+                if selected_sku and selected_countertop and selected_mirror and selected_faucet:
+                    configured_kit = request.env['product.kits'].sudo().search([
+                        ('cabinet_sku', '=', selected_sku),
+                        ('counter_top_sku', '=', selected_countertop),
+                        ('mirror_sku', '=', selected_mirror),
+                        ('faucet_sku', '=', selected_faucet),
+                    ], limit=1)
+                elif selected_sku and selected_countertop and selected_mirror:
+                    configured_kit = request.env['product.kits'].sudo().search([
+                        ('cabinet_sku', '=', selected_sku),
+                        ('counter_top_sku', '=', selected_countertop),
+                        ('mirror_sku', '=', selected_mirror),
+                    ], limit=1)
+                elif selected_sku and selected_countertop:
+                    configured_kit = request.env['product.kits'].sudo().search([
+                        ('cabinet_sku', '=', selected_sku),
+                        ('counter_top_sku', '=', selected_countertop),
+                    ], limit=1)
+                elif selected_sku:
+                    configured_kit = request.env['product.kits'].sudo().search([
+                        ('cabinet_sku', '=', selected_sku),
+                    ], limit=1)
+
+                # Try to find a product with the resulting product_sku
+                configured_product = None
+                if configured_kit and configured_kit.product_sku:
+                    configured_product = request.env['product.product'].sudo().search([
+                        ('default_code', '=', configured_kit.product_sku)
+                    ], limit=1)
 
         return request.render('product_configuration.template_product_configuration', {
             'collections': unique_collections,
@@ -120,5 +140,6 @@ class ProductKitsController(http.Controller):
             'counter_top_cards': counter_top_cards,
             'mirror_cards': mirror_cards,
             'faucet_cards': faucet_cards,
-            'colors_by_group': colors_by_group,
+            'configured_product': configured_product,
+            'configured_kit': configured_kit,
         })
