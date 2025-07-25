@@ -24,8 +24,8 @@
                             <div class="col-3 mb-3">
                                 <div class="card h-100">
                                     <!-- Image -->
-                                    <t t-if="card.image">
-                                        <img t-att-src="'data:image/png;base64,%s' % card.image" class="card-img-top" style="height: 100px; object-fit: cover;" alt="Product Image"/>
+                                    <t t-if="card.image_1920">
+                                        <img t-att-src="'data:image/png;base64,%s' % card.image_1920" class="card-img-top" style="height: 100px; object-fit: cover;" alt="Product Image"/>
                                     </t>
                                     <t t-else="">
                                         <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center" style="height: 100px;">
