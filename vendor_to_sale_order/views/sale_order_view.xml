@@ -1,30 +1,16 @@
 <odoo>
-    <!-- Button in header to create Vendor Bill -->
-    <record id="view_sale_order_form_inherit_vendor_bill_button" model="ir.ui.view">
-        <field name="name">sale.order.form.create.vendor.bill.button</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//header" position="inside">
-                <button name="action_create_vendor_bill"
-                        type="object"
-                        string="Create Vendor Bill"
-                        class="btn-primary"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Smart button for Vendor Bills -->
     <record id="view_sale_order_form_inherit_vendor_bill_smart_button" model="ir.ui.view">
         <field name="name">sale.order.form.vendor.bill.smart.button</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- Insert next to existing invoice button -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">
                 <button name="action_view_vendor_bills"
                         type="object"
                         class="oe_stat_button"
-                        icon="fa-file-invoice-dollar">
+                        icon="fa-file-invoice-dollar"
+                        attrs="{'invisible': [('vendor_bill_count', '=', 0)]}">
                     <div class="o_stat_info">
                         <field name="vendor_bill_count" widget="statinfo"/>
                         <span class="o_stat_text">Vendor Bills</span>
