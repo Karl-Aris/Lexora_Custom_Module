@@ -6,20 +6,20 @@
                 <div class="row g-5">
                     <!-- Left Column: Main Product -->
                     <div class="col-lg-6">
-                        <div class="card shadow-sm border-0 h-100">
+                        <div class="card  border-0 h-100">
                             <div class="card-body">
 
                                 <t t-if="kit and product">
                                     <!-- Breadcrumb / Product Path -->
-                              <p class="text-muted small mb-2">
-    <a t-att-href="'/product_kits'" class="text-decoration-none text-muted">All Products</a> /
-    <t t-esc="product.name" />
-</p>
+                                    <p class="text-muted small mb-2">
+                                        <a t-att-href="'/product_kits'" class="text-decoration-none text-muted">All Products</a> /
+                                        <t t-esc="product.name" />
+                                    </p>
 
 
                                     <!-- Product Image -->
                                     <div class="text-center mb-4">
-                                        <img t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'" alt="Product Image" class="img-fluid rounded shadow-sm" style="height: 400px; object-fit: cover;" />
+                                        <img t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'" alt="Product Image" class="img-fluid rounded  " style="height: 400px; object-fit: cover;" />
                                     </div>
 
                                     <!-- Product Name -->
@@ -37,28 +37,7 @@
                     Price: <t t-esc="product.lst_price and ('%.2f' % product.lst_price) or 'N/A'" />
                                     </p>
 
-                                    <!-- Product Specifications -->
-                                    <t t-if="product.product_tmpl_id.valid_product_template_attribute_line_ids">
-                                        <div class="mt-4">
-                                            <h6 class="fw-bold mb-2">Specifications</h6>
-                                            <table class="table table-sm table-bordered">
-                                                <tbody>
-                                                    <t t-foreach="product.product_tmpl_id.valid_product_template_attribute_line_ids" t-as="ptal">
-                                                        <tr t-if="ptal.value_ids">
-                                                            <td class="fw-semibold w-25">
-                                                                <t t-esc="ptal.attribute_id.name" />
-                                                            </td>
-                                                            <td class="text-muted w-75">
-                                                                <t t-foreach="ptal.product_template_value_ids._only_active()" t-as="ptv" t-separator=", ">
-                                                                    <t t-esc="ptv.name" />
-                                                                </t>
-                                                            </td>
-                                                        </tr>
-                                                    </t>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </t>
+
 
                                     <!-- Add to Cart -->
                                     <t t-if="kit.product_id">
@@ -80,8 +59,11 @@
                                     </t>
                                     <t t-else="">
                                         <div class="alert alert-warning text-center mt-4">
-                                            <i class="fa fa-exclamation-triangle me-2"></i>
-                        Product not available for sale
+                                            <div class="text-center py-5">
+                                                <img t-att-src="'/kits_products/static/description/no-order.png'" alt="No Kit" style="width: 100px; opacity: 0.3;" />
+                                                <h5 class="mt-3 text-muted">             Product not available for sale</h5>
+                                            </div>
+
                                         </div>
                                     </t>
                                 </t>
@@ -107,6 +89,29 @@
                                 </t>
 
                             </div>
+                            <t t-if="product.product_tmpl_id.valid_product_template_attribute_line_ids">
+                                <div class="mt-4">
+                                    <h3 class="fw-bold mb-2">Specifications</h3>
+                                    <table class="table table-sm spec-table">
+                                        <tbody>
+                                            <t t-foreach="product.product_tmpl_id.valid_product_template_attribute_line_ids" t-as="ptal">
+                                                <tr t-if="ptal.value_ids">
+                                                    <td class="fw-semibold w-25">
+                                                        <t t-esc="ptal.attribute_id.name" />
+                                                    </td>
+                                                    <td class="text-muted w-75">
+                                                        <t t-foreach="ptal.product_template_value_ids._only_active()" t-as="ptv" t-separator=", ">
+                                                            <t t-esc="ptv.name" />
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </t>
+
+
                         </div>
                     </div>
 
