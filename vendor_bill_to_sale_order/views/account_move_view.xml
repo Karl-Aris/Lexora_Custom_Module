@@ -1,19 +1,27 @@
 <odoo>
-    <record id="view_account_move_form_inherit" model="ir.ui.view">
-        <field name="name">account.move.form.sale.order</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form"/>
+    <record id="view_order_form_inherit_vendor_bill" model="ir.ui.view">
+        <field name="name">sale.order.vendor.bill.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="inside">
-                <group string="Sales Order Links">
-                    <field name="sale_order_count" readonly="1"/>
-                    <field name="sale_order_button_label" readonly="1" widget="label"/>
-                    <button
-                        name="action_open_sale_order"
+            <!-- Add Smart Button -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button type="action"
+                        icon="fa-file-invoice-dollar"
+                        name="%(action_vendor_bill_from_sale_order)d"
+                        class="oe_stat_button"
+                        attrs="{'invisible': [('vendor_bill_ids', '=', False)]}">
+                    <field name="vendor_bill_count" widget="statinfo" nolabel="1"/>
+                </button>
+            </xpath>
+    
+            <!-- Add regular button to open wizard -->
+            <xpath expr="//header" position="inside">
+                <button name="open_create_vendor_bill_wizard"
                         type="object"
-                        string="View Sales Orders"
-                        class="btn-secondary"/>
-                </group>
+                        string="Create Vendor Bill"
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'sale')]}"/>
             </xpath>
         </field>
     </record>
