@@ -2,11 +2,11 @@
   <template id="template_product_configuration" name="Product Configuration">
     <t t-call="website.layout">
       <div class="container my-4">
-        
+
         <!-- Collection Dropdown -->
         <div class="mb-4">
           <label for="collection_select" class="form-label">Select Collection</label>
-          <select id="collection_select" class="form-select" name="collection" onchange="updateURLWithCollection(this.value)">
+          <select id="collection_select" class="form-select" name="collection" onchange="location = this.value;">
             <option t-if="not selected_collection" selected="selected" disabled="disabled">Select collection</option>
             <t t-foreach="collections" t-as="col">
               <option t-att-value="'/store?collection=%s' % col" t-att-selected="col == selected_collection">
@@ -21,9 +21,12 @@
           <div class="mb-4">
             <strong>Colors:</strong>
             <t t-foreach="colors" t-as="color">
-              <a t-att-href="javascript:void(0);" class="badge rounded-pill me-2 px-3 py-2" style="cursor:pointer;" 
-                 t-att-class="'bg-secondary text-white' if color == selected_color else 'bg-light text-dark'"
-                 t-on-click="updateColorInURL('<t t-esc="color"/>')">
+              <a t-att-href="'/store?collection=%s%s' % (
+                      selected_collection,
+                      '&amp;color=' + color if selected_color != color else ''
+                    )"
+                 t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
+                 style="cursor:pointer;">
                 <t t-esc="color"/>
               </a>
             </t>
@@ -34,56 +37,56 @@
         <t t-if="selected_color">
 
           <div class="row">
-            <!-- LEFT COLUMN: Configured image or cabinet fallback -->
-            <div class="col-md-6">
-              <t t-if="selected_sku">
-                <!-- Load the cabinet product -->
-                <t t-set="cabinet_product"
-                  t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
+        <!-- LEFT COLUMN: Configured image or cabinet fallback -->
+      <div class="col-md-6">
+        <t t-if="selected_sku">
+          <!-- Load the cabinet product -->
+          <t t-set="cabinet_product"
+            t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
 
-                <!-- Show configured product if a valid combination exists -->
-                <t t-if="configured_product and configured_product.image_1920">
-                  <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                      alt="Configured Product"
-                      class="img-thumbnail"
-                      style="width: 100%; height: 500px; object-fit: contain;" />
-                  <div class="mt-2 text-center">
-                    <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
-                    <small class="text-muted" t-esc="configured_product.default_code or ''" />
-                  </div>
-                </t>
-
-                <!-- If no combination, show fallback cabinet image -->
-                <t t-elif="cabinet_product and cabinet_product.image_1920">
-                  <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
-                      alt="Cabinet"
-                      class="img-thumbnail"
-                      style="width: 100%; height: 500px; object-fit: contain;" />
-                  <div class="mt-2 text-center">
-                    <strong t-esc="cabinet_product.name or 'Cabinet Product'" /><br />
-                    <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
-                  </div>
-                </t>
-
-                <!-- If no image available -->
-                <t t-else="">
-                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                      style="width: 100%; height: 500px;">
-                    No image available
-                  </div>
-                </t>
-              </t>
-
-              <!-- If no SKU selected at all -->
-              <t t-if="not selected_sku">
-                <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                    style="width: 100%; height: 500px;">
-                  No cabinet selected
-                </div>
-              </t>
+          <!-- Show configured product if a valid combination exists -->
+          <t t-if="configured_product and configured_product.image_1920">
+            <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
+                alt="Configured Product"
+                class="img-thumbnail"
+                style="width: 100%; height: 500px; object-fit: contain;" />
+            <div class="mt-2 text-center">
+              <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
+              <small class="text-muted" t-esc="configured_product.default_code or ''" />
             </div>
+          </t>
 
-            <!-- Similarly mirror and faucet -->
+          <!-- If no combination, show fallback cabinet image -->
+          <t t-elif="cabinet_product and cabinet_product.image_1920">
+            <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
+                alt="Cabinet"
+                class="img-thumbnail"
+                style="width: 100%; height: 500px; object-fit: contain;" />
+            <div class="mt-2 text-center">
+              <strong t-esc="cabinet_product.name or 'Cabinet Product'" /><br />
+              <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
+            </div>
+          </t>
+
+          <!-- If no image available -->
+          <t t-else="">
+            <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                style="width: 100%; height: 500px;">
+              No image available
+            </div>
+          </t>
+        </t>
+
+        <!-- If no SKU selected at all -->
+        <t t-if="not selected_sku">
+          <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+              style="width: 100%; height: 500px;">
+            No cabinet selected
+          </div>
+        </t>
+      </div>
+
+        <!-- Similarly mirror and faucet -->
 
             <!-- RIGHT COLUMN: Size cards -->
             <div class="col-md-6">
@@ -169,21 +172,94 @@
                   </t>
                 </div>
               </t>
+
+              <!-- Step 3: Mirror -->
+              <t t-if="selected_sku">
+                <div class="d-flex align-items-center mb-3 mt-5">
+                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                    <strong>3</strong>
+                  </div>
+                  <h4 class="mb-0">Select Mirror</h4>
+                </div>
+
+                <div class="row">
+                  <t t-foreach="mirror_cards" t-as="card">
+                    <div class="col-3 mb-3">
+                      <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
+                              selected_collection,
+                              '&amp;color=' + selected_color if selected_color else '',
+                              '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                              '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
+                              '&amp;mirror_sku=' + card['mirror_sku'] if selected_mirror != card['mirror_sku'] else '',
+                              '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                            )"
+                         class="text-decoration-none">
+                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['mirror_sku'] == selected_mirror else ''}">
+                          <t t-if="card['image']">
+                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
+                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Mirror Image"/>
+                          </t>
+                          <t t-else="">
+                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
+                              <span class="text-muted">No Image</span>
+                            </div>
+                          </t>
+                          <div class="card-body text-center">
+                            <strong><t t-esc="card['mirror_sku']"/></strong>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </t>
+                </div>
+              </t>
+
+              <!-- Step 4: Faucet -->
+              <t t-if="selected_sku">
+                <div class="d-flex align-items-center mb-3 mt-5">
+                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                    <strong>4</strong>
+                  </div>
+                  <h4 class="mb-0">Select Faucet</h4>
+                </div>
+
+                <div class="row">
+                  <t t-foreach="faucet_cards" t-as="card">
+                    <div class="col-3 mb-3">
+                      <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
+                              selected_collection,
+                              '&amp;color=' + selected_color if selected_color else '',
+                              '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                              '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
+                              '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
+                              '&amp;faucet_sku=' + card['faucet_sku'] if selected_faucet != card['faucet_sku'] else ''
+                            )"
+                         class="text-decoration-none">
+                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['faucet_sku'] == selected_faucet else ''}">
+                          <t t-if="card['image']">
+                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
+                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Faucet Image"/>
+                          </t>
+                          <t t-else="">
+                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
+                              <span class="text-muted">No Image</span>
+                            </div>
+                          </t>
+                          <div class="card-body text-center">
+                            <strong><t t-esc="card['faucet_sku']"/></strong>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </t>
+                </div>
+              </t>
+
             </div>
           </div>
-
         </t>
 
       </div>
     </t>
   </template>
-
-  <script type="text/javascript">
-    function updateColorInURL(color) {
-      const url = new URL(window.location);
-      url.searchParams.set('color', color);
-      window.history.pushState({}, '', url);
-      location.reload(); // Reload page to reflect the change in URL
-    }
-  </script>
 </odoo>
