@@ -5,29 +5,31 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
 
-            <!-- Add hidden fields so 'invisible' modifiers work -->
-            <xpath expr="//form" position="inside">
-                <field name="show_create_vendor_bill" invisible="1"/>
-                <field name="show_vendor_bill_button" invisible="1"/>
+            <!-- Add hidden computed fields -->
+            <xpath expr="//sheet" position="inside">
+                <group invisible="1">
+                    <field name="show_create_vendor_bill"/>
+                    <field name="show_vendor_bill_button"/>
+                </group>
             </xpath>
 
-            <!-- Create Vendor Bill button -->
+            <!-- Create Vendor Bill button in header -->
             <xpath expr="//header" position="inside">
                 <button name="action_create_vendor_bill"
                         type="object"
                         string="Create Vendor Bill"
                         class="btn-primary"
-                        invisible="not show_create_vendor_bill"/>
+                        attrs="{'invisible': [('show_create_vendor_bill', '=', False)]}"/>
             </xpath>
 
-            <!-- Smart button area -->
+            <!-- Smart button for Vendor Bills -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">
                 <button type="action"
                         name="%(action_vendor_bills_by_sale_order)d"
                         string="Vendor Bills"
                         icon="fa-file-invoice"
                         context="{'default_sale_order_id': active_id}"
-                        invisible="not show_vendor_bill_button"/>
+                        attrs="{'invisible': [('show_vendor_bill_button', '=', False)]}"/>
                 <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
             </xpath>
 
