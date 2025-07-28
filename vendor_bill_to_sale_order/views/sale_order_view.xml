@@ -13,10 +13,14 @@
             </xpath>
 
             <xpath expr="//header" position="inside">
-                <button name="open_create_vendor_bill_wizard" type="object"
-                        string="Create Vendor Bill" class="btn-primary"
-                        attrs="{'invisible': [('state', '!=', 'sale')]}"/>
-            </xpath>
+                <xpath expr="//header" position="inside">
+                    <t t-if="record.state.raw_value == 'sale'">
+                        <button name="action_create_vendor_bill"
+                                type="object"
+                                string="Create Vendor Bill"
+                                class="btn btn-primary"/>
+                    </t>
+                </xpath>
             </data>
         </field>
     </record>
