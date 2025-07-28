@@ -1,0 +1,16 @@
+<odoo>
+    <record id="view_sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.vendor.bill</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_create_vendor_bill"
+                        type="object"
+                        string="Create Vendor Bill"
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+            </header>
+        </field>
+    </record>
+</odoo>
