@@ -80,32 +80,7 @@ class ProductKitsController(http.Controller):
  
 
 
-
-    @http.route(['/all_products'], type='http', auth="public", website=True)
-    def list_all_products(self, **kwargs):
-        collection = kwargs.get('collection')
-        size = kwargs.get('size')
  
-        attribute_value = request.env['product.template.attribute.value'].sudo().search([
-            ('name', '=', 'Bathroom Vanity')
-        ], limit=1)
-
-        product_templates = request.env['product.template'].sudo().search([
-            ('attribute_line_ids.value_ids', 'in', attribute_value.ids)
-        ])
- 
-        if collection:
-            product_templates = product_templates.filtered(lambda p: p.x_collection == collection)
-        if size:
-            product_templates = product_templates.filtered(lambda p: p.x_size == size)
- 
-        products = request.env['product.product'].sudo().search([
-            ('product_tmpl_id', 'in', product_templates.ids)
-        ])
-
-        return request.render('kits_products.all_products_template', {
-            'products': products,
-        })
 
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):

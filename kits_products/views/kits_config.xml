@@ -118,60 +118,7 @@
 
 
 
-    <template id="all_products_template" name="All Products">
-        <t t-call="website.layout">
-            <div class="container mt-4 mb-4">
-                <h1>All Products</h1>
-
-                <t t-if="products">
-                    <div class="row">
-                        <t t-foreach="products" t-as="product">
-                            <div class="col-lg-4 col-md-6 mb-3">
-                                <div class="card p-2 border h-100">
-
-                                    <!-- ✅ Optimized Image via Odoo route -->
-                                    <img t-att-src="'/web/image/product.template/%s/image_1920' % product.product_tmpl_id.id" class="card-img-top mb-2" alt="Product Image"/>
-
-                                    <h4>
-                                        <t t-esc="product.name" />
-                                    </h4>
-                                    <p>
-                                        <t t-esc="product.default_code or 'No Code'" />
-                                    </p>
-                                    <p>
-                                        <strong>Price:</strong>
-                                        <t t-esc="product.list_price or 'N/A'" />
-                                    </p>
-                                    <p>
-                                        <strong>ID:</strong>
-                                        <t t-esc="product.id" />
-                                    </p>
-
-                                    <!-- ✅ Specifications -->
-                                    <p>
-                                        <strong>Product Type:</strong>
-                                        <t t-esc="product.product_tmpl_id.x_product_type or 'N/A'" />
-                                    </p>
-                                    <p>
-                                        <strong>Collection:</strong>
-                                        <t t-esc="product.product_tmpl_id.x_collection or 'N/A'" />
-                                    </p>
-                                    <p>
-                                        <strong>Size:</strong>
-                                        <t t-esc="product.product_tmpl_id.x_size or 'N/A'" />
-                                    </p>
-
-                                </div>
-                            </div>
-                        </t>
-                    </div>
-                </t>
-                <t t-else="">
-                    <p>No products found.</p>
-                </t>
-            </div>
-        </t>
-    </template>
+  
 
 
 
