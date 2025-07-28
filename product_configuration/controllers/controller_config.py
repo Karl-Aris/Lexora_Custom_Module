@@ -1,6 +1,5 @@
 from odoo import http
 from odoo.http import request
-from odoo.exceptions import UserError
 
 class ProductKitsController(http.Controller):
 
@@ -21,24 +20,15 @@ class ProductKitsController(http.Controller):
         unique_collections = sorted(set(collections))
 
         kits = request.env['product.kits'].sudo().search([])
-
-        # If collection is selected, filter kits by that collection
         if selected_collection:
             kits = kits.filtered(lambda k: k.collection == selected_collection)
 
-        # Get unique colors based on filtered kits
-        colors = sorted(set(kit.color.lower() if kit.color else '' for kit in kits if kit.color))
+        # Get colors from kits under selected collection
+        colors = sorted(set(kit.color for kit in kits if kit.color))
 
-        # Group colors by their lowercase value and retain the original case
-        grouped_colors = {}
-        for kit in kits:
-            if kit.color:
-                color_key = kit.color.lower()
-                if color_key not in grouped_colors:
-                    grouped_colors[color_key] = kit.color  # store original case
-
-        # Final list of colors, grouped by their normalized lowercase
-        colors = list(grouped_colors.values())
+        # Filter by color if selected
+        if selected_color:
+            kits = kits.filtered(lambda k: k.color == selected_color)
 
         # Collect unique cabinet sizes/cards
         seen_sizes = set()
@@ -50,7 +40,7 @@ class ProductKitsController(http.Controller):
                 size_cards.append({
                     'size': kit.size,
                     'cabinet_sku': kit.cabinet_sku,
-                    'image': self.safe_decode_image(product)  # Use safe image decoding method
+                    'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
                 })
         size_cards.sort(key=lambda x: float(x['size']))
 
@@ -69,7 +59,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.counter_top_sku)], limit=1)
                     counter_top_cards.append({
                         'counter_top_sku': kit.counter_top_sku,
-                        'image': self.safe_decode_image(prod)  # Use safe image decoding method
+                        'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
 
                 if kit.mirror_sku and kit.mirror_sku not in seen_mirrors:
@@ -77,7 +67,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.mirror_sku)], limit=1)
                     mirror_cards.append({
                         'mirror_sku': kit.mirror_sku,
-                        'image': self.safe_decode_image(prod)  # Use safe image decoding method
+                        'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
 
                 if kit.faucet_sku and kit.faucet_sku not in seen_faucets:
@@ -85,7 +75,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.faucet_sku)], limit=1)
                     faucet_cards.append({
                         'faucet_sku': kit.faucet_sku,
-                        'image': self.safe_decode_image(prod)  # Use safe image decoding method
+                        'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
 
         # Determine configured kit (only if >1 component selected)
@@ -121,11 +111,3 @@ class ProductKitsController(http.Controller):
             'configured_product': configured_product,
             'configured_kit': configured_kit,
         })
-
-    def safe_decode_image(self, product):
-        """Safely decode product image"""
-        try:
-            return product.image_1920.decode('utf-8') if product and product.image_1920 else None
-        except Exception as e:
-            # Handle decoding error gracefully
-            return None
