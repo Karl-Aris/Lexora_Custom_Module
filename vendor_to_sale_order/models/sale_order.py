@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -6,7 +6,15 @@ class SaleOrder(models.Model):
     vendor_bill_count = fields.Integer(
         string="Vendor Bill Count",
         compute="_compute_vendor_bill_count",
-        store=False  # Not stored, computed on-the-fly
+        store=False
+    )
+
+    show_create_vendor_bill = fields.Boolean(
+        compute="_compute_show_create_vendor_bill"
+    )
+
+    show_vendor_bill_button = fields.Boolean(
+        compute="_compute_show_vendor_bill_button"
     )
 
     def _compute_vendor_bill_count(self):
@@ -16,6 +24,16 @@ class SaleOrder(models.Model):
                 ('move_type', '=', 'in_invoice'),
             ])
 
+    @api.depends('state')
+    def _compute_show_create_vendor_bill(self):
+        for order in self:
+            order.show_create_vendor_bill = order.state == 'sale'
+
+    @api.depends('vendor_bill_count')
+    def _compute_show_vendor_bill_button(self):
+        for order in self:
+            order.show_vendor_bill_button = order.vendor_bill_count > 0
+
     def action_create_vendor_bill(self):
         self.ensure_one()
         bill = self.env['account.move'].create({
@@ -24,7 +42,7 @@ class SaleOrder(models.Model):
             'invoice_date': fields.Date.context_today(self),
             'ref': self.client_order_ref,
             'sale_order_id': self.id,
-            'x_po_vb_id': self.purchase_order,  # Link PO# from Sale Order
+            'x_po_vb_id': self.purchase_order,
         })
         return {
             'name': 'Vendor Bill',
@@ -32,5 +50,5 @@ class SaleOrder(models.Model):
             'res_model': 'account.move',
             'res_id': bill.id,
             'view_mode': 'form',
-            'target': 'new',  # Mini popup
+            'target': 'new',
         }
