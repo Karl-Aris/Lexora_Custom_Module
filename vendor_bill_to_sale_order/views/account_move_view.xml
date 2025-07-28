@@ -5,10 +5,20 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
-                <group name="sale_order_link" string="Sale Order">
-                    <field name="sale_order_id" readonly="1"/>
+                <group>
+                    <field name="sale_order_count" readonly="1"/>
+                    <button
+                        name="action_open_sale_order"
+                        type="object"
+                        string=""
+                        class="btn-link"
+                        attrs="{'invisible': [('sale_order_count', '=', 0)]}"
+                    >
+                        <field name="sale_order_button_label" widget="html" readonly="1"/>
+                    </button>
                 </group>
             </xpath>
+
         </field>
     </record>
 </odoo>
