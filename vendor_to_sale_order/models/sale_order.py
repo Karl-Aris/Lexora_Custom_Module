@@ -1,4 +1,4 @@
-from odoo import models, api
+from odoo import models
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -10,7 +10,7 @@ class SaleOrder(models.Model):
             'partner_id': self.partner_id.id,
             'invoice_origin': self.name,
             'invoice_line_ids': [(0, 0, {
-                'name': 'Generated from Sale Order',
+                'name': f'Generated from Sale Order {self.name}',
                 'quantity': 1,
                 'price_unit': 0.0,
             })],
