@@ -77,12 +77,6 @@
                 </t>
               </t>
 
-              <!-- <t t-if="no_combination">
-                  <div class="alert alert-warning">
-                      No available combination for the selected configuration.
-                  </div>
-              </t> -->
-
               <!-- If no SKU selected at all -->
               <t t-if="not selected_sku">
                 <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
