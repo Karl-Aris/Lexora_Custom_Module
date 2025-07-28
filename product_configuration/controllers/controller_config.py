@@ -23,23 +23,18 @@ class ProductKitsController(http.Controller):
         if selected_collection:
             kits = kits.filtered(lambda k: k.collection == selected_collection)
 
-        # In the store_by_collection method
-        colors = sorted(set(kit.color.lower() for kit in kits if kit.color), key=lambda c: c)
+        # Get colors from kits under selected collection
+        colors = sorted(set(kit.color.strip().lower() for kit in kits if kit.color))
 
-        # Now, create a dictionary to store the original color names for each normalized (lowercase) color
-        grouped_colors = {}
-        for kit in kits:
-            if kit.color:
-                normalized_color = kit.color.lower()  # Normalize color to lowercase
-                if normalized_color not in grouped_colors:
-                    grouped_colors[normalized_color] = set()  # Use a set to avoid duplicates
-                grouped_colors[normalized_color].add(kit.color)  # Store original case-sensitive colors
+        # Make sure to retain the original case of colors
+        distinct_colors = []
+        seen_colors = set()
 
-        # Flatten the grouped colors and sort them (still preserving the original case for display)
-        colors = []
-        for color_group in grouped_colors.values():
-            # Sort the colors within each group and ensure there are no duplicates
-            colors.extend(sorted(color_group, key=lambda c: c.lower()))
+        for color in colors:
+            original_color = next((kit.color for kit in kits if kit.color.strip().lower() == color), None)
+            if original_color and original_color.lower() not in seen_colors:
+                distinct_colors.append(original_color)
+                seen_colors.add(original_color.lower())
 
         # Filter by color if selected
         if selected_color:
