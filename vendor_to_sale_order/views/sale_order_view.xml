@@ -1,15 +1,30 @@
 <odoo>
-    <record id="view_sale_order_form_inherit" model="ir.ui.view">
+    <record id="view_sale_order_form_inherit_vendor_bill" model="ir.ui.view">
         <field name="name">sale.order.form.vendor.bill</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+
+            <!-- Create Vendor Bill button -->
             <xpath expr="//header" position="inside">
                 <button name="action_create_vendor_bill"
                         type="object"
                         string="Create Vendor Bill"
-                        class="btn-primary"/>
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'sale')]}"/>
             </xpath>
+
+            <!-- Smart button area -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button type="action"
+                        name="%(action_vendor_bills_by_sale_order)d"
+                        string="Vendor Bills"
+                        icon="fa-file-invoice"
+                        context="{'default_sale_order_id': active_id}"
+                        attrs="{'invisible': [('vendor_bill_count', '=', 0)]}"/>
+                <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
+            </xpath>
+
         </field>
     </record>
 </odoo>
