@@ -103,12 +103,12 @@ class ProductKitsController(http.Controller):
         domain.append(('faucet_sku', '=', selected_faucet))
 
         # Only search if more than just cabinet_sku is selected
-        if selected_sku and (selected_countertop or selected_mirror or selected_faucet):
-            configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
-            if configured_kit and configured_kit.product_sku:
-                configured_product = request.env['product.product'].sudo().search(
-                    [('default_code', '=', configured_kit.product_sku)], limit=1
-                )
+        # if selected_sku and (selected_countertop or selected_mirror or selected_faucet):
+        configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
+        if configured_kit and configured_kit.product_sku:
+            configured_product = request.env['product.product'].sudo().search(
+                [('default_code', '=', configured_kit.product_sku)], limit=1
+            )
 
         return request.render('product_configuration.template_product_configuration', {
             'collections': unique_collections,
