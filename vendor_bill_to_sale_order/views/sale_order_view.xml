@@ -5,11 +5,12 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_create_vendor_bill"
-                        type="object"
-                        string="Create Vendor Bill"
-                        class="oe_highlight"
-                        attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                <t t-if="record.state.raw_value == 'sale'">
+                    <button name="action_create_vendor_bill"
+                            type="object"
+                            string="Create Vendor Bill"
+                            class="oe_highlight"/>
+                </t>
             </xpath>
 
             <xpath expr="//div[@name='button_box']" position="inside">
