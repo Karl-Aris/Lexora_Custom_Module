@@ -11,7 +11,7 @@ class SaleOrder(models.Model):
 
         # Pick a random expense account just for demonstration
         expense_account = self.env['account.account'].search([
-            ('account_type.internal_group', '=', 'expense')
+            ('user_type.internal_group', '=', 'expense')
         ], limit=1)
 
 
