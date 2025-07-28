@@ -53,8 +53,6 @@
                   <div class="mt-2 text-center">
                     <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
                     <small class="text-muted" t-esc="configured_product.default_code or ''" />
-                    <h4 t-esc="request.env['ir.qweb.field.monetary'].value_to_html(configured_product.standard_price, configured_product.currency_id) or ''"></h4>
-
                   </div>
                 </t>
 
@@ -67,8 +65,6 @@
                   <div class="mt-2 text-center">
                     <strong t-esc="cabinet_product.name or 'Cabinet Product'" /><br />
                     <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
-                    <h4 t-esc="request.env['ir.qweb.field.monetary'].value_to_html(configured_product.standard_price, configured_product.currency_id) or ''"></h4>
-
                   </div>
                 </t>
 
