@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id,perm_read,perm_write,perm_create,perm_unlink
-access_vendor_bill_wizard,vendor.bill.wizard,model_vendor_bill_wizard,,1,1,1,1
