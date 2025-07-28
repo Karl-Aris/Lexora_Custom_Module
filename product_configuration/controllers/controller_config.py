@@ -98,9 +98,9 @@ class ProductKitsController(http.Controller):
 
         # Determine configured kit (only if >1 component selected)
         domain = [('cabinet_sku', '=', selected_sku)]
-        domain.append(('counter_top_sku', '=', selected_countertop))
-        domain.append(('mirror_sku', '=', selected_mirror))
-        domain.append(('faucet_sku', '=', selected_faucet))
+        domain.append(('counter_top_sku', '=', selected_countertop or None))
+        domain.append(('mirror_sku', '=', selected_mirror or None))
+        domain.append(('faucet_sku', '=', selected_faucet or None))
 
         # Only search if more than just cabinet_sku is selected
         # if selected_sku and (selected_countertop or selected_mirror or selected_faucet):
