@@ -46,9 +46,9 @@
                 <!-- Show configured product if a valid combination exists -->
                 <t t-if="configured_product and configured_product.image_1920">
                   <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                       alt="Configured Product"
-                       class="img-thumbnail"
-                       style="width: 100%; height: 500px; object-fit: contain;" />
+                      alt="Configured Product"
+                      class="img-thumbnail"
+                      style="width: 100%; height: 500px; object-fit: contain;" />
                   <div class="mt-2 text-center">
                     <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
                     <small class="text-muted" t-esc="configured_product.default_code or ''" />
@@ -58,9 +58,9 @@
                 <!-- If no combination, show fallback cabinet image -->
                 <t t-elif="cabinet_product and cabinet_product.image_1920">
                   <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
-                       alt="Cabinet"
-                       class="img-thumbnail"
-                       style="width: 100%; height: 500px; object-fit: contain;" />
+                      alt="Cabinet"
+                      class="img-thumbnail"
+                      style="width: 100%; height: 500px; object-fit: contain;" />
                   <div class="mt-2 text-center">
                     <strong t-esc="cabinet_product.name or 'Unnamed Product'" /><br />
                     <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
@@ -74,19 +74,7 @@
               <h4>Select Size</h4>
               <t t-foreach="size_cards" t-as="size_card">
                 <div class="d-flex align-items-center">
-                  <!-- Check if image exists and render, else fall back to a placeholder -->
-                  <t t-if="size_card.image">
-                    <img t-att-src="'data:image/png;base64,%s' % size_card.image"
-                         class="img-thumbnail"
-                         style="width: 100px; height: 100px; object-fit: contain;" />
-                  </t>
-                  <t t-else="">
-                    <!-- Fallback placeholder image -->
-                    <img src="/website/static/src/img/placeholder.png"
-                         class="img-thumbnail"
-                         style="width: 100px; height: 100px; object-fit: contain;" />
-                  </t>
-
+                  <img t-att-src="'data:image/png;base64,%s' % size_card.image" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: contain;" />
                   <div class="ms-3">
                     <span class="badge rounded-pill bg-light text-dark" t-esc="size_card.size" />
                   </div>
