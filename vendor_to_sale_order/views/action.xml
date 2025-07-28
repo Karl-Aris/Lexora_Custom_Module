@@ -1,9 +1,0 @@
-<odoo>
-    <record id="action_vendor_bills_by_sale_order" model="ir.actions.act_window">
-        <field name="name">Vendor Bills</field>
-        <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('sale_order_id', '=', active_id)]</field>
-        <field name="context">{'default_sale_order_id': active_id}</field>
-    </record>
-</odoo>
