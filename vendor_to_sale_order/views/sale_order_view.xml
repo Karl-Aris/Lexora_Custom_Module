@@ -1,20 +1,15 @@
 <odoo>
-    <record id="view_sale_order_form_inherit_vendor_bill_field" model="ir.ui.view">
-        <field name="name">sale.order.form.vendor.bill.field</field>
+    <record id="view_sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.vendor.bill</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Add the vendor bill field in the form -->
-            <xpath expr="//sheet//group" position="inside">
-                <field name="vendor_bill_id"
-                       domain="[('move_type', '=', 'in_invoice')]"
-                       context="{'default_move_type': 'in_invoice'}"
-                       options="{'no_create_edit': True}"
-                       string="Linked Vendor Bill"/>
+            <xpath expr="//header" position="inside">
+                <button name="action_create_vendor_bill"
+                        type="object"
+                        string="Create Vendor Bill"
+                        class="btn-primary"/>
             </xpath>
-
-            <!-- Optional: remove the old button if it exists -->
-            <xpath expr="//header/button[@name='action_create_vendor_bill']" position="replace"/>
         </field>
     </record>
 </odoo>
