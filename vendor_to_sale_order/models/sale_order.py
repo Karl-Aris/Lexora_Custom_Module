@@ -1,24 +1,51 @@
-
-from odoo import models, fields
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
-    def action_create_vendor_bill(self):
+    vendor_bill_count = fields.Integer(
+        string="Vendor Bill Count",
+        compute="_compute_vendor_bill_count"
+    )
+
+    vendor_bill_button_label = fields.Char(
+        compute="_compute_vendor_bill_count"
+    )
+
+    def _compute_vendor_bill_count(self):
+        for order in self:
+            bills = self.env['account.move'].search([
+                ('move_type', '=', 'in_invoice'),
+                ('invoice_origin', '=', order.name)
+            ])
+            count = len(bills)
+            order.vendor_bill_count = count
+            if count:
+                order.vendor_bill_button_label = _("View Vendor Bills (%s)") % count
+            else:
+                order.vendor_bill_button_label = _("❌ No Vendor Bill Found")
+
+    def action_open_vendor_bills(self):
         self.ensure_one()
-        bill = self.env['account.move'].create({
-            'move_type': 'in_invoice',
-            'invoice_origin': self.name,
-            'invoice_date': fields.Date.context_today(self),
-            'ref': self.client_order_ref,
-            'sale_order_id': self.id,
-            'x_po_vb_id': self.purchase_order,  # Auto-fill PO#
-        })
-        return {
-            'name': 'Vendor Bill',
+        bills = self.env['account.move'].search([
+            ('move_type', '=', 'in_invoice'),
+            ('invoice_origin', '=', self.name)
+        ])
+
+        if not bills:
+            raise UserError(_("No Vendor Bills found for this Sales Order."))
+
+        action = {
             'type': 'ir.actions.act_window',
+            'name': _('Vendor Bills'),
             'res_model': 'account.move',
-            'res_id': bill.id,
-            'view_mode': 'form',
-            'target': 'new',  # <-- This makes it a mini popup
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', bills.ids)],
         }
+        if len(bills) == 1:
+            action.update({
+                'view_mode': 'form',
+                'res_id': bills.id
+            })
+        return action
