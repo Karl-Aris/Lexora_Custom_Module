@@ -83,7 +83,6 @@ class ProductKitsController(http.Controller):
         domain = [('cabinet_sku', '=', selected_sku)]
 
         # Check the conditions based on the selected components
-
         if selected_countertop and not selected_mirror and not selected_faucet:
             # Show cabinet + countertop only
             domain.append(('counter_top_sku', '=', selected_countertop))
@@ -111,12 +110,20 @@ class ProductKitsController(http.Controller):
 
         # Perform the search with the updated domain
         if selected_sku:
+            # Search for kits first with the exact cabinet_sku and selected components
             configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
 
             # Check if a matching kit is found, and if it has a valid product_sku
             if configured_kit and configured_kit.product_sku:
                 configured_product = request.env['product.product'].sudo().search(
                     [('default_code', '=', configured_kit.product_sku)], limit=1
+                )
+
+            # If no kit is found, check the individual cabinet product
+            if not configured_kit:
+                # If no kit is found, return the product that matches the selected cabinet_sku directly
+                configured_product = request.env['product.product'].sudo().search(
+                    [('default_code', '=', selected_sku)], limit=1
                 )
 
         return request.render('product_configuration.template_product_configuration', {
