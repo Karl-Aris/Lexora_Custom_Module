@@ -35,23 +35,31 @@ class ProductKitsController(http.Controller):
             if original_color and original_color.lower() not in seen_colors:
                 distinct_colors.append(original_color)
                 seen_colors.add(original_color.lower())
+                
+        # Normalize selected color to lowercase (same as before)        
+        selected_color_normalized = selected_color.lower() if selected_color else None
 
-        # Filter by color if selected
+        # Filter kits by the normalized color
         if selected_color:
-            kits = kits.filtered(lambda k: k.color == selected_color)
+            kits = kits.filtered(lambda k: k.color and k.color.lower() == selected_color_normalized)
 
-        # Collect unique cabinet sizes/cards
+        # Collect unique cabinet sizes/cards, ensuring no case sensitivity issues
         seen_sizes = set()
         size_cards = []
+
         for kit in kits:
-            if kit.size not in seen_sizes:
-                seen_sizes.add(kit.size)
+            # Normalize the size (to avoid issues with case or extra spaces)
+            if kit.size and kit.size.strip().lower() not in seen_sizes:
+                seen_sizes.add(kit.size.strip().lower())
+                
                 product = request.env['product.product'].sudo().search([('default_code', '=', kit.cabinet_sku)], limit=1)
                 size_cards.append({
                     'size': kit.size,
                     'cabinet_sku': kit.cabinet_sku,
                     'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
                 })
+
+        # Sort the sizes
         size_cards.sort(key=lambda x: float(x['size']))
 
         # If cabinet_sku is selected, show options only for compatible kits
