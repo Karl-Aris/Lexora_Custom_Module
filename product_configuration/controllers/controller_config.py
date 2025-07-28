@@ -87,20 +87,47 @@ class ProductKitsController(http.Controller):
                     })
 
         # Step 5: Configure the selected kit if more than one component is selected
+        configured_kit = None
+        configured_product = None
+
+        # Start with a base domain (cabinet SKU)
         domain = [('cabinet_sku', '=', selected_sku)]
+
+        # Apply additional filters based on user selection
         if selected_countertop:
             domain.append(('counter_top_sku', '=', selected_countertop))
+        else:
+            # If counter_top_sku is not selected, set it to NULL for "cabinet only"
+            if selected_mirror is None and selected_faucet is None:
+                domain.append(('counter_top_sku', '=', None))
+
         if selected_mirror:
             domain.append(('mirror_sku', '=', selected_mirror))
+        else:
+            # If mirror_sku is not selected, set it to NULL
+            if selected_faucet is None:
+                domain.append(('mirror_sku', '=', None))
+
         if selected_faucet:
             domain.append(('faucet_sku', '=', selected_faucet))
+        else:
+            # If faucet_sku is not selected, set it to NULL
+            if selected_mirror is None:
+                domain.append(('faucet_sku', '=', None))
 
-        if selected_sku and (selected_countertop or selected_mirror or selected_faucet):
-            configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
-            if configured_kit and configured_kit.product_sku:
-                configured_product = request.env['product.product'].sudo().search(
-                    [('default_code', '=', configured_kit.product_sku)], limit=1
-                )
+        # Search for the configuration that matches the criteria
+        configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
+
+        if configured_kit and configured_kit.product_sku:
+            configured_product = request.env['product.product'].sudo().search(
+                [('default_code', '=', configured_kit.product_sku)], limit=1
+            )
+
+        # If no configuration was found, set a flag for no available combination
+        if not configured_kit:
+            no_combination = True
+        else:
+            no_combination = False
 
         # Step 6: Find related kits (same color and collection)
         related_kits = []
