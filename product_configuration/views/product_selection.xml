@@ -45,15 +45,15 @@
             t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
 
           <!-- Show configured product if a valid combination exists -->
-          <t t-if="configured_product">
-              <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                  alt="Configured Product"
-                  class="img-thumbnail"
-                  style="width: 100%; height: 500px; object-fit: contain;" />
-              <div class="mt-2 text-center">
-                  <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
-                  <small class="text-muted" t-esc="configured_product.default_code or ''" />
-              </div>
+          <t t-if="configured_product and configured_product.image_1920">
+            <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
+                alt="Configured Product"
+                class="img-thumbnail"
+                style="width: 100%; height: 500px; object-fit: contain;" />
+            <div class="mt-2 text-center">
+              <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
+              <small class="text-muted" t-esc="configured_product.default_code or ''" />
+            </div>
           </t>
 
           <!-- If no combination, show fallback cabinet image -->
