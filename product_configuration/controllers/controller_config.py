@@ -20,15 +20,17 @@ class ProductKitsController(http.Controller):
         unique_collections = sorted(set(collections))
 
         kits = request.env['product.kits'].sudo().search([])
+
+        # If a collection is selected, filter kits by the selected collection
         if selected_collection:
             kits = kits.filtered(lambda k: k.collection == selected_collection)
 
-        # Get colors from kits under selected collection
-        colors = sorted(set(kit.color for kit in kits if kit.color))
+        # Collect unique colors from kits under the selected collection (case insensitive)
+        colors = sorted(set(kit.color.strip().lower() for kit in kits if kit.color))
 
-        # Filter by color if selected
+        # If color is selected, filter kits by the selected color
         if selected_color:
-            kits = kits.filtered(lambda k: k.color == selected_color)
+            kits = kits.filtered(lambda k: k.color.strip().lower() == selected_color.lower())
 
         # Collect unique cabinet sizes/cards
         seen_sizes = set()
