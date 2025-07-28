@@ -5,6 +5,12 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
 
+            <!-- Add hidden fields so 'invisible' modifiers work -->
+            <xpath expr="//form" position="inside">
+                <field name="show_create_vendor_bill" invisible="1"/>
+                <field name="show_vendor_bill_button" invisible="1"/>
+            </xpath>
+
             <!-- Create Vendor Bill button -->
             <xpath expr="//header" position="inside">
                 <button name="action_create_vendor_bill"
