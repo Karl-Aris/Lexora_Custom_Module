@@ -1,42 +1,26 @@
-from odoo import models, fields, _
-from odoo.exceptions import UserError
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    purchase_order = fields.Char(string="PO Number")  # Ensure this is present on SO as well
+    x_vendor_bill_count = fields.Integer(string="Vendor Bill Count", compute='_compute_vendor_bill_count')
+
+    def _compute_vendor_bill_count(self):
+        for order in self:
+            # Change the domain if you track vendor bills another way
+            bills = self.env['account.move'].search([
+                ('invoice_origin', '=', order.name),
+                ('move_type', '=', 'in_invoice')  # Vendor Bills only
+            ])
+            order.x_vendor_bill_count = len(bills)
 
     def action_create_vendor_bill(self):
-        self.ensure_one()
-
-        # Pick a random expense account just for demonstration
-        expense_account = self.env['account.account'].search([
-            ('user_type.internal_group', '=', 'expense')
-        ], limit=1)
-
-
-        if not expense_account:
-            raise UserError(_("No expense account found to create invoice line."))
-
-        bill = self.env['account.move'].create({
-            'partner_id': self.partner_id.id,
-            'move_type': 'in_invoice',
-            'invoice_date': fields.Date.today(),
-            'invoice_origin': self.name,
-            'purchase_order': self.purchase_order,
-            'invoice_line_ids': [(0, 0, {
-                'name': 'Auto-generated from Sales Order %s' % self.name,
-                'quantity': 1,
-                'price_unit': self.amount_total,
-                'account_id': expense_account.id,
-            })],
-        })
-
-        return {
-            'name': 'Vendor Bill',
-            'view_mode': 'form',
-            'res_model': 'account.move',
-            'res_id': bill.id,
-            'type': 'ir.actions.act_window',
-            'target': 'current',
+        # Sample logic: redirect to bill creation window
+        action = self.env.ref('account.action_move_in_invoice_type').read()[0]
+        action['context'] = {
+            'default_invoice_origin': self.name,
+            'default_move_type': 'in_invoice',  # Vendor Bill
+            'default_partner_id': self.partner_id.id,
+            'default_invoice_date': fields.Date.context_today(self),
         }
+        return action
