@@ -1,22 +1,20 @@
 <odoo>
-    <record id="view_sale_order_form_inherit_vendor_bill_smart_button" model="ir.ui.view">
-        <field name="name">sale.order.form.vendor.bill.smart.button</field>
+    <record id="view_sale_order_form_inherit_vendor_bill_field" model="ir.ui.view">
+        <field name="name">sale.order.form.vendor.bill.field</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Insert next to existing invoice button -->
-            <xpath expr="//div[@class='oe_button_box']" position="inside">
-                <button name="action_view_vendor_bills"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-file-invoice-dollar"
-                        attrs="{'invisible': [('vendor_bill_count', '=', 0)]}">
-                    <div class="o_stat_info">
-                        <field name="vendor_bill_count" widget="statinfo"/>
-                        <span class="o_stat_text">Vendor Bills</span>
-                    </div>
-                </button>
+            <!-- Add the vendor bill field in the form -->
+            <xpath expr="//sheet//group" position="inside">
+                <field name="vendor_bill_id"
+                       domain="[('move_type', '=', 'in_invoice')]"
+                       context="{'default_move_type': 'in_invoice'}"
+                       options="{'no_create_edit': True}"
+                       string="Linked Vendor Bill"/>
             </xpath>
+
+            <!-- Optional: remove the old button if it exists -->
+            <xpath expr="//header/button[@name='action_create_vendor_bill']" position="replace"/>
         </field>
     </record>
 </odoo>
