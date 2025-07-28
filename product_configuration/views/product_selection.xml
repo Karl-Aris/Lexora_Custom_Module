@@ -17,16 +17,16 @@
         </div>
 
         <!-- Color Badges -->
-        <t t-if="colors">
+        <t t-if="color_groups">
           <div class="mb-4">
             <strong>Colors:</strong>
-            <t t-foreach="colors" t-as="color">
+            <t t-foreach="color_groups" t-as="color">
               <a t-att-href="'/store?collection=%s%s' % (
                       selected_collection,
                       '&amp;color=' + color if selected_color != color else ''
                     )"
-                 t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
-                 style="cursor:pointer;">
+                t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
+                style="cursor:pointer;">
                 <t t-esc="color"/>
               </a>
             </t>
