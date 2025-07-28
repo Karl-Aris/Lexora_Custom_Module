@@ -90,32 +90,40 @@ class ProductKitsController(http.Controller):
         configured_kit = None
         configured_product = None
 
-        # Start with a base domain to match the cabinet SKU
+        # Start with a base domain (cabinet SKU)
         domain = [('cabinet_sku', '=', selected_sku)]
 
-        # Apply additional filters only if the components are selected
+        # Apply additional filters based on user selection
         if selected_countertop:
-            # If counter_top_sku is selected, make sure it's part of the domain
             domain.append(('counter_top_sku', '=', selected_countertop))
+        else:
+            # If counter_top_sku is not selected, set it to NULL for "cabinet only"
+            if selected_mirror is None and selected_faucet is None:
+                domain.append(('counter_top_sku', '=', None))
 
         if selected_mirror:
-            # If mirror_sku is selected, make sure it's part of the domain
             domain.append(('mirror_sku', '=', selected_mirror))
+        else:
+            # If mirror_sku is not selected, set it to NULL
+            if selected_faucet is None:
+                domain.append(('mirror_sku', '=', None))
 
         if selected_faucet:
-            # If faucet_sku is selected, make sure it's part of the domain
             domain.append(('faucet_sku', '=', selected_faucet))
+        else:
+            # If faucet_sku is not selected, set it to NULL
+            if selected_mirror is None:
+                domain.append(('faucet_sku', '=', None))
 
         # Search for the configuration that matches the criteria
         configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
 
-        # If a configuration is found, retrieve the corresponding product
         if configured_kit and configured_kit.product_sku:
             configured_product = request.env['product.product'].sudo().search(
                 [('default_code', '=', configured_kit.product_sku)], limit=1
             )
 
-        # If no configuration was found, flag the result
+        # If no configuration was found, set a flag for no available combination
         if not configured_kit:
             no_combination = True
         else:
@@ -174,5 +182,5 @@ class ProductKitsController(http.Controller):
             'configured_kit': configured_kit,
             'related_kits': related_kits,
             'product_specs': product_specs,  # Pass product specs to the template
-            'no_combination': no_combination,
+            'no_combination': no_combination
         })
