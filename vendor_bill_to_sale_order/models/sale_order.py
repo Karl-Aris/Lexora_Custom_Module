@@ -1,27 +1,24 @@
-from odoo import models, fields, api
+# models/sale_order.py
+from odoo import models, fields
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    vendor_bill_ids = fields.One2many('account.move', 'sale_order_id', string="Vendor Bills", domain=[('move_type', '=', 'in_invoice')])
-    vendor_bill_count = fields.Integer(string='Vendor Bill Count', compute='_compute_vendor_bill_count')
+    x_vendor_bill_ids = fields.Many2many('account.move', string="Vendor Bills")
+    x_vendor_bill_count = fields.Integer(string='Vendor Bill Count', compute='_compute_vendor_bill_count')
 
-    @api.depends('vendor_bill_ids')
     def _compute_vendor_bill_count(self):
         for order in self:
-            order.vendor_bill_count = len(order.vendor_bill_ids)
+            order.x_vendor_bill_count = len(order.x_vendor_bill_ids)
 
-    def action_open_vendor_bill_wizard(self):
-        self.ensure_one()
+    def action_create_vendor_bill(self):
         return {
             'name': 'Create Vendor Bill',
             'type': 'ir.actions.act_window',
-            'res_model': 'create.vendor.bill.wizard',
+            'res_model': 'vendor.bill.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {
                 'default_sale_order_id': self.id,
-                'default_purchase_reference': self.client_order_ref,
-                'default_partner_id': self.partner_id.id,
-            },
+            }
         }
