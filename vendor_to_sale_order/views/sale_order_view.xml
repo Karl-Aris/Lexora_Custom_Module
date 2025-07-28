@@ -5,23 +5,23 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
 
-            <!-- Create Vendor Bill button: visible only in 'sale' state -->
+            <!-- Create Vendor Bill button -->
             <xpath expr="//header" position="inside">
                 <button name="action_create_vendor_bill"
                         type="object"
                         string="Create Vendor Bill"
                         class="btn-primary"
-                        attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                        invisible="not show_create_vendor_bill"/>
             </xpath>
 
-            <!-- Smart button area: only shows if vendor_bill_count > 0 -->
+            <!-- Smart button area -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">
                 <button type="action"
                         name="%(action_vendor_bills_by_sale_order)d"
                         string="Vendor Bills"
                         icon="fa-file-invoice"
                         context="{'default_sale_order_id': active_id}"
-                        attrs="{'invisible': [('vendor_bill_count', '=', 0)]}"/>
+                        invisible="not show_vendor_bill_button"/>
                 <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
             </xpath>
 
