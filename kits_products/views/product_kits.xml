@@ -97,14 +97,17 @@
                                                 <div class="card h-100 border-0 shadow-sm">
                                                     <a
                                                         t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (rel_kit.collection or '', rel_kit.size or '')">
-                                                        <img
-                                                            t-att-src="'/web/image/product.product/' + str(rel_kit.product_id.id) + '/image_1920'"
-                                                            class="img-fluid rounded"
-                                                            style="max-height: 100px; object-fit: cover;"
-                                                            alt="Related Product Image" />
-
+                                                        <div
+                                                            class="d-flex justify-content-center align-items-center"
+                                                            style="height: 120px;">
+                                                            <img
+                                                                t-att-src="'/web/image/product.product/' + str(rel_kit.product_id.id) + '/image_1920'"
+                                                                class="img-fluid rounded"
+                                                                style="max-height: 100px; object-fit: cover;"
+                                                                alt="Related Product Image"
+                                                            />
+                                                        </div>
                                                     </a>
-
 
                                                     <div class="card-body p-2 text-center">
                                                         <h6 class="mb-1">
@@ -116,6 +119,7 @@
                                                         </h6>
                                                     </div>
                                                 </div>
+
                                             </div>
                                         </t>
                                     </t>
