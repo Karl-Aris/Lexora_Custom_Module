@@ -12,12 +12,9 @@
                         type="object"
                         string="View Sales Orders"
                         class="btn-secondary"
-                        visible="purchase_order"
-                    />
-
+                        attrs="{'invisible': [('purchase_order', '=', False)]}"/>
                 </group>
             </xpath>
-
         </field>
     </record>
 </odoo>
