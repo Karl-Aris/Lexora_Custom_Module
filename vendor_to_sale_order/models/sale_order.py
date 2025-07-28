@@ -14,31 +14,26 @@ class SaleOrder(models.Model):
     )
 
     def _compute_vendor_bill_count(self):
-        for rec in self:
-            count = 0
-            label = "❌ No Vendor Bill Found"
-            if rec.purchase_order:
-                count = self.env['account.move'].search_count([
-                    ('move_type', '=', 'in_invoice'),
-                    ('ref', '=', rec.purchase_order.strip())
-                ])
-                if count > 0:
-                    label = _("View Vendor Bills (%s)") % count
-            rec.vendor_bill_count = count
-            rec.vendor_bill_button_label = label
+        for order in self:
+            count = self.env['account.move'].search_count([
+                ('move_type', '=', 'in_invoice'),
+                ('invoice_origin', '=', order.purchase_order)
+            ])
+            label = _("Vendor Bills (%s)") % count if count else _("❌ No Vendor Bill Found")
+            order.vendor_bill_count = count
+            order.vendor_bill_button_label = label
 
     def action_open_vendor_bills(self):
         self.ensure_one()
         if not self.purchase_order:
-            raise UserError(_("No PO Number on this Sales Order."))
+            raise UserError(_("No PO Number set for this Sales Order."))
 
         bills = self.env['account.move'].search([
             ('move_type', '=', 'in_invoice'),
-            ('ref', '=', self.purchase_order.strip())
+            ('invoice_origin', '=', self.purchase_order)
         ])
-
         if not bills:
-            raise UserError(_("No Vendor Bills found for PO: %s") % self.purchase_order.strip())
+            raise UserError(_("No Vendor Bills found for PO: %s") % self.purchase_order)
 
         action = {
             'type': 'ir.actions.act_window',
@@ -48,8 +43,6 @@ class SaleOrder(models.Model):
             'domain': [('id', 'in', bills.ids)],
         }
         if len(bills) == 1:
-            action.update({
-                'view_mode': 'form',
-                'res_id': bills.id
-            })
+            action['view_mode'] = 'form'
+            action['res_id'] = bills.id
         return action
