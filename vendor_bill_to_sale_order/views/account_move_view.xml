@@ -12,8 +12,7 @@
                         name="action_open_sale_order"
                         type="object"
                         string="View Sales Orders"
-                        class="btn-secondary"
-                        attrs="{'invisible': [('purchase_order', '=', False)]}"/>
+                        class="btn-secondary"/>
                 </group>
             </xpath>
         </field>
