@@ -1,6 +1,6 @@
 <odoo>
   <record id="view_sale_order_form_vendor_bill_button" model="ir.ui.view">
-    <field name="name">sale.order.form.vendor.bill.button</field>
+    <field name="name">sale.order.form.inherit.vendor.bill.statbutton</field>
     <field name="model">sale.order</field>
     <field name="inherit_id" ref="sale.view_order_form"/>
     <field name="arch" type="xml">
@@ -8,8 +8,7 @@
         <button name="action_open_vendor_bills"
                 type="object"
                 icon="fa-file-invoice"
-                class="oe_stat_button"
-                attrs="{'invisible': [('vendor_bill_count', '=', 0)]}">
+                class="oe_stat_button">
           <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
         </button>
       </xpath>
