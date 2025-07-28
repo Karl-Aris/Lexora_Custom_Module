@@ -90,12 +90,14 @@ class ProductKitsController(http.Controller):
             domain.append(('faucet_sku', '=', selected_faucet))
 
         # Perform the search with the updated domain
-        if selected_sku and (selected_countertop or selected_mirror or selected_faucet):
-            configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
-            if configured_kit and configured_kit.product_sku:
-                configured_product = request.env['product.product'].sudo().search(
-                    [('default_code', '=', configured_kit.product_sku)], limit=1
-                )
+        # Now search for the configured kit based on the constructed domain
+        configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
+
+        # If a matching kit is found, retrieve the corresponding product
+        if configured_kit and configured_kit.product_sku:
+            configured_product = request.env['product.product'].sudo().search(
+                [('default_code', '=', configured_kit.product_sku)], limit=1
+            )
 
         return request.render('product_configuration.template_product_configuration', {
             'collections': unique_collections,
