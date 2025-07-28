@@ -31,16 +31,20 @@ class ProductKitsController(http.Controller):
         collection = kwargs.get('collection')
         size = kwargs.get('size')
 
-        # Domain for product.template based on Specifications (not tags)
-        domain = [('x_product_type', '=', 'Bathroom Vanity')]  # Always filter on Product Type
+        # ✅ Search product.template.attribute.value with name = 'Bathroom Vanity'
+        attribute_value = request.env['product.template.attribute.value'].sudo().search([
+            ('name', '=', 'Bathroom Vanity')
+        ], limit=1)
 
+        product_templates = request.env['product.template'].sudo().search([
+            ('attribute_line_ids.value_ids', 'in', attribute_value.ids)
+        ])
+
+        # Additional optional filters on custom fields
         if collection:
-            domain.append(('x_collection', '=', collection))
+            product_templates = product_templates.filtered(lambda p: p.x_collection == collection)
         if size:
-            domain.append(('x_size', '=', size))
-
-        # Get matching templates
-        product_templates = request.env['product.template'].sudo().search(domain)
+            product_templates = product_templates.filtered(lambda p: p.x_size == size)
 
         # Get product variants from the matching templates
         products = request.env['product.product'].sudo().search([
