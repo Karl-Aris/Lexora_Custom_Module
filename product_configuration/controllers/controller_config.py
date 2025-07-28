@@ -82,7 +82,7 @@ class ProductKitsController(http.Controller):
         # Start with the base domain using the cabinet_sku
         domain = [('cabinet_sku', '=', selected_sku)]
 
-        # Check the conditions based on the selected components
+        # Add components to the domain only if they are selected
         if selected_countertop and not selected_mirror and not selected_faucet:
             # Show cabinet + countertop only
             domain.append(('counter_top_sku', '=', selected_countertop))
@@ -103,12 +103,7 @@ class ProductKitsController(http.Controller):
             domain.append(('mirror_sku', '=', selected_mirror))
             domain.append(('faucet_sku', '=', selected_faucet))
 
-        # If only cabinet_sku is selected, don't add any other components (countertop, mirror, faucet)
-        elif selected_sku and not selected_countertop and not selected_mirror and not selected_faucet:
-            # Just the cabinet product
-            pass
-
-        # Perform the search with the updated domain
+        # Now we perform the search with the updated domain
         if selected_sku:
             # Search for kits first with the exact cabinet_sku and selected components
             configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
