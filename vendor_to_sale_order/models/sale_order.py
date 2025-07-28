@@ -5,7 +5,6 @@ class SaleOrder(models.Model):
 
     vendor_bill_count = fields.Integer(string="Vendor Bill Count", compute="_compute_vendor_bill_count")
 
-    @api.depends('id')
     def _compute_vendor_bill_count(self):
         for order in self:
             count = self.env['account.move'].search_count([
@@ -13,6 +12,7 @@ class SaleOrder(models.Model):
                 ('move_type', '=', 'in_invoice')
             ])
             order.vendor_bill_count = count
+
 
     def action_view_vendor_bills(self):
         self.ensure_one()
