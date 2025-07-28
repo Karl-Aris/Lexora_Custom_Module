@@ -7,7 +7,7 @@
             <xpath expr="//sheet" position="inside">
                 <group string="Sale Order Info">
                     <field name="sale_order_id" readonly="1"/>
-                    <field name="x_po_vb_id" readonly="1"/>
+                    <field name="x_po_vb_id"/>
                 </group>
             </xpath>
         </field>
