@@ -22,7 +22,7 @@
             <div class="btn-group" role="group">
               <t t-foreach="colors" t-as="color">
                 <button type="button" class="btn btn-outline-secondary" 
-                        onclick="updateURL('color', '<t t-esc="color"/>')">
+                        onclick="updateURL('color', '<t t-esc='color'/>')">
                   <t t-esc="color"/>
                 </button>
               </t>
@@ -38,7 +38,7 @@
               <t t-foreach="size_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          onclick="updateURL('cabinet_sku', '<t t-esc="card['cabinet_sku']"/>')">
+                          onclick="updateURL('cabinet_sku', '<t t-esc='card['cabinet_sku']'/>')">
                     <t t-if="card['image']">
                       <img t-att-src="'data:image/png;base64,%s' % card['image']" class="img-fluid" style="height: 80px; object-fit: cover;" alt="Product Image"/>
                     </t>
@@ -63,7 +63,7 @@
               <t t-foreach="counter_top_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          onclick="updateURL('counter_top_sku', '<t t-esc="card['counter_top_sku']"/>')">
+                          onclick="updateURL('counter_top_sku', '<t t-esc='card['counter_top_sku']'/>')">
                     <strong><t t-esc="card['counter_top']"/></strong><br/>
                     <small><t t-esc="card['counter_top_sku']"/></small>
                   </button>
@@ -81,7 +81,7 @@
               <t t-foreach="mirror_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          onclick="updateURL('mirror_sku', '<t t-esc="card['mirror_sku']"/>')">
+                          onclick="updateURL('mirror_sku', '<t t-esc='card['mirror_sku']'/>')">
                     <strong><t t-esc="card['mirror']"/></strong><br/>
                     <small><t t-esc="card['mirror_sku']"/></small>
                   </button>
@@ -99,7 +99,7 @@
               <t t-foreach="faucet_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          onclick="updateURL('faucet_sku', '<t t-esc="card['faucet_sku']"/>')">
+                          onclick="updateURL('faucet_sku', '<t t-esc='card['faucet_sku']'/>')">
                     <strong><t t-esc="card['faucet']"/></strong><br/>
                     <small><t t-esc="card['faucet_sku']"/></small>
                   </button>
@@ -116,9 +116,12 @@
         function updateURL(param, value) {
           const urlParams = new URLSearchParams(window.location.search);
 
+          // Ensure special characters are safely encoded
+          const encodedValue = encodeURIComponent(value);
+
           // Set the parameter with the new value or remove it if empty
-          if (value) {
-            urlParams.set(param, encodeURIComponent(value));  // Ensure encoding
+          if (encodedValue) {
+            urlParams.set(param, encodedValue);  // Ensure encoding
           } else {
             urlParams.delete(param);
           }
