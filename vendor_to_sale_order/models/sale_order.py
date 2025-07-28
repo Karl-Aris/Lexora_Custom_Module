@@ -1,7 +1,8 @@
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     vendor_bill_count = fields.Integer(
         string="Vendor Bill Count",
@@ -13,27 +14,27 @@ class SaleOrder(models.Model):
     )
 
     def _compute_vendor_bill_count(self):
-        for order in self:
+        for rec in self:
             count = 0
-            label = "❌ No Vendor Bills Found"
-            if order.purchase_order:
+            label = "❌ No Vendor Bill Found"
+            if rec.purchase_order:
                 count = self.env['account.move'].search_count([
                     ('move_type', '=', 'in_invoice'),
-                    ('invoice_origin', '=', order.purchase_order.strip())
+                    ('ref', '=', rec.purchase_order.strip())
                 ])
                 if count > 0:
                     label = _("View Vendor Bills (%s)") % count
-            order.vendor_bill_count = count
-            order.vendor_bill_button_label = label
+            rec.vendor_bill_count = count
+            rec.vendor_bill_button_label = label
 
     def action_open_vendor_bills(self):
         self.ensure_one()
         if not self.purchase_order:
-            raise UserError(_("This Sales Order has no Purchase Order number."))
+            raise UserError(_("No PO Number on this Sales Order."))
 
         bills = self.env['account.move'].search([
             ('move_type', '=', 'in_invoice'),
-            ('invoice_origin', '=', self.purchase_order.strip())
+            ('ref', '=', self.purchase_order.strip())
         ])
 
         if not bills:
