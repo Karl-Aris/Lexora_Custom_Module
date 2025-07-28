@@ -1,31 +1,19 @@
-from odoo import models, fields, api
+from odoo import models, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    vendor_bill_id = fields.Many2one(
-        'account.move',
-        string="Linked Vendor Bill",
-        domain="[('move_type', '=', 'in_invoice')]"
-    )
-
-    vendor_bill_count = fields.Integer(string="Vendor Bill Count", compute="_compute_vendor_bill_count")
-
-    def _compute_vendor_bill_count(self):
-        for order in self:
-            count = self.env['account.move'].search_count([
-                ('sale_order_id', '=', order.id),
-                ('move_type', '=', 'in_invoice')
-            ])
-            order.vendor_bill_count = count
-
-    def action_view_vendor_bills(self):
+    def action_create_vendor_bill(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Vendor Bills',
+            'name': 'Create Vendor Bill',
             'res_model': 'account.move',
-            'view_mode': 'tree,form',
-            'domain': [('sale_order_id', '=', self.id), ('move_type', '=', 'in_invoice')],
-            'context': {'default_sale_order_id': self.id},
+            'view_mode': 'form',
+            'context': {
+                'default_move_type': 'in_invoice',
+                'default_invoice_origin': self.name,
+                'default_sale_order_id': self.id,
+            },
+            'target': 'current',
         }
