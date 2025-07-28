@@ -1,6 +1,22 @@
 <odoo>
-    <record id="view_sale_order_form_inherit_vendor_bills" model="ir.ui.view">
-        <field name="name">sale.order.form.vendor.bills.smart.button</field>
+    <!-- Button in header to create Vendor Bill -->
+    <record id="view_sale_order_form_inherit_vendor_bill_button" model="ir.ui.view">
+        <field name="name">sale.order.form.create.vendor.bill.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_create_vendor_bill"
+                        type="object"
+                        string="Create Vendor Bill"
+                        class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Smart button for Vendor Bills -->
+    <record id="view_sale_order_form_inherit_vendor_bill_smart_button" model="ir.ui.view">
+        <field name="name">sale.order.form.vendor.bill.smart.button</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
