@@ -1,28 +1,100 @@
 <odoo>
 
-    <!-- Kits List -->
-    <!-- Kits List -->
     <template id="kits_list_template" name="Kits List">
         <t t-call="website.layout">
             <div class="container mt-4 mb-4">
                 <h1>Product Kits</h1>
 
-                <t t-if="grouped_kits">
-                    <ul class="list-unstyled">
-                        <t t-foreach="grouped_kits.items()" t-as="item">
-                            <t t-set="group_key" t-value="item[0]" />
-                            <t t-set="kits" t-value="item[1]" />
-                            <li>
-                                <a
-                                    t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (group_key[0] or '', group_key[1] or '')">
-                                    <strong>
-                                        <t t-esc="group_key[0] or 'No Collection'" />
-                                    </strong>
-                                    / <t t-esc="group_key[1] or 'No Size'" /> (<t t-esc="len(kits)" />
-                                    items) </a>
-                            </li>
+                <!-- 🔎 Filters -->
+                <form method="get" class="mb-4 d-flex flex-wrap gap-2 align-items-center">
+
+    <!-- Collection -->
+    <select name="collection" class="form-control w-auto">
+        <option value="">All Collections</option>
+        <t t-foreach="collections" t-as="coll">
+            <option t-att-value="coll" t-att-selected="collection == coll">
+                <t t-esc="coll" />
+            </option>
+        </t>
+    </select>
+
+    <!-- Size -->
+    <select name="size" class="form-control w-auto">
+        <option value="">All Sizes</option>
+        <t t-foreach="sizes" t-as="sz">
+            <option t-att-value="sz" t-att-selected="size == sz">
+                <t t-esc="sz" />
+            </option>
+        </t>
+    </select>
+
+    <!-- Color -->
+    <select name="color" class="form-control w-auto">
+        <option value="">All Colors</option>
+        <t t-foreach="colors" t-as="clr">
+            <option t-att-value="clr" t-att-selected="color == clr">
+                <t t-esc="clr" />
+            </option>
+        </t>
+    </select>
+
+    <!-- Sort -->
+    <select name="sort" class="form-control w-auto">
+        <option value="">Sort By</option>
+        <option value="collection" t-att-selected="sort == 'collection'">Collection</option>
+        <option value="size" t-att-selected="sort == 'size'">Size</option>
+        <option value="color" t-att-selected="sort == 'color'">Color</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+
+                <!-- 🧱 Kits Grid -->
+                <t t-if="paged_kits">
+                    <div class="row">
+                        <t t-foreach="paged_kits" t-as="kit">
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 p-2 border">
+                                    <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')">
+                                        <img t-if="kit.image_1920" t-att-src="'data:image/png;base64,%s' % kit.image_1920.decode('utf-8') if isinstance(kit.image_1920, bytes) else kit.image_1920" class="card-img-top mb-2" alt="Kit Image"/>
+                                    </a>
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')">
+                                                <t t-esc="kit.collection or 'N/A'" />
+                                            </a>
+                                        </h5>
+                                        <p class="card-text">
+                                            <strong>Size:</strong>
+                                            <t t-esc="kit.size or 'N/A'" />
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </t>
-                    </ul>
+                    </div>
+
+                    <!-- 📄 Pagination Controls -->
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item" t-if="page > 1">
+                                <!-- Previous Button -->
+                                <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;sort=%s' % (page - 1, collection or '', size or '', sort or '')">
+    Previous
+                                </a>
+
+
+
+                            </li>
+                            <li class="page-item" t-if="has_next">
+                                <!-- Next Button -->
+                                <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;sort=%s' % (page + 1, collection or '', size or '', sort or '')">
+    Next
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </t>
                 <t t-else="">
                     <p>
@@ -34,62 +106,60 @@
     </template>
 
 
-<template id="all_products_template" name="All Products">
-    <t t-call="website.layout">
-        <div class="container mt-4 mb-4">
-            <h1>All Products</h1>
+    <template id="all_products_template" name="All Products">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-4">
+                <h1>All Products</h1>
 
-            <t t-if="products">
-                <div class="row">
-                    <t t-foreach="products" t-as="product">
-                        <div class="col-lg-4 col-md-6 mb-3">
-                            <div class="card p-2 border h-100">
+                <t t-if="products">
+                    <div class="row">
+                        <t t-foreach="products" t-as="product">
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="card p-2 border h-100">
 
-                                <!-- ✅ Optimized Image via Odoo route -->
-                                <img t-att-src="'/web/image/product.template/%s/image_1920' % product.product_tmpl_id.id"
-                                     class="card-img-top mb-2"
-                                     alt="Product Image"/>
+                                    <!-- ✅ Optimized Image via Odoo route -->
+                                    <img t-att-src="'/web/image/product.template/%s/image_1920' % product.product_tmpl_id.id" class="card-img-top mb-2" alt="Product Image"/>
 
-                                <h4>
-                                    <t t-esc="product.name" />
-                                </h4>
-                                <p>
-                                    <t t-esc="product.default_code or 'No Code'" />
-                                </p>
-                                <p>
-                                    <strong>Price:</strong>
-                                    <t t-esc="product.list_price or 'N/A'" />
-                                </p>
-                                <p>
-                                    <strong>ID:</strong>
-                                    <t t-esc="product.id" />
-                                </p>
+                                    <h4>
+                                        <t t-esc="product.name" />
+                                    </h4>
+                                    <p>
+                                        <t t-esc="product.default_code or 'No Code'" />
+                                    </p>
+                                    <p>
+                                        <strong>Price:</strong>
+                                        <t t-esc="product.list_price or 'N/A'" />
+                                    </p>
+                                    <p>
+                                        <strong>ID:</strong>
+                                        <t t-esc="product.id" />
+                                    </p>
 
-                                <!-- ✅ Specifications -->
-                                <p>
-                                    <strong>Product Type:</strong>
-                                    <t t-esc="product.product_tmpl_id.x_product_type or 'N/A'" />
-                                </p>
-                                <p>
-                                    <strong>Collection:</strong>
-                                    <t t-esc="product.product_tmpl_id.x_collection or 'N/A'" />
-                                </p>
-                                <p>
-                                    <strong>Size:</strong>
-                                    <t t-esc="product.product_tmpl_id.x_size or 'N/A'" />
-                                </p>
+                                    <!-- ✅ Specifications -->
+                                    <p>
+                                        <strong>Product Type:</strong>
+                                        <t t-esc="product.product_tmpl_id.x_product_type or 'N/A'" />
+                                    </p>
+                                    <p>
+                                        <strong>Collection:</strong>
+                                        <t t-esc="product.product_tmpl_id.x_collection or 'N/A'" />
+                                    </p>
+                                    <p>
+                                        <strong>Size:</strong>
+                                        <t t-esc="product.product_tmpl_id.x_size or 'N/A'" />
+                                    </p>
 
+                                </div>
                             </div>
-                        </div>
-                    </t>
-                </div>
-            </t>
-            <t t-else="">
-                <p>No products found.</p>
-            </t>
-        </div>
-    </t>
-</template>
+                        </t>
+                    </div>
+                </t>
+                <t t-else="">
+                    <p>No products found.</p>
+                </t>
+            </div>
+        </t>
+    </template>
 
 
 

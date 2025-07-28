@@ -15,17 +15,67 @@ class ProductKitsController(http.Controller):
 
     @http.route(['/product_kits'], type='http', auth="public", website=True)
     def list_kits(self, **kwargs):
-        """List all kits grouped by collection and size."""
-        kits = request.env['product.kits'].sudo().search([])
+        collection_filter = kwargs.get('collection', '').strip()
+        size_filter = kwargs.get('size', '').strip()
+        color_filter = kwargs.get('color', '').strip()
+        sort_key = kwargs.get('sort')
+        page = int(kwargs.get('page', 1))
+        per_page = 6
 
-        grouped_kits = defaultdict(list)
+        domain = []
+        if collection_filter:
+            domain.append(('collection.name', '=', collection_filter))
+        if size_filter:
+            domain.append(('size.name', '=', size_filter))
+        if color_filter:
+            domain.append(('color.name', '=', color_filter))
+
+        kits_model = request.env['product.kits'].sudo()
+        kits = kits_model.search(domain)
+
+        # 🔍 Distinct dropdown values (using .name if Many2one)
+        all_kits = kits_model.search([])
+        distinct_collections = sorted(set(k.collection.name for k in all_kits if k.collection))
+        distinct_sizes = sorted(set(k.size.name for k in all_kits if k.size))
+        distinct_colors = sorted(set(k.color.name for k in all_kits if k.color))
+
+        # 🧱 Group kits
+        from collections import defaultdict
+        grouped = defaultdict(list)
         for kit in kits:
             key = (kit.collection, kit.size)
-            grouped_kits[key].append(kit)
+            grouped[key].append(kit)
+
+        unique_kits = [kits[0] for kits in grouped.values()]
+
+        # 🔃 Sorting
+        if sort_key == 'collection':
+            unique_kits.sort(key=lambda k: k.collection.name if k.collection else '')
+        elif sort_key == 'size':
+            unique_kits.sort(key=lambda k: k.size.name if k.size else '')
+        elif sort_key == 'color':
+            unique_kits.sort(key=lambda k: k.color.name if k.color else '')
+
+        # 📄 Pagination
+        start = (page - 1) * per_page
+        end = start + per_page
+        paged_kits = unique_kits[start:end]
+        has_next = end < len(unique_kits)
 
         return request.render('kits_products.kits_list_template', {
-            'grouped_kits': dict(grouped_kits),
+            'paged_kits': paged_kits,
+            'page': page,
+            'has_next': has_next,
+            'collection': collection_filter,
+            'size': size_filter,
+            'color': color_filter,
+            'sort': sort_key,
+            'collections': distinct_collections,
+            'sizes': distinct_sizes,
+            'colors': distinct_colors,
         })
+
+
     @http.route(['/all_products'], type='http', auth="public", website=True)
     def list_all_products(self, **kwargs):
         collection = kwargs.get('collection')
