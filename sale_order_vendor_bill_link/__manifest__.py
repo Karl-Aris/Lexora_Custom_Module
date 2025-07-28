@@ -3,7 +3,7 @@
     "version": "1.0",
     "category": "Accounting",
     "summary": "Allows linking Vendor Bills to Sale Orders",
-    "author": "ChatGPT",
+    "author": "Karl Areglado",
     "depends": ["account", "sale", "base"],
     "data": [
         "views/sale_order_view.xml",
