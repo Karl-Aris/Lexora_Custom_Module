@@ -7,11 +7,10 @@ class SaleOrder(models.Model):
 
     def _compute_vendor_bill_count(self):
         for order in self:
-            count = self.env['account.move'].search_count([
+            order.vendor_bill_count = self.env['account.move'].search_count([
                 ('sale_order_id', '=', order.id),
                 ('move_type', '=', 'in_invoice')
             ])
-            order.vendor_bill_count = count
 
     def action_view_vendor_bills(self):
         self.ensure_one()
