@@ -11,8 +11,9 @@ class SaleOrder(models.Model):
 
         # Pick a random expense account just for demonstration
         expense_account = self.env['account.account'].search([
-            ('user_type_id.type', '=', 'expense')
+            ('account_type.internal_group', '=', 'expense')
         ], limit=1)
+
 
         if not expense_account:
             raise UserError(_("No expense account found to create invoice line."))
