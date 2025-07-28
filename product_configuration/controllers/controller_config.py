@@ -90,21 +90,10 @@ class ProductKitsController(http.Controller):
 
         # Start with a base domain (cabinet SKU)
         domain = [('cabinet_sku', '=', selected_sku)]
+        domain = [('counter_top_sku', '=', selected_countertop)]
+        domain = [('mirror_sku', '=', selected_mirror)]
+        domain = [('faucet_sku', '=', selected_faucet)]
 
-        if selected_countertop:
-            domain.append(('counter_top_sku', '=', selected_countertop))
-            if selected_mirror and selected_faucet is None:
-                domain.append(('mirror_sku', '=', selected_mirror))
-                domain.append(('faucet_sku', '=', None))
-            elif selected_mirror is None and selected_faucet:
-                domain.append(('mirror_sku', '=', None))
-                domain.append(('faucet_sku', '=', selected_faucet))
-            elif selected_mirror and selected_faucet:
-                domain.append(('mirror_sku', '=', selected_mirror))
-                domain.append(('faucet_sku', '=', selected_faucet))     
-            else:
-                domain.append(('mirror_sku', '=', None))
-                domain.append(('faucet_sku', '=', None))
 
         # Search for the configuration that matches the criteria
         configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
