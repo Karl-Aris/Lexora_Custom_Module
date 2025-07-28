@@ -1,5 +1,6 @@
 from odoo import http
 from odoo.http import request
+from odoo.exceptions import UserError
 
 class ProductKitsController(http.Controller):
 
@@ -49,7 +50,7 @@ class ProductKitsController(http.Controller):
                 size_cards.append({
                     'size': kit.size,
                     'cabinet_sku': kit.cabinet_sku,
-                    'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
+                    'image': self.safe_decode_image(product)  # Use safe image decoding method
                 })
         size_cards.sort(key=lambda x: float(x['size']))
 
@@ -68,7 +69,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.counter_top_sku)], limit=1)
                     counter_top_cards.append({
                         'counter_top_sku': kit.counter_top_sku,
-                        'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
+                        'image': self.safe_decode_image(prod)  # Use safe image decoding method
                     })
 
                 if kit.mirror_sku and kit.mirror_sku not in seen_mirrors:
@@ -76,7 +77,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.mirror_sku)], limit=1)
                     mirror_cards.append({
                         'mirror_sku': kit.mirror_sku,
-                        'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
+                        'image': self.safe_decode_image(prod)  # Use safe image decoding method
                     })
 
                 if kit.faucet_sku and kit.faucet_sku not in seen_faucets:
@@ -84,7 +85,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.faucet_sku)], limit=1)
                     faucet_cards.append({
                         'faucet_sku': kit.faucet_sku,
-                        'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
+                        'image': self.safe_decode_image(prod)  # Use safe image decoding method
                     })
 
         # Determine configured kit (only if >1 component selected)
@@ -120,3 +121,11 @@ class ProductKitsController(http.Controller):
             'configured_product': configured_product,
             'configured_kit': configured_kit,
         })
+
+    def safe_decode_image(self, product):
+        """Safely decode product image"""
+        try:
+            return product.image_1920.decode('utf-8') if product and product.image_1920 else None
+        except Exception as e:
+            # Handle decoding error gracefully
+            return None
