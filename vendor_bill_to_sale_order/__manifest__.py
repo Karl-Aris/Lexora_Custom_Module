@@ -6,6 +6,7 @@
     'data': [
         'views/account_move_view.xml',
         'views/sale_order_view.xml',
+        'views/vendor_bill_wizard_view.xml',
     ],
     'installable': True,
     'application': False,
