@@ -11,6 +11,7 @@ class SaleOrder(models.Model):
             'invoice_date': fields.Date.context_today(self),
             'ref': self.client_order_ref,
             'sale_order_id': self.id,
+            'x_po_vb_id': self.purchase_order,  # Auto-fill PO#
         })
         return {
             'name': 'Vendor Bill',
