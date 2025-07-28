@@ -24,23 +24,22 @@ class ProductKitsController(http.Controller):
 
         domain = []
         if collection_filter:
-            domain.append(('collection.name', '=', collection_filter))
+            domain.append(('collection', '=', collection_filter))
         if size_filter:
-            domain.append(('size.name', '=', size_filter))
+            domain.append(('size', '=', size_filter))
         if color_filter:
-            domain.append(('color.name', '=', color_filter))
+            domain.append(('color', '=', color_filter))
 
         kits_model = request.env['product.kits'].sudo()
         kits = kits_model.search(domain)
 
-        # 🔍 Distinct dropdown values (using .name if Many2one)
+        # 🔍 Distinct dropdown values
         all_kits = kits_model.search([])
         collections = sorted(set(k.collection for k in all_kits if k.collection))
         sizes = sorted(set(k.size for k in all_kits if k.size))
         colors = sorted(set(k.color for k in all_kits if k.color))
 
-
-        # 🧱 Group kits
+        # 🧱 Group kits by (collection, size) as unique identifier
         from collections import defaultdict
         grouped = defaultdict(list)
         for kit in kits:
@@ -56,24 +55,29 @@ class ProductKitsController(http.Controller):
             unique_kits.sort(key=lambda k: k.size or '')
         elif sort_key == 'color':
             unique_kits.sort(key=lambda k: k.color or '')
+
+        # 📄 Pagination
         # 📄 Pagination
         start = (page - 1) * per_page
         end = start + per_page
         paged_kits = unique_kits[start:end]
-        has_next = end < len(unique_kits)
+        total_pages = (len(unique_kits) + per_page - 1) // per_page  # ceiling division
 
         return request.render('kits_products.kits_list_template', {
-        'paged_kits': paged_kits,
-        'page': page,
-        'has_next': has_next,
-        'collection': collection_filter,
-        'size': size_filter,
-        'color': color_filter,
-        'sort': sort_key,
-        'collections': collections,
-        'sizes': sizes,
-        'colors': colors,
-    })
+            'paged_kits': paged_kits,
+            'page': page,
+            'has_next': end < len(unique_kits),
+            'collection': collection_filter,
+            'size': size_filter,
+            'color': color_filter,
+            'sort': sort_key,
+            'collections': collections,
+            'sizes': sizes,
+            'colors': colors,
+            'total_pages': total_pages,  # NEW
+        })
+
+ 
 
 
 

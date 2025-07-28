@@ -8,47 +8,46 @@
                 <!-- 🔎 Filters -->
                 <form method="get" class="mb-4 d-flex flex-wrap gap-2 align-items-center">
 
-    <!-- Collection -->
-    <select name="collection" class="form-control w-auto">
-        <option value="">All Collections</option>
-        <t t-foreach="collections" t-as="coll">
-            <option t-att-value="coll" t-att-selected="collection == coll">
-                <t t-esc="coll" />
-            </option>
-        </t>
-    </select>
+                    <!-- Collection -->
+                    <select name="collection" class="form-control w-auto">
+                        <option value="">All Collections</option>
+                        <t t-foreach="collections" t-as="coll">
+                            <option t-att-value="coll" t-att-selected="collection == coll">
+                                <t t-esc="coll" />
+                            </option>
+                        </t>
+                    </select>
 
-    <!-- Size -->
-    <select name="size" class="form-control w-auto">
-        <option value="">All Sizes</option>
-        <t t-foreach="sizes" t-as="sz">
-            <option t-att-value="sz" t-att-selected="size == sz">
-                <t t-esc="sz" />
-            </option>
-        </t>
-    </select>
+                    <!-- Size -->
+                    <select name="size" class="form-control w-auto">
+                        <option value="">All Sizes</option>
+                        <t t-foreach="sizes" t-as="sz">
+                            <option t-att-value="sz" t-att-selected="size == sz">
+                                <t t-esc="sz" />
+                            </option>
+                        </t>
+                    </select>
 
-    <!-- Color -->
-    <select name="color" class="form-control w-auto">
-        <option value="">All Colors</option>
-        <t t-foreach="colors" t-as="clr">
-            <option t-att-value="clr" t-att-selected="color == clr">
-                <t t-esc="clr" />
-            </option>
-        </t>
-    </select>
+                    <!-- Color -->
+                    <select name="color" class="form-control w-auto">
+                        <option value="">All Colors</option>
+                        <t t-foreach="colors" t-as="clr">
+                            <option t-att-value="clr" t-att-selected="color == clr">
+                                <t t-esc="clr" />
+                            </option>
+                        </t>
+                    </select>
 
-    <!-- Sort -->
-    <select name="sort" class="form-control w-auto">
-        <option value="">Sort By</option>
-        <option value="collection" t-att-selected="sort == 'collection'">Collection</option>
-        <option value="size" t-att-selected="sort == 'size'">Size</option>
-        <option value="color" t-att-selected="sort == 'color'">Color</option>
-    </select>
+                    <!-- Sort -->
+                    <select name="sort" class="form-control w-auto">
+                        <option value="">Sort By</option>
+                        <option value="collection" t-att-selected="sort == 'collection'">Collection</option>
+                        <option value="size" t-att-selected="sort == 'size'">Size</option>
+                        <option value="color" t-att-selected="sort == 'color'">Color</option>
+                    </select>
 
-    <button type="submit" class="btn btn-primary">Filter</button>
-</form>
-
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
 
                 <!-- 🧱 Kits Grid -->
                 <t t-if="paged_kits">
@@ -68,6 +67,9 @@
                                         <p class="card-text">
                                             <strong>Size:</strong>
                                             <t t-esc="kit.size or 'N/A'" />
+                                            <br/>
+                                            <strong>Color:</strong>
+                                            <t t-esc="kit.color or 'N/A'" />
                                         </p>
                                     </div>
                                 </div>
@@ -75,26 +77,35 @@
                         </t>
                     </div>
 
-                    <!-- 📄 Pagination Controls -->
+                    <!-- 📄 Pagination -->
+                    <!-- 📄 Enhanced Pagination -->
                     <nav>
-                        <ul class="pagination">
-                            <li class="page-item" t-if="page > 1">
-                                <!-- Previous Button -->
-                                <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;sort=%s' % (page - 1, collection or '', size or '', sort or '')">
-    Previous
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous Button -->
+                            <li class="page-item" t-attf-class="{{ 'disabled' if page == 1 else '' }}">
+                                <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (page - 1, collection or '', size or '', color or '', sort or '')">
+                Previous
                                 </a>
-
-
-
                             </li>
-                            <li class="page-item" t-if="has_next">
-                                <!-- Next Button -->
-                                <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;sort=%s' % (page + 1, collection or '', size or '', sort or '')">
-    Next
+
+                            <!-- Page Numbers -->
+                            <t t-foreach="range(1, total_pages + 1)" t-as="p">
+                                <li class="page-item" t-attf-class="{{ 'active' if page == p else '' }}">
+                                    <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (p, collection or '', size or '', color or '', sort or '')">
+                                        <t t-esc="p" />
+                                    </a>
+                                </li>
+                            </t>
+
+                            <!-- Next Button -->
+                            <li class="page-item" t-attf-class="{{ 'disabled' if page >= total_pages else '' }}">
+                                <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (page + 1, collection or '', size or '', color or '', sort or '')">
+                Next
                                 </a>
                             </li>
                         </ul>
                     </nav>
+
                 </t>
                 <t t-else="">
                     <p>
@@ -104,6 +115,7 @@
             </div>
         </t>
     </template>
+
 
 
     <template id="all_products_template" name="All Products">
