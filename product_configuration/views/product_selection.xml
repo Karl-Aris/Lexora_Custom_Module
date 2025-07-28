@@ -21,8 +21,8 @@
             <strong>Colors:</strong>
             <div class="btn-group" role="group">
               <t t-foreach="colors" t-as="color">
-                <button type="button" class="btn btn-outline-secondary" 
-                        t-att-onclick="'updateURL(\'color\', \'' + color.replace(/\'/g, \'\\\'\') + '\')'">
+                <button type="button" class="btn btn-outline-secondary"
+                        t-att-onclick="'updateURL(\'color\', \'' + t-esc(color) + '\')'">
                   <t t-esc="color"/>
                 </button>
               </t>
@@ -38,7 +38,7 @@
               <t t-foreach="size_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          t-att-onclick="'updateURL(\'cabinet_sku\', \'' + card[\'cabinet_sku\'].replace(/\'/g, \'\\\'\') + '\')'">
+                          t-att-onclick="'updateURL(\'cabinet_sku\', \'' + t-esc(card['cabinet_sku']) + '\')'">
                     <t t-if="card['image']">
                       <img t-att-src="'data:image/png;base64,%s' % card['image']" class="img-fluid" style="height: 80px; object-fit: cover;" alt="Product Image"/>
                     </t>
@@ -63,7 +63,7 @@
               <t t-foreach="counter_top_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          t-att-onclick="'updateURL(\'counter_top_sku\', \'' + card[\'counter_top_sku\'].replace(/\'/g, \'\\\'\') + '\')'">
+                          t-att-onclick="'updateURL(\'counter_top_sku\', \'' + t-esc(card['counter_top_sku']) + '\')'">
                     <strong><t t-esc="card['counter_top']"/></strong><br/>
                     <small><t t-esc="card['counter_top_sku']"/></small>
                   </button>
@@ -81,7 +81,7 @@
               <t t-foreach="mirror_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          t-att-onclick="'updateURL(\'mirror_sku\', \'' + card[\'mirror_sku\'].replace(/\'/g, \'\\\'\') + '\')'">
+                          t-att-onclick="'updateURL(\'mirror_sku\', \'' + t-esc(card['mirror_sku']) + '\')'">
                     <strong><t t-esc="card['mirror']"/></strong><br/>
                     <small><t t-esc="card['mirror_sku']"/></small>
                   </button>
@@ -99,7 +99,7 @@
               <t t-foreach="faucet_cards" t-as="card">
                 <div class="col-3 mb-3">
                   <button type="button" class="btn btn-outline-secondary"
-                          t-att-onclick="'updateURL(\'faucet_sku\', \'' + card[\'faucet_sku\'].replace(/\'/g, \'\\\'\') + '\')'">
+                          t-att-onclick="'updateURL(\'faucet_sku\', \'' + t-esc(card['faucet_sku']) + '\')'">
                     <strong><t t-esc="card['faucet']"/></strong><br/>
                     <small><t t-esc="card['faucet_sku']"/></small>
                   </button>
