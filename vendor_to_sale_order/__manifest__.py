@@ -6,6 +6,7 @@
         'security/ir.model.access.csv',
         'views/sale_order_view.xml',
         'views/account_move_view.xml',
+        'views/vendor_bill_action.xml',
     ],
     'installable': True,
     'application': False,
