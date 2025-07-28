@@ -79,46 +79,20 @@ class ProductKitsController(http.Controller):
                     })
 
         # Determine configured kit (only if >1 component selected)
-        # Start with the base domain using the cabinet_sku
         domain = [('cabinet_sku', '=', selected_sku)]
-
-        # Add components to the domain only if they are selected
-        if selected_countertop and not selected_mirror and not selected_faucet:
-            # Show cabinet + countertop only
+        if selected_countertop:
             domain.append(('counter_top_sku', '=', selected_countertop))
-
-        elif selected_countertop and selected_mirror and not selected_faucet:
-            # Show cabinet + countertop + mirror
-            domain.append(('counter_top_sku', '=', selected_countertop))
+        if selected_mirror:
             domain.append(('mirror_sku', '=', selected_mirror))
-
-        elif selected_countertop and not selected_mirror and selected_faucet:
-            # Show cabinet + countertop + faucet
-            domain.append(('counter_top_sku', '=', selected_countertop))
+        if selected_faucet:
             domain.append(('faucet_sku', '=', selected_faucet))
 
-        elif selected_countertop and selected_mirror and selected_faucet:
-            # Show cabinet + countertop + mirror + faucet
-            domain.append(('counter_top_sku', '=', selected_countertop))
-            domain.append(('mirror_sku', '=', selected_mirror))
-            domain.append(('faucet_sku', '=', selected_faucet))
-
-        # Now we perform the search with the updated domain
-        if selected_sku:
-            # Search for kits first with the exact cabinet_sku and selected components
+        # Only search if more than just cabinet_sku is selected
+        if selected_sku and (selected_countertop or selected_mirror or selected_faucet):
             configured_kit = request.env['product.kits'].sudo().search(domain, limit=1)
-
-            # Check if a matching kit is found, and if it has a valid product_sku
             if configured_kit and configured_kit.product_sku:
                 configured_product = request.env['product.product'].sudo().search(
                     [('default_code', '=', configured_kit.product_sku)], limit=1
-                )
-
-            # If no kit is found, check the individual cabinet product
-            if not configured_kit:
-                # If no kit is found, return the product that matches the selected cabinet_sku directly
-                configured_product = request.env['product.product'].sudo().search(
-                    [('default_code', '=', selected_sku)], limit=1
                 )
 
         return request.render('product_configuration.template_product_configuration', {
