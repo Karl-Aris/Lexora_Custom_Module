@@ -16,8 +16,8 @@
           </select>
         </div>
 
-        <!-- Color Badges -->
-        <t t-if="colors">
+        <!-- Color Badges: Only show if collection is selected -->
+        <t t-if="selected_collection and colors">
           <div class="mb-4">
             <strong>Colors:</strong>
             <t t-foreach="colors" t-as="color">
@@ -37,61 +37,59 @@
         <t t-if="selected_color">
 
           <div class="row">
-        <!-- LEFT COLUMN: Configured image or cabinet fallback -->
-      <div class="col-md-6">
-        <t t-if="selected_sku">
-          <!-- Load the cabinet product -->
-          <t t-set="cabinet_product"
-            t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
+            <!-- LEFT COLUMN: Configured image or cabinet fallback -->
+            <div class="col-md-6">
+              <t t-if="selected_sku">
+                <!-- Load the cabinet product -->
+                <t t-set="cabinet_product"
+                  t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
 
-          <!-- Show configured product if a valid combination exists -->
-          <t t-if="configured_product and configured_product.image_1920">
-            <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                alt="Configured Product"
-                class="img-thumbnail"
-                style="width: 100%; height: 500px; object-fit: contain;" />
-            <div class="mt-2 text-center">
-              <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
-              <small class="text-muted" t-esc="configured_product.default_code or ''" />
+                <!-- Show configured product if a valid combination exists -->
+                <t t-if="configured_product and configured_product.image_1920">
+                  <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
+                      alt="Configured Product"
+                      class="img-thumbnail"
+                      style="width: 100%; height: 500px; object-fit: contain;" />
+                  <div class="mt-2 text-center">
+                    <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
+                    <small class="text-muted" t-esc="configured_product.default_code or ''" />
+                  </div>
+                </t>
+
+                <!-- If no combination, show fallback cabinet image -->
+                <t t-elif="cabinet_product and cabinet_product.image_1920">
+                  <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
+                      alt="Cabinet"
+                      class="img-thumbnail"
+                      style="width: 100%; height: 500px; object-fit: contain;" />
+                  <div class="mt-2 text-center">
+                    <strong t-esc="cabinet_product.name or 'Cabinet Product'" /><br />
+                    <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
+                  </div>
+                </t>
+
+                <!-- If no image available -->
+                <t t-else="">
+                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                      style="width: 100%; height: 500px;">
+                    No image available
+                  </div>
+                </t>
+              </t>
+
+              <!-- If no SKU selected at all -->
+              <t t-if="not selected_sku">
+                <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                    style="width: 100%; height: 500px;">
+                  No cabinet selected
+                </div>
+              </t>
             </div>
-          </t>
-
-          <!-- If no combination, show fallback cabinet image -->
-          <t t-elif="cabinet_product and cabinet_product.image_1920">
-            <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
-                alt="Cabinet"
-                class="img-thumbnail"
-                style="width: 100%; height: 500px; object-fit: contain;" />
-            <div class="mt-2 text-center">
-              <strong t-esc="cabinet_product.name or 'Cabinet Product'" /><br />
-              <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
-            </div>
-          </t>
-
-          <!-- If no image available -->
-          <t t-else="">
-            <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                style="width: 100%; height: 500px;">
-              No image available
-            </div>
-          </t>
-        </t>
-
-        <!-- If no SKU selected at all -->
-        <t t-if="not selected_sku">
-          <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-              style="width: 100%; height: 500px;">
-            No cabinet selected
-          </div>
-        </t>
-      </div>
-
-        <!-- Similarly mirror and faucet -->
 
             <!-- RIGHT COLUMN: Size cards -->
             <div class="col-md-6">
 
-              <!-- Step Title -->
+              <!-- Step 1: Size Selection -->
               <div class="d-flex align-items-center mb-3">
                 <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
                   <strong>1</strong>
