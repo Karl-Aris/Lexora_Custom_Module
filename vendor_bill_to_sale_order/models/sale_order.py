@@ -6,12 +6,11 @@ class SaleOrder(models.Model):
     def action_create_vendor_bill(self):
         self.ensure_one()
         bill = self.env['account.move'].create({
+            'partner_id': self.partner_id.id,
             'move_type': 'in_invoice',
+            'invoice_date': fields.Date.today(),
             'invoice_origin': self.name,
-            'invoice_date': fields.Date.context_today(self),
-            'ref': self.client_order_ref,
-            'invoice_line_ids': [],
-            'sale_order_id': self.id,
+            'invoice_line_ids': [...],
         })
         return {
             'name': 'Vendor Bill',
