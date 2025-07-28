@@ -35,9 +35,10 @@ class ProductKitsController(http.Controller):
 
         # 🔍 Distinct dropdown values (using .name if Many2one)
         all_kits = kits_model.search([])
-        distinct_collections = sorted(set(k.collection.name for k in all_kits if k.collection))
-        distinct_sizes = sorted(set(k.size.name for k in all_kits if k.size))
-        distinct_colors = sorted(set(k.color.name for k in all_kits if k.color))
+        collections = sorted(set(k.collection for k in all_kits if k.collection))
+        sizes = sorted(set(k.size for k in all_kits if k.size))
+        colors = sorted(set(k.color for k in all_kits if k.color))
+
 
         # 🧱 Group kits
         from collections import defaultdict
@@ -50,12 +51,11 @@ class ProductKitsController(http.Controller):
 
         # 🔃 Sorting
         if sort_key == 'collection':
-            unique_kits.sort(key=lambda k: k.collection.name if k.collection else '')
+            unique_kits.sort(key=lambda k: k.collection or '')
         elif sort_key == 'size':
-            unique_kits.sort(key=lambda k: k.size.name if k.size else '')
+            unique_kits.sort(key=lambda k: k.size or '')
         elif sort_key == 'color':
-            unique_kits.sort(key=lambda k: k.color.name if k.color else '')
-
+            unique_kits.sort(key=lambda k: k.color or '')
         # 📄 Pagination
         start = (page - 1) * per_page
         end = start + per_page
@@ -63,17 +63,18 @@ class ProductKitsController(http.Controller):
         has_next = end < len(unique_kits)
 
         return request.render('kits_products.kits_list_template', {
-            'paged_kits': paged_kits,
-            'page': page,
-            'has_next': has_next,
-            'collection': collection_filter,
-            'size': size_filter,
-            'color': color_filter,
-            'sort': sort_key,
-            'collections': distinct_collections,
-            'sizes': distinct_sizes,
-            'colors': distinct_colors,
-        })
+        'paged_kits': paged_kits,
+        'page': page,
+        'has_next': has_next,
+        'collection': collection_filter,
+        'size': size_filter,
+        'color': color_filter,
+        'sort': sort_key,
+        'collections': collections,
+        'sizes': sizes,
+        'colors': colors,
+    })
+
 
 
     @http.route(['/all_products'], type='http', auth="public", website=True)
