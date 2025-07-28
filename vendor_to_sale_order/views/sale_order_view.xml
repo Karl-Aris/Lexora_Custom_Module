@@ -11,17 +11,18 @@
                         type="object"
                         string="Create Vendor Bill"
                         class="btn-primary"
-                        attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                        t-attf-invisible="{{ record.state.raw_value != 'sale' }}"/>
             </xpath>
 
             <!-- Smart button area -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">
-                <button type="action"
-                        name="%(action_vendor_bills_by_sale_order)d"
-                        string="Vendor Bills"
-                        icon="fa-file-invoice"
-                        context="{'default_sale_order_id': active_id}"
-                        attrs="{'invisible': [('vendor_bill_count', '=', 0)]}"/>
+                <t t-if="record.vendor_bill_count.raw_value &gt; 0">
+                    <button type="action"
+                            name="%(action_vendor_bills_by_sale_order)d"
+                            string="Vendor Bills"
+                            icon="fa-file-invoice"
+                            context="{'default_sale_order_id': active_id}"/>
+                </t>
                 <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
             </xpath>
 
