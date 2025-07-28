@@ -1,48 +1,24 @@
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+
+from odoo import models, fields
 
 class SaleOrder(models.Model):
-    _inherit = "sale.order"
+    _inherit = 'sale.order'
 
-    vendor_bill_count = fields.Integer(
-        string="Vendor Bill Count",
-        compute="_compute_vendor_bill_count"
-    )
-
-    vendor_bill_button_label = fields.Char(
-        compute="_compute_vendor_bill_count"
-    )
-
-    def _compute_vendor_bill_count(self):
-        for order in self:
-            count = self.env['account.move'].search_count([
-                ('move_type', '=', 'in_invoice'),
-                ('invoice_origin', '=', order.purchase_order)
-            ])
-            label = _("Vendor Bills (%s)") % count if count else _("❌ No Vendor Bill Found")
-            order.vendor_bill_count = count
-            order.vendor_bill_button_label = label
-
-    def action_open_vendor_bills(self):
+    def action_create_vendor_bill(self):
         self.ensure_one()
-        if not self.purchase_order:
-            raise UserError(_("No PO Number set for this Sales Order."))
-
-        bills = self.env['account.move'].search([
-            ('move_type', '=', 'in_invoice'),
-            ('invoice_origin', '=', self.purchase_order)
-        ])
-        if not bills:
-            raise UserError(_("No Vendor Bills found for PO: %s") % self.purchase_order)
-
-        action = {
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'invoice_origin': self.name,
+            'invoice_date': fields.Date.context_today(self),
+            'ref': self.client_order_ref,
+            'sale_order_id': self.id,
+            'x_po_vb_id': self.purchase_order,  # Auto-fill PO#
+        })
+        return {
+            'name': 'Vendor Bill',
             'type': 'ir.actions.act_window',
-            'name': _('Related Vendor Bills'),
             'res_model': 'account.move',
-            'view_mode': 'tree,form',
-            'domain': [('id', 'in', bills.ids)],
+            'res_id': bill.id,
+            'view_mode': 'form',
+            'target': 'new',  # <-- This makes it a mini popup
         }
-        if len(bills) == 1:
-            action['view_mode'] = 'form'
-            action['res_id'] = bills.id
-        return action
