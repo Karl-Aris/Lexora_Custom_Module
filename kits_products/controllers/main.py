@@ -153,26 +153,7 @@ class ProductKitsController(http.Controller):
                     seen_sizes.add(kit.size)
                     unique_related_kits.append(kit)
             related_kits = unique_related_kits
-        product_specs = {}
-        if matching_product:
-            # Variant-level attributes (product.product)
-            product_specs['variant_attributes'] = [{
-            'attribute': val.attribute_id.name,
-            'value': val.product_attribute_value_id.name,
-            } for val in matching_product.product_template_attribute_value_ids]
-
-
-            # Template-level attributes (product.template)
-            tmpl = matching_product.product_tmpl_id
-            product_specs['template_attributes'] = [{
-                'attribute': line.attribute_id.name,
-                'values': [v.name for v in line.value_ids],
-            } for line in tmpl.attribute_line_ids]
-
-            # Custom specs or fields
-            product_specs['description_sale'] = tmpl.description_sale
-            product_specs['description'] = tmpl.description
-            product_specs['x_specifications'] = tmpl.x_specifications if hasattr(tmpl, 'x_specifications') else ''
+        
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
             'product': matching_product,
@@ -183,6 +164,5 @@ class ProductKitsController(http.Controller):
             'counter_top': selected_counter_top,
             'mirror': selected_mirror,
             'faucet': selected_faucet,
-            'related_kits': related_kits,
-            'product_specs': product_specs,  # ✅ Pass the specs to template
+            'related_kits': related_kits,   
         })
