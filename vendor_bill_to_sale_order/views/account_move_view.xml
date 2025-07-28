@@ -10,12 +10,11 @@
                     <button
                         name="action_open_sale_order"
                         type="object"
-                        string=""
-                        class="btn-link"
-                        attrs="{'invisible': [('sale_order_count', '=', 0)]}"
-                    >
-                        <field name="sale_order_button_label" widget="html" readonly="1"/>
-                    </button>
+                        string="View Sales Orders"
+                        class="btn-secondary"
+                        visible="purchase_order"
+                    />
+
                 </group>
             </xpath>
 
