@@ -11,15 +11,17 @@ class SaleOrder(models.Model):
         for order in self:
             order.vendor_bill_count = len(order.vendor_bill_ids)
 
-    def open_create_vendor_bill_wizard(self):
+    def action_open_vendor_bill_wizard(self):
+        self.ensure_one()
         return {
-            'type': 'ir.actions.act_window',
             'name': 'Create Vendor Bill',
+            'type': 'ir.actions.act_window',
             'res_model': 'create.vendor.bill.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {
                 'default_sale_order_id': self.id,
                 'default_purchase_reference': self.client_order_ref,
-            }
+                'default_partner_id': self.partner_id.id,
+            },
         }
