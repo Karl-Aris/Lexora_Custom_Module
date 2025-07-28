@@ -45,7 +45,7 @@
                   t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
 
                 <!-- Show configured product if a valid combination exists -->
-                <t t-if="configured_product and configured_product.image_1920">
+                <t t-if="configured_product">
                   <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
                       alt="Configured Product"
                       class="img-thumbnail"
@@ -53,11 +53,12 @@
                   <div class="mt-2 text-center">
                     <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
                     <small class="text-muted" t-esc="configured_product.default_code or ''" />
+                    <h4 t-esc="formatLang(configured_product.standard_price, currency_obj=configured_product.currency_id) or ''"></h4>
                   </div>
                 </t>
 
                 <!-- If no combination, show fallback cabinet image -->
-                <t t-elif="cabinet_product and cabinet_product.image_1920">
+                <t t-elif="cabinet_product">
                   <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
                       alt="Cabinet"
                       class="img-thumbnail"
@@ -65,6 +66,7 @@
                   <div class="mt-2 text-center">
                     <strong t-esc="cabinet_product.name or 'Cabinet Product'" /><br />
                     <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
+                    <h4 t-esc="formatLang(configured_product.standard_price, currency_obj=configured_product.currency_id) or ''"></h4>
                   </div>
                 </t>
 
