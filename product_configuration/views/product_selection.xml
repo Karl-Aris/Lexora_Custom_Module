@@ -101,15 +101,15 @@
               <div class="row">
                 <t t-foreach="size_cards" t-as="card">
                   <div class="col-3 mb-3">
-                    <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
-                            selected_collection,
-                            '&amp;color=' + selected_color if selected_color else '',
-                            '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
-                            '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
-                            '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                            '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                          )"
-                       class="text-decoration-none">
+                      <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
+                              selected_collection,
+                              '&amp;color=' + selected_color if selected_color else '',
+                              '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
+                              '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
+                              '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
+                              '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                            )"
+                        class="text-decoration-none">
                       <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
                         <t t-if="card['image']">
                           <img t-att-src="'data:image/png;base64,%s' % card['image']"
