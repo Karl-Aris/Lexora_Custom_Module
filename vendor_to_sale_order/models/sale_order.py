@@ -3,9 +3,8 @@ from odoo import models, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    @api.multi
     def action_create_vendor_bill(self):
-        # Example logic — you should replace this with your real implementation
+        self.ensure_one()
         vendor_bill = self.env['account.move'].create({
             'move_type': 'in_invoice',
             'partner_id': self.partner_id.id,
