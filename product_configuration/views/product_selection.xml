@@ -2,14 +2,13 @@
   <template id="template_product_configuration" name="Product Configuration">
     <t t-call="website.layout">
       <div class="container my-4">
-        
         <!-- Collection Dropdown -->
         <div class="mb-4">
           <label for="collection_select" class="form-label">Select Collection</label>
-          <select id="collection_select" class="form-select" name="collection" onchange="updateURL();">
+          <select id="collection_select" class="form-select" name="collection" onchange="updateURL('collection', this.value)">
             <option t-if="not selected_collection" selected="selected" disabled="disabled">Select collection</option>
             <t t-foreach="collections" t-as="col">
-              <option t-att-value="'/store?collection=%s' % col" t-att-selected="col == selected_collection">
+              <option t-att-value="col" t-att-selected="col == selected_collection">
                 <t t-esc="col"/>
               </option>
             </t>
@@ -20,232 +19,115 @@
         <t t-if="selected_collection and colors">
           <div class="mb-4">
             <strong>Colors:</strong>
-            <t t-foreach="colors" t-as="color">
-              <a t-att-href="#" 
-                 t-att-data-color="color"
-                 class="badge rounded-pill me-2 px-3 py-2 color-badge" 
-                 style="cursor:pointer;">
-                <t t-esc="color"/>
-              </a>
-            </t>
+            <div class="btn-group" role="group">
+              <t t-foreach="colors" t-as="color">
+                <button type="button" class="btn btn-outline-secondary" 
+                        onclick="updateURL('color', '<t t-esc="color"/>')">
+                  <t t-esc="color"/>
+                </button>
+              </t>
+            </div>
           </div>
         </t>
 
-        <!-- Show steps if collection and color are selected -->
+        <!-- Step 1: Size Selection -->
         <t t-if="selected_collection and selected_color">
-
-          <div class="row">
-            <!-- LEFT COLUMN: Product Image -->
-            <div class="col-md-6">
-              <t t-if="selected_sku">
-                <!-- Load cabinet product -->
-                <t t-set="cabinet_product" t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
-
-                <t t-if="cabinet_product and cabinet_product.image_1920">
-                  <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
-                       alt="Cabinet" class="img-thumbnail" style="width: 100%; height: 500px; object-fit: contain;" />
-                </t>
-                <t t-else="">
-                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                       style="width: 100%; height: 500px;">
-                    No image available
-                  </div>
-                </t>
-              </t>
-            </div>
-
-            <!-- RIGHT COLUMN: Configuration -->
-            <div class="col-md-6">
-
-              <!-- Step 1: Size Selection -->
-              <div class="d-flex align-items-center mb-3">
-                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                  <strong>1</strong>
-                </div>
-                <h4 class="mb-0">Select Sizes</h4>
-              </div>
-
-              <!-- Size Cards Grid -->
-              <div class="row">
-                <t t-foreach="size_cards" t-as="card">
-                  <div class="col-3 mb-3">
-                    <a href="#" class="text-decoration-none size-option" 
-                       t-att-data-sku="card['cabinet_sku']"
-                       t-att-class="'card h-100 ' + ('border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else '')">
-                      <t t-if="card['image']">
-                        <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                             class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Product Image"/>
-                      </t>
-                      <t t-else="">
-                        <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                          <span class="text-muted">No Image</span>
-                        </div>
-                      </t>
-                      <div class="card-body text-center">
-                        <strong><t t-esc="card['size']"/></strong><br/>
-                        <small class="text-muted"><t t-esc="card['cabinet_sku']"/></small>
-                      </div>
-                    </a>
-                  </div>
-                </t>
-              </div>
-
-              <!-- Step 2: Countertop -->
-              <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                    <strong>2</strong>
-                  </div>
-                  <h4 class="mb-0">Select Countertop</h4>
-                </div>
-
-                <div class="row">
-                  <t t-foreach="counter_top_cards" t-as="card">
-                    <div class="col-3 mb-3">
-                      <a href="#" class="text-decoration-none countertop-option" 
-                         t-att-data-sku="card['counter_top_sku']"
-                         t-att-class="'card h-100 ' + ('border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else '')">
-                        <t t-if="card['image']">
-                          <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                               class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
-                        </t>
-                        <t t-else="">
-                          <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                            <span class="text-muted">No Image</span>
-                          </div>
-                        </t>
-                        <div class="card-body text-center">
-                          <strong><t t-esc="card['counter_top_sku']"/></strong>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
+          <div class="mb-4">
+            <strong>Select Size:</strong>
+            <div class="row">
+              <t t-foreach="size_cards" t-as="card">
+                <div class="col-3 mb-3">
+                  <button type="button" class="btn btn-outline-secondary"
+                          onclick="updateURL('cabinet_sku', '<t t-esc="card['cabinet_sku']"/>')">
+                    <t t-if="card['image']">
+                      <img t-att-src="'data:image/png;base64,%s' % card['image']" class="img-fluid" style="height: 80px; object-fit: cover;" alt="Product Image"/>
+                    </t>
+                    <t t-else="">
+                      <div class="bg-light text-center" style="height: 80px;">No Image</div>
+                    </t>
+                    <br/>
+                    <strong><t t-esc="card['size']"/></strong><br/>
+                    <small><t t-esc="card['cabinet_sku']"/></small>
+                  </button>
                 </div>
               </t>
-
-              <!-- Step 3: Mirror -->
-              <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                    <strong>3</strong>
-                  </div>
-                  <h4 class="mb-0">Select Mirror</h4>
-                </div>
-
-                <div class="row">
-                  <t t-foreach="mirror_cards" t-as="card">
-                    <div class="col-3 mb-3">
-                      <a href="#" class="text-decoration-none mirror-option" 
-                         t-att-data-sku="card['mirror_sku']"
-                         t-att-class="'card h-100 ' + ('border border-2 border-secondary' if card['mirror_sku'] == selected_mirror else '')">
-                        <t t-if="card['image']">
-                          <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                               class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Mirror Image"/>
-                        </t>
-                        <t t-else="">
-                          <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                            <span class="text-muted">No Image</span>
-                          </div>
-                        </t>
-                        <div class="card-body text-center">
-                          <strong><t t-esc="card['mirror_sku']"/></strong>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
-                </div>
-              </t>
-
-              <!-- Step 4: Faucet -->
-              <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
-                    <strong>4</strong>
-                  </div>
-                  <h4 class="mb-0">Select Faucet</h4>
-                </div>
-
-                <div class="row">
-                  <t t-foreach="faucet_cards" t-as="card">
-                    <div class="col-3 mb-3">
-                      <a href="#" class="text-decoration-none faucet-option" 
-                         t-att-data-sku="card['faucet_sku']"
-                         t-att-class="'card h-100 ' + ('border border-2 border-secondary' if card['faucet_sku'] == selected_faucet else '')">
-                        <t t-if="card['image']">
-                          <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                               class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Faucet Image"/>
-                        </t>
-                        <t t-else="">
-                          <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
-                            <span class="text-muted">No Image</span>
-                          </div>
-                        </t>
-                        <div class="card-body text-center">
-                          <strong><t t-esc="card['faucet_sku']"/></strong>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
-                </div>
-              </t>
-
             </div>
           </div>
-
         </t>
+
+        <!-- Step 2: Counter Top Selection -->
+        <t t-if="selected_collection and selected_color and cabinet_sku">
+          <div class="mb-4">
+            <strong>Select Countertop:</strong>
+            <div class="row">
+              <t t-foreach="counter_top_cards" t-as="card">
+                <div class="col-3 mb-3">
+                  <button type="button" class="btn btn-outline-secondary"
+                          onclick="updateURL('counter_top_sku', '<t t-esc="card['counter_top_sku']"/>')">
+                    <strong><t t-esc="card['counter_top']"/></strong><br/>
+                    <small><t t-esc="card['counter_top_sku']"/></small>
+                  </button>
+                </div>
+              </t>
+            </div>
+          </div>
+        </t>
+
+        <!-- Step 3: Mirror Selection -->
+        <t t-if="selected_collection and selected_color and cabinet_sku">
+          <div class="mb-4">
+            <strong>Select Mirror:</strong>
+            <div class="row">
+              <t t-foreach="mirror_cards" t-as="card">
+                <div class="col-3 mb-3">
+                  <button type="button" class="btn btn-outline-secondary"
+                          onclick="updateURL('mirror_sku', '<t t-esc="card['mirror_sku']"/>')">
+                    <strong><t t-esc="card['mirror']"/></strong><br/>
+                    <small><t t-esc="card['mirror_sku']"/></small>
+                  </button>
+                </div>
+              </t>
+            </div>
+          </div>
+        </t>
+
+        <!-- Step 4: Faucet Selection -->
+        <t t-if="selected_collection and selected_color and cabinet_sku">
+          <div class="mb-4">
+            <strong>Select Faucet:</strong>
+            <div class="row">
+              <t t-foreach="faucet_cards" t-as="card">
+                <div class="col-3 mb-3">
+                  <button type="button" class="btn btn-outline-secondary"
+                          onclick="updateURL('faucet_sku', '<t t-esc="card['faucet_sku']"/>')">
+                    <strong><t t-esc="card['faucet']"/></strong><br/>
+                    <small><t t-esc="card['faucet_sku']"/></small>
+                  </button>
+                </div>
+              </t>
+            </div>
+          </div>
+        </t>
+
       </div>
+
+      <script>
+        // Update the URL without reloading the page
+        function updateURL(param, value) {
+          const urlParams = new URLSearchParams(window.location.search);
+
+          // Set the parameter with the new value or remove it if empty
+          if (value) {
+            urlParams.set(param, encodeURIComponent(value));  // Ensure encoding
+          } else {
+            urlParams.delete(param);
+          }
+
+          // Update the URL in the browser without reloading the page
+          window.history.pushState({}, '', '?' + urlParams.toString());
+        }
+      </script>
+
     </t>
-
-    <!-- JavaScript for Dynamic URL Update -->
-    <script>
-      function updateURL() {
-        // Get selected values
-        let collection = document.getElementById('collection_select').value;
-        let color = document.querySelector('.color-badge.selected')?.dataset.color || '';
-        let cabinet_sku = document.querySelector('.size-option.selected')?.dataset.sku || '';
-        let counter_top_sku = document.querySelector('.countertop-option.selected')?.dataset.sku || '';
-        let mirror_sku = document.querySelector('.mirror-option.selected')?.dataset.sku || '';
-        let faucet_sku = document.querySelector('.faucet-option.selected')?.dataset.sku || '';
-
-        // Construct base URL
-        let baseURL = '/store?';
-        let params = [];
-
-        // Add selected options to URL
-        if (collection) params.push('collection=' + collection);
-        if (color) params.push('color=' + color);
-        if (cabinet_sku) params.push('cabinet_sku=' + cabinet_sku);
-        if (counter_top_sku) params.push('counter_top_sku=' + counter_top_sku);
-        if (mirror_sku) params.push('mirror_sku=' + mirror_sku);
-        if (faucet_sku) params.push('faucet_sku=' + faucet_sku);
-
-        // Update the URL and reload the page
-        window.location.href = baseURL + params.join('&');
-      }
-
-      // Event listeners for all options (size, countertop, mirror, faucet)
-      document.querySelectorAll('.size-option, .countertop-option, .mirror-option, .faucet-option').forEach(item => {
-        item.addEventListener('click', function(e) {
-          e.preventDefault();
-          // Remove selected class from other options
-          document.querySelectorAll('.size-option, .countertop-option, .mirror-option, .faucet-option').forEach(option => {
-            option.classList.remove('selected');
-          });
-          // Mark the clicked option as selected
-          this.classList.add('selected');
-          updateURL();  // Update the URL with selected options
-        });
-      });
-
-      // Add selection state for color badges
-      document.querySelectorAll('.color-badge').forEach(badge => {
-        badge.addEventListener('click', function() {
-          document.querySelectorAll('.color-badge').forEach(item => item.classList.remove('selected'));
-          this.classList.add('selected');
-          updateURL();  // Update the URL based on the color selection
-        });
-      });
-    </script>
-
   </template>
 </odoo>
