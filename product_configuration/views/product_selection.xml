@@ -91,8 +91,11 @@
 
               <t t-if="configured_product">
               <div class="mt-2 text-left">
-                <h3 t-esc="configured_product.name or 'Unnamed Product'" /><br />
-                <small class="text-muted" t-esc="configured_product.default_code or ''" />
+                <h3 t-esc="configured_product.name or 'Unnamed Product'" />
+                <div class="d-flex align-items-center w-100">
+                  <small class="text-muted" t-esc="configured_product.default_code or ''" /> / <small class="text-muted" t-esc="selected_collection or ''"/>
+                </div>
+                
               </div>
               </t>
               
