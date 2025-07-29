@@ -1,4 +1,15 @@
 <odoo>
+
+    <!-- Define the action FIRST -->
+    <record id="action_vendor_bills_from_sale" model="ir.actions.act_window">
+        <field name="name">Vendor Bills</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('sale_order_id', '=', active_id), ('move_type', '=', 'in_invoice')]</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Inherited sale order view -->
     <record id="view_order_form_inherit_vendor_bills" model="ir.ui.view">
         <field name="name">sale.order.form.vendor.bills</field>
         <field name="model">sale.order</field>
@@ -25,7 +36,7 @@
             </xpath>
 
             <xpath expr="//header" position="inside">
-                <button name="%(action_vendor_bills_from_sale)d"
+                <button name="%(sale_vendor_bill_link.action_vendor_bills_from_sale)d"
                         type="action"
                         string="Vendor Bills"
                         icon="fa-file-invoice"
@@ -34,11 +45,4 @@
         </field>
     </record>
 
-    <record id="action_vendor_bills_from_sale" model="ir.actions.act_window">
-        <field name="name">Vendor Bills</field>
-        <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('sale_order_id', '=', active_id), ('move_type', '=', 'in_invoice')]</field>
-        <field name="context">{}</field>
-    </record>
 </odoo>
