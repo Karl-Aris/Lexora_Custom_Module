@@ -111,9 +111,6 @@
                               selected_collection,
                               '&amp;color=' + selected_color if selected_color else '',
                               '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
-                              '&amp;counter_top_sku=',
-                              '&amp;mirror_sku=',
-                              '&amp;faucet_sku='
                             )"
                        class="text-decoration-none">
                         <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
