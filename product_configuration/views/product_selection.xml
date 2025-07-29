@@ -2,6 +2,7 @@
   <template id="template_product_configuration" name="Product Configuration">
     <t t-call="website.layout">
       <div class="container my-4">
+
         <!-- Collection Dropdown -->
         <div class="mb-4">
           <label for="collection_select" class="form-label">Select Collection</label>
@@ -42,7 +43,7 @@
                 <!-- Load the cabinet product -->
                 <t t-set="cabinet_product"
                   t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
-                
+
                 <!-- Show configured product if a valid combination exists -->
                 <t t-if="configured_product">
                   <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
@@ -146,35 +147,117 @@
                 <div id="countertopSelection" class="collapse">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
-                      <div class="col-3 mb-3">
-                        <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
-                                selected_collection,
-                                '&amp;color=' + selected_color if selected_color else '',
-                                '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                                '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
-                                '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                                '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                              )"
-                           class="text-decoration-none">
-                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
-                          <t t-if="card['image']">
-                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
-                          </t>
-                          <t t-else="">
-                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
-                              <span class="text-muted">No Image</span>
-                            </div>
-                          </t>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
+                        <div class="col-3 mb-3">
+                          <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
+                                  selected_collection,
+                                  '&amp;color=' + selected_color if selected_color else '',
+                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
+                                  '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
+                                  '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                                )"
+                          class="text-decoration-none">
+                          <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
+                            <t t-if="card['image']">
+                              <img t-att-src="'data:image/png;base64,%s' % card['image']"
+                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
+                            </t>
+                            <t t-else="">
+                              <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
+                                <span class="text-muted">No Image</span>
+                              </div>
+                            </t>
+                          </div>
+                        </a>
+                      </div>
+                    </t>
+                  </div>
                 </div>
               </t>
 
-              <!-- Repeat the same structure for Mirror and Faucet selections -->
-              <!-- Add similar collapsible sections for Mirror and Faucet here... -->
+              <!-- Step 3: Mirror -->
+              <t t-if="selected_sku">
+                <div class="d-flex align-items-center mb-3 mt-5">
+                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
+                    <strong>3</strong>
+                  </div>
+                  <h4 class="mb-0" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
+                    Add Mirror <span class="ms-2">+</span>
+                  </h4>
+                </div>
+
+                <div id="mirrorSelection" class="collapse">
+                  <div class="row">
+                      <t t-foreach="mirror_cards" t-as="card">
+                        <div class="col-3 mb-3">
+                          <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
+                                  selected_collection,
+                                  '&amp;color=' + selected_color if selected_color else '',
+                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
+                                  '&amp;mirror_sku=' + card['mirror_sku'] if selected_mirror != card['mirror_sku'] else '',
+                                  '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                                )"
+                          class="text-decoration-none">
+                          <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['mirror_sku'] == selected_mirror else ''}">
+                            <t t-if="card['image']">
+                              <img t-att-src="'data:image/png;base64,%s' % card['image']"
+                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Mirror Image"/>
+                            </t>
+                            <t t-else="">
+                              <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
+                                <span class="text-muted">No Image</span>
+                              </div>
+                            </t>
+                          </div>
+                        </a>
+                      </div>
+                    </t>
+                  </div>
+                </div>
+              </t>
+
+              <!-- Step 4: Faucet -->
+              <t t-if="selected_sku">
+                <div class="d-flex align-items-center mb-3 mt-5">
+                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
+                    <strong>4</strong>
+                  </div>
+                  <h4 class="mb-0" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
+                    Add Faucet <span class="ms-2">+</span>
+                  </h4>
+                </div>
+
+                <div id="faucetSelection" class="collapse">
+                  <div class="row">
+                      <t t-foreach="faucet_cards" t-as="card">
+                        <div class="col-3 mb-3">
+                          <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
+                                  selected_collection,
+                                  '&amp;color=' + selected_color if selected_color else '',
+                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
+                                  '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
+                                  '&amp;faucet_sku=' + card['faucet_sku'] if selected_faucet != card['faucet_sku'] else ''
+                                )"
+                          class="text-decoration-none">
+                          <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['faucet_sku'] == selected_faucet else ''}">
+                            <t t-if="card['image']">
+                              <img t-att-src="'data:image/png;base64,%s' % card['image']"
+                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Faucet Image"/>
+                            </t>
+                            <t t-else="">
+                              <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
+                                <span class="text-muted">No Image</span>
+                              </div>
+                            </t>
+                          </div>
+                        </a>
+                      </div>
+                    </t>
+                  </div>
+                </div>
+              </t>
 
             </div>
           </div>
