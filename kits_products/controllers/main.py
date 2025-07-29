@@ -20,7 +20,7 @@ class ProductKitsController(http.Controller):
         color_filter = kwargs.get('color', '').strip()
         sort_key = kwargs.get('sort')
         page = int(kwargs.get('page', 1))
-        per_page = 6
+        per_page = 8
 
         domain = []
         if collection_filter:
