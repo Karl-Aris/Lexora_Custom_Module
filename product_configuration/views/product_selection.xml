@@ -326,19 +326,19 @@
             <div class="col-md-6">
               <h4>Product Specifications</h4>
               <div class="mb-3">
-                <strong>Collection:</strong> <t t-esc="configured_product.collection"/>
+                <strong>Collection:</strong> <span t-esc="configured_product.collection or 'N/A'"/>
               </div>
               <div class="mb-3">
-                <strong>Color:</strong> <t t-esc="configured_product.color"/>
+                <strong>Color:</strong> <span t-esc="configured_product.color or 'N/A'"/>
               </div>
               <div class="mb-3">
-                <strong>Size:</strong> <t t-esc="configured_product.size"/>
+                <strong>Size:</strong> <span t-esc="configured_product.size or 'N/A'"/>
               </div>
               <!-- <div class="mb-3">
-                <strong>Dimensions:</strong> <t t-esc="configured_product.dimension"/>
+                <strong>Dimensions:</strong> <span t-esc="configured_product.dimension or 'N/A'"/>
               </div>
               <div class="mb-3">
-                <strong>Material:</strong> <t t-esc="configured_product.material"/>
+                <strong>Material:</strong> <span t-esc="configured_product.material or 'N/A'"/>
               </div> -->
             </div>
 
