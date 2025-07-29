@@ -42,7 +42,7 @@
                 <!-- Load the cabinet product -->
                 <t t-set="cabinet_product"
                   t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
-
+                
                 <!-- Show configured product if a valid combination exists -->
                 <t t-if="configured_product">
                   <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
