@@ -330,43 +330,26 @@
 
           <!-- Specifications Section: Moved to the bottom of the section -->
           <div class="row mt-4">
-          <!-- Left Column: Product Details -->
-          <!-- <div class="col-md-6">
-            <h4>Product Specifications</h4>
-            
-            <div class="mb-3">
-              <strong>Collection:</strong> <span t-esc="configured_product.product_tmpl_id.collection.name or 'N/A'"/>
-            </div>
-            <div class="mb-3">
-              <strong>Color:</strong> <span t-esc="configured_product.color or 'N/A'"/>
-            </div>
-            <div class="mb-3">
-              <strong>Size:</strong> <span t-esc="configured_product.size or 'N/A'"/>
-            </div>
-            <div class="mb-3">
-              <strong>Dimensions:</strong> <span t-esc="configured_product.dimension or 'N/A'"/>
-            </div>
-            <div class="mb-3">
-              <strong>Material:</strong> <span t-esc="configured_product.material or 'N/A'"/>
-            </div>
-          </div> -->
 
           <!-- Right Column: Tags (No Label) -->
-          <div class="col-md-6">
-            <h4>Tags</h4>
-            <div class="mb-3">
-              <t t-if="configured_product.product_tag_ids">
-                <t t-foreach="configured_product.product_tag_ids" t-as="tag">
-                  <span class="badge bg-secondary text-white me-2 px-3 py-2">
-                    <t t-esc="tag.name"/>
-                  </span>
+          <t t-if="configured_product">
+           <div class="col-md-6">
+              <h4>Tags</h4>
+              <div class="mb-3">
+                <t t-if="configured_product.product_tag_ids">
+                  <t t-foreach="configured_product.product_tag_ids" t-as="tag">
+                    <span class="badge bg-secondary text-white me-2 px-3 py-2">
+                      <t t-esc="tag.name"/>
+                    </span>
+                  </t>
                 </t>
-              </t>
-              <t t-if="not configured_product.product_tag_ids">
-                <span class="text-muted">No tags available</span>
-              </t>
+                <t t-if="not configured_product.product_tag_ids">
+                  <span class="text-muted">No tags available</span>
+                </t>
+              </div>
             </div>
-          </div>
+          </t>
+         
         </div>
 
           
