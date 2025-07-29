@@ -141,7 +141,7 @@
                 </div>
               </div>
 
-              <hr>
+              <hr/>
 
               <!-- Step 2: Countertop -->
               <t t-if="selected_sku">
@@ -194,7 +194,7 @@
                 </div>
               </t>
 
-              <hr>
+              <hr/>
 
               <!-- Step 3: Mirror -->
               <t t-if="selected_sku">
@@ -247,7 +247,7 @@
                 </div>
               </t>
 
-              <hr>
+              <hr/>
 
               <!-- Step 4: Faucet -->
               <t t-if="selected_sku">
