@@ -116,7 +116,7 @@ class ProductKitsController(http.Controller):
             )
             
             # Fetch the fixed_price from the pricelist item for the configured product
-            if configured_product and configured_product.pricelist:
+            if configured_product:
                 pricelist_item = request.env['product.pricelist.item'].sudo().search([
                     ('product_tmpl_id', '=', configured_product.product.id),
                     ('pricelist_id', '=', configured_product.pricelist.id)
