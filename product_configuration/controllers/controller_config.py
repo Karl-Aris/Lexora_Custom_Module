@@ -14,6 +14,7 @@ class ProductKitsController(http.Controller):
 
         configured_kit = None
         configured_product = None
+        fixed_price = None  # Initialize fixed_price
 
         # Load collections
         collections = request.env['product.kits'].sudo().search([]).mapped('collection')
@@ -113,6 +114,17 @@ class ProductKitsController(http.Controller):
             configured_product = request.env['product.product'].sudo().search(
                 [('default_code', '=', configured_kit.product_sku)], limit=1
             )
+            
+            # Fetch the fixed_price from the pricelist item for the configured product
+            if configured_product and configured_product.pricelist:
+                pricelist_item = request.env['product.pricelist.item'].sudo().search([
+                    ('product_tmpl_id', '=', configured_product.product.id),
+                    ('pricelist_id', '=', configured_product.pricelist.id)
+                ], limit=1)
+
+                # If pricelist item is found, retrieve the fixed_price
+                if pricelist_item:
+                    fixed_price = pricelist_item.fixed_price
 
         return request.render('product_configuration.template_product_configuration', {
             'collections': unique_collections,
@@ -129,4 +141,5 @@ class ProductKitsController(http.Controller):
             'faucet_cards': faucet_cards,
             'configured_product': configured_product,
             'configured_kit': configured_kit,
+            'fixed_price': fixed_price, 
         })
