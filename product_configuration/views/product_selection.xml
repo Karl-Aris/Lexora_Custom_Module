@@ -105,7 +105,9 @@
                 <div class="d-flex align-items-center w-100 text-muted">
                   <small t-esc="configured_product.default_code or ''" />  <span class="mx-1">/</span>  <small t-esc="selected_collection or ''"/>
                 </div>
-                <h3 t-esc="configured_product.fixed_price"/>
+                <t t-if="fixed_price">
+                  <h3 class="my-2" t-esc="fixed_price"/>
+                </t>
               </div>
               </t>
               
