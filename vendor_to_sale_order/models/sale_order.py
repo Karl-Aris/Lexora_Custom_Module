@@ -1,8 +1,16 @@
-
-from odoo import models, fields
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    vendor_bill_count = fields.Integer(compute="_compute_vendor_bill_count", string="Vendor Bill Count")
+
+    def _compute_vendor_bill_count(self):
+        for order in self:
+            order.vendor_bill_count = self.env['account.move'].search_count([
+                ('sale_order_id', '=', order.id),
+                ('move_type', '=', 'in_invoice')
+            ])
 
     def action_create_vendor_bill(self):
         self.ensure_one()
