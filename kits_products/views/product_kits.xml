@@ -63,11 +63,11 @@
 
                                                     <!-- Buy Now -->
                                                     <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1" class="btn btn-outline-primary d-flex align-items-center fw-semibold shadow-sm" style="min-width: 140px; height: 44px;">
-                                                        <i class="fa fa-bolt me-2"></i> Buy Now
+                                                        <i class="fa fa-heart-o me-2"></i> Buy Now
                                                     </button>
 
                                                     <!-- Wishlist -->
-                                                    <a t-att-href="'/shop/wishlist/add/' + str(kit.product_id.id)" class="btn btn-outline-secondary d-flex align-items-center fw-semibold shadow-sm" style="height: 44px;">
+                                                    <a t-att-href="'/shop/wishlist/add/' + str(kit.product_id.id)" class="btn  d-flex align-items-start  fw-semibold " style="height: 44px;">
                                                         <i class="fa fa-heart me-2"></i> Wishlist
                                                     </a>
                                                 </div>
@@ -155,52 +155,53 @@
 
 
                                 </t>
-                                <div class="">
-                                    <div class="d-flex justify-content-between">
-
-                                        <p class="text-muted mb-0" data-oe-id="3751" data-oe-xpath="/data/xpath/p" data-oe-model="ir.ui.view" data-oe-field="arch">
-                                            <a href="/terms" class="text-muted">
+                                <div class="container py-4">
+                                    <!-- Info and Social Share -->
+                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                                        <!-- Terms and Shipping Info -->
+                                        <div class="text-muted small">
+                                            <a href="/terms" class="text-decoration-none text-muted fw-semibold mb-1 d-inline-block">
                                                 <u>Terms and Conditions</u>
                                             </a>
-                                            <br/>
-                30-day money-back guarantee<br/>
-                Shipping: 2-3 Business Days
-                                        </p>
-                                        <div data-snippet="s_share" class="s_share text-start o_no_link_popover text-lg-end">
-                                            <a href="https://www.facebook.com/sharer/sharer.php?u={url}" target="_blank" aria-label="Facebook" class="s_share_facebook mx-1 my-0">
-                                                <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[1]/i[1]" class="fa fa-facebook "></i>
-                                            </a>
-                                            <a href="https://twitter.com/intent/tweet?text={title}&amp;url={url}" target="_blank" aria-label="Twitter" class="s_share_twitter mx-1 my-0">
-                                                <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[2]/i[1]" class="fa fa-twitter "></i>
-                                            </a>
-                                            <a href="https://pinterest.com/pin/create/button/?url={url}&amp;media={media}&amp;description={title}" target="_blank" aria-label="Pinterest" class="s_share_pinterest mx-1 my-0">
-                                                <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[5]/i[1]" class="fa fa-pinterest "></i>
-                                            </a>
-                                            <a href="mailto:?body={url}&amp;subject={title}" aria-label="Email" class="s_share_email mx-1 my-0">
-                                                <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[6]/i[1]" class="fa fa-envelope "></i>
-                                            </a>
+                                            <div>30-day money-back guarantee</div>
+                                            <div>Shipping: 2-3 Business Days</div>
                                         </div>
 
+                                        <!-- Social Share Icons -->
+                                        <div class=" flex-d flex mt-3 mt-md-0 text-md-end">
+                                            <span class="fw-semibold me-2">Share:</span>
+                                            <div data-snippet="s_share" class="s_share text-start o_no_link_popover text-lg-end">
+                                                <a href="https://www.facebook.com/sharer/sharer.php?u={url}" target="_blank" aria-label="Facebook" class="s_share_facebook mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[1]/i[1]" class="fa fa-facebook "></i>
+                                                </a>
+                                                <a href="https://twitter.com/intent/tweet?text={title}&amp;url={url}" target="_blank" aria-label="Twitter" class="s_share_twitter mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[2]/i[1]" class="fa fa-twitter "></i>
+                                                </a>
+                                                <a href="https://pinterest.com/pin/create/button/?url={url}&amp;media={media}&amp;description={title}" target="_blank" aria-label="Pinterest" class="s_share_pinterest mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[5]/i[1]" class="fa fa-pinterest "></i>
+                                                </a>
+                                                <a href="mailto:?body={url}&amp;subject={title}" aria-label="Email" class="s_share_email mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[6]/i[1]" class="fa fa-envelope "></i>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- ✅ Product Tags Section -->
-                                    <t t-if="product and product.product_tmpl_id and product.product_tmpl_id.valid_product_template_attribute_line_ids" class="border-top pt-4 mt-2">
-
-                                        <div class="mt-2">
-                                            <h3 class="fw-bold mb-4 border-bottom pb-2">Specifications</h3>
-
+                                    <!-- Specifications -->
+                                    <t t-if="product and product.product_tmpl_id and product.product_tmpl_id.valid_product_template_attribute_line_ids">
+                                        <div class="border-top pt-4 mt-4">
+                                            <h4 class="fw-bold mb-3 text-dark">Specifications</h4>
                                             <div class="table-responsive">
-                                                <table class="table table-bordered align-middle shadow-sm rounded-2 overflow-hidden" style="min-width: 100%;">
+                                                <table class="table table-bordered table-hover shadow-sm rounded-3 overflow-hidden">
                                                     <tbody>
                                                         <t t-foreach="product.product_tmpl_id.valid_product_template_attribute_line_ids" t-as="ptal">
                                                             <tr t-if="ptal.value_ids">
                                                                 <!-- Attribute Name -->
-                                                                <td class="fw-semibold text-dark bg-light w-25" style="white-space: nowrap;">
+                                                                <td class="fw-semibold bg-light text-nowrap text-dark w-25">
                                                                     <t t-esc="ptal.attribute_id.name" />
                                                                 </td>
-
                                                                 <!-- Attribute Values -->
-                                                                <td class="text-muted w-75">
+                                                                <td class="w-75">
                                                                     <t t-foreach="ptal.product_template_value_ids._only_active()" t-as="ptv" t-separator=", ">
                                                                         <span class="badge bg-secondary-subtle text-dark fw-normal me-1">
                                                                             <t t-esc="ptv.name" />
@@ -213,23 +214,23 @@
                                                 </table>
                                             </div>
                                         </div>
-
                                     </t>
-                                    <t t-if="tags" class="border-top pt-4 mt-2">
-                                        <div class="mb-3">
-                                            <h5 class="fw-bold border-bottom pb-1 mb-2">Tags</h5>
+
+                                    <!-- Tags -->
+                                    <t t-if="tags">
+                                        <div class="border-top pt-4 mt-4">
+                                            <h5 class="fw-bold text-dark mb-3">Tags</h5>
                                             <div class="d-flex flex-wrap gap-2">
                                                 <t t-foreach="tags" t-as="tag">
-                                                    <span class="badge text-dark bg-light border rounded-pill px-3 py-2 small" style="cursor: default; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#e2e6ea'" onmouseout="this.style.backgroundColor=''">
+                                                    <span class="badge bg-light border rounded-pill px-3 py-2 small text-muted" style="transition: all 0.2s ease;" onmouseover="this.classList.add('bg-secondary-subtle')" onmouseout="this.classList.remove('bg-secondary-subtle')">
                                                         <t t-esc="tag.name" />
                                                     </span>
                                                 </t>
                                             </div>
                                         </div>
                                     </t>
-
-
                                 </div>
+
 
                             </div>
 

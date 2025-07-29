@@ -1,5 +1,5 @@
 {
-    'name': 'Product Kits',
+    'name': 'Product config',
     'version': '1.0',
     'summary': 'Manage Product by product configurations',
     'category': 'Inventory',
