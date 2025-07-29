@@ -327,12 +327,12 @@
               <!-- <div class="mb-3">
                 <strong>Collection:</strong> <span t-esc="configured_product.collection or 'N/A'"/>
               </div> -->
-              <div class="mb-3">
+              <!-- <div class="mb-3">
                 <strong>Color:</strong> <span t-esc="configured_product.color or 'N/A'"/>
               </div>
               <div class="mb-3">
                 <strong>Size:</strong> <span t-esc="configured_product.size or 'N/A'"/>
-              </div>
+              </div> -->
               <!-- <div class="mb-3">
                 <strong>Dimensions:</strong> <span t-esc="configured_product.dimension or 'N/A'"/>
               </div>
