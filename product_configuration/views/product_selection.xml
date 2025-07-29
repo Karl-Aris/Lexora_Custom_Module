@@ -90,13 +90,16 @@
             <div class="col-md-6">
 
               <!-- Step 1: Size Selection -->
-              <div class="d-flex align-items-center mb-3">
+              <div class="d-flex align-items-center mb-3 w-100">
                 <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                   <strong>1</strong>
                 </div>
-                <h4 class="mb-0" data-bs-toggle="collapse" href="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
-                  Select Sizes <span class="ms-2">+</span>
+                <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
+                  Select Sizes
                 </h4>
+                <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;">
+                  <span class="ms-2" style="font-size: 24px; font-weight: bold;">+</span>
+                </button>
               </div>
 
               <!-- Size Cards Grid (Collapsed by default) -->
@@ -135,13 +138,17 @@
 
               <!-- Step 2: Countertop -->
               <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
+
+                <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>2</strong>
                   </div>
-                  <h4 class="mb-0" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                    Add Countertop <span class="ms-2">+</span>
+                  <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
+                    Add Countertop
                   </h4>
+                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;">
+                    <span class="ms-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  </button>
                 </div>
 
                 <div id="countertopSelection" class="collapse">
@@ -177,13 +184,17 @@
 
               <!-- Step 3: Mirror -->
               <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
+
+                <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>3</strong>
                   </div>
-                  <h4 class="mb-0" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    Add Mirror <span class="ms-2">+</span>
+                  <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
+                    Add Mirror
                   </h4>
+                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;">
+                    <span class="ms-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  </button>
                 </div>
 
                 <div id="mirrorSelection" class="collapse">
@@ -219,13 +230,17 @@
 
               <!-- Step 4: Faucet -->
               <t t-if="selected_sku">
-                <div class="d-flex align-items-center mb-3 mt-5">
+
+              <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>4</strong>
                   </div>
-                  <h4 class="mb-0" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
-                    Add Faucet <span class="ms-2">+</span>
+                  <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
+                    Add Faucet
                   </h4>
+                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;">
+                    <span class="ms-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  </button>
                 </div>
 
                 <div id="faucetSelection" class="collapse">
