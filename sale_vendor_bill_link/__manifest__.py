@@ -8,7 +8,7 @@
         "views/sale_order_view.xml",
         "views/account_move_view.xml",
     ],
-    "application": False,
+    "application": True,
     "installable": True,
     "license": "OEEL-1",
 }
