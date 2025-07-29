@@ -98,7 +98,12 @@
                   Select Sizes
                 </h4>
                 <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
-                  <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  <t t-if="selected_sku">
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;">-</span>
+                  </t>
+                  <t t-else="">
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  </t>
                 </button>
               </div>
 
@@ -136,6 +141,8 @@
                 </div>
               </div>
 
+              <hr>
+
               <!-- Step 2: Countertop -->
               <t t-if="selected_sku">
 
@@ -147,7 +154,12 @@
                     Add Countertop
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <t t-if="selected_countertop">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">-</span>
+                    </t>
+                    <t t-else="">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    </t>
                   </button>
                 </div>
 
@@ -182,6 +194,8 @@
                 </div>
               </t>
 
+              <hr>
+
               <!-- Step 3: Mirror -->
               <t t-if="selected_sku">
 
@@ -193,7 +207,12 @@
                     Add Mirror
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <t t-if="selected_mirror">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">-</span>
+                    </t>
+                    <t t-else="">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    </t>
                   </button>
                 </div>
 
@@ -228,6 +247,8 @@
                 </div>
               </t>
 
+              <hr>
+
               <!-- Step 4: Faucet -->
               <t t-if="selected_sku">
 
@@ -239,7 +260,12 @@
                     Add Faucet
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <t t-if="selected_faucet">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">-</span>
+                    </t>
+                    <t t-else="">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    </t>
                   </button>
                 </div>
 
