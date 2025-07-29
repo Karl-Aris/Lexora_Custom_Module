@@ -5,6 +5,7 @@
     "category": "Sales",
     "depends": ["sale_management", "account"],
     "data": [
+        "views/sale_vendor_bill_action.xml",
         "views/sale_order_view.xml",
         "views/account_move_view.xml",
     ],
