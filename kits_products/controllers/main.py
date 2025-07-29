@@ -85,7 +85,8 @@ class ProductKitsController(http.Controller):
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
         """Display a single matching kit (by collection and size) and filterable components."""
- 
+
+        # Render empty/default view if collection or size is missing
         if not collection or not size:
             return request.render('kits_products.kit_group_detail_template', {
                 'kit': None,
@@ -96,9 +97,10 @@ class ProductKitsController(http.Controller):
                 'counter_top': None,
                 'mirror': None,
                 'faucet': None,
+                'tags': [],
                 'related_kits': [],
             })
- 
+
         kits = self._get_kits(collection, size)
         if not kits:
             return request.render('kits_products.kit_group_detail_template', {
@@ -110,9 +112,11 @@ class ProductKitsController(http.Controller):
                 'counter_top': None,
                 'mirror': None,
                 'faucet': None,
+                'tags': [],
                 'related_kits': [],
             })
- 
+
+        # Collect filterable components
         components = {
             'cabinet': set(),
             'counter_top': set(),
@@ -124,10 +128,11 @@ class ProductKitsController(http.Controller):
             components['counter_top'].update(kit.counter_top_ids)
             components['mirror'].update(kit.mirror_ids)
             components['faucet'].update(kit.faucet_ids)
- 
+
         default_kit = kits[0]
         is_first_load = not any([cabinet, counter_top, mirror, faucet])
 
+        # Determine selected components
         selected_cabinet = int(cabinet) if cabinet else (
             default_kit.cabinet_ids[0].id if default_kit.cabinet_ids and is_first_load else None
         )
@@ -141,7 +146,7 @@ class ProductKitsController(http.Controller):
             default_kit.faucet_ids[0].id if default_kit.faucet_ids and is_first_load else None
         )
 
-        # ✅ Step 4: Find exact match for selected components
+        # Match kit based on selected components
         matching_kit = None
         matching_product = None
 
@@ -167,7 +172,8 @@ class ProductKitsController(http.Controller):
             matching_kit = kit
             matching_product = kit.product_id
             break
- 
+
+        # Get related kits
         related_kits = []
         if matching_kit and matching_kit.color and matching_kit.collection:
             all_related_kits = request.env['product.kits'].sudo().search([
@@ -175,7 +181,6 @@ class ProductKitsController(http.Controller):
                 ('color', '=', matching_kit.color),
                 ('collection', '=', matching_kit.collection),
             ])
- 
             seen_sizes = set()
             unique_related_kits = []
             for kit in all_related_kits:
@@ -183,7 +188,11 @@ class ProductKitsController(http.Controller):
                     seen_sizes.add(kit.size)
                     unique_related_kits.append(kit)
             related_kits = unique_related_kits
-        
+
+        # Get product tags (if matching product is found)
+        product_tags = matching_product.product_tmpl_id.product_tag_ids if matching_product and matching_product.product_tmpl_id else []
+
+
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
             'product': matching_product,
@@ -194,6 +203,7 @@ class ProductKitsController(http.Controller):
             'counter_top': selected_counter_top,
             'mirror': selected_mirror,
             'faucet': selected_faucet,
-            'related_kits': related_kits,   
-            'kits': kits,  
+            'tags': product_tags,
+            'related_kits': related_kits,
+            'kits': kits,
         })
