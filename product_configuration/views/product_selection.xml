@@ -93,7 +93,7 @@
               <div class="mt-2 text-left">
                 <h3 t-esc="configured_product.name or 'Unnamed Product'" />
                 <div class="d-flex align-items-center w-100 text-muted">
-                  <small t-esc="configured_product.default_code or ''" />  <span class="mx-2">/</span>  <small t-esc="selected_collection or ''"/>
+                  <small t-esc="configured_product.default_code or ''" />  <span class="mx-1">/</span>  <small t-esc="selected_collection or ''"/>
                 </div>
                 
               </div>
