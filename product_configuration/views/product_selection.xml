@@ -111,15 +111,15 @@
                               selected_collection,
                               '&amp;color=' + selected_color if selected_color else '',
                               '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
-                              '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
-                              '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                              '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                              '&amp;counter_top_sku=',
+                              '&amp;mirror_sku=',
+                              '&amp;faucet_sku='
                             )"
-                        class="text-decoration-none">
+                       class="text-decoration-none">
                         <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
                           <t t-if="card['image']">
                             <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Product Image"/>
+                                 class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Product Image"/>
                           </t>
                           <t t-else="">
                             <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
