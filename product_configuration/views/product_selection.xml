@@ -324,9 +324,9 @@
           <div class="row mt-4">
             <!-- Left Column: Product Details -->
               <h4>Product Specifications</h4>
-              <div class="mb-3">
+              <!-- <div class="mb-3">
                 <strong>Collection:</strong> <span t-esc="configured_product.collection or 'N/A'"/>
-              </div>
+              </div> -->
               <div class="mb-3">
                 <strong>Color:</strong> <span t-esc="configured_product.color or 'N/A'"/>
               </div>
