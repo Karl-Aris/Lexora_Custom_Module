@@ -50,10 +50,10 @@
                       alt="Configured Product"
                       class="img-thumbnail"
                       style="width: 100%; height: 450px; object-fit: contain;" />
-                  <div class="mt-2 text-center">
+                  <!-- <div class="mt-2 text-center">
                     <strong t-esc="configured_product.name or 'Unnamed Product'" /><br />
                     <small class="text-muted" t-esc="configured_product.default_code or ''" />
-                  </div>
+                  </div> -->
                 </t>
 
                 <!-- If no combination, show fallback cabinet image -->
@@ -88,6 +88,11 @@
 
             <!-- RIGHT COLUMN: Size cards -->
             <div class="col-md-6">
+
+              <div class="mt-2 text-left">
+                <h3 t-esc="configured_product.name or 'Unnamed Product'" /><br />
+                <small class="text-muted" t-esc="configured_product.default_code or ''" />
+              </div>
 
               <!-- Step 1: Size Selection -->
               <div class="d-flex align-items-center mb-3 w-100">
@@ -349,7 +354,7 @@
             <div class="mb-3">
               <t t-if="configured_product.product_tag_ids">
                 <t t-foreach="configured_product.product_tag_ids" t-as="tag">
-                  <span class="badge bg-info text-dark me-2">
+                  <span class="badge bg-secondary text-white me-2 px-3 py-2">
                     <t t-esc="tag.name"/>
                   </span>
                 </t>
