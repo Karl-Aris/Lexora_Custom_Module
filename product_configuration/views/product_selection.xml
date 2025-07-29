@@ -94,7 +94,7 @@
                 <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                   <strong>1</strong>
                 </div>
-                <h5 class="mb-0">Select Sizes</h5>
+                <h4 class="mb-0">Select Sizes</h4>
               </div>
 
               <!-- Size Cards Grid -->
@@ -113,7 +113,7 @@
                       <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
                         <t t-if="card['image']">
                           <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                               class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Product Image"/>
+                               class="card-img-top" style="height: 100px; object-fit: cover;" alt="Product Image"/>
                         </t>
                         <t t-else="">
                           <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
@@ -136,7 +136,7 @@
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>2</strong>
                   </div>
-                  <h5 class="mb-0">Select Countertop</h5>
+                  <h4 class="mb-0">Select Countertop</h4>
                 </div>
 
                 <div class="row">
@@ -154,7 +154,7 @@
                         <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
                           <t t-if="card['image']">
                             <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
+                                 class="card-img-top" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
                           </t>
                           <t t-else="">
                             <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
@@ -162,7 +162,7 @@
                             </div>
                           </t>
                           <div class="card-body text-center">
-                            <strong><t t-esc="card['counter_top_sku']"/></strong>
+                            <small><t t-esc="card['name']"/></small>
                           </div>
                         </div>
                       </a>
@@ -177,7 +177,7 @@
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>3</strong>
                   </div>
-                  <h5 class="mb-0">Select Mirror</h5>
+                  <h4 class="mb-0">Select Mirror</h4>
                 </div>
 
                 <div class="row">
@@ -195,7 +195,7 @@
                         <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['mirror_sku'] == selected_mirror else ''}">
                           <t t-if="card['image']">
                             <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Mirror Image"/>
+                                 class="card-img-top" style="height: 100px; object-fit: cover;" alt="Mirror Image"/>
                           </t>
                           <t t-else="">
                             <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
@@ -203,7 +203,7 @@
                             </div>
                           </t>
                           <div class="card-body text-center">
-                            <strong><t t-esc="card['mirror_sku']"/></strong>
+                            <small><t t-esc="card['name']"/></small>
                           </div>
                         </div>
                       </a>
@@ -218,7 +218,7 @@
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>4</strong>
                   </div>
-                  <h5 class="mb-0">Select Faucet</h5>
+                  <h4h5 class="mb-0">Select Faucet</h4>
                 </div>
 
                 <div class="row">
@@ -236,7 +236,7 @@
                         <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['faucet_sku'] == selected_faucet else ''}">
                           <t t-if="card['image']">
                             <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-4" style="height: 100px; object-fit: cover;" alt="Faucet Image"/>
+                                 class="card-img-top" style="height: 100px; object-fit: cover;" alt="Faucet Image"/>
                           </t>
                           <t t-else="">
                             <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-4" style="height: 100px;">
@@ -244,7 +244,7 @@
                             </div>
                           </t>
                           <div class="card-body text-center">
-                            <strong><t t-esc="card['faucet_sku']"/></strong>
+                            <small><t t-esc="card['name']"/></small>
                           </div>
                         </div>
                       </a>
