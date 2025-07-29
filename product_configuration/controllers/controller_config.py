@@ -56,6 +56,7 @@ class ProductKitsController(http.Controller):
                 size_cards.append({
                     'size': kit.size,
                     'cabinet_sku': kit.cabinet_sku,
+                    'name': product.name,
                     'image': product.image_1920.decode('utf-8') if product and product.image_1920 else None,
                 })
 
@@ -77,6 +78,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.counter_top_sku)], limit=1)
                     counter_top_cards.append({
                         'counter_top_sku': kit.counter_top_sku,
+                        'name': product.name,
                         'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
 
@@ -85,6 +87,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.mirror_sku)], limit=1)
                     mirror_cards.append({
                         'mirror_sku': kit.mirror_sku,
+                        'name': product.name,
                         'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
 
@@ -93,6 +96,7 @@ class ProductKitsController(http.Controller):
                     prod = request.env['product.product'].sudo().search([('default_code', '=', kit.faucet_sku)], limit=1)
                     faucet_cards.append({
                         'faucet_sku': kit.faucet_sku,
+                        'name': product.name,
                         'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
 
