@@ -224,31 +224,44 @@
 
                                     <div class="row g-2">                                        <!-- Reduced gutter spacing from g-3 to g-2 -->
                                         <t t-foreach="components[category]" t-as="comp">
-                                            <t t-if="category == 'cabinet'">
-                                                <span>DEBUG CABINET: <t t-esc="comp.id" />
-                                                </span>
-                                            </t>
                                             <div class="col-6 col-sm-4 col-lg-3">
                                                 <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-                            collection, size or '',
-                            ('' if category == 'cabinet' and cabinet == comp.id else (comp.id if category == 'cabinet' else cabinet or '')),
-                            ('' if category == 'counter_top' and counter_top == comp.id else (comp.id if category == 'counter_top' else counter_top or '')),
-                            ('' if category == 'mirror' and mirror == comp.id else (comp.id if category == 'mirror' else mirror or '')),
-                            ('' if category == 'faucet' and faucet == comp.id else (comp.id if category == 'faucet' else faucet or ''))
-                        )" class="text-decoration-none">
-                                                    <div t-attf-class="card h-100 rounded-3 #{'border border-primary shadow' if ((category == 'cabinet' and comp.id == cabinet) or (category == 'counter_top' and comp.id == counter_top) or (category == 'mirror' and comp.id == mirror) or (category == 'faucet' and comp.id == faucet)) else 'border-light shadow-sm'}" style="transition: transform 0.2s; cursor: pointer; padding: 6px;">                                                        <!-- Optional: add small padding -->
-                                                        <div class="d-flex justify-content-center align-items-center" style="height: 100px;">                                                            <!-- reduced from 120px -->
-                                                            <img t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''" class="img-fluid rounded" style="max-height: 70px; object-fit: cover;" />
+            collection, size or '',
+            ('' if category == 'cabinet' and cabinet == comp.id else (comp.id if category == 'cabinet' else cabinet or '')),
+            ('' if category == 'counter_top' and counter_top == comp.id else (comp.id if category == 'counter_top' else counter_top or '')),
+            ('' if category == 'mirror' and mirror == comp.id else (comp.id if category == 'mirror' else mirror or '')),
+            ('' if category == 'faucet' and faucet == comp.id else (comp.id if category == 'faucet' else faucet or ''))
+        )" class="text-decoration-none">
+                                                    <div t-attf-class="card h-100 rounded-2 align-items-center 
+    #{'border border-primary shadow-sm' if (
+      (category == 'cabinet' and comp.id == cabinet) or
+      (category == 'counter_top' and comp.id == counter_top) or
+      (category == 'mirror' and comp.id == mirror) or
+      (category == 'faucet' and comp.id == faucet)
+    ) else 'border-light shadow-sm'}" style="transition: transform 0.2s ease-in-out; cursor: pointer; padding: 0.25rem;">
+                                                        <div class="d-flex justify-content-center align-items-center" style="height: 72px;  ">
+                                                            <img t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''" class="img-fluid rounded" style="max-height: 64px; object-fit: cover;" />
                                                         </div>
-                                                        <div class="card-body p-1 text-center">                                                            <!-- reduced padding -->
-                                                            <small class="text-muted d-block" style="font-size: 10px;">
+  <small class="text-muted d-block" style="font-size: 10px;">
                                                                 <t t-esc="comp.default_code or 'No SKU'" />
+                                                            </small>
+                                                        <div class="card-body px-1 py-0 text-center">
+                                                            <small class="text-dark fw-bold d-block" style="font-size: 10px; line-height: 1;">
+                                                                <t t-foreach="kits" t-as="kit">
+                                                                    <t t-if="comp.id in kit.cabinet_ids.ids">
+                                                                        <t t-esc="kit.color or ''" />
+                                                                        <t t-set="break" t-value="1" />
+                                                                        <t t-break="break" />
+                                                                    </t>
+                                                                </t>
                                                             </small>
                                                         </div>
                                                     </div>
+
                                                 </a>
                                             </div>
                                         </t>
+
                                     </div>
                                 </div>
                             </t>
