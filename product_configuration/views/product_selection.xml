@@ -131,11 +131,11 @@
 
                           <!-- Card Body -->
                           <div class="card-body text-center">
-                            <strong><t t-esc="card['size']"/></strong>
+                            <strong><t t-esc="card['size']"/></strong><br/>
 
                             <!-- Tooltip or Popover (Hidden by default) -->
-                            <div class="card-details-tooltip" data-bs-toggle="tooltip" style="display: none;">
-                              <t t-esc="card['name']"/>
+                            <div class="card-details-tooltip" data-bs-toggle="tooltip" title="Card of Size: <t t-esc='card['name']'/><br/>SKU: <t t-esc='card['cabinet_sku']'/>" style="display: none;">
+                              [Details here when hovered]
                             </div>
                           </div>
 
@@ -291,15 +291,16 @@
       </div>
     </t>
   </template>
+
+  <!-- JS to initialize tooltips (if using Bootstrap's tooltip) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize all tooltips
+      var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      var tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
+  </script>
 </odoo>
 
-<!-- JS to initialize tooltips (if using Bootstrap's tooltip) -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all tooltips
-    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    var tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-  });
-</script>
