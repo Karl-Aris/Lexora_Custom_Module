@@ -283,12 +283,13 @@
                 </div>
               </t>
 
+
               <t t-if="selected_sku">
                 <div class="product-action-container d-flex align-items-center mb-3 w-100">
                   <!-- Quantity Selection -->
                   <div class="quantity-selector">
                     <label for="quantity" class="form-label">Quantity</label>
-                    <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" style="width: 70px;">
+                    <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" style="width: 70px;"/>
                   </div>
 
                   <!-- Add to Cart Button -->
@@ -302,6 +303,8 @@
                   </button>
                 </div>
               </t>
+
+            
 
             </div>
           </div>
