@@ -31,15 +31,21 @@ class ProductKitsController(http.Controller):
             domain.append(('color', '=', color_filter))
 
         kits_model = request.env['product.kits'].sudo()
-        kits = kits_model.search(domain)
 
-        # 🔍 Distinct dropdown values
+        # 🔍 Filter kits where product_id is for sale and in stock
+        kits = kits_model.search(domain).filtered(
+            lambda k: k.product_id 
+            and k.product_id.sale_ok 
+            and k.product_id.qty_available > 0
+        )
+
+        # Dropdown filters (use unfiltered list for full options)
         all_kits = kits_model.search([])
         collections = sorted(set(k.collection for k in all_kits if k.collection))
         sizes = sorted(set(k.size for k in all_kits if k.size))
         colors = sorted(set(k.color for k in all_kits if k.color))
 
-        # 🧱 Group kits by (collection, size) as unique identifier
+        # Group kits by (collection, size)
         from collections import defaultdict
         grouped = defaultdict(list)
         for kit in kits:
@@ -48,7 +54,7 @@ class ProductKitsController(http.Controller):
 
         unique_kits = [kits[0] for kits in grouped.values()]
 
-        # 🔃 Sorting
+        # Sorting
         if sort_key == 'collection':
             unique_kits.sort(key=lambda k: k.collection or '')
         elif sort_key == 'size':
@@ -56,12 +62,11 @@ class ProductKitsController(http.Controller):
         elif sort_key == 'color':
             unique_kits.sort(key=lambda k: k.color or '')
 
-        # 📄 Pagination
-        # 📄 Pagination
+        # Pagination
         start = (page - 1) * per_page
         end = start + per_page
         paged_kits = unique_kits[start:end]
-        total_pages = (len(unique_kits) + per_page - 1) // per_page  # ceiling division
+        total_pages = (len(unique_kits) + per_page - 1) // per_page
 
         return request.render('kits_products.kits_list_template', {
             'paged_kits': paged_kits,
@@ -74,13 +79,9 @@ class ProductKitsController(http.Controller):
             'collections': collections,
             'sizes': sizes,
             'colors': colors,
-            'total_pages': total_pages,  # NEW
+            'total_pages': total_pages,
         })
 
- 
-
-
- 
 
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):

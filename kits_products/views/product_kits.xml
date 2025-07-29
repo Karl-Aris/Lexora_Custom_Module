@@ -224,6 +224,10 @@
 
                                     <div class="row g-2">                                        <!-- Reduced gutter spacing from g-3 to g-2 -->
                                         <t t-foreach="components[category]" t-as="comp">
+                                            <t t-if="category == 'cabinet'">
+                                                <span>DEBUG CABINET: <t t-esc="comp.id" />
+                                                </span>
+                                            </t>
                                             <div class="col-6 col-sm-4 col-lg-3">
                                                 <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
                             collection, size or '',
