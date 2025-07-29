@@ -131,7 +131,7 @@
 
                           <!-- Card Body -->
                           <div class="card-body text-center">
-                            <strong><t t-esc="card['size']"/></strong><br/>
+                            <strong><t t-esc="card['size']"/></strong>
 
                             <!-- Tooltip or Popover (Hidden by default) -->
                             <div class="card-details-tooltip" data-bs-toggle="tooltip" style="display: none;">
