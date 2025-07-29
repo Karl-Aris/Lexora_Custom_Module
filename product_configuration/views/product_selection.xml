@@ -109,7 +109,7 @@
               </div>
               </t>
               
-
+              <t t-if="selected_color">
               <!-- Step 1: Size Selection -->
               <div class="d-flex align-items-center mb-3 w-100">
                 <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
@@ -124,7 +124,7 @@
               </div>
 
               <!-- Size Cards Grid (Collapsed by default) -->
-              <div id="sizeSelection" t-att-class="not selected_sku and 'collapse' or ''">
+              <div id="sizeSelection">
                 <div class="row">
                   <t t-foreach="size_cards" t-as="card">
                     <div class="col-3 mb-3">
@@ -152,6 +152,7 @@
                   </t>
                 </div>
               </div>
+              </t>
 
               <hr/>
 
