@@ -45,7 +45,6 @@
                     </select>
                 </form>
 
-                <!-- JS to auto-submit form -->
                 <script type="text/javascript">
                     document.addEventListener('DOMContentLoaded', function () {
                         const form = document.getElementById('kits-filter-form');
@@ -60,31 +59,31 @@
                 <t t-if="paged_kits">
                     <div class="row">
                         <t t-foreach="paged_kits" t-as="kit">
-                             <div class="col-md-4 mb-4">
-        <div class="card h-100 p-2 border">
-            <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')">
-                <img t-att-src="
-                    kit.image_1920 
-                    and ('data:image/png;base64,%s' % kit.image_1920.decode('utf-8') if isinstance(kit.image_1920, bytes) else kit.image_1920) 
-                    or '/kits_products/static/description/box.png'" 
-                    class="card-img-top mb-2" alt="Kit Image"/>
-            </a>
-            <div class="card-body">
-                <h5 class="card-title">
-                    <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')">
-                        <t t-esc="kit.collection or 'N/A'" />
-                    </a>
-                </h5>
-                <p class="card-text">
-                    <strong>Size:</strong>
-                    <t t-esc="kit.size or 'N/A'" />
-                    <br/>
-                    <strong>Color:</strong>
-                    <t t-esc="kit.color or 'N/A'" />
-                </p>
-            </div>
-        </div>
-    </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-70 p-2 border">
+                                    <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')" class="  d-flex justify-content-center">
+                                        <img t-att-src="
+                        kit.image_1920 
+                        and ('data:image/png;base64,%s' % kit.image_1920.decode('utf-8') if isinstance(kit.image_1920, bytes) else kit.image_1920) 
+                        or '/kits_products/static/description/box.png'" class="card-img-top mb-1" style="height: 250px; width: 250px; object-fit: cover;" alt="Kit Image"/>
+                                        <!-- Reduced image height -->
+                                    </a>
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')">
+                                                <t t-esc="kit.collection or 'N/A'" />
+                                            </a>
+                                        </h5>
+                                        <p class="card-text">
+                                            <strong>Size:</strong>
+                                            <t t-esc="kit.size or 'N/A'" />
+                                            <br/>
+                                            <strong>Color:</strong>
+                                            <t t-esc="kit.color or 'N/A'" />
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </t>
                     </div>
 
@@ -99,7 +98,9 @@
                             <!-- Page Numbers -->
                             <t t-foreach="range(1, total_pages + 1)" t-as="p">
                                 <li class="page-item" t-attf-class="{{ 'active' if page == p else '' }}">
-                                    <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (p, collection or '', size or '', color or '', sort or '')"><t t-esc="p" /></a>
+                                    <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (p, collection or '', size or '', color or '', sort or '')">
+                                        <t t-esc="p" />
+                                    </a>
                                 </li>
                             </t>
 
@@ -111,7 +112,9 @@
                     </nav>
                 </t>
                 <t t-else="">
-                    <p><strong>No kits found.</strong></p>
+                    <p>
+                        <strong>No kits found.</strong>
+                    </p>
                 </t>
             </div>
         </t>
