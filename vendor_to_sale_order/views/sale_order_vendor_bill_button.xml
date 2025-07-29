@@ -1,4 +1,3 @@
-<!-- vendor_to_sale_order/views/sale_order_vendor_bill_button.xml -->
 <odoo>
     <record id="sale_order_vendor_bill_smart_button" model="ir.ui.view">
         <field name="name">sale.order.vendor.bill.smart.button</field>
@@ -9,8 +8,9 @@
                 <button name="%(action_vendor_bills_by_sale_order)d"
                         type="action"
                         class="oe_stat_button"
-                        icon="fa-file-invoice-dollar">
-                    <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
+                        icon="fa-file-invoice-dollar"
+                        string="Vendor Bills">
+                    <field name="vendor_bill_count" widget="statinfo"/>
                 </button>
             </xpath>
         </field>
