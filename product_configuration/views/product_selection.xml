@@ -55,8 +55,10 @@
 
                     <!-- Overlay Message for Out of Stock -->
                     <t t-if="configured_product.qty_available == 0">
-                      <div class="out-of-stock-overlay position-absolute top-50 start-50 translate-middle text-center">
-                        Out of Stock
+                      <div class="out-of-stock-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                        <div class="overlay-text">
+                          Out of Stock
+                        </div>
                       </div>
                     </t>
                   </div>
@@ -380,23 +382,32 @@
       }
 
       .out-of-stock-overlay {
-        background-color: rgba(211, 211, 211, 0.9); /* Light gray with opacity */
-        color: #000;
+        background-color: rgba(0, 0, 0, 0.7); /* Darker gray with lower opacity */
+        color: white;
         font-size: 24px;
-        padding: 12px 20px;
+        padding: 20px;
         border-radius: 8px;
         transition: opacity 0.3s ease;
-        pointer-events: auto;
+        pointer-events: none; /* Ensures the image is still clickable */
+        z-index: 10; /* Ensure the overlay appears above the image */
       }
 
-      /* When the overlay itself is hovered, hide it */
       .out-of-stock-overlay:hover {
-        opacity: 0;
+        opacity: 0; /* Hide when hovered */
       }
 
-      /* Optional: Restore visibility after hover ends */
-      .out-of-stock-wrapper:hover .out-of-stock-overlay:not(:hover) {
-        opacity: 1;
+      /* Optional: Text positioning */
+      .overlay-text {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+      }
+
+      /* Flexbox to center the text */
+      .out-of-stock-overlay {
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
     </style>
     
