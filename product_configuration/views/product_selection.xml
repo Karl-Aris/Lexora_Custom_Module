@@ -231,7 +231,7 @@
                             </t>
                             <!-- Tooltip Message Bubble -->
                             <div class="message-bubble">
-                              <t t-esc="card['size']"/>
+                              <t t-esc="card['name']"/>
                             </div>
                           </div>
                         </a>
