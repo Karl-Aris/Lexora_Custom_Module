@@ -33,20 +33,17 @@
                                     </p>
 
                                     <!-- Product price from sales -->
-                                    <t t-if="product">
-    <div class="product_price">
-        <h3>
-            <span t-field="product.list_price" t-options="{'widget': 'monetary', 'display_currency': product.currency_id}"/>
-            <t t-if="product.lst_price &gt; product.list_price">
-                <del>
-                    <span t-field="product.lst_price" t-options="{'widget': 'monetary', 'display_currency': product.currency_id}"/>
-                </del>
-            </t>
-        </h3>
-    </div>
-</t>
-
-
+                                    <!-- Product price from sales -->
+                                    <t t-if="product and product.product_tmpl_id and product.product_tmpl_id.list_price">
+                                        <t t-set="combination_info" t-value="{
+        'price': product.product_tmpl_id.price,
+        'list_price': product.product_tmpl_id.list_price,
+        'compare_list_price': product.product_tmpl_id.list_price if product.product_tmpl_id.list_price > product.product_tmpl_id.price else False,
+        'has_discounted_price': product.product_tmpl_id.list_price > product.product_tmpl_id.price,
+        'prevent_zero_price_sale': product.product_tmpl_id.list_price == 0
+    }"/>
+                                        <t t-call="website_sale.product_price"/>
+                                    </t>
 
 
                                     <!-- Add to Cart or Out of Stock -->
