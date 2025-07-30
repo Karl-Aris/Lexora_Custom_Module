@@ -64,6 +64,23 @@
                   </div>
                 </t>
 
+                <!-- Modal -->
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
+                            alt="Configured Product"
+                            style="width: 100%; height: auto; object-fit: contain;" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- If no combination, show fallback cabinet image -->
                 <!-- <t t-elif="cabinet_product">
                   <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
@@ -374,9 +391,30 @@
     </t>
 
     <script type="text/javascript">
+     // Function to open the modal
+      function openModal() {
+        var myModal = new bootstrap.Modal(document.getElementById('imageModal'), {
+          keyboard: true
+        });
+        myModal.show();
+      }
     </script>
 
     <style>
+          /* Optional: Extra styling for modal image */
+        .modal-body img {
+          width: 100%;
+          max-width: 800px; /* Set max width to ensure large images don't overflow */
+          height: auto;
+          object-fit: contain;
+        }
+
+        .img-thumbnail {
+          cursor: pointer; /* Shows pointer on hover for the image */
+        }
+
+
+
         .out-of-stock-wrapper {
           position: relative;
         }
