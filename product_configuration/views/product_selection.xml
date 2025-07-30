@@ -25,7 +25,7 @@
                       selected_collection,
                       '&amp;color=' + color if selected_color != color else ''
                     )"
-                 t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
+                 t-att-class="'badge rounded-pill me-2 px-3 py-2 mb-2' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
                  style="cursor:pointer;">
                 <t t-esc="color"/>
               </a>
@@ -352,7 +352,7 @@
               <div class="mb-3">
                 <t t-if="configured_product.product_tag_ids">
                   <t t-foreach="configured_product.product_tag_ids" t-as="tag">
-                    <span class="badge bg-secondary text-white me-2 mb-2 px-3 py-2">
+                    <span class="badge bg-light text-dark me-2 mb-2 px-3 py-2">
                       <t t-esc="tag.name"/>
                     </span>
                   </t>
