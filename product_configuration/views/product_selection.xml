@@ -124,7 +124,7 @@
             <div class="col-md-6">
 
               <t t-if="configured_product">
-              <div class="mb-3 text-left">
+              <div class="text-left">
                 <h3 t-esc="configured_product.name or 'Unnamed Product'" />
                 <div class="d-flex align-items-center w-100 text-muted">
                   <small t-esc="configured_product.default_code or ''" />  <span class="mx-1">/</span>  <small t-esc="selected_collection or ''"/>
@@ -167,7 +167,7 @@
               </t>
 
               <t t-if="configured_product.qty_available == 0">
-                  <span class="badge bg-danger text-white rounded-pill my-3">No available stock</span>
+                  <span class="badge bg-danger text-white rounded-pill my-3 px-4 py-2">No available stock</span>
               </t>
 
               <div class="terms-section">
@@ -177,12 +177,12 @@
               </a>
 
               <!-- 30-Day Money-Back Guarantee (Plain Text) -->
-              <div>
+              <div class="text-muted">
                 30-Day Money-Back Guarantee
               </div>
 
               <!-- Shipping Details (Plain Text) -->
-              <div>
+              <div class="text-muted">
                 Shipping: 2-3 Business Days
               </div>
             </div>
