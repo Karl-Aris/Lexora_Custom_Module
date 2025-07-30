@@ -46,7 +46,7 @@
 
                 <!-- Show configured product if a valid combination exists -->
                 <t t-if="configured_product">
-                  <div class="position-relative out-of-stock-wrapper" onclick="openModal('data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8'))">
+                  <div class="position-relative out-of-stock-wrapper" onclick="openModal()">
                     <!-- Image -->
                     <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
                         alt="Configured Product"
@@ -114,7 +114,7 @@
                     </div>
                     <div class="modal-body">
                       <!-- Image to be dynamically updated -->
-                      <img id="modalImage" src="" alt="Product Image" style="width: 100%; height: auto; object-fit: contain;" />
+                      <img id="modalImage" t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')" alt="Product Image" style="width: 100%; height: auto; object-fit: contain;" />
                     </div>
                   </div>
                 </div>
@@ -395,12 +395,8 @@
 
     <script type="text/javascript">
   // Function to open the modal
-   function openModal(imageSrc) {
+   function openModal() {
     var modal = document.getElementById('imageModal');
-    var modalImage = document.getElementById('modalImage');
-    
-    // Set the modal image source to the clicked image's source
-    modalImage.src = imageSrc;
     
     // Make the modal visible
     modal.style.display = 'block';
