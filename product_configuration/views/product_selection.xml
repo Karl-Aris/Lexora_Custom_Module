@@ -406,9 +406,6 @@
       document.body.appendChild(backdrop);
     }
 
-    // Optional: Close modal when clicking the backdrop or the close button
-    backdrop && backdrop.addEventListener('click', closeModal);
-    document.querySelector('.btn-close').addEventListener('click', closeModal);
   }
 
   // Function to close the modal
