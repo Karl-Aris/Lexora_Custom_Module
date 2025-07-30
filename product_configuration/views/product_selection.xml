@@ -209,11 +209,12 @@
                   <t t-foreach="size_cards" t-as="card">
                     <div class="col-3 mb-3">
                       <a t-att-href="'/store?collection=%s%s%s%s' % (
-                              selected_collection,
-                              '&amp;color=' + selected_color if selected_color else '',
-                              '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
-                              '&amp;size=' + card['size'] if selected_size != card['size'] else '')"
-                       class="text-decoration-none">
+                            selected_collection,
+                            '&amp;color=' + (selected_color or ''),
+                            '&amp;cabinet_sku=' + (card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else ''),
+                            '&amp;size=' + (card['size'] if selected_sku == card['cabinet_sku'] and selected_size != card['size'] else selected_size) if selected_size else ''
+                        )" class="text-decoration-none"/>
+
                         <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku and card['size'] == selected_size else ''}">
                           <t t-if="card['image']">
                             <img t-att-src="'data:image/png;base64,%s' % card['image']"
