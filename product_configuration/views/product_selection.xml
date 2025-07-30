@@ -230,7 +230,9 @@
                               </div>
                             </t>
                             <!-- Tooltip Message Bubble -->
-                            <div class="message-bubble" t-att-data-name="card['name']"></div>
+                            <div class="message-bubble">
+                              <t t-esc="card['size']"/>
+                            </div>
                           </div>
                         </a>
                       </div>
@@ -386,7 +388,7 @@
       tooltip.textContent = card.getAttribute('data-name'); // Set the content to the card's name
     });
   });
-  
+
   // Function to open the modal
    function openModal() {
     var modal = document.getElementById('imageModal');
