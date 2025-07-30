@@ -39,7 +39,7 @@
           <div class="row">
             <!-- LEFT COLUMN: Configured image or cabinet fallback -->
             <div class="col-md-6">
-              <t t-if="selected_sku">
+              <t t-if="selected_sku and selected_size">
                 <!-- Load the cabinet product -->
                 <t t-set="cabinet_product"
                   t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
@@ -96,7 +96,7 @@
               </t>
 
               <!-- If no SKU selected at all -->
-              <t t-if="not selected_sku">
+              <t t-if="not selected_sku and not selected_size">
                 <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
                     style="width: 100%; height: 500px;">
                   No cabinet selected
@@ -212,9 +212,9 @@
                               selected_collection,
                               '&amp;color=' + selected_color if selected_color else '',
                               '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
-                              '&amp;size=' + card['size'] if selected_size != card['size'] else '')"
+                              '&amp;size=' + card['selected_size'] if selected_size != card['size'] else '')"
                        class="text-decoration-none">
-                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
+                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku and card['size'] == selected_size else ''}">
                           <t t-if="card['image']">
                             <img t-att-src="'data:image/png;base64,%s' % card['image']"
                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Product Image"/>
@@ -238,7 +238,7 @@
               <hr/>
 
               <!-- Step 2: Countertop -->
-              <t t-if="selected_sku">
+              <t t-if="selected_sku and selected_size">
 
                 <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
@@ -289,7 +289,7 @@
               
 
               <!-- Step 3: Mirror -->
-              <t t-if="selected_sku">
+              <t t-if="selected_sku and selected_size">
 
                 <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
@@ -343,7 +343,7 @@
 
 
               <!-- Step 4: Faucet -->
-              <t t-if="selected_sku">
+              <t t-if="selected_sku and selected_size">
 
               <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
