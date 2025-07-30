@@ -133,6 +133,6 @@ class ProductKitsController(http.Controller):
             'related_kits': related_kits,
             'kits': kits,
             'price': matching_product.list_price if matching_product else 0.0,
-            'currency': matching_product.currency_id or company_currency,
+            'currency': matching_product.currency_id if matching_product and matching_product.currency_id else company_currency,
 
         })
