@@ -170,22 +170,22 @@
                   <span class="badge bg-danger text-white rounded-pill my-3 px-4 py-2">No available stock</span>
               </t>
 
-              <div class="terms-section">
-              <!-- Terms and Conditions (Underlined Link) -->
-              <a href="/terms" class="terms-link text-decoration-underline mb-2">
-                Terms and Conditions
-              </a>
+              <div class="terms-section mb-4">
+                <!-- Terms and Conditions (Underlined Link) -->
+                <a href="/terms" class="terms-link text-decoration-underline mb-2">
+                  Terms and Conditions
+                </a>
 
-              <!-- 30-Day Money-Back Guarantee (Plain Text) -->
-              <div class="text-muted">
-                30-Day Money-Back Guarantee
-              </div>
+                <!-- 30-Day Money-Back Guarantee (Plain Text) -->
+                <div class="text-muted">
+                  30-Day Money-Back Guarantee
+                </div>
 
-              <!-- Shipping Details (Plain Text) -->
-              <div class="text-muted">
-                Shipping: 2-3 Business Days
+                <!-- Shipping Details (Plain Text) -->
+                <div class="text-muted">
+                  Shipping: 2-3 Business Days
+                </div>
               </div>
-            </div>
 
               </t>
               
