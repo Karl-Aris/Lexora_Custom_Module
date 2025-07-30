@@ -373,6 +373,24 @@
 
       </div>
     </t>
+
+    <script type="text/javascript">
+    </script>
+
+    <style>
+    .input-group .btn {
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 18px;
+    }
+
+    .input-group .form-control {
+      text-align: center;
+      width: 60px;
+      font-size: 18px;
+    }
+    </style>
   </template>
 </odoo>
 
