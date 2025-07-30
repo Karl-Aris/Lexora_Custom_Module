@@ -117,6 +117,8 @@ class ProductKitsController(http.Controller):
             related_kits = unique_related_kits 
         product_tags = matching_product.product_tmpl_id.product_tag_ids if matching_product and matching_product.product_tmpl_id else [] 
 
+        company_currency = request.env.company.currency_id or request.env['res.currency'].search([], limit=1)
+
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
             'product': matching_product,
@@ -129,5 +131,8 @@ class ProductKitsController(http.Controller):
             'faucet': selected_faucet,
             'tags': product_tags,
             'related_kits': related_kits,
-            'kits': kits, 
+            'kits': kits,
+            'price': matching_product.list_price if matching_product else 0.0,
+            'currency': matching_product.currency_id or company_currency,
+
         })

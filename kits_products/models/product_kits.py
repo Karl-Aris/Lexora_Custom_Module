@@ -16,6 +16,20 @@ class ProductKits(models.Model):
     counter_top_sku = fields.Char('Counter Top SKU')
     faucet_sku = fields.Char('Faucet SKU')
     mirror_sku = fields.Char('Mirror SKU')
+    
+    # 💰 Sales Price from related product
+    list_price = fields.Monetary(
+        string="Sales Price",
+        compute="_compute_list_price",
+        store=True
+    )
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Currency',
+        compute='_compute_currency_id',
+        store=True
+    )
+
     product_image = fields.Image(
         string='Product Image',
         compute='_compute_product_image',
@@ -91,6 +105,7 @@ class ProductKits(models.Model):
     def _inverse_image_1920(self):
         for kit in self:
             kit._kit_images = kit.image_1920
+
     @api.depends('product_id.image_128', '_kit_images')
     def _compute_product_image(self):
         for kit in self:
@@ -100,3 +115,14 @@ class ProductKits(models.Model):
                 kit.product_image = kit.product_id.image_128
             else:
                 kit.product_image = False
+
+    # 🧮 Compute the sales price from related product
+    @api.depends('product_id.list_price')
+    def _compute_list_price(self):
+        for kit in self:
+            kit.list_price = kit.product_id.list_price or 0.0
+
+    @api.depends('product_id.currency_id')
+    def _compute_currency_id(self):
+        for kit in self:
+            kit.currency_id = kit.product_id.currency_id or self.env.company.currency_id
