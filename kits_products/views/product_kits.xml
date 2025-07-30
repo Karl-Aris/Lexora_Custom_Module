@@ -3,35 +3,28 @@
         <t t-call="website.layout">
             <div class="container py-5">
 
-                <div class="row g-5">
-                    <!-- Left Column: Main Product -->
+                <div class="row g-5"> 
                     <div class="col-lg-6">
                         <div class="card  border-0 h-100">
                             <div class="card-body">
 
-                                <t t-if="kit and product">
-                                    <!-- Breadcrumb / Product Path -->
+                                <t t-if="kit and product"> 
                                     <p class="text-muted small mb-2">
                                         <a t-att-href="'/product_kits'" class="text-decoration-none  ">All Products</a> /
                                         <t t-esc="product.name" />
                                     </p>
 
-
-                                    <!-- Product Image -->
+ 
                                     <div class="text-center mb-4">
                                         <img t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'" alt="Product Image" class="img-fluid rounded  " style="height: 400px; object-fit: cover;" />
                                     </div>
-
-                                    <!-- Product Name -->
+ 
                                     <h5 class="fw-semibold mb-2 text-start">
                                         <t t-esc="product.name" />
-                                    </h5>
-
-                                    <!-- Product Description -->
+                                    </h5> 
                                     <p class="text-muted small text-center mb-3">
                                         <t t-esc="product.description_sale" />
                                     </p>
-                                    <!-- Product price from sales -->
                                     <t t-name="product.product_price">
                                         <t t-if="price and currency">
                                             <div class="product_price mt-2 mb-3 d-inline-block">
@@ -50,39 +43,42 @@
                                     </t>
 
 
-
-                                    <!-- Add to Cart or Out of Stock -->
+ 
                                     <t t-if="kit.product_id">
                                         <t t-if="product.qty_available > 0">
                                             <form action="/shop/cart/update" method="post" class="mt-4">
                                                 <input type="hidden" name="product_id" t-att-value="kit.product_id.id" />
                                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
-
-                                                <!-- Quantity & Buttons Row -->
+ 
                                                 <div class="d-flex flex-wrap align-items-center gap-3">
-
-                                                    <!-- Quantity Selector -->
+ 
                                                     <div class="input-group quantity-group" style="width: 160px; height: 44px;">
                                                         <button type="button" class="btn btn-outline-secondary shadow-sm" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
                                                         <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
                                                         <button type="button" class="btn btn-outline-secondary shadow-sm" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
                                                     </div>
+ 
 
-                                                    <!-- Add to Cart -->
-                                                    <button type="submit" class="btn btn-dark d-flex align-items-center fw-semibold shadow-sm" style="min-width: 160px; height: 44px;">
-                                                        <i class="fa fa-cart-plus me-2"></i> Add to Cart
+                                                    <div class="input-group" style="width: 160px;">
+                                                        <button type="button" class="btn btn-outline-secondary" title="Decrease Quantity" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
+                                                        <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
+                                                        <button type="button" class="btn btn-outline-secondary" title="Increase Quantity" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                                                    </div>
+
+                                                    <button type="submit" class="btn btn-dark fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
+                                                        <i class="fa fa-cart-plus"></i> Add to Cart
                                                     </button>
 
-                                                    <!-- Buy Now -->
-                                                    <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1" class="btn btn-outline-primary d-flex align-items-center fw-semibold shadow-sm" style="min-width: 140px; height: 44px;">
-                                                        <i class="fa fa-heart-o me-2"></i> Buy Now
+                                                    <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1" class="btn btn-outline-primary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
+                                                        <i class="fa fa-heart-o"></i> Buy Now
                                                     </button>
 
-                                                    <!-- Wishlist -->
-                                                    <a t-att-href="'/shop/wishlist/add/' + str(kit.product_id.id)" class="btn  d-flex align-items-start  fw-semibold " style="height: 44px;">
-                                                        <i class="fa fa-heart me-2"></i> Wishlist
+                                                    <a t-att-href="'/shop/wishlist/add/' + str(kit.product_id.id)" class="btn btn-light border fw-semibold shadow-sm d-flex align-items-center gap-2 px-3 py-2">
+                                                        <i class="fa fa-heart"></i> Wishlist
                                                     </a>
                                                 </div>
+
+
                                             </form>
                                         </t>
                                         <t t-else="">
@@ -132,8 +128,7 @@
                                         </div>
                                     </t>
                                 </t>
-
-                                <!-- KIT FOUND BUT NO MATCHING PRODUCT -->
+ 
                                 <t t-if="kit and not product">
                                     <div class=" text-start mt-4">
                                         <p class="text-muted small mb-2">
@@ -148,8 +143,7 @@
                                         <h5 class="mt-3 text-muted">No matching product variant available</h5>
                                     </div>
                                 </t>
-
-                                <!-- NO KIT MATCH -->
+ 
                                 <t t-if="not kit">
                                     <div class=" text-start mt-4">
                                         <p class="text-muted small mb-2">
@@ -167,10 +161,9 @@
 
 
                                 </t>
-                                <div class="container py-4">
-                                    <!-- Info and Social Share -->
+                                <div class="container py-4"> 
                                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-                                        <!-- Terms and Shipping Info -->
+                                
                                         <div class="text-muted small">
                                             <a href="/terms" class="text-decoration-none text-muted fw-semibold mb-1 d-inline-block">
                                                 <u>Terms and Conditions</u>
@@ -179,7 +172,7 @@
                                             <div>Shipping: 2-3 Business Days</div>
                                         </div>
 
-                                        <!-- Social Share Icons -->
+                                      
                                         <div class=" flex-d flex mt-3 mt-md-0 text-md-end">
                                             <span class="fw-semibold me-2">Share:</span>
                                             <div data-snippet="s_share" class="s_share text-start o_no_link_popover text-lg-end">
@@ -199,7 +192,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Specifications -->
                                     <t t-if="product and product.product_tmpl_id and product.product_tmpl_id.valid_product_template_attribute_line_ids">
                                         <div class="border-top pt-4 mt-4">
                                             <h4 class="fw-bold mb-3 text-dark">Specifications</h4>
@@ -208,14 +200,12 @@
                                                     <tbody>
                                                         <t t-foreach="product.product_tmpl_id.valid_product_template_attribute_line_ids" t-as="ptal">
                                                             <tr t-if="ptal.value_ids">
-                                                                <!-- Attribute Name -->
                                                                 <td class="fw-semibold bg-light text-nowrap text-dark w-30">
 
                                                                     <span class="badge bg-secondary-subtle text-dark fw-normal me-1">
                                                                         <t t-esc="ptal.attribute_id.name" />
                                                                     </span>
                                                                 </td>
-                                                                <!-- Attribute Values -->
                                                                 <td class="w-75">
                                                                     <t t-foreach="ptal.product_template_value_ids._only_active()" t-as="ptv" t-separator=", ">
                                                                         <span class="badge bg-secondary-subtle text-dark fw-normal me-1">
@@ -231,7 +221,6 @@
                                         </div>
                                     </t>
 
-                                    <!-- Tags -->
                                     <t t-if="tags">
                                         <div class="border-top pt-4 mt-4">
                                             <h5 class="fw-bold text-dark mb-3">Tags</h5>
@@ -253,43 +242,35 @@
                         </div>
                     </div>
 
-
-                    <!-- Right Column: Components -->
-                    <div class="col-lg-6">
-                        <!-- Cabinet Sizes -->
+ 
+                    <div class="col-lg-6"> 
                         <t t-if="related_kits">
                             <t t-set="shown_sizes" t-value="[]" />
-
                             <div class="mb-4">
-                                <h4 class="mb-3 fw-bold border-bottom pb-2 text-primary">
-                                    <i class="fa fa-expand-arrows-alt me-1"></i>
-                                    <span class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle" style="width: 30px; height: 30px; font-size: 14px;">
-  1
+                                <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-primary">
+                                    <span class="badge bg-dark text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px; font-size: 0.95rem;">
+                1
                                     </span>
+                                    <span style="font-size: 1.05rem;">Select Cabinet Size</span>
+                                </h5>
 
-
-        Select Cabinet Size
-                                </h4>
-
-                                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+                                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4">
                                     <t t-foreach="related_kits" t-as="rel_kit">
                                         <t t-if="rel_kit.size not in shown_sizes">
                                             <t t-set="shown_sizes" t-value="shown_sizes + [rel_kit.size]" />
                                             <div class="col">
-                                                <div class="card h-100 border-0 shadow-sm text-center">
-                                                    <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (rel_kit.collection or '', rel_kit.size or '')">
-                                                        <div class="d-flex justify-content-center align-items-center p-2" style="height: 90px;">
-                                                            <img t-att-src="'/web/image/product.product/' + str(rel_kit.product_id.id) + '/image_1920'" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;" alt="Size Image" />
+                                                <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (rel_kit.collection or '', rel_kit.size or '')" class="text-decoration-none">
+                                                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center transition" style="transition: all 0.25s ease; cursor: pointer;">
+                                                        <div class="d-flex justify-content-center align-items-center p-3" style="height: 110px; background: #f8f9fa; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                                                            <img t-att-src="'/web/image/product.product/' + str(rel_kit.product_id.id) + '/image_1920'" class="img-fluid rounded" style="max-height: 80px; object-fit: contain; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';" alt="Size" />
                                                         </div>
-                                                    </a>
-                                                    <div class="card-body p-2">
-                                                        <h6 class="mb-0">
-                                                            <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (rel_kit.collection or '', rel_kit.size or '')" class="text-decoration-none text-dark">
+                                                        <div class="card-body py-2 px-3">
+                                                            <strong class="text-dark d-block" style="font-size: 0.9rem;">
                                                                 <t t-esc="rel_kit.size" />
-                                                            </a>
-                                                        </h6>
+                                                            </strong>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </a>
                                             </div>
                                         </t>
                                     </t>
@@ -297,60 +278,43 @@
                             </div>
                         </t>
 
-                        <!-- Components Section -->
+ 
                         <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']" t-as="category">
                             <t t-if="components[category]">
-                                <div class="mb-3">                                    <!-- Reduced mb-5 to mb-3 -->
-                                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-1">                                        <!-- mb-3 to mb-2, pb-2 to pb-1 -->
-                                        <h4 class="mb-0 fw-semibold" style="font-size: 1rem;">                                            <!-- Optional: Smaller heading -->
-                                            <t t-if="category == 'cabinet'">
-                                                <span class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle" style="width: 24px; height: 24px; font-size: 12px;">
-2
-                                                </span> Color
-                                            </t>
-                                            <t t-if="category == 'counter_top'">
-                                                <span class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle" style="width: 24px; height: 24px; font-size: 12px;">
-3
-                                                </span> Counter Top
-                                            </t>
-                                            <t t-if="category == 'mirror'">
-                                                <span class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle" style="width: 24px; height: 24px; font-size: 12px;">
-4
-                                                </span> Mirror
-                                            </t>
-                                            <t t-if="category == 'faucet'">
-                                                <span class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle" style="width: 24px; height: 24px; font-size: 12px;">
-5
-                                                </span> Faucet
-                                            </t>
-                                        </h4>
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center gap-2 mb-2 border-bottom pb-2">
+                                        <span class="badge bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                                            <t t-esc="{'cabinet': 2, 'counter_top': 3, 'mirror': 4, 'faucet': 5}[category]" />
+                                        </span>
+                                        <h6 class="mb-0 fw-semibold text-uppercase" style="font-size: 0.9rem;">
+                                            <t t-esc="{'cabinet': 'Color', 'counter_top': 'Counter Top', 'mirror': 'Mirror', 'faucet': 'Faucet'}[category]" />
+                                        </h6>
                                     </div>
 
-                                    <div class="row g-2">                                        <!-- Reduced gutter spacing from g-3 to g-2 -->
+                                    <div class="row g-2">
                                         <t t-foreach="components[category]" t-as="comp">
                                             <div class="col-6 col-sm-4 col-lg-3">
                                                 <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
-            collection, size or '',
-            ('' if category == 'cabinet' and cabinet == comp.id else (comp.id if category == 'cabinet' else cabinet or '')),
-            ('' if category == 'counter_top' and counter_top == comp.id else (comp.id if category == 'counter_top' else counter_top or '')),
-            ('' if category == 'mirror' and mirror == comp.id else (comp.id if category == 'mirror' else mirror or '')),
-            ('' if category == 'faucet' and faucet == comp.id else (comp.id if category == 'faucet' else faucet or ''))
-        )" class="text-decoration-none">
-                                                    <div t-attf-class="card h-100 rounded-2 align-items-center 
-    #{'border border-primary shadow-sm' if (
-      (category == 'cabinet' and comp.id == cabinet) or
-      (category == 'counter_top' and comp.id == counter_top) or
-      (category == 'mirror' and comp.id == mirror) or
-      (category == 'faucet' and comp.id == faucet)
-    ) else 'border-light shadow-sm'}" style="transition: transform 0.2s ease-in-out; cursor: pointer; padding: 0.25rem;">
-                                                        <div class="d-flex justify-content-center align-items-center" style="height: 72px;  ">
+                                collection, size or '',
+                                ('' if category == 'cabinet' and cabinet == comp.id else (comp.id if category == 'cabinet' else cabinet or '')),
+                                ('' if category == 'counter_top' and counter_top == comp.id else (comp.id if category == 'counter_top' else counter_top or '')),
+                                ('' if category == 'mirror' and mirror == comp.id else (comp.id if category == 'mirror' else mirror or '')),
+                                ('' if category == 'faucet' and faucet == comp.id else (comp.id if category == 'faucet' else faucet or ''))
+                            )" class="text-decoration-none">
+                                                    <div t-attf-class="card h-100 text-center p-2 rounded-3 border-2 #{'border-primary shadow-sm' if (
+                                    (category == 'cabinet' and comp.id == cabinet) or
+                                    (category == 'counter_top' and comp.id == counter_top) or
+                                    (category == 'mirror' and comp.id == mirror) or
+                                    (category == 'faucet' and comp.id == faucet)
+                                ) else 'border-light shadow'} transition">
+                                                        <div class="d-flex justify-content-center align-items-center" style="height: 72px;">
                                                             <img t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''" class="img-fluid rounded" style="max-height: 64px; object-fit: cover;" />
                                                         </div>
-                                                        <small class="text-muted d-block" style="font-size: 10px;">
+                                                        <small class="text-muted d-block" style="font-size: 11px;">
                                                             <t t-esc="comp.default_code or 'No SKU'" />
                                                         </small>
-                                                        <div class="card-body px-1 py-0 text-center">
-                                                            <small class="text-dark fw-bold d-block" style="font-size: 10px; line-height: 1;">
+                                                        <div class="card-body px-1 py-1">
+                                                            <small class="text-dark fw-bold" style="font-size: 10px;">
                                                                 <t t-set="kit_color" t-value="''" />
                                                                 <t t-foreach="kits" t-as="kit">
                                                                     <t t-if="not kit_color and comp.id in kit.cabinet_ids.ids">
@@ -358,24 +322,19 @@
                                                                     </t>
                                                                 </t>
                                                                 <t t-esc="kit_color" />
-
                                                             </small>
                                                         </div>
                                                     </div>
-
                                                 </a>
                                             </div>
                                         </t>
-
                                     </div>
                                 </div>
                             </t>
                         </t>
-
                     </div>
-                </div>
 
-                <!-- Reset Button -->
+                </div> 
                 <div class="mt-4 text-end">
                     <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (collection, size or '')" class="btn btn-outline-secondary">Reset Selection</a>
                 </div>

@@ -1,13 +1,12 @@
 <odoo>
     <template id="kits_list_template" name="Kits List">
         <t t-call="website.layout">
-            <div class="container mt-4 mb-4">
-                <h1>Vanities   </h1>
-
-                <!-- 🔎 Filters -->
-                <form method="get" class="mb-4 d-flex flex-wrap gap-2 align-items-center" id="kits-filter-form">
-                    <!-- Collection -->
-                    <select name="collection" class="form-control w-auto">
+            <div class="container py-5"> 
+                <h1 class="fw-bold mb-4 text-center text-primary" style="font-size: 2rem;">Browse Vanities</h1>
+ 
+                <form method="get" id="kits-filter-form"
+                    class="bg-light rounded-4 shadow-sm p-3 mb-5 d-flex flex-wrap gap-3 align-items-center justify-content-center">
+                    <select name="collection" class="form-select w-auto">
                         <option value="">All Collections</option>
                         <t t-foreach="collections" t-as="coll">
                             <option t-att-value="coll" t-att-selected="collection == coll">
@@ -16,8 +15,7 @@
                         </t>
                     </select>
 
-                    <!-- Size -->
-                    <select name="size" class="form-control w-auto">
+                    <select name="size" class="form-select w-auto">
                         <option value="">All Sizes</option>
                         <t t-foreach="sizes" t-as="sz">
                             <option t-att-value="sz" t-att-selected="size == sz">
@@ -26,8 +24,7 @@
                         </t>
                     </select>
 
-                    <!-- Color -->
-                    <select name="color" class="form-control w-auto">
+                    <select name="color" class="form-select w-auto">
                         <option value="">All Colors</option>
                         <t t-foreach="colors" t-as="clr">
                             <option t-att-value="clr" t-att-selected="color == clr">
@@ -36,8 +33,7 @@
                         </t>
                     </select>
 
-                    <!-- Sort -->
-                    <select name="sort" class="form-control w-auto">
+                    <select name="sort" class="form-select w-auto">
                         <option value="">Sort By</option>
                         <option value="collection" t-att-selected="sort == 'collection'">Collection</option>
                         <option value="size" t-att-selected="sort == 'size'">Size</option>
@@ -48,54 +44,49 @@
                 <script type="text/javascript">
                     document.addEventListener('DOMContentLoaded', function () {
                         const form = document.getElementById('kits-filter-form');
-                        const selects = form.querySelectorAll('select');
-                        selects.forEach(select => {
+                        form.querySelectorAll('select').forEach(select => {
                             select.addEventListener('change', () => form.submit());
                         });
                     });
                 </script>
-
-                <!-- 🧱 Kits Grid -->
+ 
                 <t t-if="paged_kits">
-                    <div class="row">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                         <t t-foreach="paged_kits" t-as="kit">
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-70 p-2 border">
-                                    <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')" class="  d-flex justify-content-center">
+                            <div class="col">
+                                <div class="card h-100 border-0 shadow-sm rounded-4">
+                                    <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')"
+                                       class="text-center d-block p-3">
                                         <img t-att-src="
-                        kit.image_1920 
-                        and ('data:image/png;base64,%s' % kit.image_1920.decode('utf-8') if isinstance(kit.image_1920, bytes) else kit.image_1920) 
-                        or '/kits_products/static/description/box.png'" class="card-img-top mb-1" style="height: 250px; width: 250px; object-fit: cover;" alt="Kit Image"/>
-                                        <!-- Reduced image height -->
+                                            kit.image_1920 
+                                            and ('data:image/png;base64,%s' % kit.image_1920.decode('utf-8') if isinstance(kit.image_1920, bytes) else kit.image_1920) 
+                                            or '/kits_products/static/description/box.png'"
+                                            class="img-fluid rounded shadow-sm"
+                                            style="height: 200px; width: auto; object-fit: contain;"
+                                            alt="Kit Image"/>
                                     </a>
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title mb-2">
+                                            <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (kit.collection or '', kit.size or '')"
+                                               class="text-decoration-none text-dark fw-semibold">
                                                 <t t-esc="kit.collection or 'N/A'" />
                                             </a>
                                         </h5>
-                                        <p class="card-text">
-                                            <strong>Size:</strong>
-                                            <t t-esc="kit.size or 'N/A'" />
-                                            <br/>
-                                            <strong>Color:</strong>
-                                            <t t-esc="kit.color or 'N/A'" />
+                                        <p class="card-text text-muted small mb-0">
+                                            <strong>Size:</strong> <t t-esc="kit.size or 'N/A'" /><br/>
+                                            <strong>Color:</strong> <t t-esc="kit.color or 'N/A'" />
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </t>
                     </div>
-
-                    <!-- 📄 Pagination -->
-                    <nav>
+ 
+                    <nav class="mt-5">
                         <ul class="pagination justify-content-center">
-                            <!-- Previous -->
                             <li class="page-item" t-attf-class="{{ 'disabled' if page == 1 else '' }}">
                                 <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (page - 1, collection or '', size or '', color or '', sort or '')">Previous</a>
                             </li>
-
-                            <!-- Page Numbers -->
                             <t t-foreach="range(1, total_pages + 1)" t-as="p">
                                 <li class="page-item" t-attf-class="{{ 'active' if page == p else '' }}">
                                     <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (p, collection or '', size or '', color or '', sort or '')">
@@ -103,18 +94,17 @@
                                     </a>
                                 </li>
                             </t>
-
-                            <!-- Next -->
                             <li class="page-item" t-attf-class="{{ 'disabled' if page >= total_pages else '' }}">
                                 <a class="page-link" t-att-href="'/product_kits?page=%s&amp;collection=%s&amp;size=%s&amp;color=%s&amp;sort=%s' % (page + 1, collection or '', size or '', color or '', sort or '')">Next</a>
                             </li>
                         </ul>
                     </nav>
                 </t>
+ 
                 <t t-else="">
-                    <p>
-                        <strong>No kits found.</strong>
-                    </p>
+                    <div class="text-center py-5">
+                        <h5 class="text-muted">No kits found for the selected filters.</h5>
+                    </div>
                 </t>
             </div>
         </t>
