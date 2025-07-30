@@ -193,24 +193,7 @@ class ProductKitsController(http.Controller):
         # Get product tags (if matching product is found)
         product_tags = matching_product.product_tmpl_id.product_tag_ids if matching_product and matching_product.product_tmpl_id else []
         
-        combination_info = {}
-        if matching_product:
-            pricelist_id = request.session.get('website_pricelist') or request.website.pricelist_id.id
-            pricelist = request.env['product.pricelist'].sudo().browse(pricelist_id)
-
-            # Compute price
-            product_price = pricelist.with_context(uom=matching_product.uom_id.id).get_product_price(
-                matching_product, 1.0, request.website.user_id
-            )
-
-            combination_info = {
-                'product_id': matching_product.id,
-                'price': product_price,
-                'currency': pricelist.currency_id,
-                'price_string': "%s %s" % (product_price, pricelist.currency_id.symbol),
-            }
-
-
+        
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
             'product': matching_product,
@@ -224,5 +207,4 @@ class ProductKitsController(http.Controller):
             'tags': product_tags,
             'related_kits': related_kits,
             'kits': kits,
-            'combination_info': combination_info,  
         })

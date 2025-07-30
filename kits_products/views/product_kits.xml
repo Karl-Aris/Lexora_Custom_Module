@@ -33,14 +33,10 @@
                                     </p>
 
                                     <!-- Product Price -->
-                                   <t t-if="combination_info">
-  <div>
-    <strong>Price:</strong>
-    <span t-esc="combination_info['price_string']"/>
-  </div>
-</t>
-
-
+                                    <pre>
+                                        <t t-esc="product.read()[0]" />
+                                    </pre>
+ 
 
                                     <!-- Add to Cart or Out of Stock -->
                                     <t t-if="kit.product_id">
