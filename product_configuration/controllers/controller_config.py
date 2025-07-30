@@ -68,8 +68,8 @@ class ProductKitsController(http.Controller):
         counter_top_cards = []
         mirror_cards = []
         faucet_cards = []
-        if selected_sku:
-            matching_kits = kits.filtered(lambda k: k.cabinet_sku == selected_sku)
+        if selected_sku and selected_size:
+            matching_kits = kits.filtered(lambda k: k.cabinet_sku == selected_sku and k.size == selected_size)
 
             # Collect unique countertop, mirror, faucet
             seen_ctops, seen_mirrors, seen_faucets = set(), set(), set()
@@ -103,7 +103,7 @@ class ProductKitsController(http.Controller):
 
         # Determine configured kit (only if >1 component selected)
         domain = [('cabinet_sku', '=', selected_sku)]
-        domain.append(('size', '=', selected_size or ''))
+        domain.append(('size', '=', selected_size))
         domain.append(('counter_top_sku', '=', selected_countertop or ''))
         domain.append(('mirror_sku', '=', selected_mirror or ''))
         domain.append(('faucet_sku', '=', selected_faucet or ''))
