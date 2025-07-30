@@ -221,6 +221,7 @@
                                     <p class="text-start  fw-semibold fs-5"> Price: <t
                                             t-esc="product.lst_price and ('%.2f' % product.lst_price) or 'N/A'" />
                                     </p>
+                                          <pre><t t-esc="product.read()[0]" /></pre>
                                 </t>
 
                                 <t t-if="kit.product_id">
