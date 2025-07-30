@@ -145,7 +145,7 @@
               </div>
 
               <t t-if="configured_product.qty_available > 0">
-                <div class="product-action-container d-flex align-items-center mb-3 w-100">
+                <div class="product-action-container d-flex align-items-center my-3 w-100">
                   
                   <!-- Quantity Selection with Minus, Quantity, Plus -->
                   <div class="input-group quantity-group" style="width: 160px; height: 44px;">
@@ -167,12 +167,12 @@
               </t>
 
               <t t-if="configured_product.qty_available == 0">
-                  <span class="text-danger">No available stock</span>
+                  <span class="badge bg-danger text-white rounded-pill my-3">No available stock</span>
               </t>
 
               <div class="terms-section">
               <!-- Terms and Conditions (Underlined Link) -->
-              <a href="/terms" class="terms-link">
+              <a href="/terms" class="terms-link text-decoration-underline mb-2">
                 Terms and Conditions
               </a>
 
