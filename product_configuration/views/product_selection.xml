@@ -208,7 +208,7 @@
                 <div class="row">
                   <t t-foreach="size_cards" t-as="card">
                     <div class="col-3 mb-3">
-                      <a t-att-href="'/store?collection=%s%s%s%s' % (
+                      <a t-att-href="'/store?collection=%s%s%s%s%s' % (
                                       selected_collection,
                                       '&amp;color=' + selected_color if selected_color else '',
                                       '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
