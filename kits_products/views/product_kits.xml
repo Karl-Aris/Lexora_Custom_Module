@@ -33,30 +33,8 @@
                                     </p>
 
                                     <!-- Product Price -->
-                               <t t-if="combination_info">
-    <div itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer"
-         t-attf-class="product_price fs-5 fw-semibold mb-3 {{'d-none' if combination_info['prevent_zero_price_sale'] else 'd-block'}}">
-        <h5 class="mb-0">
-            <span class="oe_price text-dark" t-out="combination_info['price']"
-                  t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
-            <span itemprop="price" style="display:none;" t-out="combination_info['price']"/>
-            <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/>
+                                    <pre><t t-esc="product.read()[0]" /></pre>
 
-            <span t-if="combination_info['has_discounted_price'] and not combination_info['compare_list_price']"
-                  class="text-danger ms-2"
-                  style="text-decoration: line-through;"
-                  t-esc="combination_info['list_price']"
-                  t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"
-                  itemprop="listPrice"/>
-
-            <del t-if="combination_info['compare_list_price'] and (combination_info['compare_list_price'] &gt; combination_info['price'])">
-                <span t-esc="combination_info['compare_list_price']"
-                      groups="website_sale.group_product_price_comparison"
-                      t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
-            </del>
-        </h5>
-    </div>
-</t>
 
 
 

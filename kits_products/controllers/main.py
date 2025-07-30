@@ -1,6 +1,7 @@
 from odoo import http
 from odoo.http import request
 from collections import defaultdict
+from odoo.tools import formatLang
 
 class ProductKitsController(http.Controller):
 
@@ -191,7 +192,7 @@ class ProductKitsController(http.Controller):
 
         # Get product tags (if matching product is found)
         product_tags = matching_product.product_tmpl_id.product_tag_ids if matching_product and matching_product.product_tmpl_id else []
-
+        
 
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
