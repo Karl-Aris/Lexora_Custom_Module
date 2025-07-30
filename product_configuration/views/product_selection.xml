@@ -310,19 +310,10 @@
               <div class="product-action-container d-flex align-items-center mb-3 w-100">
                 
                 <!-- Quantity Selection with Minus, Quantity, Plus -->
-                <div class="input-group">
-                  <!-- Minus Button -->
-                  <button class="btn btn-outline-secondary" type="button" id="decrease-btn" style="border-radius: 50%; width: 35px; height: 35px; font-size: 18px;">
-                    -
-                  </button>
-
-                  <!-- Quantity -->
-                  <input type="number" id="quantity" name="quantity" class="form-control text-center" value="1" min="1" style="font-size: 18px; width: 60px;"/>
-
-                  <!-- Plus Button -->
-                  <button class="btn btn-outline-secondary" type="button" id="increase-btn" style="border-radius: 50%; width: 35px; height: 35px; font-size: 18px;">
-                    +
-                  </button>
+                <div class="input-group quantity-group" style="width: 160px; height: 44px;">
+                    <button type="button" class="btn btn-outline-secondary shadow-sm" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
+                    <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
+                    <button type="button" class="btn btn-outline-secondary shadow-sm" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
                 </div>
 
                 <!-- Add to Cart Button -->
@@ -376,21 +367,7 @@
 
     <script type="text/javascript">
     </script>
-
-    <style>
-    .input-group .btn {
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      font-size: 18px;
-    }
-
-    .input-group .form-control {
-      text-align: center;
-      width: 60px;
-      font-size: 18px;
-    }
-    </style>
+    
   </template>
 </odoo>
 
