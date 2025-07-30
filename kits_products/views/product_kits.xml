@@ -33,8 +33,12 @@
                                     </p>
 
                                     <!-- Product Price -->
-                                    <pre><t t-esc="product.read()[0]" /></pre>
-
+                                   <t t-if="combination_info">
+  <div>
+    <strong>Price:</strong>
+    <span t-esc="combination_info['price_string']"/>
+  </div>
+</t>
 
 
 
@@ -197,10 +201,10 @@
                                                             <tr t-if="ptal.value_ids">
                                                                 <!-- Attribute Name -->
                                                                 <td class="fw-semibold bg-light text-nowrap text-dark w-30">
-                                                                   
-                                                                     <span class="badge bg-secondary-subtle text-dark fw-normal me-1">
-                                                                         <t t-esc="ptal.attribute_id.name" />
-                                                                        </span>
+
+                                                                    <span class="badge bg-secondary-subtle text-dark fw-normal me-1">
+                                                                        <t t-esc="ptal.attribute_id.name" />
+                                                                    </span>
                                                                 </td>
                                                                 <!-- Attribute Values -->
                                                                 <td class="w-75">
