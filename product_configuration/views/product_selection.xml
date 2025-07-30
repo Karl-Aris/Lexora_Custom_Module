@@ -391,13 +391,38 @@
     </t>
 
     <script type="text/javascript">
-     // Function to open the modal
-      function openModal() {
-        var myModal = new bootstrap.Modal(document.getElementById('imageModal'), {
-          keyboard: true
-        });
-        myModal.show();
-      }
+  // Function to open the modal
+  function openModal() {
+    var modal = document.getElementById('imageModal');
+    var modalBackdrop = document.querySelector('.modal-backdrop'); // Get the backdrop element
+    
+    // Make the modal visible
+    modal.style.display = 'block';
+    
+    // Create the backdrop manually
+    if (!modalBackdrop) {
+      var backdrop = document.createElement('div');
+      backdrop.classList.add('modal-backdrop', 'fade', 'show');
+      document.body.appendChild(backdrop);
+    }
+
+    // Optional: Close modal when clicking the backdrop or the close button
+    backdrop && backdrop.addEventListener('click', closeModal);
+    document.querySelector('.btn-close').addEventListener('click', closeModal);
+  }
+
+  // Function to close the modal
+  function closeModal() {
+    var modal = document.getElementById('imageModal');
+    var modalBackdrop = document.querySelector('.modal-backdrop');
+    
+    // Hide the modal and remove the backdrop
+    modal.style.display = 'none';
+    if (modalBackdrop) {
+      modalBackdrop.remove();
+    }
+  }
+
     </script>
 
     <style>
