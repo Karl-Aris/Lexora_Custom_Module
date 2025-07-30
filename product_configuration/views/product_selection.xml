@@ -144,7 +144,7 @@
                 <!-- <h4 t-esc="configured_product.property_product_pricelist"/> -->
               </div>
 
-              <t t-if="qty_available > 0">
+              <t t-if="configured_product.qty_available > 0">
                 <div class="product-action-container d-flex align-items-center mb-3 w-100">
                   
                   <!-- Quantity Selection with Minus, Quantity, Plus -->
@@ -166,8 +166,8 @@
                 </div>
               </t>
 
-              <t t-if="qty_available == 0">
-
+              <t t-if="configured_product.qty_available == 0">
+                  <span class="text-danger">No available stock</span>
               </t>
 
               <div class="terms-section">
