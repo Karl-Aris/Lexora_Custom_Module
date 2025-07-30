@@ -46,12 +46,12 @@
 
                 <!-- Show configured product if a valid combination exists -->
                 <t t-if="configured_product">
-                  <div class="position-relative out-of-stock-wrapper" onclick="openModal()">
+                  <div class="position-relative out-of-stock-wrapper">
                     <!-- Image -->
                     <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
                         alt="Configured Product"
                         class="img-thumbnail"
-                        style="width: 100%; height: 450px; object-fit: contain;"/>
+                        style="width: 100%; height: 450px; object-fit: contain;" onclick="openModal()"/>
 
                     <!-- Overlay Message for Out of Stock -->
                     <t t-if="configured_product.qty_available == 0">
@@ -104,21 +104,25 @@
               </t>
 
               <!-- Modal -->
-                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                            alt="Configured Product"
-                            style="width: 100%; height: auto; object-fit: contain;" />
-                      </div>
+              <t t-if="configured_product">
+              <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true" style="display: none;">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+                      <button type="button" class="btn-close" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
+                          alt="Configured Product"
+                          style="width: 100%; height: auto; object-fit: contain;" />
                     </div>
                   </div>
                 </div>
+              </div>
+              </t>
+
+
             </div>
 
             <!-- RIGHT COLUMN: Size cards -->
