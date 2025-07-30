@@ -311,9 +311,9 @@
                 
                 <!-- Quantity Selection with Minus, Quantity, Plus -->
                 <div class="input-group quantity-group" style="width: 160px; height: 44px;">
-                    <button type="button" class="btn" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
                     <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
-                    <button type="button" class="btn" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
                 </div>
 
                 <!-- Add to Cart Button -->
@@ -367,7 +367,7 @@
 
     <script type="text/javascript">
     </script>
-
+    
   </template>
 </odoo>
 
