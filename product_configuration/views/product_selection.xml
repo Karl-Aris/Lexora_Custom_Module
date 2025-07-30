@@ -144,7 +144,7 @@
                 <!-- <h4 t-esc="configured_product.property_product_pricelist"/> -->
               </div>
 
-              <t t-if="configured_product">
+              <t t-if="qty_available > 0">
                 <div class="product-action-container d-flex align-items-center mb-3 w-100">
                   
                   <!-- Quantity Selection with Minus, Quantity, Plus -->
@@ -165,6 +165,28 @@
                   </button>
                 </div>
               </t>
+
+              <t t-if="qty_available == 0">
+
+              </t>
+
+              <div class="terms-section">
+              <!-- Terms and Conditions (Underlined Link) -->
+              <a href="/terms" class="terms-link">
+                Terms and Conditions
+              </a>
+
+              <!-- 30-Day Money-Back Guarantee (Plain Text) -->
+              <div>
+                30-Day Money-Back Guarantee
+              </div>
+
+              <!-- Shipping Details (Plain Text) -->
+              <div>
+                Shipping: 2-3 Business Days
+              </div>
+            </div>
+
               </t>
               
               <t t-if="selected_color">
