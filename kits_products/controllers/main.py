@@ -1,7 +1,6 @@
 from odoo import http
 from odoo.http import request
 from collections import defaultdict
-from odoo.tools import formatLang
 
 class ProductKitsController(http.Controller):
 
@@ -14,80 +13,11 @@ class ProductKitsController(http.Controller):
             domain.append(('size', '=', False))
         return request.env['product.kits'].sudo().search(domain)
 
-    @http.route(['/product_kits'], type='http', auth="public", website=True)
-    def list_kits(self, **kwargs):
-        collection_filter = kwargs.get('collection', '').strip()
-        size_filter = kwargs.get('size', '').strip()
-        color_filter = kwargs.get('color', '').strip()
-        sort_key = kwargs.get('sort')
-        page = int(kwargs.get('page', 1))
-        per_page = 12
-
-        domain = []
-        if collection_filter:
-            domain.append(('collection', '=', collection_filter))
-        if size_filter:
-            domain.append(('size', '=', size_filter))
-        if color_filter:
-            domain.append(('color', '=', color_filter))
-
-        kits_model = request.env['product.kits'].sudo()
-        kits = kits_model.search(domain)
-
-        # 🔍 Distinct dropdown values
-        all_kits = kits_model.search([])
-        collections = sorted(set(k.collection for k in all_kits if k.collection))
-        sizes = sorted(set(k.size for k in all_kits if k.size))
-        colors = sorted(set(k.color for k in all_kits if k.color))
-
-        # 🧱 Group kits by (collection, size) as unique identifier
-        from collections import defaultdict
-        grouped = defaultdict(list)
-        for kit in kits:
-            key = (kit.collection, kit.size)
-            grouped[key].append(kit)
-
-        unique_kits = [kits[0] for kits in grouped.values()]
-
-        # 🔃 Sorting
-        if sort_key == 'collection':
-            unique_kits.sort(key=lambda k: k.collection or '')
-        elif sort_key == 'size':
-            unique_kits.sort(key=lambda k: k.size or '')
-        elif sort_key == 'color':
-            unique_kits.sort(key=lambda k: k.color or '')
-
-        # 📄 Pagination
-        # 📄 Pagination
-        start = (page - 1) * per_page
-        end = start + per_page
-        paged_kits = unique_kits[start:end]
-        total_pages = (len(unique_kits) + per_page - 1) // per_page  # ceiling division
-
-        return request.render('kits_products.kits_list_template', {
-            'paged_kits': paged_kits,
-            'page': page,
-            'has_next': end < len(unique_kits),
-            'collection': collection_filter,
-            'size': size_filter,
-            'color': color_filter,
-            'sort': sort_key,
-            'collections': collections,
-            'sizes': sizes,
-            'colors': colors,
-            'total_pages': total_pages,  # NEW
-        })
-
- 
-
-
- 
-
+  
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
         """Display a single matching kit (by collection and size) and filterable components."""
-
-        # Render empty/default view if collection or size is missing
+ 
         if not collection or not size:
             return request.render('kits_products.kit_group_detail_template', {
                 'kit': None,
@@ -116,8 +46,7 @@ class ProductKitsController(http.Controller):
                 'tags': [],
                 'related_kits': [],
             })
-
-        # Collect filterable components
+ 
         components = {
             'cabinet': set(),
             'counter_top': set(),
@@ -132,8 +61,7 @@ class ProductKitsController(http.Controller):
 
         default_kit = kits[0]
         is_first_load = not any([cabinet, counter_top, mirror, faucet])
-
-        # Determine selected components
+ 
         selected_cabinet = int(cabinet) if cabinet else (
             default_kit.cabinet_ids[0].id if default_kit.cabinet_ids and is_first_load else None
         )
@@ -146,8 +74,7 @@ class ProductKitsController(http.Controller):
         selected_faucet = int(faucet) if faucet else (
             default_kit.faucet_ids[0].id if default_kit.faucet_ids and is_first_load else None
         )
-
-        # Match kit based on selected components
+ 
         matching_kit = None
         matching_product = None
 
@@ -173,8 +100,7 @@ class ProductKitsController(http.Controller):
             matching_kit = kit
             matching_product = kit.product_id
             break
-
-        # Get related kits
+ 
         related_kits = []
         if matching_kit and matching_kit.color and matching_kit.collection:
             all_related_kits = request.env['product.kits'].sudo().search([
@@ -188,12 +114,9 @@ class ProductKitsController(http.Controller):
                 if kit.size and kit.size not in seen_sizes:
                     seen_sizes.add(kit.size)
                     unique_related_kits.append(kit)
-            related_kits = unique_related_kits
+            related_kits = unique_related_kits 
+        product_tags = matching_product.product_tmpl_id.product_tag_ids if matching_product and matching_product.product_tmpl_id else [] 
 
-        # Get product tags (if matching product is found)
-        product_tags = matching_product.product_tmpl_id.product_tag_ids if matching_product and matching_product.product_tmpl_id else []
-        
-        
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
             'product': matching_product,
@@ -206,5 +129,5 @@ class ProductKitsController(http.Controller):
             'faucet': selected_faucet,
             'tags': product_tags,
             'related_kits': related_kits,
-            'kits': kits,
+            'kits': kits, 
         })

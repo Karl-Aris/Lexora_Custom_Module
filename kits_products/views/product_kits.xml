@@ -32,11 +32,22 @@
                                         <t t-esc="product.description_sale" />
                                     </p>
 
-                                    <!-- Product Price -->
-                                    <pre>
-                                        <t t-esc="product.read()[0]" />
-                                    </pre>
- 
+                                    <!-- Product price from sales -->
+                                    <t t-if="product">
+    <div class="product_price">
+        <h3>
+            <span t-field="product.list_price" t-options="{'widget': 'monetary', 'display_currency': product.currency_id}"/>
+            <t t-if="product.lst_price &gt; product.list_price">
+                <del>
+                    <span t-field="product.lst_price" t-options="{'widget': 'monetary', 'display_currency': product.currency_id}"/>
+                </del>
+            </t>
+        </h3>
+    </div>
+</t>
+
+
+
 
                                     <!-- Add to Cart or Out of Stock -->
                                     <t t-if="kit.product_id">

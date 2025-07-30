@@ -11,78 +11,7 @@ class ProductKitsController(http.Controller):
             domain.append(('size', '=', size))
         else:
             domain.append(('size', '=', False))
-        return request.env['product.kits'].sudo().search(domain)
-
-    @http.route(['/product_kits'], type='http', auth="public", website=True)
-    def list_kits(self, **kwargs):
-        collection_filter = kwargs.get('collection', '').strip()
-        size_filter = kwargs.get('size', '').strip()
-        color_filter = kwargs.get('color', '').strip()
-        sort_key = kwargs.get('sort')
-        page = int(kwargs.get('page', 1))
-        per_page = 12
-
-        domain = []
-        if collection_filter:
-            domain.append(('collection', '=', collection_filter))
-        if size_filter:
-            domain.append(('size', '=', size_filter))
-        if color_filter:
-            domain.append(('color', '=', color_filter))
-
-        kits_model = request.env['product.kits'].sudo()
-
-        # 🔍 Filter kits where product_id is for sale and in stock
-        kits = kits_model.search(domain).filtered(
-            lambda k: k.product_id 
-            and k.product_id.sale_ok 
-            and k.product_id.qty_available > 0
-        )
-
-        # Dropdown filters (use unfiltered list for full options)
-        all_kits = kits_model.search([])
-        collections = sorted(set(k.collection for k in all_kits if k.collection))
-        sizes = sorted(set(k.size for k in all_kits if k.size))
-        colors = sorted(set(k.color for k in all_kits if k.color))
-
-        # Group kits by (collection, size)
-        from collections import defaultdict
-        grouped = defaultdict(list)
-        for kit in kits:
-            key = (kit.collection, kit.size)
-            grouped[key].append(kit)
-
-        unique_kits = [kits[0] for kits in grouped.values()]
-
-        # Sorting
-        if sort_key == 'collection':
-            unique_kits.sort(key=lambda k: k.collection or '')
-        elif sort_key == 'size':
-            unique_kits.sort(key=lambda k: k.size or '')
-        elif sort_key == 'color':
-            unique_kits.sort(key=lambda k: k.color or '')
-
-        # Pagination
-        start = (page - 1) * per_page
-        end = start + per_page
-        paged_kits = unique_kits[start:end]
-        total_pages = (len(unique_kits) + per_page - 1) // per_page
-
-        return request.render('kits_products.kits_list_template', {
-            'paged_kits': paged_kits,
-            'page': page,
-            'has_next': end < len(unique_kits),
-            'collection': collection_filter,
-            'size': size_filter,
-            'color': color_filter,
-            'sort': sort_key,
-            'collections': collections,
-            'sizes': sizes,
-            'colors': colors,
-            'total_pages': total_pages,
-        })
-
-
+        return request.env['product.kits'].sudo().search(domain) 
     @http.route(['/product_kits/group'], type='http', auth="public", website=True)
     def group_detail(self, collection=None, size=None, cabinet=None, counter_top=None, mirror=None, faucet=None, **kwargs):
         """Display a single matching kit (by collection and size) and filterable components."""
@@ -141,8 +70,7 @@ class ProductKitsController(http.Controller):
         selected_faucet = int(faucet) if faucet else (
             default_kit.faucet_ids[0].id if default_kit.faucet_ids and is_first_load else None
         )
-
-        # ✅ Step 4: Find exact match for selected components
+ 
         matching_kit = None
         matching_product = None
 
@@ -177,7 +105,7 @@ class ProductKitsController(http.Controller):
                 ('collection', '=', matching_kit.collection),
             ])
  
-            seen_sizes = set()
+            seen_sizess = set()
             unique_related_kits = []
             for kit in all_related_kits:
                 if kit.size and kit.size not in seen_sizes:
@@ -188,8 +116,8 @@ class ProductKitsController(http.Controller):
         return request.render('kits_products.kit_group_detail_template', {
             'kit': matching_kit,
             'product': matching_product,
-            'collection': collection,
-            'size': size,
+            'collection': collections,
+            'size': sizes,
             'components': components,
             'cabinet': selected_cabinet,
             'counter_top': selected_counter_top,
