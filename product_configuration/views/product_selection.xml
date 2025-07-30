@@ -211,7 +211,8 @@
                       <a t-att-href="'/store?collection=%s%s%s' % (
                               selected_collection,
                               '&amp;color=' + selected_color if selected_color else '',
-                              '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '')"
+                              '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
+                              '&amp;size=' + card['size'] if selected_size != card['size'] else '')"
                        class="text-decoration-none">
                         <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku else ''}">
                           <t t-if="card['image']">
@@ -259,6 +260,7 @@
                                   selected_collection,
                                   '&amp;color=' + selected_color if selected_color else '',
                                   '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;size=' + selected_size if selected_size else '',
                                   '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
                                   '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
                                   '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
@@ -314,6 +316,7 @@
                                   selected_collection,
                                   '&amp;color=' + selected_color if selected_color else '',
                                   '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;size=' + selected_size if selected_size else '',
                                   '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
                                   '&amp;mirror_sku=' + card['mirror_sku'] if selected_mirror != card['mirror_sku'] else '',
                                   '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
@@ -362,6 +365,7 @@
                                   selected_collection,
                                   '&amp;color=' + selected_color if selected_color else '',
                                   '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;size=' + selected_size if selected_size else '',
                                   '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
                                   '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
                                   '&amp;faucet_sku=' + card['faucet_sku'] if selected_faucet != card['faucet_sku'] else ''
