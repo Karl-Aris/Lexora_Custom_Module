@@ -11,6 +11,7 @@ class ProductKitsController(http.Controller):
         selected_countertop = kwargs.get('counter_top_sku')
         selected_mirror = kwargs.get('mirror_sku')
         selected_faucet = kwargs.get('faucet_sku')
+        selected_size = kwargs.get('size')
 
         configured_kit = None
         configured_product = None
@@ -102,6 +103,7 @@ class ProductKitsController(http.Controller):
 
         # Determine configured kit (only if >1 component selected)
         domain = [('cabinet_sku', '=', selected_sku)]
+        domain.append(('size', '=', selected_size or ''))
         domain.append(('counter_top_sku', '=', selected_countertop or ''))
         domain.append(('mirror_sku', '=', selected_mirror or ''))
         domain.append(('faucet_sku', '=', selected_faucet or ''))
@@ -120,6 +122,7 @@ class ProductKitsController(http.Controller):
             'colors': colors,
             'selected_color': selected_color,
             'selected_sku': selected_sku,
+            'selected_size': selected_size,
             'selected_countertop': selected_countertop,
             'selected_mirror': selected_mirror,
             'selected_faucet': selected_faucet,
