@@ -46,12 +46,12 @@
 
                 <!-- Show configured product if a valid combination exists -->
                 <t t-if="configured_product">
-                  <div class="position-relative out-of-stock-wrapper">
+                  <div class="position-relative out-of-stock-wrapper" onclick="openModal()">
                     <!-- Image -->
                     <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
                         alt="Configured Product"
                         class="img-thumbnail"
-                        style="width: 100%; height: 450px; object-fit: contain;" onclick="openModal()"/>
+                        style="width: 100%; height: 450px; object-fit: contain;"/>
 
                     <!-- Overlay Message for Out of Stock -->
                     <t t-if="configured_product.qty_available == 0">
