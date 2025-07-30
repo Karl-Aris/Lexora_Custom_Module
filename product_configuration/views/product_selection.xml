@@ -194,6 +194,7 @@
 
               <!-- Step 2: Countertop -->
               <t t-if="selected_sku">
+
                 <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>2</strong>
@@ -202,22 +203,22 @@
                     Add Countertop
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
 
                 <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
-                      <div class="col-3 mb-3">
-                        <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
-                                selected_collection,
-                                '&amp;color=' + selected_color if selected_color else '',
-                                '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                                '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
-                                '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                                '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                              )"
+                        <div class="col-3 mb-3">
+                          <a t-att-href="'/store?collection=%s%s%s%s%s%s' % (
+                                  selected_collection,
+                                  '&amp;color=' + selected_color if selected_color else '',
+                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
+                                  '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
+                                  '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                                )"
                           class="text-decoration-none">
                           <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
                             <t t-if="card['image']">
@@ -229,10 +230,6 @@
                                 <span class="text-muted">No Image</span>
                               </div>
                             </t>
-                            <!-- Tooltip Message Bubble -->
-                            <div class="message-bubble">
-                              <t t-esc="card['name']"/>
-                            </div>
                           </div>
                         </a>
                       </div>
@@ -381,14 +378,6 @@
     </t>
 
     <script type="text/javascript">
-
-    document.querySelectorAll('.card').forEach(function(card) {
-    card.addEventListener('mouseenter', function() {
-      var tooltip = card.querySelector('.message-bubble');
-      tooltip.textContent = card.getAttribute('data-name'); // Set the content to the card's name
-    });
-  });
-
   // Function to open the modal
    function openModal() {
     var modal = document.getElementById('imageModal');
@@ -423,57 +412,6 @@
     </script>
 
     <style>
-
-     /* Message bubble style */
-  .message-bubble {
-    display: none;
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 8px 12px;
-    font-size: 14px;
-    border-radius: 12px;
-    white-space: nowrap;
-    z-index: 1000; /* Ensure it is above the card */
-    opacity: 0;
-    transition: opacity 0.3s ease; /* Smooth fade-in */
-    pointer-events: none; /* Avoid interfering with other elements */
-    max-width: 150px;
-    text-align: center;
-  }
-
-  /* Triangle at the bottom of the bubble */
-  .message-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 6px;
-    border-style: solid;
-    border-color: #333 transparent transparent transparent; /* Triangle shape */
-  }
-
-  /* Card container should be relative to position the tooltip properly */
-  .card {
-    position: relative;
-  }
-
-  /* Show message bubble when card is hovered */
-  .card:hover .message-bubble {
-    display: block;
-    opacity: 1; /* Fade-in effect */
-  }
-
-  /* Optional: Styling for when hovering over the card */
-  .card:hover {
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
-  }
-
           /* Optional: Extra styling for modal image */
         .modal-body img {
           width: 100%;
