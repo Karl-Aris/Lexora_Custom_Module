@@ -143,6 +143,28 @@
                 </div>
                 <!-- <h4 t-esc="configured_product.property_product_pricelist"/> -->
               </div>
+
+              <t t-if="configured_product">
+                <div class="product-action-container d-flex align-items-center mb-3 w-100">
+                  
+                  <!-- Quantity Selection with Minus, Quantity, Plus -->
+                  <div class="input-group quantity-group" style="width: 160px; height: 44px;">
+                      <button type="button" class="btn btn-outline-secondary" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
+                      <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
+                      <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                  </div>
+
+                  <!-- Add to Cart Button -->
+                  <button class="btn btn-primary" id="add-to-cart-btn" type="button" style="margin-left: 10px;">
+                    Add to Cart
+                  </button>
+
+                  <!-- Buy Now Button -->
+                  <button class="btn btn-success" id="buy-now-btn" type="button" style="margin-left: 10px;">
+                    Buy Now
+                  </button>
+                </div>
+              </t>
               </t>
               
               <t t-if="selected_color">
@@ -342,27 +364,7 @@
               </t>
 
 
-              <t t-if="selected_sku">
-              <div class="product-action-container d-flex align-items-center mb-3 w-100">
-                
-                <!-- Quantity Selection with Minus, Quantity, Plus -->
-                <div class="input-group quantity-group" style="width: 160px; height: 44px;">
-                    <button type="button" class="btn btn-outline-secondary" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
-                    <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
-                    <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
-                </div>
-
-                <!-- Add to Cart Button -->
-                <button class="btn btn-primary" id="add-to-cart-btn" type="button" style="margin-left: 10px;">
-                  Add to Cart
-                </button>
-
-                <!-- Buy Now Button -->
-                <button class="btn btn-success" id="buy-now-btn" type="button" style="margin-left: 10px;">
-                  Buy Now
-                </button>
-              </div>
-            </t>
+             
 
             
 
