@@ -80,7 +80,7 @@
                 <t t-elif="cabinet_product">
                   <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
                         style="width: 100%; height: 500px;">
-                      Non-existing SKU
+                      Non-existing SKU.
                     </div>
                 </t>
 
@@ -239,7 +239,6 @@
 
               <!-- Step 2: Countertop -->
               <t t-if="selected_sku and selected_size">
-
                 <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>2</strong>
@@ -248,15 +247,15 @@
                     Add Countertop
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                  <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
 
                 <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
-                        <div class="col-3 mb-3">
-                          <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
+                      <div class="col-3 mb-3">
+                        <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
                                   selected_collection,
                                   '&amp;color=' + selected_color if selected_color else '',
                                   '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
@@ -265,8 +264,12 @@
                                   '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
                                   '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
                                 )"
-                          class="text-decoration-none">
+                          class="text-decoration-none position-relative">
+                          
+                          <!-- Card with Hover Effect -->
                           <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
+
+                            <!-- Image Block -->
                             <t t-if="card['image']">
                               <img t-att-src="'data:image/png;base64,%s' % card['image']"
                                   class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
@@ -276,6 +279,13 @@
                                 <span class="text-muted">No Image</span>
                               </div>
                             </t>
+
+                            <!-- Hoverable Product Name -->
+                            <div class="product-name-overlay position-absolute top-0 start-0 end-0 bottom-0 d-flex justify-content-center align-items-center text-white p-2 opacity-0">
+                              <!-- <span class="text-center">{ card['product_name'] if card.get('product_name') else 'No Name' }</span> -->
+                                <span class="text-center">prodd name</span>
+                            </div>
+
                           </div>
                         </a>
                       </div>
@@ -440,6 +450,26 @@
     </script>
 
     <style>
+
+    .card {
+    position: relative;
+  }
+
+  .product-name-overlay {
+    transition: opacity 0.3s ease-in-out;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: none; /* Initially hidden */
+  }
+
+  .card:hover .product-name-overlay {
+    display: block;
+    opacity: 1; /* Make visible on hover */
+  }
+
+  .card:hover .card-img-top {
+    opacity: 0.5; /* Optional: dim the image on hover */
+  }
+  
           /* Optional: Extra styling for modal image */
         .modal-body img {
           width: 100%;
