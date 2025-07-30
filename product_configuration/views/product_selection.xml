@@ -379,6 +379,14 @@
     </t>
 
     <script type="text/javascript">
+
+    document.querySelectorAll('.card').forEach(function(card) {
+    card.addEventListener('mouseenter', function() {
+      var tooltip = card.querySelector('.message-bubble');
+      tooltip.textContent = card.getAttribute('data-name'); // Set the content to the card's name
+    });
+  });
+  
   // Function to open the modal
    function openModal() {
     var modal = document.getElementById('imageModal');
@@ -463,7 +471,7 @@
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
   }
-  
+
           /* Optional: Extra styling for modal image */
         .modal-body img {
           width: 100%;
