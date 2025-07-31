@@ -1,2 +1,2 @@
 from . import models
-from . import post_init_hook
+from .post_init_hook import post_init_hook  # ✅ Import the function!
