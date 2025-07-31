@@ -282,6 +282,9 @@
                                 <span class="text-muted">No Image</span>
                               </div>
                             </t>
+                            <div class="card-body text-left">
+                              <small><t t-esc="card['name']"/></small>
+                            </div>
                           </div>
                         </a>
                       </div>
@@ -338,6 +341,9 @@
                                 <span class="text-muted">No Image</span>
                               </div>
                             </t>
+                            <div class="card-body text-left">
+                              <small><t t-esc="card['name']"/></small>
+                            </div>
                           </div>
                         </a>
                       </div>
@@ -387,6 +393,9 @@
                                 <span class="text-muted">No Image</span>
                               </div>
                             </t>
+                            <div class="card-body text-left">
+                              <small><t t-esc="card['name']"/></small>
+                            </div>
                           </div>
                         </a>
                       </div>
