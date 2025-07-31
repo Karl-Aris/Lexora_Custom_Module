@@ -108,7 +108,9 @@ class ProductKitsController(http.Controller):
         partner = user.partner_id
 
         # Fetch the 'property_product_pricelist' field from the partner
-        pricelist = partner.property_product_pricelist            
+        pricelist = partner.property_product_pricelist 
+        
+        pricelist = request.env['product.pricelist'].sudo().browse(23966)           
 
         # Determine configured kit (only if >1 component selected)
         domain = [('cabinet_sku', '=', selected_sku)]
