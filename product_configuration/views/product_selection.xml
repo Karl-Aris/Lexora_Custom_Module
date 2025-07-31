@@ -205,7 +205,7 @@
                   Select Sizes
                 </h4>
                 <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
-                  <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  <span class="p-2" style="font-size: 24px; font-weight: bold;" id="sizeToggle">+</span>
                 </button>
               </div>
 
@@ -254,7 +254,7 @@
                     Add Countertop
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                  <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                  <span class="p-2" style="font-size: 24px; font-weight: bold;" id="countertopToggle">+</span>
                   </button>
                 </div>
 
@@ -308,7 +308,7 @@
                     Add Mirror
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;" id="mirrorToggle">+</span>
                   </button>
                 </div>
 
@@ -360,7 +360,7 @@
                     Add Faucet
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;" id="faucetToggle">+</span>
                   </button>
                 </div>
 
@@ -442,7 +442,7 @@
     handleCollapseToggle('countertopSelection', 'countertopToggle');
     handleCollapseToggle('mirrorSelection', 'mirrorToggle');
     handleCollapseToggle('faucetSelection', 'faucetToggle');
-    
+
   // Function to open the modal
    function openModal() {
     var modal = document.getElementById('imageModal');
