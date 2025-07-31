@@ -3,7 +3,7 @@
     "version": "1.0",
     "category": "Sales",
     "summary": "Adds 3.5% fee to Sales Order when Authorize.Net is used",
-    "depends": ["sale", "website_sale", "payment_authorize"],
+    "depends": ["sale", "website_sale", "payment_authorize", "payment"],
     "author": "Custom",
     "license": "LGPL-3",
     "installable": True,
