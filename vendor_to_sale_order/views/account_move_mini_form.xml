@@ -2,7 +2,6 @@
     <record id="account_move_vendor_bill_minimal_form" model="ir.ui.view">
         <field name="name">account.move.vendor.bill.minimal.form</field>
         <field name="model">account.move</field>
-        <field name="mode">form</field>
         <field name="priority">20</field>
         <field name="arch" type="xml">
             <form string="Vendor Bill">
