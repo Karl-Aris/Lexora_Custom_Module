@@ -253,42 +253,41 @@
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
                     Add Countertop
                   </h4>
-                  <!-- Button with dynamic + or - sign -->
-                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection" id="countertopToggleButton">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;" id="countertopSign">+</span>
+                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
+                  <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
 
                 <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
-                      <div class="col-3 mb-3">
-                        <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
-                              selected_collection,
-                              '&amp;color=' + selected_color if selected_color else '',
-                              '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                              '&amp;size=' + selected_size if selected_size else '',
-                              '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
-                              '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                              '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                            )"
-                        class="text-decoration-none">
-                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
-                          <t t-if="card['image']">
-                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
-                          </t>
-                          <t t-else="">
-                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
-                              <span class="text-muted">No Image</span>
+                        <div class="col-3 mb-3">
+                          <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
+                                  selected_collection,
+                                  '&amp;color=' + selected_color if selected_color else '',
+                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                  '&amp;size=' + selected_size if selected_size else '',
+                                  '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
+                                  '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
+                                  '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                                )"
+                          class="text-decoration-none">
+                          <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
+                            <t t-if="card['image']">
+                              <img t-att-src="'data:image/png;base64,%s' % card['image']"
+                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
+                            </t>
+                            <t t-else="">
+                              <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
+                                <span class="text-muted">No Image</span>
+                              </div>
+                            </t>
+                            <div class="card-body text-left">
+                              <small><t t-esc="card['name']"/></small>
                             </div>
-                          </t>
-                          <div class="card-body text-left">
-                            <small><t t-esc="card['name']"/></small>
                           </div>
-                        </div>
-                      </a>
-                    </div>
+                        </a>
+                      </div>
                     </t>
                   </div>
                 </div>
@@ -309,7 +308,12 @@
                     Add Mirror
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <t t-if="selected_mirror">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">-</span>
+                    </t>
+                    <t t-else="">
+                      <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    </t>
                   </button>
                 </div>
 
@@ -418,36 +422,43 @@
 
     <script type="text/javascript">
 
-   document.addEventListener("DOMContentLoaded", function () {
-  // Get the URL parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const counterTopSku = urlParams.get('counter_top_sku');
-  const toggleButton = document.getElementById('countertopToggleButton');
-  const signSpan = document.getElementById('countertopSign');
-  const collapseElement = document.getElementById('countertopSelection');
+      document.addEventListener("DOMContentLoaded", function() {
+    // Check if 'counter_top_sku' exists in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const counterTopSku = urlParams.get('counter_top_sku');
+    
+    // Get the element for the countertop section
+    const countertopSection = document.getElementById("countertopSelection");
 
-  // If counter_top_sku exists in the URL, set the sign to "-"
-  if (counterTopSku) {
-    signSpan.textContent = '-';
-    collapseElement.classList.add('show');  // Ensure the body is visible if counter_top_sku exists
-  } else {
-    collapseElement.classList.remove('show');  // Ensure the body is hidden by default
-  }
-
-  // Add an event listener to toggle the sign reactively and collapse body when button is clicked
-  toggleButton.addEventListener('click', function () {
-    // Toggle the collapse state
-    if (collapseElement.classList.contains('show')) {
-      // If the collapse is currently open, hide it and change the sign to "+"
-      collapseElement.classList.remove('show');
-      signSpan.textContent = '+';
+    // If 'counter_top_sku' is in the URL, show the section
+    if (counterTopSku) {
+      countertopSection.classList.remove('collapse');
+      countertopSection.classList.add('show');
     } else {
-      // If the collapse is currently closed, show it and change the sign to "-"
-      collapseElement.classList.add('show');
-      signSpan.textContent = '-';
+      countertopSection.classList.add('collapse');
+      countertopSection.classList.remove('show');
     }
   });
-});
+
+   document.addEventListener("DOMContentLoaded", function() {
+    // Get the button and the section
+    const toggleButton = document.querySelector('[data-bs-toggle="collapse"]');
+    const countertopSection = document.getElementById("countertopSelection");
+
+    // Add click event listener to the button
+    toggleButton.addEventListener("click", function() {
+      // Toggle the 'collapse' and 'show' classes
+      if (countertopSection.classList.contains('collapse')) {
+        countertopSection.classList.remove('collapse');
+        countertopSection.classList.add('show');
+      } else {
+        countertopSection.classList.remove('show');
+        countertopSection.classList.add('collapse');
+      }
+    });
+  });
+
+
 
   // Function to open the modal
    function openModal() {
