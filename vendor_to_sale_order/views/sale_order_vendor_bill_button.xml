@@ -8,7 +8,7 @@
                 <button name="%(action_vendor_bills_by_sale_order)d"
                         type="action"
                         class="oe_stat_button"
-                        icon="fa-file-invoice-dollar"
+                        icon="fa-cube"
                         string="Vendor Bills">
                     <field name="vendor_bill_count" widget="statinfo"/>
                 </button>
