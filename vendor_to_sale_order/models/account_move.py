@@ -25,5 +25,4 @@ class AccountMove(models.Model):
             'res_model': 'sale.order',
             'res_id': self.sale_order_id.id,
             'view_mode': 'form',
-            'target': 'current'
         }
