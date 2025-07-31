@@ -426,7 +426,7 @@
       // Get the button, section, and sign element
       const toggleButton = document.querySelector('[data-bs-toggle="collapse"]');
       const countertopSection = document.getElementById("countertopSelection");
-      const sign = toggleButton.querySelector("span");  // Targeting the <span> inside the button
+      const sign = toggleButton.querySelector("span"); 
 
       // Check if 'counter_top_sku' exists in the URL and show/hide accordingly
       const urlParams = new URLSearchParams(window.location.search);
