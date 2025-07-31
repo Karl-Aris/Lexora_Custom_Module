@@ -6,7 +6,7 @@
     "installable": True,
     "auto_install": False,
     "data": [
-        "data/payment_provider_data.xml",
+        # "data/payment_provider_data.xml",
     ],
     "post_init_hook": "post_init_hook",  # <<== required!
 }
