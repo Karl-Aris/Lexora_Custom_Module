@@ -422,41 +422,38 @@
 
     <script type="text/javascript">
 
-      document.addEventListener("DOMContentLoaded", function() {
-    // Check if 'counter_top_sku' exists in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const counterTopSku = urlParams.get('counter_top_sku');
-    
-    // Get the element for the countertop section
-    const countertopSection = document.getElementById("countertopSelection");
+    document.addEventListener("DOMContentLoaded", function() {
+      // Get the button, section, and sign element
+      const toggleButton = document.querySelector('[data-bs-toggle="collapse"]');
+      const countertopSection = document.getElementById("countertopSelection");
+      const sign = toggleButton.querySelector("span");  // Targeting the <span> inside the button
 
-    // If 'counter_top_sku' is in the URL, show the section
-    if (counterTopSku) {
-      countertopSection.classList.remove('collapse');
-      countertopSection.classList.add('show');
-    } else {
-      countertopSection.classList.add('collapse');
-      countertopSection.classList.remove('show');
-    }
-  });
-
-   document.addEventListener("DOMContentLoaded", function() {
-    // Get the button and the section
-    const toggleButton = document.querySelector('[data-bs-toggle="collapse"]');
-    const countertopSection = document.getElementById("countertopSelection");
-
-    // Add click event listener to the button
-    toggleButton.addEventListener("click", function() {
-      // Toggle the 'collapse' and 'show' classes
-      if (countertopSection.classList.contains('collapse')) {
+      // Check if 'counter_top_sku' exists in the URL and show/hide accordingly
+      const urlParams = new URLSearchParams(window.location.search);
+      const counterTopSku = urlParams.get('counter_top_sku');
+      if (counterTopSku) {
         countertopSection.classList.remove('collapse');
         countertopSection.classList.add('show');
+        sign.textContent = '-';  // Set sign to "-" if the section is shown
       } else {
-        countertopSection.classList.remove('show');
         countertopSection.classList.add('collapse');
+        countertopSection.classList.remove('show');
+        sign.textContent = '+';  // Set sign to "+" if the section is hidden
       }
+
+      // Add click event listener to toggle the section and change the sign
+      toggleButton.addEventListener("click", function() {
+        if (countertopSection.classList.contains('collapse')) {
+          countertopSection.classList.remove('collapse');
+          countertopSection.classList.add('show');
+          sign.textContent = '-';  // Change the sign to "-"
+        } else {
+          countertopSection.classList.remove('show');
+          countertopSection.classList.add('collapse');
+          sign.textContent = '+';  // Change the sign to "+"
+        }
+      });
     });
-  });
 
 
 
