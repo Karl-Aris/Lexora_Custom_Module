@@ -492,6 +492,18 @@
     </script>
 
     <style>
+
+        #countertopSelection {
+          overflow: hidden;
+          transition: height 0.3s ease-in-out;
+          height: 0;
+        }
+
+        #countertopSelection.show {
+          height: auto; /* This will expand the section */
+        }
+
+
           /* Optional: Extra styling for modal image */
         .modal-body img {
           width: 100%;
