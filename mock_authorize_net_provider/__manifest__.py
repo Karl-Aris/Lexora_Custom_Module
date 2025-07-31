@@ -1,11 +1,10 @@
 {
-    "name": "Mock Authorize.Net Provider",
-    "version": "1.0",
-    "category": "Accounting/Payment Acquirers",
-    "depends": ["payment"],
-    "data": [
-        "data/mock_authorize_net.xml",
-    ],
-    "installable": True,
-    "application": False,
+    'name': 'Mock Authorize.Net Provider',
+    'version': '1.0',
+    'depends': ['payment'],
+    'data': [],
+    'post_init_hook': 'post_init_hook',
+    'installable': True,
+    'application': False,
+    'auto_install': False,
 }
