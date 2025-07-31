@@ -21,15 +21,14 @@ class SaleOrder(models.Model):
             'ref': self.client_order_ref,
             'sale_order_id': self.id,
             'x_po_vb_id': self.purchase_order,
-            'partner_id': self.partner_id.id,  # Ensure vendor is set
+            'partner_id': self.partner_id.id,  # optional, but recommended
         })
         return {
+            'name': 'Vendor Bill',
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
             'res_id': bill.id,
             'view_mode': 'form',
-            'views': [(self.env.ref('account.view_move_form').id, 'form')],
-            'context': {
-                'default_move_type': 'in_invoice'
-            },
+            'target': 'new',  # 👈 makes it a modal popup
         }
+    
