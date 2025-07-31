@@ -5,8 +5,6 @@
     "category": "Accounting",
     "installable": True,
     "auto_install": False,
-    "data": [
-        # "data/payment_provider_data.xml",
-    ],
-    "post_init_hook": "post_init_hook",  # <<== required!
+    "post_init_hook": "hooks.post_init_hook",
+    "data": [],
 }
