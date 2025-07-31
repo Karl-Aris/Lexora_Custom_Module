@@ -258,7 +258,7 @@
                   </button>
                 </div>
 
-                <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
+                <div id="countertopSelection" t-att-class="not selected_countertop and 'show.bs.collapse' or ''">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -312,7 +312,7 @@
                   </button>
                 </div>
 
-                <div id="mirrorSelection" t-att-class="not selected_mirror and 'collapse' or ''">
+                <div id="mirrorSelection" t-att-class="not selected_mirror and 'show.bs.collapse' or ''">
                   <div class="row">
                       <t t-foreach="mirror_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -364,7 +364,7 @@
                   </button>
                 </div>
 
-                <div id="faucetSelection" t-att-class="not selected_faucet and 'collapse' or ''">
+                <div id="faucetSelection" t-att-class="not selected_faucet and 'show.bs.collapse' or ''">
                   <div class="row">
                       <t t-foreach="faucet_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -432,7 +432,7 @@
         });
 
         // Set the initial icon based on whether the collapse section is already visible
-        if (collapseElement.classList.contains('collapse')) {
+        if (collapseElement.classList.contains('show')) {
             toggleElement.innerHTML = '-'; // If visible, set the icon to '-'
         } else {
             toggleElement.innerHTML = '+'; // If hidden, set the icon to '+'
@@ -442,7 +442,7 @@
         var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
         button.addEventListener('click', function () {
             // If the section is currently open, close it
-            if (collapseElement.classList.contains('collapse')) {
+            if (collapseElement.classList.contains('show')) {
                 $(collapseElement).collapse('hide'); // Use Bootstrap's collapse API to hide it
             } else {
                 $(collapseElement).collapse('show'); // Use Bootstrap's collapse API to show it
