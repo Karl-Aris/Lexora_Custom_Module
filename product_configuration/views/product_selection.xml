@@ -210,7 +210,7 @@
               </div>
 
               <!-- Size Cards Grid (Collapsed by default) -->
-              <div id="sizeSelection">
+              <div id="sizeSelection" class="collapse">
                 <div class="row">
                   <t t-foreach="size_cards" t-as="card">
                     <div class="col-3 mb-3">
@@ -258,7 +258,7 @@
                   </button>
                 </div>
 
-                <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
+                <div id="countertopSelection" class="collapse" t-att-class="not selected_countertop and 'collapse' or ''">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -312,7 +312,7 @@
                   </button>
                 </div>
 
-                <div id="mirrorSelection" t-att-class="not selected_mirror and 'collapse' or ''">
+                <div id="mirrorSelection" class="collapse" t-att-class="not selected_mirror and 'collapse' or ''">
                   <div class="row">
                       <t t-foreach="mirror_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -364,7 +364,7 @@
                   </button>
                 </div>
 
-                <div id="faucetSelection" t-att-class="not selected_faucet and 'collapse' or ''">
+                <div id="faucetSelection" class="collapse" t-att-class="not selected_faucet and 'collapse' or ''">
                   <div class="row">
                       <t t-foreach="faucet_cards" t-as="card">
                         <div class="col-3 mb-3">
