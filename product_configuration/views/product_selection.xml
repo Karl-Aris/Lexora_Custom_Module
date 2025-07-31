@@ -417,7 +417,7 @@
 
     <script type="text/javascript">
 
-    // Function to toggle the + and - icons and handle the aria-expanded attribute
+     // Function to handle dynamic collapse behavior
     function handleCollapseToggle(collapseId, toggleId) {
         var collapseElement = document.getElementById(collapseId);
         var toggleElement = document.getElementById(toggleId);
@@ -435,13 +435,32 @@
             var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
             button.setAttribute('aria-expanded', 'false');
         });
+
+        // Handle immediate toggle: Close the section if it's open
+        var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+        button.addEventListener('click', function () {
+            // Check if the section is currently collapsed or shown
+            if (collapseElement.classList.contains('show')) {
+                // If it's open, force it to collapse
+                collapseElement.classList.remove('show');
+                var event = new Event('hide.bs.collapse');
+                collapseElement.dispatchEvent(event);
+            } else {
+                // Otherwise, trigger the collapse to show
+                collapseElement.classList.add('show');
+                var event = new Event('show.bs.collapse');
+                collapseElement.dispatchEvent(event);
+            }
+        });
     }
 
-    // Initialize collapses
+    // Initialize collapses for each section
     handleCollapseToggle('sizeSelection', 'sizeToggle');
     handleCollapseToggle('countertopSelection', 'countertopToggle');
     handleCollapseToggle('mirrorSelection', 'mirrorToggle');
     handleCollapseToggle('faucetSelection', 'faucetToggle');
+
+
 
   // Function to open the modal
    function openModal() {
