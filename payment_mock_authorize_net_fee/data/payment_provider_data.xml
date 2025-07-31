@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="payment_provider_mock_authorize_net" model="payment.provider">
         <field name="name">Mock Authorize.Net</field>
