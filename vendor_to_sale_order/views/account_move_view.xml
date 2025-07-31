@@ -1,22 +1,6 @@
 <odoo>
-    <!-- Existing: Sale Order Info group -->
     <record id="view_account_move_form_inherit" model="ir.ui.view">
         <field name="name">account.move.form.sale.order</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//sheet" position="inside">
-                <group string="Sale Order Info">
-                    <field name="sale_order_id" readonly="1"/>
-                    <field name="x_po_vb_id"/>
-                </group>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- New: Smart button for related Sale Order -->
-    <record id="view_account_move_form_inherit_vendor_sale_order" model="ir.ui.view">
-        <field name="name">account.move.form.vendor.sale.order.button</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
@@ -26,8 +10,14 @@
                         class="oe_stat_button"
                         icon="fa-shopping-cart"
                         attrs="{'invisible': [('sale_order_id', '=', False)]}">
-                    <field name="sale_order_count" widget="statinfo"/>
+                    <field name="sale_order_count" widget="statinfo" string="Sale Order"/>
                 </button>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Sale Order Info">
+                    <field name="sale_order_id" readonly="1"/>
+                    <field name="x_po_vb_id"/>
+                </group>
             </xpath>
         </field>
     </record>
