@@ -100,6 +100,15 @@ class ProductKitsController(http.Controller):
                         'name': prod.name,
                         'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
+                    
+        # Fetch the logged-in user
+        user = request.env.user
+
+        # Get the partner related to the current user
+        partner = user.partner_id
+
+        # Fetch the 'property_product_pricelist' field from the partner
+        pricelist = partner.property_product_pricelist            
 
         # Determine configured kit (only if >1 component selected)
         domain = [('cabinet_sku', '=', selected_sku)]
@@ -132,4 +141,5 @@ class ProductKitsController(http.Controller):
             'faucet_cards': faucet_cards,
             'configured_product': configured_product,
             'configured_kit': configured_kit,
+            'pricelist': pricelist,
         })
