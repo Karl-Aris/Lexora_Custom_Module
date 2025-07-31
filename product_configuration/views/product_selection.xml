@@ -132,7 +132,7 @@
                 <div class="my-1">
                   <t t-if="configured_product.product_tag_ids">
                     <t t-foreach="configured_product.product_tag_ids" t-as="tag">
-                      <span class="badge bg-secondary-subtle text-dark me-2 mb-2 px-3 py-2">
+                      <span class="badge bg-body-secondary text-dark me-2 mb-2 px-3 py-2">
                         <t t-esc="tag.name"/>
                       </span>
                     </t>
