@@ -198,7 +198,7 @@
               <t t-if="selected_color">
               <!-- Step 1: Size Selection -->
               <div class="d-flex align-items-center mb-3 w-100">
-                <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2" t-att-class="selected_sku and 'bg-primary' or 'bg-secondary'" style="width: 25px; height: 25px; font-size: 12px;">
+                <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2" t-att-class="not selected_sku and 'bg-secondary' or 'bg-primary'" style="width: 25px; height: 25px; font-size: 12px;">
                   <strong>1</strong>
                 </div>
                 <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
@@ -247,7 +247,7 @@
               <t t-if="selected_sku and selected_size">
 
                 <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2" t-att-class="selected_countertop and 'bg-primary' or 'bg-secondary'" style="width: 25px; height: 25px; font-size: 12px;">
+                  <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2" t-att-class="not selected_countertop and 'bg-secondary' or 'bg-primary'" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>2</strong>
                   </div>
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
@@ -301,7 +301,7 @@
               <t t-if="selected_sku and selected_size">
 
                 <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2" t-att-class="selected_mirror and 'bg-primary' or 'bg-secondary'" style="width: 25px; height: 25px; font-size: 12px;">
+                  <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2" t-att-class="not selected_mirror and 'bg-secondary' or 'bg-primary'" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>3</strong>
                   </div>
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
@@ -353,7 +353,7 @@
               <t t-if="selected_sku and selected_size">
 
               <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" t-att-class="selected_faucet and 'bg-primary' or 'bg-secondary'" style="width: 25px; height: 25px; font-size: 12px;">
+                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" t-att-class="not selected_faucet and 'bg-secondary' or 'bg-primary'" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>4</strong>
                   </div>
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
