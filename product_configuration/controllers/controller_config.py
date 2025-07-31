@@ -145,5 +145,5 @@ class ProductKitsController(http.Controller):
             'faucet_cards': faucet_cards,
             'configured_product': configured_product,
             'configured_kit': configured_kit,
-            'pricelist': pricelist,
+            # 'pricelist': pricelist,
         })
