@@ -7,7 +7,9 @@ class AccountMove(models.Model):
     x_po_vb_id = fields.Char(string="PO# from Sale Order")
 
     sale_order_count = fields.Integer(
-        compute="_compute_sale_order_count", string="Sale Order Count"
+        string='Related Sale Order Count',
+        compute='_compute_sale_order_count',
+        readonly=True
     )
 
     def _compute_sale_order_count(self):
@@ -16,6 +18,9 @@ class AccountMove(models.Model):
 
     def action_view_related_sale_order(self):
         self.ensure_one()
+        if not self.sale_order_id:
+            return {'type': 'ir.actions.act_window_close'}
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
