@@ -247,7 +247,9 @@
               <t t-if="selected_sku and selected_size">
 
                 <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
+                  <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2"
+                    t-att-style="selected_countertop and 'background-color: #007bff; width: 25px; height: 25px; font-size: 12px;' or 'background-color: #6c757d; width: 25px; height: 25px; font-size: 12px;'">
+                  </div>
                     <strong>2</strong>
                   </div>
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
@@ -301,7 +303,8 @@
               <t t-if="selected_sku and selected_size">
 
                 <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
+                  <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2"
+                    t-att-style="selected_mirror and 'background-color: #007bff; width: 25px; height: 25px; font-size: 12px;' or 'background-color: #6c757d; width: 25px; height: 25px; font-size: 12px;'">
                     <strong>3</strong>
                   </div>
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
@@ -353,7 +356,8 @@
               <t t-if="selected_sku and selected_size">
 
               <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
+                  <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2"
+                    t-att-style="selected_faucet and 'background-color: #007bff; width: 25px; height: 25px; font-size: 12px;' or 'background-color: #6c757d; width: 25px; height: 25px; font-size: 12px;'">
                     <strong>4</strong>
                   </div>
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
