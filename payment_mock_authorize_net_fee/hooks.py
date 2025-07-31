@@ -7,5 +7,6 @@ def post_init_hook(cr, registry):
         env['payment.provider'].create({
             'name': 'Mock Authorize.Net',
             'code': 'mock_authorize_net',
-            'module_id': env.ref('base.module_payment_mock_authorize_net_fee').id,
+            'state': 'enabled',
+            'support_tokenization': False,
         })
