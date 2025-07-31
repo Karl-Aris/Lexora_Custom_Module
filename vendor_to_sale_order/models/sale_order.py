@@ -12,7 +12,7 @@ class SaleOrder(models.Model):
                 ('move_type', '=', 'in_invoice')
             ])
 
-   def action_create_vendor_bill(self):
+    def action_create_vendor_bill(self):
         self.ensure_one()
         bill = self.env['account.move'].create({
             'move_type': 'in_invoice',
@@ -21,7 +21,7 @@ class SaleOrder(models.Model):
             'ref': self.client_order_ref,
             'sale_order_id': self.id,
             'x_po_vb_id': self.purchase_order,
-            'partner_id': self.partner_id.id,  # 👈 Use customer as placeholder or change as needed
+            'partner_id': self.partner_id.id,  # Ensure vendor is set
         })
         return {
             'type': 'ir.actions.act_window',
