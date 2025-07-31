@@ -9,22 +9,9 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-shopping-cart"
-                        string="Sale Order"
-                        invisible="1">
-                    <field name="sale_order_count" widget="statinfo"/>
+                        attrs="{'invisible': [('sale_order_id', '=', False)]}">
+                    <field name="sale_order_count" widget="statinfo" string="Sale Order"/>
                 </button>
-                <xpath expr="." position="after">
-                    <script type="text/javascript">
-                        odoo.define('vendor_to_sale_order.account_move_button_visibility', function (require) {
-                            const { onWillStart, useRef, useState } = owl;
-                            const { Component } = owl;
-                            const viewRegistry = require('web.view_registry');
-                            const FormView = require('web.FormView');
-
-                            // This script is optional if you're customizing visibility in JS instead.
-                        });
-                    </script>
-                </xpath>
             </xpath>
         </field>
     </record>
