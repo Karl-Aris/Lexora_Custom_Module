@@ -20,11 +20,9 @@ class AccountMove(models.Model):
         self.ensure_one()
         if not self.sale_order_id:
             return {'type': 'ir.actions.act_window_close'}
-
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
             'res_id': self.sale_order_id.id,
             'view_mode': 'form',
-            'target': 'current',
         }
