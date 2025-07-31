@@ -144,6 +144,8 @@
                 <!-- <h4 t-esc="configured_product.property_product_pricelist"/> -->
               </div>
 
+              <h4 t-esc="configured_product.property_product_pricelist" class="my-2"/>
+
               <t t-if="configured_product.qty_available > 0">
                 <div class="product-action-container d-flex align-items-center my-3 w-100">
                   
