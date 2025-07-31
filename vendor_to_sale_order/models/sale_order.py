@@ -14,6 +14,7 @@ class SaleOrder(models.Model):
 
     def action_create_vendor_bill(self):
         self.ensure_one()
+    
         bill = self.env['account.move'].create({
             'move_type': 'in_invoice',
             'invoice_origin': self.name,
@@ -23,11 +24,15 @@ class SaleOrder(models.Model):
             'x_po_vb_id': self.purchase_order,
             'partner_id': self.partner_id.id,
         })
+    
         return {
             'name': 'Vendor Bill',
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
             'res_id': bill.id,
             'view_mode': 'form',
-            'target': 'new',
+            'target': 'new',  # Opens in modal
+            'context': {
+                'reload_on_close': True,  # 🔁 Refresh Sale Order on modal close
+            },
         }
