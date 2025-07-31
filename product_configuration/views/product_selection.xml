@@ -250,7 +250,7 @@
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>2</strong>
                   </div>
-                  <h4 class="mb-0 flex-grow-1">
+                  <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
                     Add Countertop
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
@@ -308,12 +308,7 @@
                     Add Mirror
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    <t t-if="selected_mirror">
-                      <span class="p-2" style="font-size: 24px; font-weight: bold;">-</span>
-                    </t>
-                    <t t-else="">
-                      <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
-                    </t>
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
 
@@ -421,43 +416,6 @@
     </t>
 
     <script type="text/javascript">
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // Get the button and the section for countertop
-        const toggleButton = document.querySelector('[data-bs-toggle="collapse"]');
-        const countertopSection = document.getElementById("countertopSelection");
-        const sign = toggleButton.querySelector("span"); 
-        
-        // Check if 'counter_top_sku' exists in the URL and set the initial state
-        const urlParams = new URLSearchParams(window.location.search);
-        const counterTopSku = urlParams.get('counter_top_sku');
-        
-        if (counterTopSku) {
-          countertopSection.classList.remove('collapse');
-          countertopSection.classList.add('show');
-          sign.textContent = '-';  // Change sign to "-" if section is shown
-        } else {
-          countertopSection.classList.add('collapse');
-          countertopSection.classList.remove('show');
-          sign.textContent = '+';  // Change sign to "+" if section is hidden
-        }
-
-        // Add click event listener to toggle the section and change the sign
-        toggleButton.addEventListener("click", function() {
-          if (countertopSection.classList.contains('collapse')) {
-            countertopSection.classList.remove('collapse');
-            countertopSection.classList.add('show');
-            sign.textContent = '-';  // Change sign to "-"
-          } else {
-            countertopSection.classList.remove('show');
-            countertopSection.classList.add('collapse');
-            sign.textContent = '+';  // Change sign to "+"
-          }
-        });
-      });
-
-
-
   // Function to open the modal
    function openModal() {
     var modal = document.getElementById('imageModal');
@@ -492,18 +450,6 @@
     </script>
 
     <style>
-
-        #countertopSelection {
-          overflow: hidden;
-          transition: height 0.3s ease-in-out;
-          height: 0;
-        }
-
-        #countertopSelection.show {
-          height: auto; /* This will expand the section */
-        }
-
-
           /* Optional: Extra styling for modal image */
         .modal-body img {
           width: 100%;
