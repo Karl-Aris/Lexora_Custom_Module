@@ -417,7 +417,7 @@
 
     <script type="text/javascript">
 
-     // Function to handle dynamic collapse behavior
+    // Function to handle dynamic collapse behavior
     function handleCollapseToggle(collapseId, toggleId) {
         var collapseElement = document.getElementById(collapseId);
         var toggleElement = document.getElementById(toggleId);
@@ -436,20 +436,21 @@
             button.setAttribute('aria-expanded', 'false');
         });
 
+        // Check if the section should be open based on URL parameters or initial state
+        if (collapseElement.classList.contains('show')) {
+            toggleElement.innerHTML = '-';
+        } else {
+            toggleElement.innerHTML = '+';
+        }
+
         // Handle immediate toggle: Close the section if it's open
         var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
         button.addEventListener('click', function () {
-            // Check if the section is currently collapsed or shown
+            // If the section is currently open, close it
             if (collapseElement.classList.contains('show')) {
-                // If it's open, force it to collapse
-                collapseElement.classList.remove('show');
-                var event = new Event('hide.bs.collapse');
-                collapseElement.dispatchEvent(event);
+                $(collapseElement).collapse('hide'); // Use Bootstrap's collapse API to hide it
             } else {
-                // Otherwise, trigger the collapse to show
-                collapseElement.classList.add('show');
-                var event = new Event('show.bs.collapse');
-                collapseElement.dispatchEvent(event);
+                $(collapseElement).collapse('show'); // Use Bootstrap's collapse API to show it
             }
         });
     }
