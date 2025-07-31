@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="payment_provider_mock_authorize_net" model="payment.provider">
-        <field name="name">Mock Authorize.Net</field>
-        <field name="code">mock_authorize_net</field>
-        <field name="state">enabled</field>
-        <field name="support_tokenization">False</field>
-    </record>
+    <data noupdate="1">
+        <record id="payment_provider_mock_authorize_net" model="payment.provider">
+            <field name="name">Mock Authorize.Net</field>
+            <field name="code">mock_authorize_net</field>
+            <field name="state">enabled</field>
+            <field name="support_tokenization">False</field>
+        </record>
+    </data>
 </odoo>
