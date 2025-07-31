@@ -1,15 +1,30 @@
 <odoo>
-    <record id="view_sale_order_form_inherit" model="ir.ui.view">
-        <field name="name">sale.order.form.vendor.bill</field>
+    <record id="view_order_form_inherit_vendor_bill_link" model="ir.ui.view">
+        <field name="name">sale.order.form.link.vendor.bills</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//header" position="inside">
-                <button name="action_create_vendor_bill"
-                        type="object"
-                        string="Create Vendor Bill"
-                        class="btn-primary"/>
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="x_po_so_id"/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="%(action_view_vendor_bills_from_sale)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-file-invoice">
+                    <field name="vendor_bill_count" widget="statinfo"/>
+                    <span>Vendor Bills</span>
+                </button>
             </xpath>
         </field>
+    </record>
+
+    <record id="action_view_vendor_bills_from_sale" model="ir.actions.act_window">
+        <field name="name">Vendor Bills</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('sale_order_id', '=', active_id)]</field>
+        <field name="context">{'default_sale_order_id': active_id}</field>
     </record>
 </odoo>
