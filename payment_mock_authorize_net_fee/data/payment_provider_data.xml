@@ -3,7 +3,6 @@
     <record id="payment_provider_mock_authorize_net" model="payment.provider">
         <field name="name">Mock Authorize.Net</field>
         <field name="code">mock_authorize_net</field>
-        <field name="display_as">Mock Authorize.Net</field>
         <field name="state">enabled</field>
         <field name="support_tokenization">False</field>
     </record>
