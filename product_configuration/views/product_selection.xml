@@ -450,14 +450,11 @@
         });
     }
 
-    // Wait for the DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize collapses for each section after the page has loaded
-        handleCollapseToggle('sizeSelection', 'sizeToggle');
-        handleCollapseToggle('countertopSelection', 'countertopToggle');
-        handleCollapseToggle('mirrorSelection', 'mirrorToggle');
-        handleCollapseToggle('faucetSelection', 'faucetToggle');
-    });
+    // Initialize collapses for each section
+    handleCollapseToggle('sizeSelection', 'sizeToggle');
+    handleCollapseToggle('countertopSelection', 'countertopToggle');
+    handleCollapseToggle('mirrorSelection', 'mirrorToggle');
+    handleCollapseToggle('faucetSelection', 'faucetToggle');
 
 
 
