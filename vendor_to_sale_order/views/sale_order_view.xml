@@ -8,7 +8,6 @@
                 <button name="action_create_vendor_bill"
                         type="object"
                         string="Create Vendor Bill"
-                        icon="fa-cube"
                         class="btn-primary"/>
             </xpath>
         </field>
