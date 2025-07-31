@@ -6,5 +6,7 @@
     "installable": True,
     "auto_install": False,
     "post_init_hook": "payment_mock_authorize_net_fee.hooks.post_init_hook",
-    "data": [],
+    "data": [
+        "data/payment_provider_data.xml"
+    ]
 }
