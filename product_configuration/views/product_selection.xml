@@ -417,7 +417,19 @@
         var collapseElement = document.getElementById(collapseId);
         var toggleElement = document.getElementById(toggleId);
 
-     
+        // Event listener for showing the collapse
+        collapseElement.addEventListener('show.bs.collapse', function () {
+            toggleElement.innerHTML = '-';
+            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+            button.setAttribute('aria-expanded', 'true');
+        });
+
+        // Event listener for hiding the collapse
+        collapseElement.addEventListener('hide.bs.collapse', function () {
+            toggleElement.innerHTML = '+';
+            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+            button.setAttribute('aria-expanded', 'false');
+        });
 
         // Set the initial icon based on whether the collapse section is already visible
         if (collapseElement.classList.contains('show')) {
