@@ -432,7 +432,7 @@
         });
 
         // Set the initial icon based on whether the collapse section is already visible
-        if (collapseElement.classList.contains('show')) {
+        if (collapseElement.classList.contains('collapse')) {
             toggleElement.innerHTML = '-'; // If visible, set the icon to '-'
         } else {
             toggleElement.innerHTML = '+'; // If hidden, set the icon to '+'
@@ -442,7 +442,7 @@
         var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
         button.addEventListener('click', function () {
             // If the section is currently open, close it
-            if (collapseElement.classList.contains('show')) {
+            if (collapseElement.classList.contains('collapse')) {
                 $(collapseElement).collapse('hide'); // Use Bootstrap's collapse API to hide it
             } else {
                 $(collapseElement).collapse('show'); // Use Bootstrap's collapse API to show it
