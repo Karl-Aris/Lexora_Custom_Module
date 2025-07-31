@@ -418,24 +418,33 @@
 
     <script type="text/javascript">
 
-    document.addEventListener("DOMContentLoaded", function () {
+   document.addEventListener("DOMContentLoaded", function () {
   // Get the URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const counterTopSku = urlParams.get('counter_top_sku');
   const toggleButton = document.getElementById('countertopToggleButton');
   const signSpan = document.getElementById('countertopSign');
+  const collapseElement = document.getElementById('countertopSelection');
 
   // If counter_top_sku exists in the URL, set the sign to "-"
   if (counterTopSku) {
     signSpan.textContent = '-';
+    collapseElement.classList.add('show');  // Ensure the body is visible if counter_top_sku exists
+  } else {
+    collapseElement.classList.remove('show');  // Ensure the body is hidden by default
   }
 
-  // Add an event listener to toggle the sign reactively when the button is clicked
+  // Add an event listener to toggle the sign reactively and collapse body when button is clicked
   toggleButton.addEventListener('click', function () {
-    if (signSpan.textContent === '+') {
-      signSpan.textContent = '-';
-    } else {
+    // Toggle the collapse state
+    if (collapseElement.classList.contains('show')) {
+      // If the collapse is currently open, hide it and change the sign to "+"
+      collapseElement.classList.remove('show');
       signSpan.textContent = '+';
+    } else {
+      // If the collapse is currently closed, show it and change the sign to "-"
+      collapseElement.classList.add('show');
+      signSpan.textContent = '-';
     }
   });
 });
