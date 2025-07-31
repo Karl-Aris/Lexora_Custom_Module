@@ -1,8 +1,7 @@
-def post_init_hook(cr, registry):
-    from odoo.api import Environment
-    env = Environment(cr, SUPERUSER_ID, {})
+from odoo import SUPERUSER_ID, api
 
-    # Only create if it doesn't exist
+def post_init_hook(cr, registry):
+    env = api.Environment(cr, SUPERUSER_ID, {})
     if not env['payment.provider'].search([('code', '=', 'mock_authorize_net')]):
         env['payment.provider'].create({
             'name': 'Mock Authorize.Net',
