@@ -245,7 +245,6 @@
 
               <!-- Step 2: Countertop -->
               <t t-if="selected_sku and selected_size">
-
                 <div class="d-flex align-items-center mb-3 w-100">
                   <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
                     <strong>2</strong>
@@ -254,24 +253,31 @@
                     Add Countertop
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                  <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;">
+                      <t t-if="request.params.get('counter_top_sku')">
+                        -
+                      </t>
+                      <t t-else="">
+                        +
+                      </t>
+                    </span>
                   </button>
                 </div>
 
-                <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
+                <div id="countertopSelection" t-att-class="request.params.get('counter_top_sku') and '' or 'collapse'">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
-                        <div class="col-3 mb-3">
-                          <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
-                                  selected_collection,
-                                  '&amp;color=' + selected_color if selected_color else '',
-                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                                  '&amp;size=' + selected_size if selected_size else '',
-                                  '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
-                                  '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                                  '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                                )"
-                          class="text-decoration-none">
+                      <div class="col-3 mb-3">
+                        <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
+                                selected_collection,
+                                '&amp;color=' + selected_color if selected_color else '',
+                                '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
+                                '&amp;size=' + selected_size if selected_size else '',
+                                '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
+                                '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
+                                '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
+                              )"
+                        class="text-decoration-none">
                           <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
                             <t t-if="card['image']">
                               <img t-att-src="'data:image/png;base64,%s' % card['image']"
@@ -295,6 +301,7 @@
                 <hr/>
               </t>
 
+
               
 
               <!-- Step 3: Mirror -->
@@ -308,12 +315,7 @@
                     Add Mirror
                   </h4>
                   <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    <t t-if="selected_mirror">
-                      <span class="p-2" style="font-size: 24px; font-weight: bold;">-</span>
-                    </t>
-                    <t t-else="">
-                      <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
-                    </t>
+                    <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
 
