@@ -4,12 +4,27 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- Add Create Vendor Bill button in header -->
             <xpath expr="//header" position="inside">
                 <button name="action_create_vendor_bill"
                         type="object"
                         string="Create Vendor Bill"
                         icon="fa-cube"
                         class="btn-primary"/>
+            </xpath>
+
+            <!-- Add the mini vendor bill list at the bottom of the form -->
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Vendor Bills">
+                    <field name="vendor_bill_ids" context="{'default_move_type': 'in_invoice'}">
+                        <tree editable="bottom">
+                            <field name="partner_id"/>
+                            <field name="invoice_date"/>
+                            <field name="ref"/>
+                        </tree>
+                        <form string="Vendor Bill" view_id="vendor_to_sale_order.account_move_vendor_bill_minimal_form"/>
+                    </field>
+                </page>
             </xpath>
         </field>
     </record>
