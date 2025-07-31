@@ -20,13 +20,16 @@ class SaleOrder(models.Model):
             'invoice_date': fields.Date.context_today(self),
             'ref': self.client_order_ref,
             'sale_order_id': self.id,
-            'x_po_vb_id': self.purchase_order,  # Auto-fill PO#
+            'x_po_vb_id': self.purchase_order,
         })
         return {
-            'name': 'Vendor Bill',
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
             'res_id': bill.id,
             'view_mode': 'form',
-            'target': 'new',  # <-- This makes it a mini popup
+            'views': [(self.env.ref('account.view_move_form').id, 'form')],
+            'context': {
+                'default_move_type': 'in_invoice'
+            },
+            # No 'target': 'new' — opens in main content
         }
