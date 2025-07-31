@@ -102,13 +102,13 @@ class ProductKitsController(http.Controller):
                     })
                     
         # Fetch the logged-in user
-        user = request.env.user
+        # user = request.env.user
 
         # Get the partner related to the current user
-        partner = user.partner_id
+        # partner = user.partner_id
 
         # Fetch the 'property_product_pricelist' field from the partner
-        pricelist = partner.property_product_pricelist 
+        # pricelist = partner.property_product_pricelist 
         
         pricelist = request.env['product.pricelist'].sudo().browse(23966)           
 
