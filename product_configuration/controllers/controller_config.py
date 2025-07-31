@@ -104,13 +104,13 @@ class ProductKitsController(http.Controller):
         # Fetch the logged-in user
         # user = request.env.user
 
-        # Get the partner related to the current user
+        # # Get the partner related to the current user
         # partner = user.partner_id
 
-        # Fetch the 'property_product_pricelist' field from the partner
+        # # Fetch the 'property_product_pricelist' field from the partner
         # pricelist = partner.property_product_pricelist 
         
-        pricelist = request.env['product.pricelist'].sudo().browse(23966)           
+        # pricelist = request.env['product.pricelist'].sudo().browse(23966)           
 
         # Determine configured kit (only if >1 component selected)
         domain = [('cabinet_sku', '=', selected_sku)]
@@ -126,6 +126,8 @@ class ProductKitsController(http.Controller):
             configured_product = request.env['product.product'].sudo().search(
                 [('default_code', '=', configured_kit.product_sku)], limit=1
             )
+            
+            print(configured_product)
 
         return request.render('product_configuration.template_product_configuration', {
             'collections': unique_collections,
