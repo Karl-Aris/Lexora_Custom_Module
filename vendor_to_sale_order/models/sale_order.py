@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -21,7 +21,7 @@ class SaleOrder(models.Model):
             'ref': self.client_order_ref,
             'sale_order_id': self.id,
             'x_po_vb_id': self.purchase_order,
-            'partner_id': self.partner_id.id,
+            'partner_id': self.partner_id.id,  # optional, but recommended
         })
         return {
             'name': 'Vendor Bill',
@@ -29,8 +29,5 @@ class SaleOrder(models.Model):
             'res_model': 'account.move',
             'res_id': bill.id,
             'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'form_view_ref': 'vendor_to_sale_order.account_move_vendor_bill_minimal_form',
-            }
+            'target': 'new',  # 👈 makes it a modal popup
         }
