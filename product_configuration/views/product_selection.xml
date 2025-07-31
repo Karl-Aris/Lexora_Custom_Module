@@ -258,7 +258,7 @@
                   </button>
                 </div>
 
-                <div id="countertopSelection">
+                <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
                   <div class="row">
                     <t t-foreach="counter_top_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -312,7 +312,7 @@
                   </button>
                 </div>
 
-                <div id="mirrorSelection">
+                <div id="mirrorSelection" t-att-class="not selected_mirror and 'collapse' or ''">
                   <div class="row">
                       <t t-foreach="mirror_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -364,7 +364,7 @@
                   </button>
                 </div>
 
-                <div id="faucetSelection">
+                <div id="faucetSelection" t-att-class="not selected_faucet and 'collapse' or ''">
                   <div class="row">
                       <t t-foreach="faucet_cards" t-as="card">
                         <div class="col-3 mb-3">
@@ -413,51 +413,48 @@
     <script type="text/javascript">
 
     // Function to handle dynamic collapse behavior
-    function handleCollapseToggle(collapseId, toggleId, initialShow) {
+    function handleCollapseToggle(collapseId, toggleId) {
         var collapseElement = document.getElementById(collapseId);
         var toggleElement = document.getElementById(toggleId);
 
-        // Set the initial state of the collapse section based on the URL or passed state
-        if (initialShow) {
-            collapseElement.classList.add('show');  // Show the section initially
-            toggleElement.innerHTML = '-';  // Set icon to '-' if the section is visible
-        } else {
-            collapseElement.classList.remove('show');  // Hide the section initially
-            toggleElement.innerHTML = '+';  // Set icon to '+' if the section is hidden
-        }
-
         // Event listener for showing the collapse
         collapseElement.addEventListener('show.bs.collapse', function () {
-            toggleElement.innerHTML = '-';  // Change icon to '-' when the section is shown
+            toggleElement.innerHTML = '-';
+            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+            button.setAttribute('aria-expanded', 'true');
         });
 
         // Event listener for hiding the collapse
         collapseElement.addEventListener('hide.bs.collapse', function () {
-            toggleElement.innerHTML = '+';  // Change icon to '+' when the section is hidden
+            toggleElement.innerHTML = '+';
+            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+            button.setAttribute('aria-expanded', 'false');
         });
+
+        // Set the initial icon based on whether the collapse section is already visible
+        if (collapseElement.classList.contains('show')) {
+            toggleElement.innerHTML = '-'; // If visible, set the icon to '-'
+        } else {
+            toggleElement.innerHTML = '+'; // If hidden, set the icon to '+'
+        }
 
         // Handle immediate toggle: Close the section if it's open
         var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
         button.addEventListener('click', function () {
+            // If the section is currently open, close it
             if (collapseElement.classList.contains('show')) {
-                collapseElement.classList.remove('show');  // Hide the section
+                $(collapseElement).collapse('hide'); // Use Bootstrap's collapse API to hide it
             } else {
-                collapseElement.classList.add('show');  // Show the section
+                $(collapseElement).collapse('show'); // Use Bootstrap's collapse API to show it
             }
         });
     }
 
-    // Helper function to check if the section should be shown based on URL params
-    function shouldShowSection(param) {
-        var urlParams = new URLSearchParams(window.location.search);
-        return urlParams.has(param);
-    }
-
-    // Initialize collapses for each section with URL parameter checks
-    handleCollapseToggle('sizeSelection', 'sizeToggle', shouldShowSection('size'));
-    handleCollapseToggle('countertopSelection', 'countertopToggle', shouldShowSection('counter_top_sku'));
-    handleCollapseToggle('mirrorSelection', 'mirrorToggle', shouldShowSection('mirror_sku'));
-    handleCollapseToggle('faucetSelection', 'faucetToggle', shouldShowSection('faucet_sku'));
+    // Initialize collapses for each section
+    handleCollapseToggle('sizeSelection', 'sizeToggle');
+    handleCollapseToggle('countertopSelection', 'countertopToggle');
+    handleCollapseToggle('mirrorSelection', 'mirrorToggle');
+    handleCollapseToggle('faucetSelection', 'faucetToggle');
 
 
 
