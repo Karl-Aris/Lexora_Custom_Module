@@ -204,7 +204,7 @@
                 <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
                   Select Sizes
                 </h4>
-                <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
+                <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
                   <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                 </button>
               </div>
@@ -253,7 +253,7 @@
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
                     Add Countertop
                   </h4>
-                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
+                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
                   <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
@@ -307,7 +307,7 @@
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
                     Add Mirror
                   </h4>
-                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
+                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
                     <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
@@ -359,7 +359,7 @@
                   <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
                     Add Faucet
                   </h4>
-                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
+                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
                     <span class="p-2" style="font-size: 24px; font-weight: bold;">+</span>
                   </button>
                 </div>
@@ -416,6 +416,33 @@
     </t>
 
     <script type="text/javascript">
+
+    // Function to toggle the + and - icons and handle the aria-expanded attribute
+    function handleCollapseToggle(collapseId, toggleId) {
+        var collapseElement = document.getElementById(collapseId);
+        var toggleElement = document.getElementById(toggleId);
+
+        // Event listener for showing the collapse
+        collapseElement.addEventListener('show.bs.collapse', function () {
+            toggleElement.innerHTML = '-';
+            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+            button.setAttribute('aria-expanded', 'true');
+        });
+
+        // Event listener for hiding the collapse
+        collapseElement.addEventListener('hide.bs.collapse', function () {
+            toggleElement.innerHTML = '+';
+            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+            button.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    // Initialize collapses
+    handleCollapseToggle('sizeSelection', 'sizeToggle');
+    handleCollapseToggle('countertopSelection', 'countertopToggle');
+    handleCollapseToggle('mirrorSelection', 'mirrorToggle');
+    handleCollapseToggle('faucetSelection', 'faucetToggle');
+    
   // Function to open the modal
    function openModal() {
     var modal = document.getElementById('imageModal');
