@@ -5,6 +5,6 @@
     "category": "Accounting",
     "installable": True,
     "auto_install": False,
-    "post_init_hook": "hooks.post_init_hook",
+    "post_init_hook": "payment_mock_authorize_net_fee.hooks.post_init_hook",
     "data": [],
 }
