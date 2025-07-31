@@ -101,31 +101,7 @@ class ProductKitsController(http.Controller):
                         'image': prod.image_1920.decode('utf-8') if prod and prod.image_1920 else None
                     })
                     
-       # Fetch the current partner's pricelist (property_product_pricelist)
-        partner = request.env.user.partner_id  # Assuming the current logged-in user's partner
-        pricelist = partner.property_product_pricelist  # This is the 'Tier 3 (USD)' pricelist
-        
-        fixed_price = None
-        
-        if pricelist:
-            # Now fetch all the pricelist items that are related to the current product SKU
-            pricelist_items = pricelist.item_ids  # Get all items from the pricelist
-
-            # Iterate through the pricelist items
-            for item in pricelist_items:
-                # Check if the product SKU matches the SKU (ABC123, for example)
-                product = item.product_tmpl_id  # The product template related to this item
-                
-                # Check if this product matches the SKU
-                if configured_kit.product_sku == product.default_code:  # Check against the configured SKU
-                    fixed_price = f"Price: {item.fixed_price} {pricelist.currency_id.symbol}"
-                    print(f"Found matching price rule for SKU {configured_kit.product_sku} in Pricelist {pricelist.name}:")
-                    print(f"Product: {product.name}")
-                    print(f"Price: {item.fixed_price} {pricelist.currency_id.symbol}")
-                else:
-                    print(f"No matching SKU found in this price rule: {item.name}")
-        else:
-            print("No pricelist found for the partner.")
+       
                 
         # Determine configured kit (only if >1 component selected)
         domain = [('cabinet_sku', '=', selected_sku)]
@@ -141,6 +117,32 @@ class ProductKitsController(http.Controller):
             configured_product = request.env['product.product'].sudo().search(
                 [('default_code', '=', configured_kit.product_sku)], limit=1
             )
+            
+        #     # Fetch the current partner's pricelist (property_product_pricelist)
+        # partner = request.env.user.partner_id  # Assuming the current logged-in user's partner
+        # pricelist = partner.property_product_pricelist  # This is the 'Tier 3 (USD)' pricelist
+        
+        # fixed_price = None
+        
+        # if pricelist:
+        #     # Now fetch all the pricelist items that are related to the current product SKU
+        #     pricelist_items = pricelist.item_ids  # Get all items from the pricelist
+
+        #     # Iterate through the pricelist items
+        #     for item in pricelist_items:
+        #         # Check if the product SKU matches the SKU (ABC123, for example)
+        #         product = item.product_tmpl_id  # The product template related to this item
+                
+        #         # Check if this product matches the SKU
+        #         if configured_kit.product_sku == product.default_code:  # Check against the configured SKU
+        #             fixed_price = f"Price: {item.fixed_price} {pricelist.currency_id.symbol}"
+        #             print(f"Found matching price rule for SKU {configured_kit.product_sku} in Pricelist {pricelist.name}:")
+        #             print(f"Product: {product.name}")
+        #             print(f"Price: {item.fixed_price} {pricelist.currency_id.symbol}")
+        #         else:
+        #             print(f"No matching SKU found in this price rule: {item.name}")
+        # else:
+        #     print("No pricelist found for the partner.")
             
 
         return request.render('product_configuration.template_product_configuration', {
@@ -159,5 +161,5 @@ class ProductKitsController(http.Controller):
             'faucet_cards': faucet_cards,
             'configured_product': configured_product,
             'configured_kit': configured_kit,
-            'fixed_price': fixed_price,
+            # 'fixed_price': fixed_price,
         })
