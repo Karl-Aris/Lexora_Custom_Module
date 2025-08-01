@@ -181,7 +181,7 @@
                     <!-- <a t-att-href="'/store/add_to_cart?product_sku=' + configured_product.default_code|urlencode" class="btn btn-secondary">
                         Add to Cart
                     </a> -->
-                    <a class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
+                    <a class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2 text-center">
                         <i class="fa fa-heart"></i> Save for Later
                     </a>
               </div>
