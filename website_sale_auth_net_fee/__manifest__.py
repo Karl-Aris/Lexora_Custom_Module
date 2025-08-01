@@ -1,11 +1,10 @@
-
 {
-    "name": "Website Sale Authorize.net Fee",
-    "version": "1.0",
-    "depends": ["website_sale", "payment_authorize"],
+    "name": "Authorize.net Fee on Sale Order",
+    "version": "1.1",
+    "depends": ["sale_management", "payment_authorize"],
     "author": "Carl Custom",
-    "category": "Website",
-    "description": "Automatically adds a 3.5% Authorize.net fee to Sale Order lines when selected as payment method.",
+    "category": "Sales",
+    "description": "Adds a 3.5% Authorize.net fee as a sale order line when the payment method is Authorize.net.",
     "data": [],
     "installable": True,
     "auto_install": False,
