@@ -1,5 +1,4 @@
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo import models
 
 class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
@@ -7,7 +6,8 @@ class PaymentTransaction(models.Model):
     def _reconcile_after_done(self):
         res = super()._reconcile_after_done()
         for tx in self:
-            if tx.acquirer_id.provider == 'authorize' and tx.sale_order_ids:
+            if tx.sale_order_ids and tx.provider_id.code == 'authorize':
                 for order in tx.sale_order_ids:
+                    order.payment_provider_id = tx.provider_id
                     order._add_authorize_fee()
         return res
