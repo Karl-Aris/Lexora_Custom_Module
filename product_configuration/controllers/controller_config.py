@@ -135,7 +135,7 @@ class ProductKitsController(http.Controller):
                 
                 # Check if this product matches the SKU
                 if configured_kit.product_sku == product.default_code:  # Check against the configured SKU
-                    fixed_price = f"Price: {item.fixed_price} {pricelist.currency_id.symbol}"
+                    fixed_price = f"{pricelist.currency_id.symbol} {item.fixed_price}"
                     print(f"Found matching price rule for SKU {configured_kit.product_sku} in Pricelist {pricelist.name}:")
                     print(f"Product: {product.name}")
                     print(f"Price: {item.fixed_price} {pricelist.currency_id.symbol}")
