@@ -2,9 +2,7 @@
     <record id="payment_provider_authorize_net" model="payment.provider">
         <field name="name">Authorize.Net</field>
         <field name="code">authorize_net</field>
-        <field name="module">payment_authorize_net_fee</field>
         <field name="state">enabled</field>
-        <field name="surcharge_percentage">3.5</field>
         <field name="fees_active">True</field>
     </record>
 </odoo>
