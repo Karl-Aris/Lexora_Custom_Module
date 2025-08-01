@@ -175,7 +175,7 @@
                     <button class="btn btn-secondary px-4 py-2" id="buy-now-btn" type="button">
                       Save for Later
                     </button>
-                    <a href="/store/add_to_cart?product_sku={{ configured_product.default_code|urlencode }}" class="btn btn-secondary">
+                    <a t-att-href="'/store/add_to_cart?product_sku=' + configured_product.default_code" class="btn btn-secondary">
                         Add to Cart
                     </a>
               </div>
