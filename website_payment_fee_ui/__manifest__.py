@@ -11,7 +11,7 @@
     ],
     "assets": {
         "website.assets_frontend": [
-            "/website_payment_fee_ui/static/src/js/payment_fee.js",
+            "website_payment_fee_ui/static/src/js/payment_fee.js",
         ]
     },
     "installable": True,
