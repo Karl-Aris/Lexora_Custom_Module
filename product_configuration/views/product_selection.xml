@@ -175,7 +175,7 @@
                     <!-- <button class="btn btn-secondary px-4 py-2" id="buy-now-btn" type="button">
                       Save for Later
                     </button> -->
-                    <a t-att-href="'/shop/wishlist/add/' + configured_product.id" class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
+                    <a t-att-href="'/shop/wishlist/add/' + str(configured_product.id)" class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
                         <i class="fa fa-heart"></i> Save for Later
                     </a>
                     <!-- <a t-att-href="'/store/add_to_cart?product_sku=' + configured_product.default_code|urlencode" class="btn btn-secondary">
