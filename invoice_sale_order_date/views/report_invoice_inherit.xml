@@ -1,10 +1,10 @@
 <odoo>
-    <template id="report_invoice_document_inherit" inherit_id="account.account_invoices">
-        <xpath expr="//span[@t-field='o.date_invoice']" position="after">
-            <p t-if="o.sale_order_date">
-                <strong>Sale Order Date:</strong>
-                <span t-esc="o.sale_order_date"/>
-            </p>
-        </xpath>
-    </template>
+  <template id="report_invoice_document_inherit" inherit_id="account.report_invoice_document">
+    <xpath expr="//span[@t-field='o.invoice_date']" position="after">
+      <p>
+        <strong>Sale Order Date:</strong>
+        <span t-field="o.sale_order_date"/>
+      </p>
+    </xpath>
+  </template>
 </odoo>
