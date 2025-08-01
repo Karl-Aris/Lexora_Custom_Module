@@ -3,9 +3,9 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    payment_acquirer_id = fields.Many2one(
-        'payment.acquirer',
-        string="Payment Acquirer",
+    payment_provider_id = fields.Many2one(
+        'payment.provider',
+        string="Payment Provider",
         help="The payment method selected by the customer during checkout."
     )
 
@@ -15,11 +15,9 @@ class SaleOrder(models.Model):
             return
 
         for order in self:
-            # Skip if no payment method set or not authorize.net
-            if not order.payment_acquirer_id or order.payment_acquirer_id.provider != 'authorize':
+            if not order.payment_provider_id or order.payment_provider_id.code != 'authorize':
                 continue
 
-            # Check if fee already added
             existing_fee_line = order.order_line.filtered(lambda l: l.product_id == fee_product)
             fee = round(order.amount_untaxed * 0.035, 2)
 
