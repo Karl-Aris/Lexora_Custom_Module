@@ -181,6 +181,9 @@
                     <!-- <a t-att-href="'/store/add_to_cart?product_sku=' + configured_product.default_code|urlencode" class="btn btn-secondary">
                         Add to Cart
                     </a> -->
+                    <a class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
+                        <i class="fa fa-heart"></i> Save for Later
+                    </a>
               </div>
                   
               </t>
@@ -240,7 +243,10 @@
                             </div>
                           </t>
                           <div class="card-body text-center">
-                            <strong><t t-esc="card['size']"/></strong><br/>
+                              <strong><t t-esc="card['size']"/></strong><br/>
+                            <div class="text-left">
+                              <small><t t-esc="card['name']"/></small>
+                            </div>
                           </div>
                         </div>
                       </a>
