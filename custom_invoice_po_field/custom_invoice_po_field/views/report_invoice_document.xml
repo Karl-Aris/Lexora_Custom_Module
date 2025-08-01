@@ -1,9 +1,0 @@
-<odoo>
-    <template id="report_invoice_document_inherit_po" inherit_id="account.report_invoice_document">
-        <xpath expr="//div[hasclass('row')][1]/div[2]" position="after">
-            <div t-if="o.sale_po_number">
-                <strong>PO Number:</strong> <span t-esc="o.sale_po_number"/>
-            </div>
-        </xpath>
-    </template>
-</odoo>
