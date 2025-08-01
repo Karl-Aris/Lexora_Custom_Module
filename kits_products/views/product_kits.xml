@@ -22,14 +22,14 @@
 
 
 
-                                    <div class="text-center mb-4">
+                                    <div class="text-center mb-4 border-b">
                                         <img t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'" alt="Product Image" class="img-fluid rounded  " style="height: 400px; object-fit: cover;" />
                                     </div>
 
                                   
-                                        <h1 class="  text-start">
+                                        <h3 class="fw-semibold mb-2 text-start">
                                         <t t-esc="product.name" />
-                                    </h1> 
+                                    </h3> 
                                     <p class="text-muted small text-center mb-3">
                                         <t t-set="title" t-value="product.name or 'Kit Details'" />
                                         <t t-set="description" t-value="product.description_sale or 'Explore our premium kits.'" />
