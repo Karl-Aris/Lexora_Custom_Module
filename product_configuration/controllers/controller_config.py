@@ -3,6 +3,23 @@ from odoo.http import request
 
 class ProductKitsController(http.Controller):
 
+    # You can also create a separate route if you prefer adding to the cart directly
+    @http.route('/store/add_to_cart', type='http', auth='public', website=True)
+    def add_to_cart(self, **kwargs):
+        product_sku = kwargs.get('product_sku')
+        
+        # Find the product based on SKU
+        product = request.env['product.product'].sudo().search([('default_code', '=', product_sku)], limit=1)
+        
+        if product:
+            # Assuming the cart functionality from `website_sale`
+            cart = request.website.sale_get_cart()
+            cart.add_product(product, 1)  # Add 1 quantity of the product
+            # Redirect the user to the cart or the same page with a success message
+            return request.redirect('/shop/cart')
+        
+        return request.redirect('/shop')  # Redirect to shop if no product found
+
     @http.route('/store', type='http', auth='public', website=True)
     def store_by_collection(self, **kwargs):
         selected_collection = kwargs.get('collection')
