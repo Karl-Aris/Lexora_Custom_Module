@@ -1,23 +1,25 @@
 odoo.define('website_payment_fee_ui.payment_fee', function (require) {
-    const publicWidget = require('web.public.widget');
+    "use strict";
 
-    publicWidget.registry.PaymentFeeDisplay = publicWidget.Widget.extend({
-        selector: '.payment_option',
-        start: function () {
-            this.updateFees();
+    const publicWidget = require('web.public.widget');
+    const rpc = require('web.rpc');
+
+    publicWidget.registry.PaymentFee = publicWidget.Widget.extend({
+        selector: '.o_payment_provider',
+
+        events: {
+            'click input[name="provider"]': '_onProviderClick',
         },
-        updateFees: function () {
-            document.querySelectorAll('.payment_option input').forEach(input => {
-                input.addEventListener('change', async () => {
-                    const providerId = input.value;
-                    const resp = await fetch('/get_payment_fee?provider_id=' + providerId);
-                    const data = await resp.json();
-                    const feeDisplay = input.closest('.payment_option').querySelector('.payment_fee_display');
-                    if (feeDisplay) {
-                        feeDisplay.innerText = data.fee > 0 ? `+ $${data.fee.toFixed(2)} Fees` : '+ $0.00 Fees';
-                    }
-                });
+
+        _onProviderClick: function (ev) {
+            const provider = ev.currentTarget.value;
+
+            rpc.query({
+                route: "/shop/payment",
+                params: { provider: provider },
             });
-        }
+        },
     });
+
+    return publicWidget.registry.PaymentFee;
 });
