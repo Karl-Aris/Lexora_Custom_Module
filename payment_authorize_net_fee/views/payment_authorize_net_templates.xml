@@ -1,9 +1,0 @@
-<odoo>
-  <template id="assets_frontend" inherit_id="website_sale.payment">
-    <xpath expr="//t[@t-set='provider']" position="inside">
-      <t t-if="provider.code == 'authorize_net'">
-        <span class="text-warning">+ <t t-esc="'%.2f' % (amount_total * 0.035)"/> Fees</span>
-      </t>
-    </xpath>
-  </template>
-</odoo>
