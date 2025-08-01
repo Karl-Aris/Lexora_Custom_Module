@@ -1,5 +1,5 @@
 {
-    "name": "Authorize.Net Payment Fee",
+    "name": "Authorize.Net Payment",
     "version": "1.0",
     "category": "Accounting/Payment Acquirers",
     "summary": "Adds 3.5% surcharge when Authorize.Net is selected on website checkout",
