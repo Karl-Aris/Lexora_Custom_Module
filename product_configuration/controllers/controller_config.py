@@ -2,7 +2,7 @@ from odoo import http
 from odoo.http import request
 
 class ProductKitsController(http.Controller):
-
+    
     # You can also create a separate route if you prefer adding to the cart directly
     @http.route('/store/add_to_cart', type='http', auth='public', website=True)
     def add_to_cart(self, **kwargs):
