@@ -1,0 +1,11 @@
+<odoo>
+  <record id="product_authorize_net_fee" model="product.product">
+    <field name="name">Authorize.Net Fee</field>
+    <field name="type">service</field>
+    <field name="list_price">0.0</field>
+    <field name="default_code">AUTH_NET_FEE</field>
+    <field name="sale_ok">False</field>
+    <field name="purchase_ok">False</field>
+    <field name="invoice_policy">order</field>
+  </record>
+</odoo>
