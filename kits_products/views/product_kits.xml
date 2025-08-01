@@ -48,11 +48,7 @@
     <div class="product_price mt-2 mb-3 text-muted">
         <h3>Price not available</h3>
     </div>
-</t>
-
-
-
-
+</t>  
                                     <t t-if="kit.product_id">
                                         <t t-if="product.qty_available > 0">
                                             <form action="/shop/cart/update" method="post" class="mt-4">
@@ -61,12 +57,7 @@
 
                                                 <div class="d-flex flex-wrap align-items-center gap-3">
 
-                                                    <div class="input-group quantity-group" style="width: 160px; height: 44px;">
-                                                        <button type="button" class="btn btn-outline-secondary shadow-sm" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
-                                                        <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
-                                                        <button type="button" class="btn btn-outline-secondary shadow-sm" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
-                                                    </div>
-
+                                     
 
                                                     <div class="input-group" style="width: 160px;">
                                                         <button type="button" class="btn btn-outline-secondary" title="Decrease Quantity" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
