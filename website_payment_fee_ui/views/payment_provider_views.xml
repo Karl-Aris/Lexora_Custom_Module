@@ -4,9 +4,12 @@
         <field name="model">payment.provider</field>
         <field name="inherit_id" ref="payment.view_payment_provider_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='module_id']" position="after">
-                <field name="fee_percent"/>
-            </xpath>
+            <group name="availability" position="after">
+                <group string="Fee Settings" name="fee_settings">
+                    <field name="fee_percentage"/>
+                    <field name="fee_product_id"/>
+                </group>
+            </group>
         </field>
     </record>
 </odoo>
