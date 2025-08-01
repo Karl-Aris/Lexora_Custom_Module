@@ -1,13 +1,7 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
-
-    payment_provider_id = fields.Many2one(
-        'payment.provider',
-        string="Payment Provider",
-        help="The payment method selected by the customer during checkout."
-    )
 
     def _add_authorize_fee(self):
         fee_product = self.env['product.product'].sudo().search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
@@ -15,9 +9,7 @@ class SaleOrder(models.Model):
             return
 
         for order in self:
-            if not order.payment_provider_id or order.payment_provider_id.code != 'authorize':
-                continue
-
+            # Don't add again if already added
             existing_fee_line = order.order_line.filtered(lambda l: l.product_id == fee_product)
             fee = round(order.amount_untaxed * 0.035, 2)
 
@@ -33,7 +25,3 @@ class SaleOrder(models.Model):
                     'order_partner_id': order.partner_id.id,
                     'product_uom': fee_product.uom_id.id,
                 })
-
-    def action_confirm(self):
-        self._add_authorize_fee()
-        return super().action_confirm()
