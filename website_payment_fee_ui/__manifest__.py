@@ -1,19 +1,27 @@
 {
-    "name": "Website Payment Fee UI",
-    "version": "1.0",
-    "depends": ["website_sale", "website", "payment"],
-    "author": "Carl Custom Dev",
-    "category": "Website",
-    "description": "Adds dynamic payment method fees during checkout.",
-    "data": [
-        "views/payment_provider_views.xml",
-        "views/templates.xml"
+    'name': 'Website Payment Fee UI',
+    'version': '17.0.1.0.0',
+    'category': 'Website',
+    'summary': 'Display dynamic payment method fees in the website checkout UI.',
+    'description': """
+Adds per-payment-method fee display logic to website checkout.
+""",
+    'author': 'Your Name or Company',
+    'website': 'https://yourwebsite.com',
+    'depends': [
+        'website_sale',
+        'payment',
     ],
-    "assets": {
-        "website.assets_frontend": [
-            "website_payment_fee_ui/static/src/js/payment_fee.js",
-        ]
+    'data': [
+        'views/payment_provider_views.xml',
+        'views/templates.xml',
+    ],
+    'assets': {
+        'website.assets_frontend': [
+            'website_payment_fee_ui/static/src/js/payment_fee.js',
+        ],
     },
-    "installable": True,
-    "auto_install": False,
+    'installable': True,
+    'application': False,
+    'license': 'LGPL-3',
 }
