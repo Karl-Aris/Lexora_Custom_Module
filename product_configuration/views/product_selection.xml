@@ -275,7 +275,9 @@
 
                 <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
                   <div class="row">
-                    <t t-foreach="counter_top_cards" t-as="card">
+                    <t t-if="counter_top_cards">
+
+                      <t t-foreach="counter_top_cards" t-as="card">
                         <div class="col-3 mb-3">
                           <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
                                   selected_collection,
@@ -304,11 +306,23 @@
                         </a>
                       </div>
                     </t>
+
+                  </t>
+                  <t t-else="">
+                    <div class="col-12 card-body text-left">
+                      No Countertops
+                    </div>
+                  </t>
+                    
                   </div>
                 </div>
 
                 <hr/>
               </t>
+              <!-- <t t-else="">
+                <div class="row">
+
+              </t> -->
 
               
 
