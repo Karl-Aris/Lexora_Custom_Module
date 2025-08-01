@@ -1,554 +1,301 @@
 <odoo>
-  <template id="template_product_configuration" name="Product Configuration">
-    <t t-call="website.layout">
-      <div class="container my-4">
+    <template id="kit_group_detail_template" name="Kit Group Detail">
+        <t t-call="website.layout">
+            <div class="container py-5">
 
-        <!-- Collection Dropdown -->
-        <div class="mb-4">
-          <label for="collection_select" class="form-label">Select Collection</label>
-          <select id="collection_select" class="form-select" name="collection" onchange="location = this.value;">
-            <option t-if="not selected_collection" selected="selected" disabled="disabled">Select collection</option>
-            <t t-foreach="collections" t-as="col">
-              <option t-att-value="'/store?collection=%s' % col" t-att-selected="col == selected_collection">
-                <t t-esc="col"/>
-              </option>
-            </t>
-          </select>
-        </div>
+                <div class="row g-5">
+                    <div class="col-lg-6">
+                        <div class="card  border-0 h-100">
+                            <div class="card-body">
 
-        <!-- Color Badges: Only show if collection is selected -->
-        <t t-if="selected_collection and colors">
-          <div class="mb-4">
-            <strong>Colors:</strong>
-            <t t-foreach="colors" t-as="color">
-              <a t-att-href="'/store?collection=%s%s' % (
-                      selected_collection,
-                      '&amp;color=' + color if selected_color != color else ''
-                    )"
-                 t-att-class="'badge rounded-pill me-2 px-3 py-2 ' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
-                 style="cursor:pointer;">
-                <t t-esc="color"/>
-              </a>
-            </t>
-          </div>
-        </t>
+                                <t t-if="kit and product">
+                                    <p class="text-muted small mb-2">
+                                        <a t-att-href="'/product_kits'" class="text-decoration-none  ">All Products</a> /
+                                        <t t-esc="product.name" />
+                                    </p>
 
-        <!-- Show rest only if collection selected -->
-        <t t-if="selected_color">
 
-          <div class="row">
-            <!-- LEFT COLUMN: Configured image or cabinet fallback -->
-            <div class="col-md-6">
-              <t t-if="selected_sku and selected_size">
-                <!-- Load the cabinet product -->
-                <t t-set="cabinet_product"
-                  t-value="request.env['product.product'].sudo().search([('default_code', '=', selected_sku)], limit=1)" />
+                                    <div class="text-center mb-4">
+                                        <img t-att-src="'/web/image/product.product/' + str(product.id) + '/image_1920'" alt="Product Image" class="img-fluid rounded  " style="height: 400px; object-fit: cover;" />
+                                    </div>
 
-                <!-- Show configured product if a valid combination exists -->
-                <t t-if="configured_product">
-                  <div class="position-relative out-of-stock-wrapper" onclick="openModal()">
-                    <!-- Image -->
-                    <img t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')"
-                        alt="Configured Product"
-                        class="img-thumbnail"
-                        style="width: 100%; height: 450px; object-fit: contain;"/>
+                                    <h5 class="fw-semibold mb-2 text-start">
+                                        <t t-esc="product.name" />
+                                    </h5>
+                                    <p class="text-muted small text-center mb-3">
+                                        <t t-esc="product.description_sale" />
+                                    </p>
 
-                    <!-- Overlay Message for Out of Stock -->
-                    <t t-if="configured_product.qty_available == 0">
-                      <div class="out-of-stock-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
-                        <div class="overlay-text">
-                          Out of Stock
+ 
+ 
+                                    <t t-else="">
+                                        <div class=" text-start mt-4">
+                                            <p class="text-muted small mb-2">
+                                                <a t-att-href="'/product_kits'" class="text-decoration-none text-muted">All Products</a> /
+                                            
+                                            </p>
+
+                                        </div>
+                                        <div class="alert alert-warning text-center mt-4">
+                                            <div class="text-center py-5">
+                                                <img t-att-src="'/kits_products/static/description/no-order.png'" alt="No Kit" style="width: 50px; opacity: 0.3;" />
+                                                <h5 class="mt-3 text-muted">             Product not available for sale</h5>
+                                            </div>
+
+                                        </div>
+                                    </t>
+                                </t>
+
+                                <t t-if="kit and not product">
+                                    <div class=" text-start mt-4">
+                                        <p class="text-muted small mb-2">
+                                            <a t-att-href="'/product_kits'" class="text-decoration-none text-muted">All Products</a> /
+                                            
+                                        </p>
+
+                                    </div>
+                                    <div class="text-center py-5">
+
+                                        <img t-att-src="'/kits_products/static/description/no-order.png'" alt="No Kit" style="width: 50px; opacity: 0.3;" />
+                                        <h5 class="mt-3 text-muted">No matching product variant available</h5>
+                                    </div>
+                                </t>
+
+                                <t t-if="not kit">
+                                    <div class=" text-start mt-4">
+                                        <p class="text-muted small mb-2">
+                                            <a t-att-href="'/product_kits'" class="text-decoration-none text-muted">All Products</a> /
+                                            
+                                        </p>
+
+                                    </div>
+                                    <div class="text-center py-5">
+
+                                        <img t-att-src="'/kits_products/static/description/no-order.png'" alt="No Kit" style="width: 50px; opacity: 0.3;" />
+                                        <h5 class="mt-3 text-muted">No matching kit found for this selection</h5>
+                                    </div>
+
+
+
+                                </t>
+                                <div class="container py-4">
+                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+
+                                        <div class="text-muted small">
+                                            <a href="/terms" class="text-decoration-none text-muted fw-semibold mb-1 d-inline-block">
+                                                <u>Terms and Conditions</u>
+                                            </a>
+                                            <div>30-day money-back guarantee</div>
+                                            <div>Shipping: 2-3 Business Days</div>
+                                        </div>
+
+
+                                        <div class=" flex-d flex mt-3 mt-md-0 text-md-end">
+                                            <span class="fw-semibold me-2">Share:</span>
+                                            <div data-snippet="s_share" class="s_share text-start o_no_link_popover text-lg-end">
+                                                <a href="https://www.facebook.com/sharer/sharer.php?u={url}" target="_blank" aria-label="Facebook" class="s_share_facebook mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[1]/i[1]" class="fa fa-facebook "></i>
+                                                </a>
+                                                <a href="https://twitter.com/intent/tweet?text={title}&amp;url={url}" target="_blank" aria-label="Twitter" class="s_share_twitter mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[2]/i[1]" class="fa fa-twitter "></i>
+                                                </a>
+                                                <a href="https://pinterest.com/pin/create/button/?url={url}&amp;media={media}&amp;description={title}" target="_blank" aria-label="Pinterest" class="s_share_pinterest mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[5]/i[1]" class="fa fa-pinterest "></i>
+                                                </a>
+                                                <a href="mailto:?body={url}&amp;subject={title}" aria-label="Email" class="s_share_email mx-1 my-0">
+                                                    <i data-oe-model="ir.ui.view" data-oe-id="2943" data-oe-field="arch" data-oe-xpath="/t[1]/div[1]/a[6]/i[1]" class="fa fa-envelope "></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <t t-if="product and product.product_tmpl_id and product.product_tmpl_id.valid_product_template_attribute_line_ids">
+                                        <div class="border-top pt-4 mt-4">
+                                            <h4 class="fw-bold mb-3 text-dark">Specifications</h4>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-hover shadow-sm rounded-3 overflow-hidden">
+                                                    <tbody>
+                                                        <t t-foreach="product.product_tmpl_id.valid_product_template_attribute_line_ids" t-as="ptal">
+                                                            <tr t-if="ptal.value_ids">
+                                                                <td class="fw-semibold bg-light text-nowrap text-dark w-30">
+
+                                                                    <span class="badge bg-secondary-subtle text-dark fw-normal me-1">
+                                                                        <t t-esc="ptal.attribute_id.name" />
+                                                                    </span>
+                                                                </td>
+                                                                <td class="w-75">
+                                                                    <t t-foreach="ptal.product_template_value_ids._only_active()" t-as="ptv" t-separator=", ">
+                                                                        <span class="badge bg-secondary-subtle text-dark fw-normal me-1">
+                                                                            <t t-esc="ptv.name" />
+                                                                        </span>
+                                                                    </t>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                    <t t-if="tags">
+                                        <div class="border-top pt-4 mt-4">
+                                            <h5 class="fw-bold text-dark mb-3">Tags</h5>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <t t-foreach="tags" t-as="tag">
+                                                    <span class="badge bg-light border rounded-pill px-3 py-2 small text-muted" style="transition: all 0.2s ease;" onmouseover="this.classList.add('bg-secondary-subtle')" onmouseout="this.classList.remove('bg-secondary-subtle')">
+                                                        <t t-esc="tag.name" />
+                                                    </span>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+
+
+                            </div>
+
+
                         </div>
-                      </div>
-                    </t>
-                  </div>
-                </t>
-
-                <!-- If no combination, show fallback cabinet image -->
-                <!-- <t t-elif="cabinet_product">
-                  <img t-att-src="'data:image/png;base64,%s' % cabinet_product.image_1920.decode('utf-8')"
-                      alt="Cabinet"
-                      class="img-thumbnail"
-                      style="width: 100%; height: 500px; object-fit: contain;" />
-                  <div class="mt-2 text-center">
-                    <strong>Selected components resulted no existing combination</strong>
-                    <strong t-esc="cabinet_product.name or 'Cabinet Product'" /><br />
-                    <small class="text-muted" t-esc="cabinet_product.default_code or ''" />
-                  </div>
-                </t> -->
-
-                <t t-elif="cabinet_product">
-                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                        style="width: 100%; height: 500px;">
-                      Non-existing SKU.
                     </div>
-                </t>
 
-                
 
-                <!-- If no image available -->
-                <t t-else="">
-                  <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                      style="width: 100%; height: 500px;">
-                    No image available
-                  </div>
-                </t>
-              </t>
+                    <div class="col-lg-6">
+                        <t t-if="related_kits">
+                            <t t-set="shown_sizes" t-value="[]" />
+                            <div class="mb-4">
+                                <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-primary">
+                                    <span class="badge bg-dark text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px; font-size: 0.95rem;">
+                1
+                                    </span>
+                                    <span style="font-size: 1.05rem;">Select Cabinet Size</span>
+                                </h5>
 
-              <!-- If no SKU selected at all -->
-              <t t-if="not selected_sku and not selected_size">
-                <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
-                    style="width: 100%; height: 500px;">
-                  No cabinet selected
-                </div>
-              </t>
+                                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4">
+                                    <t t-foreach="related_kits" t-as="rel_kit">
+                                        <t t-if="rel_kit.size not in shown_sizes">
+                                            <t t-set="shown_sizes" t-value="shown_sizes + [rel_kit.size]" />
+                                            <div class="col">
+                                                <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (rel_kit.collection or '', rel_kit.size or '')" class="text-decoration-none">
+                                                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center transition" style="transition: all 0.25s ease; cursor: pointer;">
+                                                        <div class="d-flex justify-content-center align-items-center p-3" style="height: 110px; background: #f8f9fa; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                                                            <img t-att-src="'/web/image/product.product/' + str(rel_kit.product_id.id) + '/image_1920'" class="img-fluid rounded" style="max-height: 80px; object-fit: contain; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';" alt="Size" />
+                                                        </div>
+                                                        <div class="card-body py-2 px-3">
+                                                            <strong class="text-dark d-block" style="font-size: 0.9rem;">
+                                                                <t t-esc="rel_kit.size" />
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
 
-              <!-- Modal -->
-              <t t-if="configured_product">
-              <div class="modal" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true" style="display: none;" onclick="closeModal()">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-body">
-                      <!-- Image to be dynamically updated -->
-                      <img id="modalImage" t-att-src="'data:image/png;base64,%s' % configured_product.image_1920.decode('utf-8')" alt="Product Image" style="width: 100%; height: auto; object-fit: contain;" />
+
+                        <t t-foreach="['cabinet', 'counter_top', 'mirror', 'faucet']" t-as="category">
+                            <t t-if="components[category]">
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center gap-2 mb-2 border-bottom pb-2">
+                                        <span class="badge bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                                            <t t-esc="{'cabinet': 2, 'counter_top': 3, 'mirror': 4, 'faucet': 5}[category]" />
+                                        </span>
+                                        <h6 class="mb-0 fw-semibold text-uppercase" style="font-size: 0.9rem;">
+                                            <t t-esc="{'cabinet': 'Color', 'counter_top': 'Counter Top', 'mirror': 'Mirror', 'faucet': 'Faucet'}[category]" />
+                                        </h6>
+                                    </div>
+
+                                    <div class="row g-2">
+                                        <t t-foreach="components[category]" t-as="comp">
+                                            <div class="col-6 col-sm-4 col-lg-3">
+                                                <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s&amp;cabinet=%s&amp;counter_top=%s&amp;mirror=%s&amp;faucet=%s' % (
+                                collection, size or '',
+                                ('' if category == 'cabinet' and cabinet == comp.id else (comp.id if category == 'cabinet' else cabinet or '')),
+                                ('' if category == 'counter_top' and counter_top == comp.id else (comp.id if category == 'counter_top' else counter_top or '')),
+                                ('' if category == 'mirror' and mirror == comp.id else (comp.id if category == 'mirror' else mirror or '')),
+                                ('' if category == 'faucet' and faucet == comp.id else (comp.id if category == 'faucet' else faucet or ''))
+                            )" class="text-decoration-none">
+                                                    <div t-attf-class="card h-100 text-center p-2 rounded-3 border-2 #{'border-primary shadow-sm' if (
+                                    (category == 'cabinet' and comp.id == cabinet) or
+                                    (category == 'counter_top' and comp.id == counter_top) or
+                                    (category == 'mirror' and comp.id == mirror) or
+                                    (category == 'faucet' and comp.id == faucet)
+                                ) else 'border-light shadow'} transition">
+                                                        <div class="d-flex justify-content-center align-items-center" style="height: 72px;">
+                                                            <img t-att-src="comp.image_1920 and '/web/image/product.product/' + str(comp.id) + '/image_1920' or ''" class="img-fluid rounded" style="max-height: 64px; object-fit: cover;" />
+                                                        </div>
+                                                        <small class="text-muted d-block" style="font-size: 11px;">
+                                                            <t t-esc="comp.default_code or 'No SKU'" />
+                                                        </small>
+                                                        <div class="card-body px-1 py-1">
+                                                            <small class="text-dark fw-bold" style="font-size: 10px;">
+                                                                <t t-set="kit_color" t-value="''" />
+                                                                <t t-foreach="kits" t-as="kit">
+                                                                    <t t-if="not kit_color and comp.id in kit.cabinet_ids.ids">
+                                                                        <t t-set="kit_color" t-value="kit.color or ''" />
+                                                                    </t>
+                                                                </t>
+                                                                <t t-esc="kit_color" />
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
                     </div>
-                  </div>
-                </div>
-              </div>
-              </t>
 
+                </div>
+                <div class="mt-4 text-end">
+                    <a t-att-href="'/product_kits/group?collection=%s&amp;size=%s' % (collection, size or '')" class="btn btn-outline-secondary">Reset Selection</a>
+                </div>
 
             </div>
 
-            <!-- RIGHT COLUMN: Size cards -->
-            <div class="col-md-6">
-
-              <t t-if="configured_product">
-              <div class="text-left">
-                <h3 t-esc="configured_product.name or 'Unnamed Product'" />
-                <div class="d-flex align-items-center w-100 text-muted">
-                  <small t-esc="configured_product.default_code or ''" />  <span class="mx-1">/</span>  <small t-esc="selected_collection or ''"/>
-                </div>
-                <div class="my-1">
-                  <t t-if="configured_product.product_tag_ids">
-                    <t t-foreach="configured_product.product_tag_ids" t-as="tag">
-                      <span class="badge bg-light text-dark me-2 mb-2 px-3 py-2">
-                        <t t-esc="tag.name"/>
-                      </span>
-                    </t>
-                  </t>
-                  <t t-if="not configured_product.product_tag_ids">
-                    <span class="text-muted">No tags available</span>
-                  </t>
-                </div>
-                <!-- <h4 t-esc="configured_product.property_product_pricelist"/> -->
-              </div>
-
-              <!-- <h2 t-esc="configured_product.lst_price" class="my-2"/> -->
-               <h2 t-esc="fixed_price" class="my-2"/>
-
-              <t t-if="configured_product.qty_available > 0">
-                <div class="product-action-container d-flex align-items-center my-3 w-100">
-                  
-                  <!-- Quantity Selection with Minus, Quantity, Plus -->
-                  <div class="input-group quantity-group" style="width: 160px; height: 44px;">
-                      <button type="button" class="btn btn-outline-secondary" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
-                      <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
-                      <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
-                  </div>
-
-                  <!-- Add to Cart Button -->
-                  <button class="btn btn-primary" id="add-to-cart-btn" type="button" style="margin-left: 10px;">
-                    Add to Cart
-                  </button>
-
-                  <!-- Buy Now Button -->
-                  <button class="btn btn-success" id="buy-now-btn" type="button" style="margin-left: 10px;">
-                    Buy Now
-                  </button>
-                </div>
-              </t>
-
-              <t t-if="configured_product.qty_available == 0">
-              <div class="d-flex flex-column space-y-2 mb-2">
-                    <span class="text-danger my-3 w-auto text-left">No available stock</span>
-                    <!-- <button class="btn btn-secondary px-4 py-2" id="buy-now-btn" type="button">
-                      Save for Later
-                    </button> -->
-                    <a t-att-href="'/shop/wishlist/add/' + str(configured_product.id)" class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
-                        <i class="fa fa-heart"></i> Save for Later
-                    </a>
-                    <!-- <a t-att-href="'/store/add_to_cart?product_sku=' + configured_product.default_code|urlencode" class="btn btn-secondary">
-                        Add to Cart
-                    </a> -->
-              </div>
-                  
-              </t>
-
-              <div class="terms-section mb-4">
-                <!-- Terms and Conditions (Underlined Link) -->
-                <a href="/terms" class="terms-link text-decoration-underline mb-2">
-                  Terms and Conditions
-                </a>
-
-                <!-- 30-Day Money-Back Guarantee (Plain Text) -->
-                <div class="text-muted">
-                  30-Day Money-Back Guarantee
-                </div>
-
-                <!-- Shipping Details (Plain Text) -->
-                <div class="text-muted">
-                  Shipping: 2-3 Business Days
-                </div>
-              </div>
-
-              </t>
-              
-              <t t-if="selected_color">
-              <!-- Step 1: Size Selection -->
-              <div class="d-flex align-items-center mb-3 w-100">
-                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
-                  <strong>1</strong>
-                </div>
-                <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
-                  Select Sizes
-                </h4>
-                <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#sizeSelection" aria-expanded="false" aria-controls="sizeSelection">
-                  <span class="p-2" style="font-size: 24px; font-weight: bold;" id="sizeToggle"></span>
-                </button>
-              </div>
-
-              <!-- Size Cards Grid (Collapsed by default) -->
-              <div id="sizeSelection">
-                <div class="row">
-                  <t t-foreach="size_cards" t-as="card">
-                    <div class="col-3 mb-3">
-                      <a t-att-href="'/store?collection=%s%s%s%s' % (
-                              selected_collection,
-                              '&amp;color=' + selected_color if selected_color else '',
-                              '&amp;cabinet_sku=' + card['cabinet_sku'] if selected_sku != card['cabinet_sku'] else '',
-                              '&amp;size=' + card['size'] if selected_size != card['size'] else '')"
-                       class="text-decoration-none">
-                        <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['cabinet_sku'] == selected_sku and card['size'] == selected_size else ''}">
-                          <t t-if="card['image']">
-                            <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                 class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Product Image"/>
-                          </t>
-                          <t t-else="">
-                            <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
-                              <span class="text-muted">No Image</span>
-                            </div>
-                          </t>
-                          <div class="card-body text-center">
-                            <strong><t t-esc="card['size']"/></strong><br/>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </t>
-                </div>
-              </div>
-              </t>
-
-              <hr/>
-
-              <!-- Step 2: Countertop -->
-              <t t-if="selected_sku and selected_size">
-
-                <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
-                    <strong>2</strong>
-                  </div>
-                  <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                    Add Countertop
-                  </h4>
-                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#countertopSelection" aria-expanded="false" aria-controls="countertopSelection">
-                  <span class="p-2" style="font-size: 24px; font-weight: bold;" id="countertopToggle"></span>
-                  </button>
-                </div>
-
-                <div id="countertopSelection" t-att-class="not selected_countertop and 'collapse' or ''">
-                  <div class="row">
-                    <t t-foreach="counter_top_cards" t-as="card">
-                        <div class="col-3 mb-3">
-                          <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
-                                  selected_collection,
-                                  '&amp;color=' + selected_color if selected_color else '',
-                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                                  '&amp;size=' + selected_size if selected_size else '',
-                                  '&amp;counter_top_sku=' + card['counter_top_sku'] if selected_countertop != card['counter_top_sku'] else '',
-                                  '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                                  '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                                )"
-                          class="text-decoration-none">
-                          <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['counter_top_sku'] == selected_countertop else ''}">
-                            <t t-if="card['image']">
-                              <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Countertop Image"/>
-                            </t>
-                            <t t-else="">
-                              <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
-                                <span class="text-muted">No Image</span>
-                              </div>
-                            </t>
-                            <div class="card-body text-left">
-                              <small><t t-esc="card['name']"/></small>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </t>
-                  </div>
-                </div>
-
-                <hr/>
-              </t>
-
-              
-
-              <!-- Step 3: Mirror -->
-              <t t-if="selected_sku and selected_size">
-
-                <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
-                    <strong>3</strong>
-                  </div>
-                  <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    Add Mirror
-                  </h4>
-                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#mirrorSelection" aria-expanded="false" aria-controls="mirrorSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;" id="mirrorToggle"></span>
-                  </button>
-                </div>
-
-                <div id="mirrorSelection" t-att-class="not selected_mirror and 'collapse' or ''">
-                  <div class="row">
-                      <t t-foreach="mirror_cards" t-as="card">
-                        <div class="col-3 mb-3">
-                          <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
-                                  selected_collection,
-                                  '&amp;color=' + selected_color if selected_color else '',
-                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                                  '&amp;size=' + selected_size if selected_size else '',
-                                  '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
-                                  '&amp;mirror_sku=' + card['mirror_sku'] if selected_mirror != card['mirror_sku'] else '',
-                                  '&amp;faucet_sku=' + selected_faucet if selected_faucet else ''
-                                )"
-                          class="text-decoration-none">
-                          <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['mirror_sku'] == selected_mirror else ''}">
-                            <t t-if="card['image']">
-                              <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Mirror Image"/>
-                            </t>
-                            <t t-else="">
-                              <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
-                                <span class="text-muted">No Image</span>
-                              </div>
-                            </t>
-                            <div class="card-body text-left">
-                              <small><t t-esc="card['name']"/></small>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </t>
-                  </div>
-                </div>
-                <hr/>
-              </t>
 
 
-              <!-- Step 4: Faucet -->
-              <t t-if="selected_sku and selected_size">
-
-              <div class="d-flex align-items-center mb-3 w-100">
-                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 25px; height: 25px; font-size: 12px;">
-                    <strong>4</strong>
-                  </div>
-                  <h4 class="mb-0 flex-grow-1" data-bs-toggle="collapse" href="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
-                    Add Faucet
-                  </h4>
-                  <button class="btn btn-link text-decoration-none" type="button" style="font-size: 18px; padding: 0; margin-left: auto;" data-bs-toggle="collapse" data-bs-target="#faucetSelection" aria-expanded="false" aria-controls="faucetSelection">
-                    <span class="p-2" style="font-size: 24px; font-weight: bold;" id="faucetToggle"></span>
-                  </button>
-                </div>
-
-                <div id="faucetSelection" t-att-class="not selected_faucet and 'collapse' or ''">
-                  <div class="row">
-                      <t t-foreach="faucet_cards" t-as="card">
-                        <div class="col-3 mb-3">
-                          <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
-                                  selected_collection,
-                                  '&amp;color=' + selected_color if selected_color else '',
-                                  '&amp;cabinet_sku=' + selected_sku if selected_sku else '',
-                                  '&amp;size=' + selected_size if selected_size else '',
-                                  '&amp;counter_top_sku=' + selected_countertop if selected_countertop else '',
-                                  '&amp;mirror_sku=' + selected_mirror if selected_mirror else '',
-                                  '&amp;faucet_sku=' + card['faucet_sku'] if selected_faucet != card['faucet_sku'] else ''
-                                )"
-                          class="text-decoration-none">
-                          <div t-attf-class="card h-100 #{'border border-2 border-secondary' if card['faucet_sku'] == selected_faucet else ''}">
-                            <t t-if="card['image']">
-                              <img t-att-src="'data:image/png;base64,%s' % card['image']"
-                                  class="card-img-top p-2" style="height: 100px; object-fit: cover;" alt="Faucet Image"/>
-                            </t>
-                            <t t-else="">
-                              <div class="card-img-top bg-light text-center d-flex align-items-center justify-content-center p-2" style="height: 100px;">
-                                <span class="text-muted">No Image</span>
-                              </div>
-                            </t>
-                            <div class="card-body text-left">
-                              <small><t t-esc="card['name']"/></small>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </t>
-                  </div>
-                </div>
-              </t>
-
-            </div>
-          </div>
-
-          
         </t>
+        <script type="text/javascript">
+           
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
 
-        
+function submitStockNotification() {
+    const email = document.getElementById('stock_notification_input').value;
+    const productId = document.querySelector('input[name="product_id"]').value;
 
-      </div>
-    </t>
-
-    <script type="text/javascript">
-
-    // Function to handle dynamic collapse behavior
-    function handleCollapseToggle(collapseId, toggleId) {
-        var collapseElement = document.getElementById(collapseId);
-        var toggleElement = document.getElementById(toggleId);
-
-        // Event listener for showing the collapse
-        collapseElement.addEventListener('show.bs.collapse', function () {
-            toggleElement.innerHTML = '-';
-            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
-            button.setAttribute('aria-expanded', 'true');
-        });
-
-        // Event listener for hiding the collapse
-        collapseElement.addEventListener('hide.bs.collapse', function () {
-            toggleElement.innerHTML = '+';
-            var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
-            button.setAttribute('aria-expanded', 'false');
-        });
-
-        // Set the initial icon based on whether the collapse section is already visible
-        if (collapseElement.classList.contains('show')) {
-            toggleElement.innerHTML = '-'; // If visible, set the icon to '-'
-        } else {
-            toggleElement.innerHTML = '+'; // If hidden, set the icon to '+'
-        }
-
-        // Handle immediate toggle: Close the section if it's open
-        var button = document.querySelector(`[data-bs-target="#${collapseId}"]`);
-        button.addEventListener('click', function () {
-            // If the section is currently open, close it
-            if (collapseElement.classList.contains('show')) {
-                $(collapseElement).collapse('hide'); // Use Bootstrap's collapse API to hide it
-            } else {
-                $(collapseElement).collapse('show'); // Use Bootstrap's collapse API to show it
-            }
-        });
+    if (!validateEmail(email)) {
+        document.getElementById('stock_notification_input_incorrect').classList.remove('d-none');
+        return;
     }
 
-    // Initialize collapses for each section
-    handleCollapseToggle('sizeSelection', 'sizeToggle');
-    handleCollapseToggle('countertopSelection', 'countertopToggle');
-    handleCollapseToggle('mirrorSelection', 'mirrorToggle');
-    handleCollapseToggle('faucetSelection', 'faucetToggle');
+    // Hide error and show success (you should connect to backend via AJAX here)
+    document.getElementById('stock_notification_input_incorrect').classList.add('d-none');
+    document.getElementById('stock_notification_form').classList.add('d-none');
+    document.getElementById('stock_notification_success_message').classList.remove('d-none');
+
+    // Optional: Send to your controller with fetch/AJAX
+    /*
+    fetch('/notify_me_stock', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email, product_id: productId})
+    });
+    */
+}
+ 
+
+        </script>
+    </template>
 
 
 
-  // Function to open the modal
-   function openModal() {
-    var modal = document.getElementById('imageModal');
-    
-    // Make the modal visible
-    modal.style.display = 'block';
-    
-    // Create the backdrop manually if it doesn't exist
-    var modalBackdrop = document.querySelector('.modal-backdrop');
-    if (!modalBackdrop) {
-      var backdrop = document.createElement('div');
-      backdrop.classList.add('modal-backdrop', 'fade', 'show');
-      document.body.appendChild(backdrop);
-      
-      // Close modal when backdrop is clicked
-      backdrop.addEventListener('click', closeModal);
-    }
-  }
-
-  // Function to close the modal
-  function closeModal() {
-    var modal = document.getElementById('imageModal');
-    var modalBackdrop = document.querySelector('.modal-backdrop');
-    
-    // Hide the modal and remove the backdrop
-    modal.style.display = 'none';
-    if (modalBackdrop) {
-      modalBackdrop.remove();
-    }
-  }
-
-    </script>
-
-    <style>
-          /* Optional: Extra styling for modal image */
-        .modal-body img {
-          width: 100%;
-          max-width: 800px; /* Set max width to ensure large images don't overflow */
-          height: auto;
-          object-fit: contain;
-        }
-
-        .img-thumbnail {
-          cursor: zoom-in; /* Shows pointer on hover for the image */
-        }
-
-
-
-        .out-of-stock-wrapper {
-          position: relative;
-        }
-
-        .out-of-stock-overlay {
-          background-color: rgba(0, 0, 0, 0.7); /* Darker gray with lower opacity */
-          color: white;
-          font-size: 24px;
-          padding: 20px;
-          border-radius: 8px;
-          transition: opacity 0.3s ease;
-          z-index: 10; /* Ensure the overlay appears above the image */
-          pointer-events: auto; /* Allow hover effect */
-        }
-
-        .out-of-stock-overlay:hover {
-          opacity: 0; /* Hide when hovered */
-        }
-
-        /* Optional: Text positioning */
-        .overlay-text {
-          text-align: center;
-          font-size: 30px;
-          font-weight: thin;
-        }
-
-        /* Flexbox to center the text */
-        .out-of-stock-overlay {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-      </style>
-    
-  </template>
 </odoo>
-
