@@ -1,7 +1,9 @@
-from odoo import models
+from odoo import models, fields
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
+
+    payment_acquirer_id = fields.Many2one('payment.acquirer', string="Payment Acquirer")
 
     def _add_authorize_fee(self):
         fee_product = self.env['product.product'].sudo().search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
