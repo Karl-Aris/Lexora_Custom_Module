@@ -3,13 +3,21 @@ from odoo import models, fields
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    payment_provider_id = fields.Many2one(
+        'payment.provider',
+        string="Payment Provider",
+        help="Set automatically based on the linked payment transaction (e.g., Authorize.net)"
+    )
+
     def _add_authorize_fee(self):
         fee_product = self.env['product.product'].sudo().search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
         if not fee_product:
             return
 
         for order in self:
-            # Don't add again if already added
+            if order.payment_provider_id.code != 'authorize':
+                continue
+
             existing_fee_line = order.order_line.filtered(lambda l: l.product_id == fee_product)
             fee = round(order.amount_untaxed * 0.035, 2)
 
