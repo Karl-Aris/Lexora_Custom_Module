@@ -5,30 +5,31 @@ class SaleOrder(models.Model):
 
     authorize_fee_added = fields.Boolean(default=False)
 
-    @api.onchange('payment_term_id')
-    def _onchange_payment_method_fee(self):
-        """Optional: Trigger fee addition if needed on change."""
-
     def add_authorize_net_fee(self):
         self.ensure_one()
         if self.authorize_fee_added:
-            return
+            return  # Prevent duplicate fee lines
 
-        provider = self.env.context.get('active_payment_provider')
-        if provider != 'authorize':
-            return
+        if self.state in ['sale', 'done']:
+            return  # Don't add after confirmation
 
-        fee_product = self.env['product.product'].search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
+        fee_product = self.env.ref('payment_authorize_net_fee.product_authorize_net_fee', raise_if_not_found=False)
         if not fee_product:
-            raise UserError("Please create a product with Internal Reference = AUTH_NET_FEE")
+            return
 
-        fee = self.amount_total * 0.035
+        # Remove existing line if any (for safety)
+        existing = self.order_line.filtered(lambda l: l.product_id == fee_product)
+        existing.unlink()
 
-        self.order_line = [(0, 0, {
+        fee_amount = self.amount_untaxed * 0.035
+        self.order_line.create({
+            'order_id': self.id,
             'product_id': fee_product.id,
             'name': fee_product.name,
-            'price_unit': round(fee, 2),
+            'price_unit': round(fee_amount, 2),
             'product_uom_qty': 1,
-        })]
+            'product_uom': fee_product.uom_id.id,
+            'tax_id': [(6, 0, fee_product.taxes_id.ids)],
+        })
 
         self.authorize_fee_added = True
