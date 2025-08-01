@@ -1,7 +1,7 @@
 {
     "name": "Website Payment Fee UI",
     "version": "1.0",
-    "depends": ["website_sale", "payment"],
+    "depends": ["website_sale", "website", "payment"],
     "author": "Carl Custom Dev",
     "category": "Website",
     "description": "Adds dynamic payment method fees during checkout.",
@@ -10,8 +10,8 @@
         "views/templates.xml"
     ],
     "assets": {
-        "web.assets_frontend": [
-            "website_payment_fee_ui/static/src/js/payment_fee.js",
+        "website.assets_frontend": [
+            "/website_payment_fee_ui/static/src/js/payment_fee.js",
         ]
     },
     "installable": True,
