@@ -146,7 +146,6 @@
 
               <!-- <h2 t-esc="configured_product.lst_price" class="my-2"/> -->
                <h2 t-esc="fixed_price" class="my-2"/>
-                <h2 t-esc="pricelist" class="my-2"/>
 
               <t t-if="configured_product.qty_available > 0">
                 <div class="product-action-container d-flex align-items-center my-3 w-100">
