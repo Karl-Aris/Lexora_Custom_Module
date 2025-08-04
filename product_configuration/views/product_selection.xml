@@ -148,15 +148,15 @@
                <h2 t-esc="fixed_price" class="my-2"/>
 
               <t t-if="configured_product.qty_available > 0">
-                <div class="product-action-container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 my-3 w-100">
-                  <form action="/shop/cart/update" method="post" class="d-flex flex-column flex-md-row align-items-center gap-3 w-100">
+                <div class="product-action-container w-100 d-flex justify-content-center">
+                  <form action="/shop/cart/update" method="post" class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 w-100">
 
                       <!-- Hidden Inputs -->
                       <input type="hidden" name="product_id" t-att-value="configured_product.id" />
                       <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
 
                       <!-- Quantity Selector -->
-                      <div class="input-group quantity-group w-100" style="height: 44px;">
+                      <div class="input-group quantity-group" style="width: 160px; height: 44px;">
                           <button type="button" class="btn btn-outline-secondary"
                               onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
                           <input name="add_qty" type="number" class="form-control text-center" value="1" min="1" style="max-width: 60px;" />
@@ -165,7 +165,7 @@
                       </div>
 
                       <!-- Buttons -->
-                      <div class="d-flex flex-column flex-md-row gap-2 w-100 justify-content-md-end">
+                      <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end w-100 w-md-auto">
                           <button type="submit"
                               class="btn btn-dark fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2">
                               <i class="fa fa-cart-plus"></i> Add to Cart
@@ -176,6 +176,7 @@
                               <i class="fa fa-heart-o"></i> Buy Now
                           </button>
                       </div>
+
                   </form>
               </div>
 
