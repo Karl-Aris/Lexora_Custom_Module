@@ -171,7 +171,7 @@
                               <i class="fa fa-cart-plus"></i> Add to Cart
                           </button>
 
-                          <data inherit_id="website_sale.product" active="False" name="Buy Now Button">
+                          <!-- <data inherit_id="website_sale.product" active="False" name="Buy Now Button">
                               <xpath expr="//t[@t-set='hasBuyNow']" position="attributes">
                                   <attribute name="t-value" remove="false" add="true" separator=" "/>
                               </xpath>
@@ -181,12 +181,14 @@
                                       Buy now
                                   </a>
                               </xpath>
-                          </data>
+                          </data> -->
 
-                          <!-- <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1"
+                          <!-- Buy Now Button -->
+                          <button type="button" id="buy_now_button"
                               class="btn btn-outline-primary fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2">
                               <i class="fa fa-bag-heart"></i> Buy Now
-                          </button> -->
+                          </button>
+
                       </div>
 
                   </form>
@@ -492,6 +494,32 @@
     </t>
 
     <script type="text/javascript">
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const buyNowBtn = document.getElementById("buy_now_button");
+        const form = buyNowBtn.closest("form");
+
+        buyNowBtn.addEventListener("click", function () {
+            const formData = new FormData(form);
+
+            fetch("/shop/cart/update", {
+                method: "POST",
+                body: formData,
+                credentials: "same-origin"
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = "/shop/cart/shipping-details";
+                } else {
+                    alert("Failed to add product to cart.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("An error occurred.");
+            });
+        });
+    });
 
     // Function to handle dynamic collapse behavior
     function handleCollapseToggle(collapseId, toggleId) {
