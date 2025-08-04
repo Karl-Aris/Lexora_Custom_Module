@@ -148,7 +148,7 @@
                <h2 t-esc="fixed_price" class="my-2"/>
 
               <t t-if="configured_product.qty_available > 0">
-                <div class="product-action-container w-100 d-flex justify-content-center">
+                <div class="product-action-container w-100 d-flex justify-content-center mb-2">
                   <form action="/shop/cart/update" method="post" class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 w-100">
 
                       <!-- Hidden Inputs -->
