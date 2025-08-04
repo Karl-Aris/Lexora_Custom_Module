@@ -8,7 +8,6 @@
     ],
     "data": [
         "data/fee_product.xml",
-        "views/assets.xml",
     ],
     "assets": {
         "web.assets_frontend": [
