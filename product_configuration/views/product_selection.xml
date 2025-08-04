@@ -186,7 +186,7 @@
                           <!-- Buy Now Button -->
                           <button type="button" id="buy_now_button"
                               class="btn btn-outline-primary fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2">
-                              <i class="fa fa-bag-heart"></i> Buy Now
+                              <i class="fa fa-bolt me-2"></i> Buy Now
                           </button>
 
                       </div>
@@ -509,7 +509,7 @@
             })
             .then(response => {
                 if (response.ok) {
-                    window.location.href = "/shop/cart/shipping-details";
+                    window.location.href = "/shop/shipping-details";
                 } else {
                     alert("Failed to add product to cart.");
                 }
