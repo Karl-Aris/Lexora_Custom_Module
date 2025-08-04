@@ -149,7 +149,11 @@
 
               <t t-if="configured_product.qty_available > 0">
                 <div class="product-action-container d-flex align-items-center my-3 w-100">
-                  
+                  <form action="/shop/cart/update" method="post" class="mt-4">
+
+                  <input type="hidden" name="product_id" t-att-value="configured_product.id" />
+                  <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+
                   <!-- Quantity Selection with Minus, Quantity, Plus -->
                   <div class="input-group quantity-group" style="width: 160px; height: 44px;">
                       <button type="button" class="btn btn-outline-secondary" onclick="let input = this.parentNode.querySelector('input'); if (input.value > 1) input.stepDown();">−</button>
@@ -158,14 +162,16 @@
                   </div>
 
                   <!-- Add to Cart Button -->
-                  <button class="btn btn-primary" id="add-to-cart-btn" type="button" style="margin-left: 10px;">
-                    Add to Cart
-                  </button>
+                   <button type="submit" class="btn btn-dark fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
+                        <i class="fa fa-cart-plus"></i> Add to Cart
+                    </button>
 
                   <!-- Buy Now Button -->
-                  <button class="btn btn-success" id="buy-now-btn" type="button" style="margin-left: 10px;">
-                    Buy Now
+                  <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1" class="btn btn-outline-primary fw-semibold shadow-sm d-flex align-items-center gap-2 px-4 py-2">
+                      <i class="fa fa-heart-o"></i> Buy Now
                   </button>
+
+                  </form>
                 </div>
               </t>
 
@@ -181,9 +187,10 @@
                     <!-- <a t-att-href="'/store/add_to_cart?product_sku=' + configured_product.default_code|urlencode" class="btn btn-secondary">
                         Add to Cart
                     </a> -->
-                    <a class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2 text-center">
+                    <a t-att-href="'/shop/wishlist/add/' + str(configured_product.id)" class="btn btn-secondary fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2 text-center">
                       <i class="fa fa-heart"></i> Save for Later
                     </a>
+
               </div>
                   
               </t>
@@ -309,8 +316,13 @@
 
                   </t>
                   <t t-else="">
-                    <div class="col-12 card-body text-left">
-                      No Countertops
+                    <!-- If No Countertops: Show this fallback card -->
+                    <div class="col-3 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <span class="text-muted">No Countertops</span>
+                        </div>
+                      </div>
                     </div>
                   </t>
                     
@@ -319,12 +331,7 @@
 
                 <hr/>
               </t>
-              <!-- <t t-else="">
-                <div class="row">
 
-              </t> -->
-
-              
 
               <!-- Step 3: Mirror -->
               <t t-if="selected_sku and selected_size">
@@ -343,7 +350,8 @@
 
                 <div id="mirrorSelection" t-att-class="not selected_mirror and 'collapse' or ''">
                   <div class="row">
-                      <t t-foreach="mirror_cards" t-as="card">
+                  <t t-if="mirror_cards">
+                     <t t-foreach="mirror_cards" t-as="card">
                         <div class="col-3 mb-3">
                           <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
                                   selected_collection,
@@ -372,6 +380,18 @@
                         </a>
                       </div>
                     </t>
+                  </t>
+                  <t t-else="">
+                    <!-- If No Mirrors: Show this fallback card -->
+                    <div class="col-3 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <span class="text-muted">No Mirrors</span>
+                        </div>
+                      </div>
+                    </div>
+                  </t>
+                     
                   </div>
                 </div>
                 <hr/>
@@ -395,7 +415,8 @@
 
                 <div id="faucetSelection" t-att-class="not selected_faucet and 'collapse' or ''">
                   <div class="row">
-                      <t t-foreach="faucet_cards" t-as="card">
+                  <t t-if="faucet_cards">
+                     <t t-foreach="faucet_cards" t-as="card">
                         <div class="col-3 mb-3">
                           <a t-att-href="'/store?collection=%s%s%s%s%s%s%s' % (
                                   selected_collection,
@@ -424,6 +445,18 @@
                         </a>
                       </div>
                     </t>
+                  </t>
+                  <t t-else="">
+                    <!-- If No Faucets: Show this fallback card -->
+                    <div class="col-3 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <span class="text-muted">No Faucets</span>
+                        </div>
+                      </div>
+                    </div>
+                  </t>
+                     
                   </div>
                 </div>
               </t>
