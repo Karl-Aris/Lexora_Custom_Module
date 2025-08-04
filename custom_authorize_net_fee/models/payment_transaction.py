@@ -9,18 +9,17 @@ class PaymentTransaction(models.Model):
                 continue
 
             sale_order = tx.sale_order_ids and tx.sale_order_ids[0]
-            if not sale_order or sale_order.state != 'draft':
+            if not sale_order or sale_order.state not in ['draft', 'sent']:
                 continue
 
-            # Use superuser to ensure access in public context
             env = api.Environment(self.env.cr, SUPERUSER_ID, {})
             sale_order_sudo = env['sale.order'].browse(sale_order.id)
 
-            sale_order_sudo.apply_authorize_net_fee()
+            if not sale_order_sudo.authorize_fee_applied:
+                sale_order_sudo.apply_authorize_net_fee()
             sale_order_sudo.action_confirm()
 
     def _execute_callback(self):
-        """Hook into transaction callback to apply the fee after success."""
         res = super()._execute_callback()
         if self.state == 'done':
             self._handle_authorize_net_fee_post_payment()
