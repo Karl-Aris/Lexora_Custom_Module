@@ -171,10 +171,10 @@
                               <i class="fa fa-cart-plus"></i> Add to Cart
                           </button>
 
-                          <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1"
+                          <!-- <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1"
                               class="btn btn-outline-primary fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2">
                               <i class="fa fa-heart-o"></i> Buy Now
-                          </button>
+                          </button> -->
                       </div>
 
                   </form>
