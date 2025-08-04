@@ -6,7 +6,7 @@
         </xpath>
     </template>
 
-    <!-- Correct payment provider label with fee -->
+    <!-- Add 3.5% fee label next to Authorize.Net -->
     <template id="payment_provider_fee_label" inherit_id="website_sale.payment_option">
         <xpath expr="//label[contains(@class, 'o_payment_provider_label')]" position="inside">
             <t t-if="provider.code == 'authorize'">
