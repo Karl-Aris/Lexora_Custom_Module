@@ -1,10 +1,4 @@
 <odoo>
-    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Authorize.Net Fee JS">
-        <xpath expr="." position="inside">
-            <script type="module" src="/website_authorize_net_fee/static/src/js/payment_fee.js"/>
-        </xpath>
-    </template>
-
     <template id="payment_provider_fee_label" inherit_id="payment.payment_provider">
         <xpath expr="//label" position="inside">
             <t t-if="provider.code == 'authorize'">
