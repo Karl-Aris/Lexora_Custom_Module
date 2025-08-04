@@ -1,7 +1,13 @@
 {
     "name": "Website Authorize.Net Fee",
     "version": "1.0",
-    "depends": ["website", "website_sale", "payment_authorize", "sale"],
+    "depends": [
+        "web",                  # ← Required for asset bundling
+        "website",
+        "website_sale",
+        "payment_authorize",
+        "sale"
+    ],
     "category": "Website",
     "summary": "Adds 3.5% fee on selecting Authorize.Net during checkout",
     "author": "Carl A.",
