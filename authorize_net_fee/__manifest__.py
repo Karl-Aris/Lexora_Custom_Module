@@ -5,7 +5,7 @@
     "summary": "Adds a 3.5% surcharge when paying with Authorize.Net",
     "depends": ["website_sale", "payment", "sale"],
     "data": [
-        "views/payment_authorize_net_templates.xml",
+        #"views/payment_authorize_net_templates.xml",
     ],
     "assets": {
         "web.assets_frontend": [
