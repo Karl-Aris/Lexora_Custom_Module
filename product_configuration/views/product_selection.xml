@@ -25,7 +25,7 @@
                       selected_collection,
                       '&amp;color=' + color if selected_color != color else ''
                     )"
-                 t-att-class="'badge rounded-pill me-2 px-3 py-2 mb-2' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
+                 t-att-class="'badge rounded-pill me-2 px-3 py-2' + ('bg-secondary text-white' if color == selected_color else 'bg-light text-dark')"
                  style="cursor:pointer;">
                 <t t-esc="color"/>
               </a>
