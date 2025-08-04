@@ -8,12 +8,13 @@
     ],
     "data": [
         "data/fee_product.xml",
-    ],
-    "assets": {
-        "web.assets_frontend": [
-            "custom_authorize_net_fee/static/src/js/fee_dynamic.js",
-        ],
-    },
+    #],
+    #"assets": {
+    #    "web.assets_frontend": [
+    #        "custom_authorize_net_fee/static/src/js/fee_dynamic.js",
+    #    ],
+    #},
+        
     "installable": True,
     "application": False,
     "license": "LGPL-3",
