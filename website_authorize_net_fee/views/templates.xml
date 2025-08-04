@@ -1,0 +1,9 @@
+<odoo>
+    <template id="payment_provider_fee_label" inherit_id="payment.payment_provider">
+        <xpath expr="//label" position="inside">
+            <t t-if="provider.code == 'authorize'">
+                <span class="text-danger fw-bold"> (+3.5% Fee)</span>
+            </t>
+        </xpath>
+    </template>
+</odoo>
