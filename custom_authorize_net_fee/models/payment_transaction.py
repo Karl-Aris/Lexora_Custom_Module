@@ -1,4 +1,4 @@
-from odoo import models
+from odoo import models, api, SUPERUSER_ID
 
 class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
@@ -12,15 +12,16 @@ class PaymentTransaction(models.Model):
             if not sale_order or sale_order.state != 'draft':
                 continue
 
-            # Apply fee and confirm the order
-            sale_order.apply_authorize_net_fee()
-            sale_order.action_confirm()
+            # Use superuser to ensure access in public context
+            env = api.Environment(self.env.cr, SUPERUSER_ID, {})
+            sale_order_sudo = env['sale.order'].browse(sale_order.id)
 
-    def _send_payment_request(self):
-        response = super()._send_payment_request()
+            sale_order_sudo.apply_authorize_net_fee()
+            sale_order_sudo.action_confirm()
 
-        # After successful payment, inject surcharge and confirm order
+    def _execute_callback(self):
+        """Hook into transaction callback to apply the fee after success."""
+        res = super()._execute_callback()
         if self.state == 'done':
             self._handle_authorize_net_fee_post_payment()
-
-        return response
+        return res
