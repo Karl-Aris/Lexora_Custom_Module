@@ -1,11 +1,15 @@
 <odoo>
-    <record id="auth_net_fee_product" model="product.product">
-        <field name="name">Authorize.Net Payment Fee</field>
-        <field name="default_code">AUTH_NET_FEE</field>
-        <field name="type">service</field>
-        <field name="sale_ok">True</field>
-        <field name="purchase_ok">False</field>
-        <field name="list_price">0</field>
-        <field name="invoice_policy">order</field>
-    </record>
+    <data noupdate="1">
+        <record id="product_product_auth_net_fee" model="product.product">
+            <field name="name">Authorize.Net Fee</field>
+            <field name="default_code">AUTH_NET_FEE</field>
+            <field name="sale_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="type">service</field>
+            <field name="invoice_policy">order</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="categ_id" ref="product.product_category_1"/>
+        </record>
+    </data>
 </odoo>
