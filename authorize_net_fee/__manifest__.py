@@ -10,7 +10,7 @@
     "assets": {
         "web.assets_frontend": [
             "authorize_net_fee/static/src/js/authorize_net_fee.js",
-           # "authorize_net_fee/static/src/scss/authorize_net_fee.scss",
+            "authorize_net_fee/static/src/scss/authorize_net_fee.scss",
         ],
     },
     "installable": True,
