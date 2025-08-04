@@ -171,9 +171,21 @@
                               <i class="fa fa-cart-plus"></i> Add to Cart
                           </button>
 
+                          <data inherit_id="website_sale.product" active="False" name="Buy Now Button">
+                              <xpath expr="//t[@t-set='hasBuyNow']" position="attributes">
+                                  <attribute name="t-value" remove="false" add="true" separator=" "/>
+                              </xpath>
+                              <xpath expr="//a[@id='add_to_cart']" position="after">
+                                  <a role="button" t-attf-class="btn btn-outline-primary fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2 o_we_buy_now ms-1" href="#">
+                                      <i class="fa fa-bolt me-2"/>
+                                      Buy now
+                                  </a>
+                              </xpath>
+                          </data>
+
                           <!-- <button type="submit" name="buy_now" value="1" formaction="/shop/cart/update?buy_now=1"
                               class="btn btn-outline-primary fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 px-4 py-2">
-                              <i class="fa fa-heart-o"></i> Buy Now
+                              <i class="fa fa-bag-heart"></i> Buy Now
                           </button> -->
                       </div>
 
