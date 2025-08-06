@@ -7,13 +7,11 @@ class SaleOrder(models.Model):
     def create(self, vals):
         record = super().create(vals)
         record._update_pickings_fast()
-        record._safe_tag_invoice_number()
         return record
 
     def write(self, vals):
         res = super().write(vals)
         self._update_pickings_fast()
-        self._safe_tag_invoice_number()
         return res
 
     def _update_pickings_fast(self):
@@ -43,17 +41,3 @@ class SaleOrder(models.Model):
     
             if vals:
                 rec.write(vals)
-
-    def _safe_tag_invoice_number(self):
-        for rec in self:
-            if rec.purchase_order:
-                invoice = self.env['account.move'].search([
-                    ('x_po_so_id', '=', rec.purchase_order),
-                    ('state', '=', 'posted'),
-                    ('move_type', '=', 'out_invoice'),  # Ensure it’s a customer invoice
-                ], limit=1)
-
-                if invoice and invoice.name and invoice.name != '/':
-                    rec.write({
-                        'x_invoice_number': invoice.name,
-                    })
