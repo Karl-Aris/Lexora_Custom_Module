@@ -7,13 +7,13 @@ class SaleOrder(models.Model):
     def create(self, vals):
         record = super().create(vals)
         record._update_pickings_fast()
-        record._tag_invoice_number()
+        record._safe_tag_invoice_number()
         return record
 
     def write(self, vals):
         res = super().write(vals)
         self._update_pickings_fast()
-        self._tag_invoice_number()
+        self._safe_tag_invoice_number()
         return res
 
     def _update_pickings_fast(self):
@@ -44,14 +44,26 @@ class SaleOrder(models.Model):
             if vals:
                 rec.write(vals)
 
-    def _tag_invoice_number(self):
+    def _safe_tag_invoice_number(self):
         Invoice = self.env['account.move']
         for record in self:
-            if record.purchase_order:
+            # Only tag if purchase_order exists and x_invoice_number is not already set
+            if record.purchase_order and not record.x_invoice_number:
                 matched_invoice = Invoice.search([
                     ('x_po_so_id', '=', record.purchase_order),
                 ], limit=1)
                 if matched_invoice:
-                    record.write({
-                        'x_invoice_number': matched_invoice.name,
-                    })
+                    try:
+                        record.x_invoice_number = matched_invoice.name
+                    except Exception as e:
+                        # Log or handle the exception gracefully
+                        _logger = self.env['ir.logging']
+                        _logger.create({
+                            'name': 'Invoice Tagging Error',
+                            'type': 'server',
+                            'level': 'error',
+                            'message': str(e),
+                            'path': 'sale.order',
+                            'func': '_safe_tag_invoice_number',
+                            'line': '0',
+                        })
