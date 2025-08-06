@@ -1,7 +1,10 @@
-from odoo import models, api
+from odoo import models, api, fields
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    x_picking_in = fields.Char(string='Picking IN')
+    x_delivery_out = fields.Char(string='Delivery OUT')
 
     @api.model
     def create(self, vals):
@@ -16,11 +19,9 @@ class SaleOrder(models.Model):
 
     def _update_picking_references(self):
         for r in self:
-            # Skip if no linked PO or both pickings are already set
             if not r.purchase_order or (r.x_picking_in and r.x_delivery_out):
                 continue
 
-            # Search for all related pickings linked via PO reference and stock location prefix
             related_pickings = self.env['stock.picking'].search([
                 ('purchase_order', '=', r.purchase_order),
                 ('name', 'ilike', 'WH/%'),
