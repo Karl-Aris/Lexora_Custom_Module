@@ -42,7 +42,7 @@ class SaleOrder(models.Model):
                     vals['x_delivery_out'] = picking_out.name
     
             if vals:
-                rec.write(vals)
+                rec.update(vals)  # use update to avoid recursion
 
     def _safe_tag_invoice_number(self):
         for rec in self:
@@ -50,10 +50,10 @@ class SaleOrder(models.Model):
                 invoice = self.env['account.move'].search([
                     ('x_po_so_id', '=', rec.purchase_order),
                     ('state', '=', 'posted'),
-                    ('move_type', '=', 'out_invoice'),  # Ensure it’s a customer invoice
+                    ('move_type', '=', 'out_invoice'),
                 ], limit=1)
 
                 if invoice and invoice.name and invoice.name != '/':
-                    rec.write({
+                    rec.update({  # use update instead of write
                         'x_invoice_number': invoice.name,
                     })
