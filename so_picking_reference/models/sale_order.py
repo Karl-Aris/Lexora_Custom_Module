@@ -1,6 +1,5 @@
 from odoo import models, api
 
-
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -22,10 +21,10 @@ class SaleOrder(models.Model):
         for rec in self:
             if not rec.purchase_order:
                 continue
-
+    
             vals = {}
             domain_base = [('purchase_order', '=', rec.purchase_order)]
-
+    
             if not rec.x_picking_in:
                 picking_in = Picking.search(
                     domain_base + [('name', '=like', 'WH/PICK%')],
@@ -33,7 +32,7 @@ class SaleOrder(models.Model):
                 )
                 if picking_in:
                     vals['x_picking_in'] = picking_in.name
-
+    
             if not rec.x_delivery_out:
                 picking_out = Picking.search(
                     domain_base + [('name', '=like', 'WH/OUT%')],
@@ -41,17 +40,20 @@ class SaleOrder(models.Model):
                 )
                 if picking_out:
                     vals['x_delivery_out'] = picking_out.name
-
+    
             if vals:
                 rec.write(vals)
 
     def _safe_tag_invoice_number(self):
-        Invoice = self.env['account.move']
-        for record in self:
-            if record.purchase_order and not record.x_invoice_number:
-                matched_invoice = Invoice.search([
-                    ('x_po_so_id', '=', record.purchase_order),
+        for rec in self:
+            if rec.purchase_order:
+                invoice = self.env['account.move'].search([
+                    ('x_po_so_id', '=', rec.purchase_order),
                     ('state', '=', 'posted'),
+                    ('move_type', '=', 'out_invoice'),  # Ensure it’s a customer invoice
                 ], limit=1)
-                if matched_invoice:
-                    record.x_invoice_number = matched_invoice.name
+
+                if invoice and invoice.name and invoice.name != '/':
+                    rec.write({
+                        'x_invoice_number': invoice.name,
+                    })
