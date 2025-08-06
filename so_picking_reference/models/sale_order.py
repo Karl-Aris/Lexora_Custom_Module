@@ -1,41 +1,43 @@
-from odoo import fields, models, api
+from odoo import models, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    x_picking_in = fields.Char(string="Picking IN Ref", readonly=True)
-    x_delivery_out = fields.Char(string="Delivery OUT Ref", readonly=True)
-
     @api.model
     def create(self, vals):
         record = super().create(vals)
-        record._update_picking_refs()
+        record._update_pickings_fast()
         return record
 
     def write(self, vals):
-        result = super().write(vals)
-        self._update_picking_refs()
-        return result
+        res = super().write(vals)
+        self._update_pickings_fast()
+        return res
 
-    def _update_picking_refs(self):
-        for order in self:
-            if not order.purchase_order:
+    def _update_pickings_fast(self):
+        for rec in self:
+            if not rec.purchase_order:
                 continue
 
-            domain = [
-                ('purchase_order', '=', order.purchase_order),
-                ('name', 'ilike', 'WH/%')
-            ]
-            pickings = self.env['stock.picking'].search(domain)
+            # Only update if at least one of the Studio fields is empty
+            if rec.x_picking_in and rec.x_delivery_out:
+                continue
 
-            picking_in = next((p.name for p in pickings if 'WH/PICK' in p.name), False)
-            picking_out = next((p.name for p in pickings if 'WH/OUT' in p.name), False)
+            # Fetch only required fields to speed up lookup
+            related_pickings = self.env['stock.picking'].search_read(
+                [('purchase_order', '=', rec.purchase_order), ('name', 'ilike', 'WH/%')],
+                fields=['name']
+            )
 
-            updates = {}
-            if picking_in and not order.x_picking_in:
-                updates['x_picking_in'] = picking_in
-            if picking_out and not order.x_delivery_out:
-                updates['x_delivery_out'] = picking_out
+            vals = {}
+            if not rec.x_picking_in:
+                picking_in = next((p for p in related_pickings if 'WH/PICK' in p['name']), None)
+                if picking_in:
+                    vals['x_picking_in'] = picking_in['name']
+            if not rec.x_delivery_out:
+                picking_out = next((p for p in related_pickings if 'WH/OUT' in p['name']), None)
+                if picking_out:
+                    vals['x_delivery_out'] = picking_out['name']
 
-            if updates:
-                order.write(updates)
+            if vals:
+                rec.write(vals)
