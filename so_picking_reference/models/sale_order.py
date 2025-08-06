@@ -1,5 +1,6 @@
 from odoo import models, api
 
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -47,23 +48,10 @@ class SaleOrder(models.Model):
     def _safe_tag_invoice_number(self):
         Invoice = self.env['account.move']
         for record in self:
-            # Only tag if purchase_order exists and x_invoice_number is not already set
             if record.purchase_order and not record.x_invoice_number:
                 matched_invoice = Invoice.search([
                     ('x_po_so_id', '=', record.purchase_order),
+                    ('state', '=', 'posted'),
                 ], limit=1)
                 if matched_invoice:
-                    try:
-                        record.x_invoice_number = matched_invoice.name
-                    except Exception as e:
-                        # Log or handle the exception gracefully
-                        _logger = self.env['ir.logging']
-                        _logger.create({
-                            'name': 'Invoice Tagging Error',
-                            'type': 'server',
-                            'level': 'error',
-                            'message': str(e),
-                            'path': 'sale.order',
-                            'func': '_safe_tag_invoice_number',
-                            'line': '0',
-                        })
+                    record.x_invoice_number = matched_invoice.name
