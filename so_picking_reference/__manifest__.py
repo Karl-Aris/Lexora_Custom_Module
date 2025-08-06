@@ -5,7 +5,9 @@
     'depends': ['sale_management', 'stock', 'purchase'],
     'author': 'Carl',
     'category': 'Sales',
-    'data': [],
+    'data': [
+    'views/sale_order_views.xml',
+    ],
     'installable': True,
     'application': False,
 }
