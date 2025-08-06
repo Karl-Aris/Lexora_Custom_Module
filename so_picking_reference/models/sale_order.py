@@ -1,51 +1,57 @@
-from odoo import models, fields, api
+from odoo import models, api
 
 class SaleOrder(models.Model):
-    _inherit = "sale.order"
-
-    # Using existing Studio-created fields:
-    # No need to redeclare them here unless you want to change something
+    _inherit = 'sale.order'
 
     @api.model
-    def _get_related_pickings(self, po_number):
-        return self.env['stock.picking'].search([
-            ('purchase_order', '=', po_number),
-            ('name', 'ilike', 'WH/%'),
-        ])
-
-    def _get_related_invoice(self, po_number):
-        return self.env['account.move'].search([
-            ('x_po_so_id', '=', po_number),
-        ], limit=1)
+    def create(self, vals):
+        record = super().create(vals)
+        record._update_pickings_fast()
+        record._tag_invoice_number()
+        return record
 
     def write(self, vals):
         res = super().write(vals)
-
-        for record in self:
-            # Set Picking IN/OUT references
-            if record.purchase_order and (not record.x_picking_in or not record.x_delivery_out):
-                pickings = self._get_related_pickings(record.purchase_order)
-                updates = {}
-
-                if not record.x_picking_in:
-                    picking_in = next((p for p in pickings if 'WH/PICK' in p.name), None)
-                    if picking_in:
-                        updates['x_picking_in'] = picking_in.name
-
-                if not record.x_delivery_out:
-                    picking_out = next((p for p in pickings if 'WH/OUT' in p.name), None)
-                    if picking_out:
-                        updates['x_delivery_out'] = picking_out.name
-
-                if updates:
-                    record.super().write(updates)
-
-            # Set Invoice # reference
-            if record.purchase_order and not record.x_invoice_number:
-                invoice = self._get_related_invoice(record.purchase_order)
-                if invoice:
-                    record.super().write({
-                        'x_invoice_number': invoice.name
-                    })
-
+        self._update_pickings_fast()
+        self._tag_invoice_number()
         return res
+
+    def _update_pickings_fast(self):
+        Picking = self.env['stock.picking']
+        for rec in self:
+            if not rec.purchase_order:
+                continue
+
+            vals = {}
+            domain_base = [('purchase_order', '=', rec.purchase_order)]
+
+            if not rec.x_picking_in:
+                picking_in = Picking.search(
+                    domain_base + [('name', '=like', 'WH/PICK%')],
+                    limit=1
+                )
+                if picking_in:
+                    vals['x_picking_in'] = picking_in.name
+
+            if not rec.x_delivery_out:
+                picking_out = Picking.search(
+                    domain_base + [('name', '=like', 'WH/OUT%')],
+                    limit=1
+                )
+                if picking_out:
+                    vals['x_delivery_out'] = picking_out.name
+
+            if vals:
+                rec.write(vals)
+
+    def _tag_invoice_number(self):
+        Invoice = self.env['account.move']
+        for record in self:
+            if record.purchase_order:
+                matched_invoice = Invoice.search([
+                    ('x_po_so_id', '=', record.purchase_order),
+                ], limit=1)
+                if matched_invoice:
+                    record.write({
+                        'x_invoice_number': matched_invoice.name,
+                    })
