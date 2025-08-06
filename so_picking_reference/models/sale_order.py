@@ -15,29 +15,29 @@ class SaleOrder(models.Model):
         return res
 
     def _update_pickings_fast(self):
-        Picking = self.env['stock.picking']
         for rec in self:
             if not rec.purchase_order:
                 continue
-    
+
+            # Only update if at least one of the Studio fields is empty
+            if rec.x_picking_in and rec.x_delivery_out:
+                continue
+
+            # Fetch only required fields to speed up lookup
+            related_pickings = self.env['stock.picking'].search_read(
+                [('purchase_order', '=', rec.purchase_order), ('name', 'ilike', 'WH/%')],
+                fields=['name']
+            )
+
             vals = {}
-            domain_base = [('purchase_order', '=', rec.purchase_order)]
-    
             if not rec.x_picking_in:
-                picking_in = Picking.search(
-                    domain_base + [('name', '=like', 'WH/PICK%')],
-                    limit=1
-                )
+                picking_in = next((p for p in related_pickings if 'WH/PICK' in p['name']), None)
                 if picking_in:
-                    vals['x_picking_in'] = picking_in.name
-    
+                    vals['x_picking_in'] = picking_in['name']
             if not rec.x_delivery_out:
-                picking_out = Picking.search(
-                    domain_base + [('name', '=like', 'WH/OUT%')],
-                    limit=1
-                )
+                picking_out = next((p for p in related_pickings if 'WH/OUT' in p['name']), None)
                 if picking_out:
-                    vals['x_delivery_out'] = picking_out.name
-    
+                    vals['x_delivery_out'] = picking_out['name']
+
             if vals:
                 rec.write(vals)
