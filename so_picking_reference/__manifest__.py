@@ -1,11 +1,12 @@
 {
-    'name': 'Sales Order Picking Reference',
+    'name': 'Sales Order Picking Link',
     'version': '1.0',
-    'summary': 'Auto-fill Picking IN/OUT from Purchase Order in Sales Order',
-    'depends': ['sale_management', 'stock', 'purchase'],
-    'author': 'Carl',
     'category': 'Sales',
+    'summary': 'Link IN/OUT Pickings to Sales Order using PO #',
+    'description': 'Automatically links x_picking_in and x_delivery_out based on Purchase Order reference.',
+    'depends': ['sale', 'stock'],
     'data': [],
     'installable': True,
+    'auto_install': False,
     'application': False,
 }
