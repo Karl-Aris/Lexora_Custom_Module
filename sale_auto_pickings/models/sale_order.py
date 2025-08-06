@@ -3,7 +3,7 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    purchase_order = fields.Many2one('purchase.order', string='Purchase Order')
+    purchase_order = fields.Char(string='Purchase Order')  # Use Char instead of Many2one
     x_picking_in = fields.Char(string='Picking IN')
     x_delivery_out = fields.Char(string='Delivery OUT')
 
@@ -24,8 +24,9 @@ class SaleOrder(models.Model):
             if not r.purchase_order or (r.x_picking_in and r.x_delivery_out):
                 continue
 
+            # Match by PO name
             pickings = self.env['stock.picking'].search([
-                ('purchase_order', '=', r.purchase_order.id),
+                ('origin', '=', r.purchase_order),
                 ('name', 'ilike', 'WH/%')
             ])
 
