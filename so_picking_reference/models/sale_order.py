@@ -1,44 +1,41 @@
-from odoo import models, fields, api
+from odoo import fields, models, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    x_picking_in = fields.Char(string="Picking IN", readonly=True)
-    x_delivery_out = fields.Char(string="Delivery OUT", readonly=True)
+    x_picking_in = fields.Char(string="Picking IN Ref", readonly=True)
+    x_delivery_out = fields.Char(string="Delivery OUT Ref", readonly=True)
 
     @api.model
     def create(self, vals):
-        order = super().create(vals)
-        order._set_picking_refs()
-        return order
+        record = super().create(vals)
+        record._update_picking_refs()
+        return record
 
     def write(self, vals):
-        res = super().write(vals)
-        if any(field in vals for field in ['purchase_order']):
-            for order in self:
-                order._set_picking_refs()
-        return res
+        result = super().write(vals)
+        self._update_picking_refs()
+        return result
 
-    def _set_picking_refs(self):
-        for record in self:
-            if not record.purchase_order:
+    def _update_picking_refs(self):
+        for order in self:
+            if not order.purchase_order:
                 continue
 
-            # Search both pickings in a single query
-            pickings = self.env['stock.picking'].search([
-                ('purchase_order', '=', record.purchase_order),
+            domain = [
+                ('purchase_order', '=', order.purchase_order),
                 ('name', 'ilike', 'WH/%')
-            ])
+            ]
+            pickings = self.env['stock.picking'].search(domain)
 
-            vals = {}
-            # Filter matching pickings once
-            pick_dict = {p.name: p.name for p in pickings}
+            picking_in = next((p.name for p in pickings if 'WH/PICK' in p.name), False)
+            picking_out = next((p.name for p in pickings if 'WH/OUT' in p.name), False)
 
-            if not record.x_picking_in:
-                vals['x_picking_in'] = next((name for name in pick_dict if 'WH/PICK' in name), False)
+            updates = {}
+            if picking_in and not order.x_picking_in:
+                updates['x_picking_in'] = picking_in
+            if picking_out and not order.x_delivery_out:
+                updates['x_delivery_out'] = picking_out
 
-            if not record.x_delivery_out:
-                vals['x_delivery_out'] = next((name for name in pick_dict if 'WH/OUT' in name), False)
-
-            if vals:
-                record.write(vals)
+            if updates:
+                order.write(updates)
