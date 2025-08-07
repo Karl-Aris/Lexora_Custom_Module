@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="authnet_fee_portal_note" inherit_id="payment.portal_payment_status">
-        <xpath expr="//h2" position="before">
-            <p>
-                <strong>Note:</strong>
-                This order is not yet paid. An Authorize.Net surcharge has been added.
-            </p>
+    <template id="authnet_fee_portal_note" inherit_id="portal.portal_payment_status_page">
+        <xpath expr="//div[@id='wrap']//div[contains(@class, 'o_portal_payment_status')]" position="inside">
+            <t t-if="'authorize_net' in tx.provider_id.code">
+                <p>
+                    <strong>Note:</strong>
+                    An Authorize.Net surcharge has been added. This order is not yet paid.
+                </p>
+            </t>
         </xpath>
     </template>
 </odoo>
