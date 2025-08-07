@@ -1,13 +1,12 @@
-from odoo.addons.website_sale.controllers.main import WebsiteSale
+from odoo import http
 from odoo.http import request
+from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 class WebsiteSaleAuthorizeNetFee(WebsiteSale):
 
-    def payment_transaction(self, **post):
-        order = request.website.sale_get_order()
-        provider_code = post.get('pm_id') and request.env['payment.provider'].browse(int(post['pm_id'])).code or None
-
-        if order and provider_code == 'authorize_net':
-            order.with_context(payment_provider_code=provider_code)._add_authorize_net_fee()
-
-        return super().payment_transaction(**post)
+    def _get_order(self):
+        """Override to add fee before payment if Authorize.Net is chosen."""
+        order = super()._get_order()
+        if order and order.payment_provider_id and order.payment_provider_id.code == 'authorize':
+            order._add_authorize_net_fee()
+        return order
