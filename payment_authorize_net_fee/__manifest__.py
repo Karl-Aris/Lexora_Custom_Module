@@ -5,4 +5,5 @@
     "category": "Website",
     "summary": "Adds 3.5% surcharge when Authorize.Net is selected",
     "installable": True
+    "data": "views/portal_templates.xml",
 }
