@@ -1,5 +1,5 @@
 <odoo>
-  <template inherit_id="account.portal_invoice_page">
+  <template id="authorize_net_portal_invoice_note" inherit_id="account.portal_invoice_page">
     <xpath expr="//div[@id='invoice_content']//div[hasclass('o_portal_html_view')]" position="before">
       <t t-set="tx" t-value="invoice.get_portal_last_transaction()"/>
 
