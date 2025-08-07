@@ -8,7 +8,5 @@
     "application": False,
     "license": "LGPL-3",
     "assets": {},
-    "data": [
-    "views/payment_pending_template.xml",
-    ],
+    "data": [],
 }
