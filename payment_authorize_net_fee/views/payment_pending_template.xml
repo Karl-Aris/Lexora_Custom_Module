@@ -1,0 +1,10 @@
+<odoo>
+    <template id="template_payment_pending" name="Authorize.Net Payment Pending" page="True">
+        <t t-call="website.layout">
+            <div class="container my-5">
+                <h2>Your payment is being processed...</h2>
+                <p>Please wait a moment. If this page does not refresh, please check your email for updates or contact support.</p>
+            </div>
+        </t>
+    </template>
+</odoo>
