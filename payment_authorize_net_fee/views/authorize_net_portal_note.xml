@@ -1,23 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="authnet_fee_portal_note" inherit_id="payment_portal.portal_payment_page">
-        <xpath expr="//div[@id='invoice_content']//div[hasclass('o_portal_html_view')]" position="before">
-            <t t-set="tx" t-value="invoice.get_portal_last_transaction()"/>
-            
-            <!-- Authorize.Net Fee Notice -->
-            <t t-if="tx and tx.provider_code == 'authorize_net' and tx.state in ('pending', 'authorized')">
-                <div class="alert alert-warning" role="alert">
-                    <strong>Note:</strong> An Authorize.Net surcharge has been applied. This invoice is not yet paid.
-                </div>
-            </t>
-        
-            <div t-if="tx and invoice.amount_total and not success and not error and (invoice.payment_state != 'not_paid' or tx.state in ('pending', 'authorized'))" class="o_account_payment_tx_status" t-att-data-invoice-id="invoice.id">
-                <t t-call="payment.transaction_status"/>
-            </div>
-        
-            <div t-if="invoice._has_to_be_paid()" id="portal_pay">
-                <t t-call="account_payment.portal_invoice_payment"/>
-            </div>
-        </xpath>
-    </template>
+  <template inherit_id="account.portal_invoice_page">
+    <xpath expr="//div[@id='invoice_content']//div[hasclass('o_portal_html_view')]" position="before">
+      <t t-set="tx" t-value="invoice.get_portal_last_transaction()"/>
+
+      <!-- Authorize.Net Fee Notice -->
+      <t t-if="tx and tx.provider_code == 'authorize_net' and tx.state in ('pending', 'authorized')">
+        <div class="alert alert-warning" role="alert">
+          <strong>Note:</strong> An Authorize.Net surcharge has been applied. This invoice is not yet paid.
+        </div>
+      </t>
+
+      <div t-if="tx and invoice.amount_total and not success and not error and (invoice.payment_state != 'not_paid' or tx.state in ('pending', 'authorized'))"
+           class="o_account_payment_tx_status"
+           t-att-data-invoice-id="invoice.id">
+        <t t-call="payment.transaction_status"/>
+      </div>
+
+      <div t-if="invoice._has_to_be_paid()" id="portal_pay">
+        <t t-call="account_payment.portal_invoice_payment"/>
+      </div>
+    </xpath>
+  </template>
 </odoo>
