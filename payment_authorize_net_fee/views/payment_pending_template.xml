@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="authnet_fee_portal_note" inherit_id="portal.portal_payment_status">
+    <template id="authnet_fee_portal_note" inherit_id="payment.portal_payment_status">
         <xpath expr="//h2" position="before">
             <p>
                 <strong>Note:</strong>
