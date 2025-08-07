@@ -1,13 +1,12 @@
-
 from odoo import http
 from odoo.http import request
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 class WebsiteSaleInherit(WebsiteSale):
 
-    @http.route(['/shop/payment'], type='http', auth="public", website=True, sitemap=False)
-    def website_payment(self, **post):
-        response = super().website_payment(**post)
+    @http.route(['/shop/payment/transaction'], type='http', auth="public", website=True, sitemap=False)
+    def website_payment_transaction(self, **post):
+        response = super().website_payment_transaction(**post)
         order = request.website.sale_get_order()
         if not order:
             return response
