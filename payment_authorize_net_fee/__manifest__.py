@@ -3,9 +3,7 @@
     "version": "17.0.1.0.0",
     "depends": ["payment", "sale", "website_sale"],
     "category": "Website",
-    "data": [
-    "views/payment_pending_template.xml",
-    ],
+    "data": [],
     "summary": "Adds 3.5% surcharge when Authorize.Net is selected",
-    "installable": True
+    "installable": True,
 }
