@@ -6,6 +6,6 @@
     "summary": "Adds 3.5% surcharge when Authorize.Net is selected",
     "installable": True,
     "data": [
-    "authorize_net_portal_note.xml",
+        "views/authorize_net_portal_note.xml",
     ],
 }
