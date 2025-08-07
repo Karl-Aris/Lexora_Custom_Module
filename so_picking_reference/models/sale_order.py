@@ -50,6 +50,8 @@ class SaleOrder(models.Model):
             if rec.purchase_order and not rec.x_invoice_number:
                 invoice = Move.search([
                     ('x_po_so_id', '=', rec.purchase_order),
+                    ('state', '=', 'posted'),
+                    ('name', '!=', '/'),
                 ], limit=1)
                 if invoice:
                     rec.x_invoice_number = invoice.name
