@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="payment_custom_pending" inherit_id="payment.payment_custom_pending">
+    <template id="authorize_net_pending_note" inherit_id="payment.payment_portal_payment_pending">
         <xpath expr="//h2" position="before">
-            <p><strong>Note:</strong> This is not yet paid. Authorize.Net surcharge has been added.</p>
+            <p><strong>Note:</strong> This order is not yet paid. An Authorize.Net surcharge has been added.</p>
         </xpath>
     </template>
 </odoo>
