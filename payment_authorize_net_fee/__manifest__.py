@@ -3,7 +3,7 @@
     'version': '17.0.1.0.0',
     'summary': 'Add 3.5% surcharge before Authorize.Net payment',
     'category': 'Accounting/Payment',
-    'depends': ['sale', 'website_sale', 'payment'],
+    'depends': ['sale', 'website_sale', 'payment', 'website'],
     'data': [
         'views/assets.xml',
     ],
