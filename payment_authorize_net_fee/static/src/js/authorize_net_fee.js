@@ -17,7 +17,7 @@ publicWidget.registry.AuthorizeNetFeeHandler = publicWidget.Widget.extend({
         const providerCode = $form.find(`input[name="payment_method_id"][value="${selectedId}"]`).data('provider_code');
 
         // Only trigger for Authorize.Net
-        if (providerCode === 'authorize_net') {
+        if (providerCode === 'authorize') {
             const saleOrderId = parseInt($form.data('sale-order-id'));
             if (!saleOrderId) return;
 
