@@ -1,9 +1,13 @@
 {
-    'name': 'Authorize.Net Payment Fee (Transaction pre-hook)',
+    'name': 'Authorize.Net Fee + Provider (mock) + Portal double-pay guard',
     'version': '1.0.0',
-    'summary': 'Inject 3.5% surcharge for Authorize.Net into sale orders before creating payment.transaction',
-    'depends': ['sale', 'payment'],
-    'data': [],
+    'summary': 'Add Authorize.Net provider, inject 3.5% fee before payment and avoid double payments in portal',
+    'author': 'You',
+    'depends': ['website_sale', 'sale', 'payment', 'sale_portal'],
+    'data': [
+        'data/payment_provider_authorize.xml',
+        'views/portal_sale_templates.xml',
+    ],
     'installable': True,
     'application': False,
     'license': 'LGPL-3',
