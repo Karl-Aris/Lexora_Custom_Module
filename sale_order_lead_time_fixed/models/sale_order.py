@@ -1,4 +1,3 @@
-
 from odoo import models, fields, api
 from datetime import timedelta
 
@@ -25,11 +24,12 @@ class SaleOrder(models.Model):
             else:
                 order.lead_time = 0.0
 
-    @api.depends('confirmation_date', 'lead_time')
+    @api.depends('confirmation_date_utc', 'lead_time')
     def _compute_expected_delivery_date(self):
         for order in self:
-            if order.confirmation_date:
-                order.expected_delivery_date = fields.Date.from_string(order.confirmation_date) + timedelta(days=order.lead_time)
+            if order.confirmation_date_utc:
+                confirmation_date = fields.Datetime.context_timestamp(order, order.confirmation_date_utc).date()
+                order.expected_delivery_date = confirmation_date + timedelta(days=order.lead_time)
             else:
                 order.expected_delivery_date = False
 
