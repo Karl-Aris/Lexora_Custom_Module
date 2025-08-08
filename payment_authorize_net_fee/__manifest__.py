@@ -3,7 +3,7 @@
     'version': '1.0',
     'category': 'Accounting/Payment',
     'summary': 'Adds surcharge confirmation page for Authorize.Net payment method',
-    'author': "ChatGPT",
+    'author': "Carl Areglado",
     'depends': ['payment', 'website_sale'],
     'data': [
         'views/payment_templates.xml',
