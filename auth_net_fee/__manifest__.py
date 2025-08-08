@@ -1,10 +1,11 @@
 {
-    'name': 'Payment Authorize.Net Fee',
-    'version': '1.0',
-    'category': 'Website',
-    'summary': 'Adds 3.5% surcharge when paying via Authorize.Net',
-    'depends': ['website_sale', 'payment'],
+    'name': 'Authorize.Net Payment Fee (Pre-Payment)',
+    'version': '1.0.0',
+    'summary': 'Inject 3.5% surcharge for Authorize.Net before payment transaction is created (portal-safe)',
+    'author': 'You',
+    'depends': ['website_sale', 'sale', 'payment'],
     'data': [],
     'installable': True,
     'application': False,
+    'license': 'LGPL-3',
 }
