@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-  <template id="assets_frontend" inherit_id="web.assets_frontend" name="Authorize.Net Fee JS">
-    <xpath expr="." position="inside">
-      <script type="module" src="/payment_authorize_net_fee_pre/static/src/js/authorize_net_fee.js"/>
-    </xpath>
-  </template>
-</odoo>
