@@ -1,38 +1,34 @@
-/** @odoo-module **/
+/** 
+ * Simple JS module to detect payment method change on Odoo website sale payment step
+ */
+odoo.define('payment_authorize_net_fee_pre.authorize_net_fee', function (require) {
+    "use strict";
 
-import publicWidget from "@web/legacy/js/public/public_widget";
-import { jsonRpc } from "@web/core/network/rpc_service";
+    var publicWidget = require('web.public.widget');
 
-publicWidget.registry.AuthorizeNetFeeHandler = publicWidget.Widget.extend({
-    selector: 'form.o_payment_form',
-    events: {
-        'change input[name="payment_method_id"]': '_onPaymentMethodChange',
-    },
+    publicWidget.registry.AuthorizeNetFee = publicWidget.Widget.extend({
+        selector: '.o_payment_form',  // adjust selector to the payment form container
+        start: function () {
+            var self = this;
+            this._super.apply(this, arguments);
 
-    _onPaymentMethodChange: function (ev) {
-        const selectedId = $(ev.currentTarget).val();
-        const $form = this.$el;
+            // Listen for changes on payment method radio buttons
+            this.$el.on('change', 'input[name="payment_method_id"]', function () {
+                var selectedMethodCode = $(this).data('provider'); // usually data-provider has the code
+                if (selectedMethodCode === 'authorize') {
+                    console.log('Authorize.Net payment method selected');
 
-        // Get provider code from data attribute (set by Odoo)
-        const providerCode = $form.find(`input[name="payment_method_id"][value="${selectedId}"]`).data('provider_code');
+                    // You can trigger a reload or AJAX call here to update surcharge
+                    // For example, trigger a custom event
+                    self.trigger_up('payment_method_authorize_selected');
+                } else {
+                    console.log('Another payment method selected');
+                    self.trigger_up('payment_method_authorize_deselected');
+                }
+            });
 
-        // Only trigger for Authorize.Net
-        if (providerCode === 'authorize') {
-            const saleOrderId = parseInt($form.data('sale-order-id'));
-            if (!saleOrderId) return;
+            return Promise.resolve();
+        },
+    });
 
-            jsonRpc("/authorize_net/add_fee", 'call', { sale_order_id: saleOrderId })
-                .then((res) => {
-                    if (res.success) {
-                        console.log(`Authorize.Net fee added. New total: ${res.new_total}`);
-                        // Refresh page to update total before payment
-                        window.location.reload();
-                    } else {
-                        console.warn("Authorize.Net fee error:", res.error);
-                    }
-                });
-        }
-    },
 });
-
-export default publicWidget.registry.AuthorizeNetFeeHandler;
