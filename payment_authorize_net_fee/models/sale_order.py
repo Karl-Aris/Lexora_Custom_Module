@@ -1,25 +1,23 @@
-from odoo import api, fields, models
+from odoo import models, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    payment_provider_code = fields.Selection([
-        ('authorize', 'Authorize.Net'),
-        ('paypal', 'PayPal'),
-        ('stripe', 'Stripe'),
-        # add others as needed
-    ], string='Payment Provider', help='Payment method selected for this order')
+    def _add_authorize_net_fee(self):
+        fee_product = self.env['product.product'].search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
+        if not fee_product:
+            return
 
-    authorize_net_surcharge_amount = fields.Monetary(
-        string="Authorize.Net Surcharge Amount",
-        compute='_compute_authorize_net_surcharge',
-        store=True,
-    )
-
-    @api.depends('amount_total', 'payment_provider_code')
-    def _compute_authorize_net_surcharge(self):
         for order in self:
-            if order.payment_provider_code == 'authorize':
-                order.authorize_net_surcharge_amount = order.amount_total * 0.035
-            else:
-                order.authorize_net_surcharge_amount = 0.0
+            # Remove previous surcharge lines if any
+            order.order_line.filtered(lambda l: l.product_id == fee_product).unlink()
+
+            fee = round(order.amount_untaxed * 0.035, 2)
+            if fee > 0:
+                order.order_line.create({
+                    'order_id': order.id,
+                    'product_id': fee_product.id,
+                    'name': fee_product.name,
+                    'price_unit': fee,
+                    'product_uom_qty': 1,
+                })
