@@ -5,11 +5,13 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet/notebook/page[@name='other_info']" position="inside">
-                <group>
-                    <field name="lead_time" readonly="1"/>
-                    <field name="expected_delivery_date" readonly="1"/>
-                </group>
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Lead Time Info">
+                    <group>
+                        <field name="lead_time" readonly="1"/>
+                        <field name="expected_delivery_date" readonly="1"/>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
