@@ -1,32 +1,34 @@
-from odoo import models, api
+from odoo import models
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    @api.onchange('payment_provider_id')
-    def _onchange_payment_provider_id(self):
-        """Add Authorize.Net surcharge when selected from the portal."""
+    def _create_payment_transaction(self, vals):
+        """Inject Authorize.Net surcharge before creating the payment transaction."""
         fee_product = self.env['product.product'].search([
             ('default_code', '=', 'AUTH_NET_FEE')
         ], limit=1)
 
-        # Remove old surcharge lines
-        if fee_product:
-            self.order_line = self.order_line.filtered(
-                lambda l: l.product_id.id != fee_product.id
-            )
-
         if (
-            self.payment_provider_id
-            and self.payment_provider_id.code == 'authorize'
+            vals.get('provider_id')
             and fee_product
         ):
-            fee = round(self.amount_untaxed * 0.035, 2)
-            if fee > 0:
-                self.order_line += self.env['sale.order.line'].new({
-                    'order_id': self.id,
-                    'product_id': fee_product.id,
-                    'name': fee_product.name,
-                    'price_unit': fee,
-                    'product_uom_qty': 1,
-                })
+            provider = self.env['payment.provider'].browse(vals['provider_id'])
+            if provider.code == 'authorize':
+                # Remove old fee line
+                self.order_line.filtered(
+                    lambda l: l.product_id.id == fee_product.id
+                ).unlink()
+
+                # Add new fee line
+                fee = round(self.amount_untaxed * 0.035, 2)
+                if fee > 0:
+                    self.env['sale.order.line'].create({
+                        'order_id': self.id,
+                        'product_id': fee_product.id,
+                        'name': fee_product.name,
+                        'price_unit': fee,
+                        'product_uom_qty': 1,
+                    })
+
+        return super()._create_payment_transaction(vals)
