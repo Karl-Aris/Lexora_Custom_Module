@@ -1,5 +1,47 @@
+<!-- views/payment_templates.xml -->
+
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+  <template id="assets_frontend" inherit_id="payment.assets_frontend" name="Authorize.Net surcharge payment JS">
+    <xpath expr="." position="inside">
+      <script type="text/javascript">
+        odoo.define('payment_authorize_net_fee.payment_redirect_override', function (require) {
+          "use strict";
+          var ajax = require('web.ajax');
+          var core = require('web.core');
+          var _t = core._t;
+
+          $(document).on('submit', 'form.o_payment_form', function (ev) {
+            var $form = $(this);
+            var provider = $form.find('input[name="provider"]').val();
+            if (provider === 'authorize') {
+              ev.preventDefault();
+              var tx_id = $form.find('input[name="transaction_id"]').val();
+              if (!tx_id) {
+                alert(_t('Transaction ID missing, cannot proceed.'));
+                return;
+              }
+              // Post to surcharge start controller
+              $.post('/payment/authorize_net/start', {transaction_id: tx_id})
+                .done(function (data, status, xhr) {
+                  if (xhr.getResponseHeader('Location')) {
+                    window.location.href = xhr.getResponseHeader('Location');
+                  } else {
+                    // fallback redirect if no Location header
+                    window.location.href = data;
+                  }
+                })
+                .fail(function () {
+                  alert(_t('Error processing surcharge confirmation.'));
+                });
+            }
+            // Else let other providers continue normally
+          });
+        });
+      </script>
+    </xpath>
+  </template>
+
   <template id="surcharge_confirmation_template" name="Authorize.Net Surcharge Confirmation" inherit_id="website.layout">
     <xpath expr="//main" position="replace">
       <main role="main" class="o_surcharge_confirmation_page">
@@ -8,10 +50,10 @@
           <p>
             A surcharge of 3.5% will be applied to your payment amount.
             <br/>
-            Amount: <strong t-esc="transaction.amount"/> USD
+            Amount: <strong t-esc="transaction.amount or 0.0"/> USD
           </p>
           <p>
-            Surcharge: <strong t-esc="transaction.surcharge_amount"/> USD
+            Surcharge: <strong t-esc="transaction.surcharge_amount or 0.0"/> USD
           </p>
           <form method="post" action="/payment/authorize_net/surcharge_confirm">
             <input type="hidden" name="transaction_id" t-att-value="transaction.id"/>
