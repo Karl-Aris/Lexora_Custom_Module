@@ -1,12 +1,14 @@
 {
-    "name": "Report Sale Order Date in External Layout",
-    "version": "1.0",
-    "depends": ["base", "sale", "account", "web"],
-    "category": "Reporting",
-    "description": "Show Sale Order Date on reports even when printing from invoice.",
-    "data": [
-        "views/external_layout_inherit.xml"
+    'name': 'Sale Order Lead Time',
+    'version': '1.0',
+    'summary': 'Add Lead Time and Expected Delivery Date to Sale Orders',
+    'category': 'Sales',
+    'author': 'ChatGPT',
+    'depends': ['sale'],
+    'data': [
+        'views/sale_order_views.xml',
     ],
-    "installable": True,
-    "auto_install": False
+    'installable': True,
+    'application': False,
+    'license': 'LGPL-3',
 }
