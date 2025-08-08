@@ -24,29 +24,32 @@ class SaleOrder(models.Model):
             else:
                 order.lead_time = 0.0
 
-    @api.depends('confirmation_date_utc', 'lead_time')
+    @api.depends('lead_time')
     def _compute_expected_delivery_date(self):
+        # Determine which confirmation field exists
+        confirmation_field = None
+        sample_order = self[:1]
+        if sample_order:
+            fields_available = self.env['sale.order'].fields_get()
+            if 'confirmation_date_utc' in fields_available:
+                confirmation_field = 'confirmation_date_utc'
+            elif 'confirmation_date' in fields_available:
+                confirmation_field = 'confirmation_date'
+            else:
+                confirmation_field = None  # fallback to date_order
+
         for order in self:
-            if order.confirmation_date_utc:
-                confirmation_date = fields.Datetime.context_timestamp(order, order.confirmation_date_utc).date()
-                order.expected_delivery_date = confirmation_date + timedelta(days=order.lead_time)
+            date_to_use = False
+            if confirmation_field:
+                dt = getattr(order, confirmation_field)
+                if dt:
+                    # convert datetime to local date
+                    date_to_use = fields.Datetime.context_timestamp(order, dt).date()
+            if not date_to_use and order.date_order:
+                # fallback: use date_order datetime converted to date
+                date_to_use = fields.Datetime.context_timestamp(order, order.date_order).date()
+
+            if date_to_use:
+                order.expected_delivery_date = date_to_use + timedelta(days=order.lead_time)
             else:
                 order.expected_delivery_date = False
-
-
-class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
-
-    delay = fields.Float(
-        'Delivery Lead Time',
-        help="Number of days between order confirmation and delivery",
-        default=0.0,
-    )
-
-    @api.onchange('product_id')
-    def _onchange_product_id_set_delay(self):
-        for line in self:
-            if line.product_id:
-                line.delay = line.product_id.sale_delay
-            else:
-                line.delay = 0.0
