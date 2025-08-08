@@ -1,37 +1,146 @@
+import logging
 from odoo import models, api
+
+_logger = logging.getLogger('payment_authorize_net_full')
 
 class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
 
+    def _parse_sale_order_ids_vals(self, sale_order_ids):
+        ids = []
+        if not sale_order_ids:
+            return ids
+        if isinstance(sale_order_ids, list):
+            for item in sale_order_ids:
+                if isinstance(item, (list, tuple)):
+                    if item and item[0] == 6 and len(item) >= 3:
+                        ids.extend(item[2] or [])
+                    elif item and item[0] == 4 and len(item) >= 2:
+                        ids.append(item[1])
+                elif isinstance(item, int):
+                    ids.append(item)
+        elif isinstance(sale_order_ids, int):
+            ids.append(sale_order_ids)
+        return list(set(ids))
+
+    def _is_authorize_provider(self, provider):
+        if not provider:
+            return False
+        code = (provider.code or '').lower()
+        name = (getattr(provider, 'name', '') or '').lower()
+        return ('authoriz' in code) or ('authoriz' in name) or code in ('authorize', 'authorize_net', 'authorizenet')
+
     @api.model_create_multi
     def create(self, vals_list):
-        transactions = super().create(vals_list)
+        Product = self.env['product.product']
+        SaleOrder = self.env['sale.order']
+        Provider = self.env['payment.provider']
 
-        # Get the surcharge product once instead of querying for each transaction
-        fee_product = self.env['product.product'].search([
-            ('default_code', '=', 'AUTH_NET_FEE')
-        ], limit=1)
+        fee_product = Product.search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
 
-        for tx in transactions:
-            if (
-                tx.provider_id.code == 'authorize'
-                and tx.sale_order_ids
-                and fee_product
-            ):
-                for so in tx.sale_order_ids:
-                    # Remove previous surcharge lines (ensure we match by ID to avoid ORM caching issues)
-                    so.order_line.filtered(
-                        lambda l: l.product_id.id == fee_product.id
-                    ).unlink()
+        for vals in vals_list:
+            try:
+                provider_id = vals.get('provider_id') or vals.get('provider') or vals.get('acquirer_id') or vals.get('payment_provider_id')
+                so_ids = []
+                if vals.get('sale_order_ids'):
+                    so_ids = self._parse_sale_order_ids_vals(vals.get('sale_order_ids'))
+                elif vals.get('sale_order_id'):
+                    so_ids = [vals.get('sale_order_id')]
+
+                if not so_ids:
+                    continue
+
+                provider = Provider.browse(provider_id) if provider_id else None
+                if not provider:
+                    so0 = SaleOrder.browse(so_ids[0])
+                    provider = so0.payment_provider_id or None
+
+                if not provider or not self._is_authorize_provider(provider):
+                    continue
+
+                if not fee_product:
+                    _logger.info('payment_authorize_net_full: AUTH_NET_FEE not found; skipping.')
+                    continue
+
+                sale_orders = SaleOrder.browse(so_ids).sudo()
+
+                for so in sale_orders:
+                    if so.transaction_ids.filtered(lambda t: t.state in ('done', 'authorized')):
+                        _logger.info('payment_authorize_net_full: skipping injection for %s (has confirmed tx).', so.name)
+                        continue
+
+                    # remove existing fee lines
+                    existing = so.order_line.filtered(lambda l: l.product_id.id == fee_product.id)
+                    if existing:
+                        existing.sudo().unlink()
 
                     fee = round(so.amount_untaxed * 0.035, 2)
-                    if fee > 0:
-                        self.env['sale.order.line'].create({
+                    if fee <= 0:
+                        _logger.info('payment_authorize_net_full: fee 0 for %s', so.name)
+                        continue
+
+                    self.env['sale.order.line'].sudo().create({
+                        'order_id': so.id,
+                        'product_id': fee_product.id,
+                        'name': fee_product.name,
+                        'price_unit': fee,
+                        'product_uom_qty': 1,
+                    })
+                    so.sudo()._amount_all()
+                    _logger.info('payment_authorize_net_full: injected %s fee into %s', fee, so.name)
+
+                total_amount = sum(SaleOrder.browse(so_ids).mapped('amount_total'))
+                vals['amount'] = float(total_amount)
+                _logger.info('payment_authorize_net_full: set tx amount=%s for so_ids=%s', vals['amount'], so_ids)
+
+            except Exception:
+                _logger.exception('payment_authorize_net_full: error in create pre-hook')
+
+        return super(PaymentTransaction, self).create(vals_list)
+
+    def write(self, vals):
+        res = super(PaymentTransaction, self).write(vals)
+
+        # fallback when sale order link / provider changes later
+        if any(k in vals for k in ('sale_order_ids', 'sale_order_id', 'provider_id', 'provider', 'acquirer_id', 'payment_provider_id')):
+            Product = self.env['product.product']
+            fee_product = Product.search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
+            for tx in self:
+                try:
+                    provider = tx.provider_id or tx.acquirer_id or tx.payment_provider_id
+                    if not provider or not self._is_authorize_provider(provider):
+                        continue
+                    if not tx.sale_order_ids:
+                        continue
+                    if not fee_product:
+                        _logger.info('payment_authorize_net_full: fee missing in write fallback; skip.')
+                        continue
+
+                    for so in tx.sale_order_ids.sudo():
+                        if so.transaction_ids.filtered(lambda t: t.state in ('done', 'authorized') and t.id != tx.id):
+                            _logger.info('payment_authorize_net_full: order %s has other confirmed tx; skip fallback', so.name)
+                            continue
+
+                        # remove and add fee
+                        so.order_line.filtered(lambda l: l.product_id.id == fee_product.id).sudo().unlink()
+                        fee = round(so.amount_untaxed * 0.035, 2)
+                        if fee <= 0:
+                            continue
+                        self.env['sale.order.line'].sudo().create({
                             'order_id': so.id,
                             'product_id': fee_product.id,
                             'name': fee_product.name,
                             'price_unit': fee,
                             'product_uom_qty': 1,
                         })
+                        so.sudo()._amount_all()
+                        _logger.info('payment_authorize_net_full: fallback injected fee %s on %s', fee, so.name)
 
-        return transactions
+                    new_amount = sum(so.amount_total for so in tx.sale_order_ids)
+                    if float(tx.amount) != float(new_amount):
+                        tx.amount = new_amount
+                        _logger.info('payment_authorize_net_full: updated tx %s amount -> %s', tx.reference or tx.id, new_amount)
+                except Exception:
+                    _logger.exception('payment_authorize_net_full: error in write fallback')
+
+        return res
