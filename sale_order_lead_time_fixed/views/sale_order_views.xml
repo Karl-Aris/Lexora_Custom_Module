@@ -8,7 +8,7 @@
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Lead Time Info">
                     <group>
-                        <field name="lead_time" readonly="1"/>
+                        <field name="lead_time"/>
                         <field name="expected_delivery_date" readonly="1"/>
                     </group>
                 </page>
