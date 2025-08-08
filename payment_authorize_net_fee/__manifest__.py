@@ -1,9 +1,10 @@
 {
-    "name": "Authorize.Net Payment Fee",
-    "version": "17.0.1.0.0",
-    "depends": ["payment", "sale", "website_sale"],
-    "category": "Website",
-    "summary": "Adds 3.5% surcharge when Authorize.Net is selected",
-    "installable": True,
-    "data": [],
+    'name': 'Authorize.Net Payment Fee (Transaction pre-hook)',
+    'version': '1.0.0',
+    'summary': 'Inject 3.5% surcharge for Authorize.Net into sale orders before creating payment.transaction',
+    'depends': ['sale', 'payment'],
+    'data': [],
+    'installable': True,
+    'application': False,
+    'license': 'LGPL-3',
 }
