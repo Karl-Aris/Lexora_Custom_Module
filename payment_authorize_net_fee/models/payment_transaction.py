@@ -4,7 +4,6 @@ class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
 
     surcharge_accepted = fields.Boolean(string="Surcharge Accepted", default=False)
-
     surcharge_amount = fields.Monetary(string="Authorize.Net Surcharge", compute='_compute_surcharge_amount')
 
     @api.depends('amount', 'provider_code')
