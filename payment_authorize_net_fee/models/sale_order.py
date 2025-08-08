@@ -24,10 +24,7 @@ class SaleOrder(models.Model):
                 })
 
     def action_confirm(self):
-        # Add surcharge line if payment method is Authorize.Net
         for order in self:
-            # Detect if Authorize.Net is selected on the order:
-            # This depends on your payment selection logic - adjust accordingly.
-            if order.payment_method_code == 'authorize':  # example field, replace as needed
+            if order.x_payment_method == 'authorize':
                 order._add_authorize_net_fee()
         return super().action_confirm()
