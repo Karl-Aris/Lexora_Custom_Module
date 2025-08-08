@@ -1,12 +1,11 @@
 {
     'name': 'Authorize.Net Payment Fee',
     'version': '1.0',
-    'summary': 'Add 3.5% surcharge for Authorize.Net payments on Sale Orders',
+    'summary': 'Add 3.5% surcharge for Authorize.Net payments',
     'category': 'Accounting',
-    'author': 'Your Name',
-    'depends': ['sale', 'payment'],
+    'depends': ['payment', 'sale', 'account'],
     'data': [
-        'views/payment_authorize_net_fee_templates.xml',
+        # Add your product AUTH_NET_FEE in demo or data xml if needed
     ],
     'installable': True,
     'application': False,
