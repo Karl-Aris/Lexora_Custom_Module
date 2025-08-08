@@ -1,13 +1,17 @@
 {
-    'name': 'Authorize.Net Fee + Provider (mock) + Portal double-pay guard',
-    'version': '1.0.0',
-    'summary': 'Add Authorize.Net provider, inject 3.5% fee before payment and avoid double payments in portal',
-    'author': 'You',
-    'depends': ['website_sale', 'sale', 'payment', 'sale_portal'],
+    'name': 'Authorize.Net Fee Pre-Payment',
+    'version': '17.0.1.0.0',
+    'summary': 'Add 3.5% surcharge before Authorize.Net payment',
+    'category': 'Accounting/Payment',
+    'depends': ['sale', 'website_sale', 'payment'],
     'data': [
-        'views/portal_sale_templates.xml',
+        'views/assets.xml',
     ],
-    'installable': True,
-    'application': False,
+    'assets': {
+        'web.assets_frontend': [
+            'payment_authorize_net_fee_pre/static/src/js/authorize_net_fee.js',
+        ],
+    },
     'license': 'LGPL-3',
+    'installable': True,
 }
