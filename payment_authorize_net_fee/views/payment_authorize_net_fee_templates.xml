@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="assets_frontend_inherit" inherit_id="payment.assets_frontend" name="Authorize.Net surcharge payment JS">
+      <xpath expr="." position="inside">
+        <script type="text/javascript">
+          odoo.define('payment_authorize_net_fee.payment_redirect_override', function (require) {
+            "use strict";
+            var ajax = require('web.ajax');
+            var core = require('web.core');
+            var _t = core._t;
+
+            $(document).on('submit', 'form.o_payment_form', function (ev) {
+              var $form = $(this);
+              var provider = $form.find('input[name="provider"]').val();
+              if (provider === 'authorize') {
+                ev.preventDefault();
+                var tx_id = $form.find('input[name="transaction_id"]').val();
+                if (!tx_id) {
+                  alert(_t('Transaction ID missing, cannot proceed.'));
+                  return;
+                }
+                // Post to surcharge start controller (you need to implement this route)
+                $.post('/payment/authorize_net/start', {transaction_id: tx_id})
+                  .done(function (data, status, xhr) {
+                    if (xhr.getResponseHeader('Location')) {
+                      window.location.href = xhr.getResponseHeader('Location');
+                    } else {
+                      window.location.href = data;
+                    }
+                  })
+                  .fail(function () {
+                    alert(_t('Error processing surcharge confirmation.'));
+                  });
+              }
+              // else continue normally for other providers
+            });
+          });
+        </script>
+      </xpath>
+    </template>
+  </data>
+</odoo>
