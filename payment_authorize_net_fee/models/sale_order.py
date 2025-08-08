@@ -3,6 +3,13 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    payment_provider_code = fields.Selection([
+        ('authorize', 'Authorize.Net'),
+        ('paypal', 'PayPal'),
+        ('stripe', 'Stripe'),
+        # add others as needed
+    ], string='Payment Provider', help='Payment method selected for this order')
+
     authorize_net_surcharge_amount = fields.Monetary(
         string="Authorize.Net Surcharge Amount",
         compute='_compute_authorize_net_surcharge',
