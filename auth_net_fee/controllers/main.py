@@ -6,11 +6,11 @@ from odoo.addons.website_sale.controllers import main as website_sale_main
 _logger = logging.getLogger(__name__)
 
 class WebsiteSaleAuthorizePrePayment(website_sale_main.WebsiteSale):
-    "
+    """
     Override several portal entry points to ensure the Authorize.Net fee is injected
     into the sale order BEFORE a payment.transaction is created.
     This tries multiple commonly-used endpoints used by different configurations.
-    "
+    """
 
     def _inject_fee_for_order(self, order, provider_id):
         try:
