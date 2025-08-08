@@ -1,0 +1,7 @@
+<odoo>
+    <template id="assets_frontend" inherit_id="website.assets_frontend">
+        <xpath expr="." position="inside">
+            <script type="module" src="/payment_authorize_net_fee_pre/static/src/js/authorize_net_fee.js"/>
+        </xpath>
+    </template>
+</odoo>
