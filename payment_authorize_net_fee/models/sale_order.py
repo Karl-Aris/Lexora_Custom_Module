@@ -3,6 +3,8 @@ from odoo import models, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    payment_provider_id = fields.Many2one('payment.provider', string="Payment Provider")
+    
     def _get_authorize_fee_product(self):
         return self.env['product.product'].search([('default_code', '=', 'AUTH_NET_FEE')], limit=1)
 
