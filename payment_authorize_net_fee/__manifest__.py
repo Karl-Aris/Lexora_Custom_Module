@@ -5,7 +5,6 @@
     'author': 'You',
     'depends': ['website_sale', 'sale', 'payment', 'sale_portal'],
     'data': [
-        'data/payment_provider_authorize.xml',
         'views/portal_sale_templates.xml',
     ],
     'installable': True,
