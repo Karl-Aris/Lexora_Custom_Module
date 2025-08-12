@@ -2,13 +2,21 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const payButton = document.querySelector('button[name="o_payment_submit_button"]');
-    const paymentRadios = [...document.querySelectorAll('input[name="o_payment_radio"]')];
+    if (!payButton) {
+        console.error('Pay button not found');
+        return;
+    }
+
+    const paymentRadios = Array.from(document.querySelectorAll('input[name="o_payment_radio"]'));
+    if (paymentRadios.length === 0) {
+        console.error('Payment radio buttons not found');
+        return;
+    }
 
     function isAuthorizeSelected() {
         return paymentRadios.some(radio => radio.checked && radio.dataset.providerCode === 'authorize');
     }
 
-    // Enable/disable Pay button depending on payment selection
     function togglePayButton() {
         payButton.disabled = !paymentRadios.some(radio => radio.checked);
     }
