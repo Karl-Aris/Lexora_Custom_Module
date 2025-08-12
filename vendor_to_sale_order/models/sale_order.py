@@ -22,7 +22,7 @@ class SaleOrder(models.Model):
             'ref': self.client_order_ref,
             'sale_order_id': self.id,
             'x_po_vb_id': self.purchase_order,
-            'partner_id': self.partner_id.id,
+            ##'partner_id': self.partner_id.id,
         })
     
         return {
