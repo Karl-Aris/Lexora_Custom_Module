@@ -1,47 +1,32 @@
 /** @odoo-module **/
 
-import { onMounted, ref } from "@odoo/owl";
+document.addEventListener('DOMContentLoaded', () => {
+    const payButton = document.querySelector('button[name="o_payment_submit_button"]');
+    const paymentRadios = [...document.querySelectorAll('input[name="o_payment_radio"]')];
 
-class PaymentAuthorizeNet {
-    constructor() {
-        this.payButton = null;
-        this.radioButtons = [];
-        this.selectedProviderCode = ref(null);
+    function isAuthorizeSelected() {
+        return paymentRadios.some(radio => radio.checked && radio.dataset.providerCode === 'authorize');
+    }
 
-        onMounted(() => {
-            this.payButton = document.querySelector('button[name="o_payment_submit_button"]');
-            this.radioButtons = [...document.querySelectorAll('input[name="o_payment_radio"]')];
-            this._bindEvents();
-            this._togglePayButton();
+    // Enable/disable Pay button depending on payment selection
+    function togglePayButton() {
+        payButton.disabled = !paymentRadios.some(radio => radio.checked);
+    }
+
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            togglePayButton();
         });
-    }
+    });
 
-    _bindEvents() {
-        this.radioButtons.forEach(rb => {
-            rb.addEventListener('change', () => {
-                this.selectedProviderCode.value = rb.dataset.provider_code;
-                this._togglePayButton();
-            });
-        });
+    togglePayButton();
 
-        if (this.payButton) {
-            this.payButton.addEventListener('click', (ev) => {
-                if (this.selectedProviderCode.value === 'authorize') {
-                    ev.preventDefault();
-                    if (confirm("Paying via Authorize.Net will add a 3.5% processing fee to your total. Do you wish to continue?")) {
-                        this.payButton.closest('form').submit();
-                    }
-                }
-            });
+    payButton.addEventListener('click', (ev) => {
+        if (isAuthorizeSelected()) {
+            ev.preventDefault();
+            if (confirm("A 3.5% processing fee will be added for Authorize.Net. Proceed?")) {
+                payButton.closest('form').submit();
+            }
         }
-    }
-
-    _togglePayButton() {
-        const checked = this.radioButtons.some(rb => rb.checked);
-        if (this.payButton) {
-            this.payButton.disabled = !checked;
-        }
-    }
-}
-
-new PaymentAuthorizeNet();
+    });
+});
