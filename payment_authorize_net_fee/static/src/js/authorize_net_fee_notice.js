@@ -1,29 +1,32 @@
-odoo.define('payment_authorize_net_fee.notice', function (require) {
-    'use strict';
+odoo.define('your_module.payment_authorize_net', function (require) {
+    "use strict";
+    var publicWidget = require('web.public.widget');
 
-    const publicWidget = require('web.public.widget');
-
-    publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-        selector: 'form.o_payment_form', // payment form container
+    publicWidget.registry.PaymentAuthorizeNet = publicWidget.Widget.extend({
+        selector: '#payment_form', // or your actual payment form selector
         events: {
+            'change input[name="o_payment_radio"]': '_onPaymentMethodChange',
             'click button[name="o_payment_submit_button"]': '_onPayClick',
         },
-
+        start: function () {
+            this._togglePayButton();
+            return this._super.apply(this, arguments);
+        },
+        _togglePayButton: function () {
+            var checked = this.$('input[name="o_payment_radio"]:checked').length > 0;
+            this.$('button[name="o_payment_submit_button"]').prop('disabled', !checked);
+        },
+        _onPaymentMethodChange: function () {
+            this._togglePayButton();
+        },
         _onPayClick: function (ev) {
-            const $selected = this.$('input[name="o_payment_radio"]:checked');
-            const providerCode = $selected.data('provider_code');
-
-            if (providerCode === 'authorize_net') {
-                ev.preventDefault(); // stop immediate submission
-
-                // Show browser confirm dialog (simplest way)
+            var provider = this.$('input[name="o_payment_radio"]:checked').data('provider_code');
+            if (provider === 'authorize') {
+                ev.preventDefault();
                 if (confirm("Paying via Authorize.Net will add a 3.5% processing fee to your total. Do you wish to continue?")) {
-                    this.el.submit(); // proceed with payment
+                    this.$('form').submit();
                 }
             }
-            // else: let default submit happen
         },
     });
-
-    return publicWidget.registry.AuthorizeNetFeeNotice;
 });
