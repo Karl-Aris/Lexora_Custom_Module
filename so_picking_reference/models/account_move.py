@@ -24,4 +24,5 @@ class AccountMove(models.Model):
                 rec.sale_order_id.write({
                     'x_vb_number': rec.name,
                     'x_amount': rec.amount_total_signed,
+                    'x_bol' : rec.ref,
                 })
