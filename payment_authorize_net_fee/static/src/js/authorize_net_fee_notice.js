@@ -4,19 +4,42 @@ odoo.define('payment_authorize_net_fee.notice', function (require) {
     const publicWidget = require('web.public.widget');
 
     publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-        selector: 'form.o_payment_form',
-        events: {
-            'click button[type="submit"]': '_onPayNowClick',
+        selector: '.o_portal_sign_payment', // Payment form container after signing
+        events: {},
+
+        start: function () {
+            // Wait for payment form to be injected after signature
+            this._observePaymentForm();
+            return this._super.apply(this, arguments);
         },
 
-        _onPayNowClick: function (ev) {
-            const $selected = this.$el.find('input[name="pm_id"]:checked').closest('.o_payment_acquirer');
-            const methodName = $selected.find('.o_payment_acquirer_name').text().trim();
+        _observePaymentForm: function () {
+            const targetNode = document.querySelector('.o_portal_sign_payment');
+            if (!targetNode) return;
 
-            if (methodName && methodName.toLowerCase().includes('authorize.net')) {
-                ev.preventDefault(); // Stop the form submit now
-                this._showFeeModal(ev.currentTarget);
-            }
+            const observer = new MutationObserver(() => {
+                const $form = this.$('.o_payment_form');
+                if ($form.length) {
+                    this._attachHandler($form);
+                }
+            });
+
+            observer.observe(targetNode, { childList: true, subtree: true });
+        },
+
+        _attachHandler: function ($form) {
+            if ($form.data('authorizeNetFeeBound')) return; // Avoid double-binding
+            $form.data('authorizeNetFeeBound', true);
+
+            $form.find('button[type="submit"]').on('click', (ev) => {
+                const $selected = $form.find('input[name="pm_id"]:checked').closest('.o_payment_acquirer');
+                const methodName = $selected.find('.o_payment_acquirer_name').text().trim();
+
+                if (methodName && methodName.toLowerCase().includes('authorize.net')) {
+                    ev.preventDefault();
+                    this._showFeeModal(ev.currentTarget);
+                }
+            });
         },
 
         _showFeeModal: function (submitButton) {
@@ -41,7 +64,6 @@ odoo.define('payment_authorize_net_fee.notice', function (require) {
                 </div>
             `;
 
-            // Append modal to body if not already present
             if (!$('#authorizeNetFeeModal').length) {
                 $('body').append(modalHtml);
             }
@@ -51,7 +73,7 @@ odoo.define('payment_authorize_net_fee.notice', function (require) {
 
             $('#authorizeNetFeeConfirm').off('click').on('click', () => {
                 modal.hide();
-                submitButton.click(); // Trigger the original Pay Now click again
+                submitButton.click(); // Resume original payment
             });
         },
     });
