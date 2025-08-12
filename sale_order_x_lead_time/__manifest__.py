@@ -5,6 +5,6 @@
     'depends': ['sale', 'stock'],
     'data': [],
     'installable': True,
-    'application': False,
+    'application': True,
     'license': 'LGPL-3',
 }
