@@ -1,40 +1,38 @@
-/** @odoo-module **/
-
-document.addEventListener('DOMContentLoaded', () => {
-    const payButton = document.querySelector('button[name="o_payment_submit_button"]');
-    if (!payButton) {
-        console.error('Pay button not found');
-        return;
-    }
-
-    const paymentRadios = Array.from(document.querySelectorAll('input[name="o_payment_radio"]'));
-    if (paymentRadios.length === 0) {
-        console.error('Payment radio buttons not found');
-        return;
-    }
-
-    function isAuthorizeSelected() {
-        return paymentRadios.some(radio => radio.checked && radio.dataset.providerCode === 'authorize');
-    }
-
-    function togglePayButton() {
-        payButton.disabled = !paymentRadios.some(radio => radio.checked);
-    }
+<t t-javascript="true">
+document.addEventListener('DOMContentLoaded', function () {
+    // Adjust selector to your payment method radio buttons
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
 
     paymentRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            togglePayButton();
+        radio.addEventListener('change', function () {
+            if (this.value === 'authorize_net') {  // match your payment provider code here
+                // Show modal or alert
+                if (!document.getElementById('authNetFeeModal')) {
+                    const modalHtml = `
+                    <div class="modal fade" id="authNetFeeModal" tabindex="-1" aria-labelledby="authNetFeeModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="authNetFeeModalLabel">Authorize.Net Payment Fee</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            You will be charged an additional 3.5% processing fee for payments made via Authorize.Net.
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    `;
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+                }
+
+                const authNetFeeModal = new bootstrap.Modal(document.getElementById('authNetFeeModal'));
+                authNetFeeModal.show();
+            }
         });
     });
-
-    togglePayButton();
-
-    payButton.addEventListener('click', (ev) => {
-        if (isAuthorizeSelected()) {
-            ev.preventDefault();
-            if (confirm("A 3.5% processing fee will be added for Authorize.Net. Proceed?")) {
-                payButton.closest('form').submit();
-            }
-        }
-    });
 });
+</t>
