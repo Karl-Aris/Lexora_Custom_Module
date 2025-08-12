@@ -1,32 +1,47 @@
-odoo.define('your_module.payment_authorize_net', function (require) {
-    "use strict";
-    var publicWidget = require('web.public.widget');
+/** @odoo-module **/
 
-    publicWidget.registry.PaymentAuthorizeNet = publicWidget.Widget.extend({
-        selector: '#payment_form', // or your actual payment form selector
-        events: {
-            'change input[name="o_payment_radio"]': '_onPaymentMethodChange',
-            'click button[name="o_payment_submit_button"]': '_onPayClick',
-        },
-        start: function () {
+import { onMounted, ref } from "@odoo/owl";
+
+class PaymentAuthorizeNet {
+    constructor() {
+        this.payButton = null;
+        this.radioButtons = [];
+        this.selectedProviderCode = ref(null);
+
+        onMounted(() => {
+            this.payButton = document.querySelector('button[name="o_payment_submit_button"]');
+            this.radioButtons = [...document.querySelectorAll('input[name="o_payment_radio"]')];
+            this._bindEvents();
             this._togglePayButton();
-            return this._super.apply(this, arguments);
-        },
-        _togglePayButton: function () {
-            var checked = this.$('input[name="o_payment_radio"]:checked').length > 0;
-            this.$('button[name="o_payment_submit_button"]').prop('disabled', !checked);
-        },
-        _onPaymentMethodChange: function () {
-            this._togglePayButton();
-        },
-        _onPayClick: function (ev) {
-            var provider = this.$('input[name="o_payment_radio"]:checked').data('provider_code');
-            if (provider === 'authorize') {
-                ev.preventDefault();
-                if (confirm("Paying via Authorize.Net will add a 3.5% processing fee to your total. Do you wish to continue?")) {
-                    this.$('form').submit();
+        });
+    }
+
+    _bindEvents() {
+        this.radioButtons.forEach(rb => {
+            rb.addEventListener('change', () => {
+                this.selectedProviderCode.value = rb.dataset.provider_code;
+                this._togglePayButton();
+            });
+        });
+
+        if (this.payButton) {
+            this.payButton.addEventListener('click', (ev) => {
+                if (this.selectedProviderCode.value === 'authorize') {
+                    ev.preventDefault();
+                    if (confirm("Paying via Authorize.Net will add a 3.5% processing fee to your total. Do you wish to continue?")) {
+                        this.payButton.closest('form').submit();
+                    }
                 }
-            }
-        },
-    });
-});
+            });
+        }
+    }
+
+    _togglePayButton() {
+        const checked = this.radioButtons.some(rb => rb.checked);
+        if (this.payButton) {
+            this.payButton.disabled = !checked;
+        }
+    }
+}
+
+new PaymentAuthorizeNet();
