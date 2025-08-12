@@ -1,0 +1,18 @@
+<odoo>
+  <template id="sale_order_portal_fee_notice" inherit_id="sale.sale_order_portal_template">
+    <!-- insert the fee notice right before the payment.form call -->
+    <xpath expr="//div[@id='payment_method']" position="before">
+      <div id="authorize_fee_notice" class="alert alert-warning d-none" role="alert" style="margin-bottom:1rem;">
+        <p class="mb-2">
+          By selecting <strong>Authorize.Net</strong>, a <strong>3.5% processing fee</strong> will be added to your order total.
+        </p>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="authorize_fee_confirm" name="authorize_fee_confirm"/>
+          <label class="form-check-label" for="authorize_fee_confirm">
+            I accept the 3.5% Authorize.Net processing fee.
+          </label>
+        </div>
+      </div>
+    </xpath>
+  </template>
+</odoo>
