@@ -6,6 +6,7 @@
         'views/vendor_bill_action.xml', 
         'views/sale_order_vendor_bill_button.xml',
         'views/sale_order_view.xml',
+        'views/account_move_view.xml',
     ],
     'installable': True,
     'application': False,
