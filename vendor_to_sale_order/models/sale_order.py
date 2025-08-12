@@ -3,7 +3,7 @@ from odoo import models, fields
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    vendor_bill_count = fields.Integer(compute="_compute_vendor_bill_count", string="Vendor Bill Count")
+    vendor_bill_count = fields.Integer(compute="_compute_vendor_bill_count", string="Vendor Bill")
 
     def _compute_vendor_bill_count(self):
         for order in self:
