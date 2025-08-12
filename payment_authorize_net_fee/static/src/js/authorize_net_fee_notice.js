@@ -1,25 +1,25 @@
 odoo.define('payment_authorize_net_fee.notice', function (require) {
     'use strict';
 
-    const publicWidget = require('web.public.widget');
+    const PaymentForm = require('payment.payment_form');
 
-    publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-        selector: '.o_payment_acquirer_select',
-        events: {
-            'change input[name="o_payment_radio"]': '_onPaymentMethodChange',
-        },
-        popupShown: false,  // ensure it only shows once
+    PaymentForm.include({
+        events: Object.assign({}, PaymentForm.prototype.events, {
+            'change input[name="o_payment_radio"]': '_onPaymentMethodChangeWithNotice',
+        }),
 
-        _onPaymentMethodChange: function (ev) {
+        _onPaymentMethodChangeWithNotice: function (ev) {
+            this._super.apply(this, arguments); // keep Odoo's normal behavior
+
             const $input = $(ev.currentTarget);
-            const providerCode = $input.data('provider_code'); // Odoo sets this
-            if (providerCode === 'authorize_net' && !this.popupShown) {
-                this.popupShown = true;
-                this._showPopup();
+            const providerCode = $input.data('provider_code'); // Odoo sets this in payment template
+            if (providerCode === 'authorize_net' && !this.authorizeNetPopupShown) {
+                this.authorizeNetPopupShown = true;
+                this._showAuthorizeNetNotice();
             }
         },
 
-        _showPopup: function () {
+        _showAuthorizeNetNotice: function () {
             const $modal = $(`
                 <div class="modal fade" tabindex="-1" role="dialog">
                   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -44,5 +44,5 @@ odoo.define('payment_authorize_net_fee.notice', function (require) {
         },
     });
 
-    return publicWidget.registry.AuthorizeNetFeeNotice;
+    return PaymentForm;
 });
