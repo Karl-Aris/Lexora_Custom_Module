@@ -1,11 +1,9 @@
 <odoo>
   <data>
-    <record id="web_assets_frontend_inherit_authorize_net_fee" model="ir.asset.bundle">
-      <field name="inherit_id" ref="web.assets_frontend"/>
-      <field name="name">AuthorizeNet Fee Popup</field>
-      <field name="xpath" eval="'<xpath expr=\".\" position=\"inside\"> \
-        <script type=\"text/javascript\" src=\"/payment_authourize_net_fee/static/src/js/authorize_net_notice.js\"/> \
-      </xpath>'"/>
-    </record>
+    <template id="assets_frontend_inherit_authorize_net_fee" inherit_id="web.assets_frontend" name="AuthorizeNet Fee Popup">
+      <xpath expr="." position="inside">
+        <script type="text/javascript" src="/payment_authorize_net_fee/static/src/js/authorize_net_notice.js"/>
+      </xpath>
+    </template>
   </data>
 </odoo>
