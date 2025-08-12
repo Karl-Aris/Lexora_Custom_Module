@@ -3,7 +3,7 @@
     'version': '1.0',
     'category': 'Sales',
     'summary': 'Compute lead time in days between order date and commitment date',
-    'author': 'Your Name',
+    'author': 'Karl Areglado',
     'depends': ['sale'],
     'data': [],
     'installable': True,
