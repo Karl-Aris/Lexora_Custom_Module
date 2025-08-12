@@ -1,7 +1,7 @@
 <odoo>
   <data inherit_id="web.assets_frontend" name="AuthorizeNet Fee Popup">
     <xpath expr="." position="inside">
-      <script type="text/javascript" src="/payment_authourize_net_fee/static/src/js/authorize_net_fee_popup.js"/>
+      <script type="text/javascript" src="/payment_authourize_net_fee/static/src/js/authorize_net_notice.js"/>
     </xpath>
   </data>
 </odoo>
