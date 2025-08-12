@@ -4,31 +4,27 @@ odoo.define('payment_authorize_net_fee.notice', function (require) {
     const publicWidget = require('web.public.widget');
 
     publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-        selector: '.o_portal_sign_payment', // Payment form container after signing
+        selector: 'body', // Bind globally
         events: {},
 
         start: function () {
-            // Wait for payment form to be injected after signature
-            this._observePaymentForm();
+            // Watch for payment forms appearing anywhere
+            this._observePaymentForms();
             return this._super.apply(this, arguments);
         },
 
-        _observePaymentForm: function () {
-            const targetNode = document.querySelector('.o_portal_sign_payment');
-            if (!targetNode) return;
-
+        _observePaymentForms: function () {
             const observer = new MutationObserver(() => {
-                const $form = this.$('.o_payment_form');
-                if ($form.length) {
-                    this._attachHandler($form);
-                }
+                document.querySelectorAll('.o_payment_form').forEach(form => {
+                    this._attachHandler($(form));
+                });
             });
 
-            observer.observe(targetNode, { childList: true, subtree: true });
+            observer.observe(document.body, { childList: true, subtree: true });
         },
 
         _attachHandler: function ($form) {
-            if ($form.data('authorizeNetFeeBound')) return; // Avoid double-binding
+            if ($form.data('authorizeNetFeeBound')) return;
             $form.data('authorizeNetFeeBound', true);
 
             $form.find('button[type="submit"]').on('click', (ev) => {
@@ -73,7 +69,7 @@ odoo.define('payment_authorize_net_fee.notice', function (require) {
 
             $('#authorizeNetFeeConfirm').off('click').on('click', () => {
                 modal.hide();
-                submitButton.click(); // Resume original payment
+                submitButton.click(); // Continue original payment
             });
         },
     });
