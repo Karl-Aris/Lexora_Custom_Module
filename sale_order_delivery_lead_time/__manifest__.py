@@ -3,7 +3,7 @@
     'version': '1.0',
     'summary': 'Compute lead time from order date and delivery date on Sale Orders',
     'category': 'Sales',
-    'author': 'ChatGPT',
+    'author': 'Karl Areglado',
     'depends': ['sale'],
     'data': [
         'views/sale_order_views.xml',
