@@ -7,7 +7,7 @@ class AccountMove(models.Model):
     x_po_vb_id = fields.Char(string="PO# from Sale Order")
 
     sale_order_count = fields.Integer(
-        string='Related Sale Order Count',
+        string='Sale Order',
         compute='_compute_sale_order_count',
         readonly=True
     )
