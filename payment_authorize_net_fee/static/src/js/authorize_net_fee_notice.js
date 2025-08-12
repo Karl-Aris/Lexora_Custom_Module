@@ -1,31 +1,22 @@
 odoo.define('payment_authorize_net_fee.notice', function (require) {
-    "use strict";
+    'use strict';
 
     const publicWidget = require('web.public.widget');
-    const Dialog = require('web.Dialog');
 
     publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-        selector: '.o_payment_provider_selection',
+        selector: 'form.o_payment_form',  // payment form in checkout & portal
         events: {
-            'click input[name="provider_id"]': '_onPaymentMethodClick',
+            'click input[name="o_payment_radio"]': '_onPaymentMethodClick',
         },
 
-        /**
-         * Triggered when a payment provider is selected.
-         */
         _onPaymentMethodClick: function (ev) {
-            const $input = $(ev.currentTarget);
-            const providerName = ($input.data('provider-name') || '').toLowerCase();
+            const $option = $(ev.currentTarget);
+            const providerCode = $option.data('provider_code');
 
-            // Check if selected method is Authorize.Net
-            if (providerName.includes('authorize.net')) {
-                Dialog.alert(this, _t("Notice"), {
-                    title: _t("Additional Fee"),
-                    $content: $("<div/>", {
-                        text: "A 3.5% processing fee will be added to your total if you pay using Authorize.Net."
-                    }),
-                    buttons: [{ text: _t("OK"), close: true }],
-                });
+            // Only trigger for Authorize.Net
+            if (providerCode === 'authorize_net' && !sessionStorage.getItem('auth_net_fee_notice_shown')) {
+                alert('Notice: A 3.5% processing fee will be added to your payment when using Authorize.Net.');
+                sessionStorage.setItem('auth_net_fee_notice_shown', '1');
             }
         },
     });
