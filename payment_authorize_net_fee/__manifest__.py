@@ -3,7 +3,7 @@
     'version': '1.0',
     'summary': 'Show 3.5% surcharge notice when clicking Pay with Authorize.Net',
     'category': 'Accounting',
-    'depends': ['payment', 'sale', 'account', 'website_sale'],
+    'depends': ['payment', 'sale', 'account', 'website_sale', 'web'],
     'data': [
         'views/assets.xml',
     ],
