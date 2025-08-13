@@ -9,13 +9,21 @@ class SaleOrder(models.Model):
         store=True
     )
 
-    @api.depends('date_order', 'picking_ids.date_done')
+    @api.depends('date_order')  # Only depend on date_order
     def _compute_x_lead_time(self):
+        StockPicking = self.env['stock.picking']
         for order in self:
-            # Get the latest done date from all related pickings
-            done_dates = order.picking_ids.filtered(lambda p: p.state == 'done').mapped('date_done')
-            if done_dates and order.date_order:
-                last_done = max(done_dates)
+            if not order.date_order:
+                order.x_lead_time = 0
+                continue
+
+            # Find all done pickings for this sale order
+            pickings = StockPicking.search([
+                ('sale_id', '=', order.id),
+                ('state', '=', 'done')
+            ])
+            if pickings:
+                last_done = max(pickings.mapped('date_done'))
                 order.x_lead_time = (last_done - order.date_order).days
             else:
                 order.x_lead_time = 0
