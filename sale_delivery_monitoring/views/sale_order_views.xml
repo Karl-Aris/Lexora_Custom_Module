@@ -4,8 +4,8 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Place fields in Other Info tab -->
-            <xpath expr="//page[@name='other_info']/group" position="inside">
+            <!-- Put fields into the 'Other Info' tab -->
+            <xpath expr="//page[@string='Other Info']/group" position="inside">
                 <group string="Delivery Tracking">
                     <field name="tracking_number"/>
                     <field name="estimated_delivery_date"/>
@@ -13,25 +13,6 @@
                     <field name="follow_up_status"/>
                 </group>
             </xpath>
-        </field>
-    </record>
-
-    <!-- Search filters -->
-    <record id="view_order_search_delivery_tracking" model="ir.ui.view">
-        <field name="name">sale.order.search.delivery.tracking</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-        <field name="arch" type="xml">
-            <filter name="my_orders_filter" position="after">
-                <separator/>
-                <filter string="Shipped" domain="[('delivery_status','=','shipped')]"/>
-                <filter string="In Transit" domain="[('delivery_status','=','in_transit')]"/>
-                <filter string="Delivered" domain="[('delivery_status','=','delivered')]"/>
-                <filter string="Not Delivered on EDD" domain="[('delivery_status','=','not_delivered_on_edd')]"/>
-                <separator/>
-                <filter string="Follow-up Pending" domain="[('follow_up_status','=','pending')]"/>
-                <filter string="Follow-up Done" domain="[('follow_up_status','=','done')]"/>
-            </filter>
         </field>
     </record>
 </odoo>
