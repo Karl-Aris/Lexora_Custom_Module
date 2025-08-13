@@ -3,24 +3,22 @@
 import publicWidget from "@web/legacy/js/public/public_widget";
 
 publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-    selector: '.o_payment_form', // Payment form container
-    events: {
-        'click button[type="submit"]': '_onSubmit',
-    },
+    selector: '#o_payment_form',
 
-    _onSubmit: function (ev) {
-        const selectedMethod = this.$('input[name="pm_id"]:checked');
-        if (!selectedMethod.length) {
-            return; // No payment method selected
-        }
-
-        const providerCode = selectedMethod.data('provider');
-        if (providerCode === 'authorize') {
-            ev.preventDefault();
-            if (confirm("⚠ You will be charged an additional 3.5% fee for payments made via Authorize.Net.\n\nDo you wish to continue?")) {
-                // If user clicks OK, submit form
-                this.el.submit();
+    start: function () {
+        this.el.addEventListener('submit', (ev) => {
+            const selectedOption = this.el.querySelector('input[name="pm_id"]:checked');
+            if (selectedOption) {
+                const providerCode = selectedOption.dataset.provider;
+                if (providerCode === 'authorize') {
+                    if (!confirm("⚠ You will be charged an additional 3.5% fee for payments made via Authorize.Net.\n\nDo you want to continue?")) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        return false;
+                    }
+                }
             }
-        }
+        });
+        return this._super.apply(this, arguments);
     },
 });
