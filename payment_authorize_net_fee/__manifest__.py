@@ -3,7 +3,8 @@
     'version': '1.0',
     'summary': 'Show 3.5% surcharge notice before Authorize.Net payment',
     'category': 'Accounting',
-    'depends': ['payment', 'website_sale'],
+    'depends': ['payment', 'website_sale', 'web'],
+    'data': [],
     'assets': {
         'web.assets_frontend': [
             'payment_authorize_net_fee/static/src/js/authorize_net_fee_notice.js',
