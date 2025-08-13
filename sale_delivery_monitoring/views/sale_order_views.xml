@@ -1,16 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_order_form_delivery_tracking" model="ir.ui.view">
-        <field name="name">sale.order.form.delivery.tracking</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//form/sheet/notebook/page[@name='other_information']/group/group[@name='sales_person']/field[@name='user_id']" position="before">
-                <group string="Delivery Tracking">
-                    <field name="tracking_number" readonly="state != 'sale'"/>
-                    <field name="edd" invisible="state == 'draft'"/>
-                    <field name="delivery_status" readonly="1"/>
-                </group>
-            </xpath>
-        </field>
-    </record>
+  <record id="view_order_form_delivery_tracking" model="ir.ui.view">
+    <field name="name">sale.order.form.delivery.tracking</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//form/sheet/notebook/page[@name='other_information']/group/group[@name='sales_person']/field[@name='user_id']" position="before">
+        <group string="Delivery Tracking">
+          <field name="tracking_number" readonly="state != 'sale'"/>
+          <field name="edd" invisible="state == 'draft'"/>
+          <field name="delivery_status" readonly="1"/>
+          <field name="follow_up_status" invisible="delivery_status != 'delivered'"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
 </odoo>
