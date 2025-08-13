@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Inherit Sale Order Form: add Tracking + EDD + Delivery Status + Follow-up -->
+  <record id="view_order_form_delivery_tracking" model="ir.ui.view">
+    <field name="name">sale.order.form.delivery.tracking</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//sheet/notebook" position="inside">
+        <page string="Delivery Tracking" name="delivery_tracking">
+          <group>
+            <group>
+              <field name="x_tracking_number"/>
+              <field name="x_edd_date"/>
+              <field name="delivery_status"/>
+              <field name="follow_up_status"/>
+            </group>
+            <group>
+              <field name="is_edd_today_or_earlier" readonly="1" invisible="1"/>
+              <field name="x_delivery_note" placeholder="Notes about delays, exceptions, or call outcomes..."/>
+            </group>
+          </group>
+          <separator string="Quick Actions"/>
+          <group col="6">
+            <button name="action_mark_in_transit" type="object" string="Mark In Transit" class="btn-secondary" attrs="{'invisible': [('delivery_status','in',['in_transit','delivered'])]}"/>
+            <button name="action_mark_delivered" type="object" string="Mark Delivered" class="btn-primary" attrs="{'invisible': [('delivery_status','=','delivered')]}"/>
+            <button name="action_mark_exception" type="object" string="Mark Exception" class="btn-danger"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Inherit Tree/List View: show key columns -->
+  <record id="view_order_tree_delivery_tracking" model="ir.ui.view">
+    <field name="name">sale.order.tree.delivery.tracking</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+    <field name="arch" type="xml">
+      <xpath expr="//tree" position="inside">
+        <field name="x_edd_date" optional="show"/>
+        <field name="delivery_status" optional="show"/>
+        <field name="follow_up_status" optional="show"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Search View: add filters for the workflow -->
+  <record id="view_order_filter_delivery_tracking" model="ir.ui.view">
+    <field name="name">sale.order.search.delivery.tracking</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='my_orders']" position="after">
+        <!-- Step 2: Daily Filter (EDD Today or Earlier & Shipped) -->
+        <filter string="Shipped & EDD Today/Earlier" name="flt_shipped_edd_today" 
+                domain="[('delivery_status','=','shipped'), ('x_edd_date','&lt;=', context_today())]"/>
+
+        <!-- Step 4: Manual Tracking bucket -->
+        <filter string="Not Delivered on EDD" name="flt_not_delivered_on_edd"
+                domain="[('delivery_status','=','not_delivered_on_edd')]"/>
+
+        <!-- Step 5: Delivered & Follow-up Pending -->
+        <filter string="Delivered & Follow-up Pending" name="flt_delivered_followup_pending"
+                domain="[('delivery_status','=','delivered'), ('follow_up_status','=','pending')]"/>
+
+        <!-- Status quick filters -->
+        <separator/>
+        <filter string="Shipped" name="flt_shipped" domain="[('delivery_status','=','shipped')]"/>
+        <filter string="In Transit" name="flt_in_transit" domain="[('delivery_status','=','in_transit')]"/>
+        <filter string="Delivered" name="flt_delivered" domain="[('delivery_status','=','delivered')]"/>
+        <filter string="Exception" name="flt_exception" domain="[('delivery_status','=','exception')]"/>
+      </xpath>
+
+      <!-- Group By helpers -->
+      <xpath expr="//group" position="inside">
+        <filter string="Delivery Status" name="grp_delivery_status" context="{'group_by':'delivery_status'}"/>
+        <filter string="EDD" name="grp_edd" context="{'group_by':'x_edd_date'}"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Optional: Kanban view for delivery tracking -->
+  <record id="view_order_kanban_delivery_tracking" model="ir.ui.view">
+    <field name="name">sale.order.kanban.delivery.tracking</field>
+    <field name="model">sale.order</field>
+    <field name="priority">20</field>
+    <field name="arch" type="xml">
+      <kanban default_group_by="delivery_status" create="false" class="o_kanban_small_column">
+        <field name="name"/>
+        <field name="partner_id"/>
+        <field name="x_edd_date"/>
+        <field name="delivery_status"/>
+        <field name="follow_up_status"/>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_global_click">
+              <div class="o_kanban_record_top">
+                <strong><field name="name"/></strong>
+              </div>
+              <div class="o_kanban_record_body">
+                <div>Customer: <field name="partner_id"/></div>
+                <div>EDD: <field name="x_edd_date"/></div>
+                <div>Status: <field name="delivery_status"/></div>
+                <div>Follow-up: <field name="follow_up_status"/></div>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <!-- Action & Menu Shortcut (optional; reuse existing Sales menus) -->
+  <record id="action_orders_delivery_tracking" model="ir.actions.act_window">
+    <field name="name">Delivery Tracking</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">tree,form,kanban,pivot,graph</field>
+    <field name="domain">[]</field>
+    <field name="context">{"search_default_flt_shipped_edd_today": 1}</field>
+  </record>
+
+  <menuitem id="menu_delivery_tracking_root" name="Delivery Tracking" parent="sale.menu_sale_root" action="action_orders_delivery_tracking" sequence="95"/>
+</odoo>
