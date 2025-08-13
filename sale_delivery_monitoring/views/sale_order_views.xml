@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+  <!-- Form view: add Tracking, EDD, Delivery Status, Follow-up -->
+  <record id="view_order_form_delivery_monitoring" model="ir.ui.view">
+    <field name="name">sale.order.form.delivery.monitoring</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+
+      <!-- Place after customer/shipping area -->
+      <xpath expr="//sheet//group[.//field[@name='partner_id']][1]" position="after">
+        <group string="Delivery Monitoring">
+          <field name="x_tracking_number"/>
+          <field name="x_edd"/>
+          <field name="x_delivery_status"/>
+          <field name="x_followup_status"
+                 modifiers='{"invisible":[["x_delivery_status","!=","delivered"]]}'/>
+        </group>
+      </xpath>
+
+      <!-- Helpful note -->
+      <xpath expr="//sheet" position="inside">
+        <label for="x_delivery_status" string="Delivery Status Flow"/>
+        <p class="o_form_label_help">
+          Shipped → (EDD reached) → Not Delivered on EDD → (manual/API) → In Transit / Delivered / Exception
+        </p>
+      </xpath>
+
+    </field>
+  </record>
+
+  <!-- Tree view: show quick columns -->
+  <record id="view_order_tree_delivery_monitoring" model="ir.ui.view">
+    <field name="name">sale.order.tree.delivery.monitoring</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+    <field name="arch" type="xml">
+      <xpath expr="//tree" position="inside">
+        <field name="x_tracking_number"/>
+        <field name="x_edd"/>
+        <field name="x_delivery_status"/>
+        <field name="x_followup_status"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Search: filters for your workflow -->
+  <record id="view_order_search_delivery_monitoring" model="ir.ui.view">
+    <field name="name">sale.order.search.delivery.monitoring</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+    <field name="arch" type="xml">
+      <xpath expr="//search" position="inside">
+
+        <!-- Status filters -->
+        <filter name="x_so_status_shipped"
+                string="Shipped"
+                domain="[('x_delivery_status','=','shipped')]"/>
+        <filter name="x_so_status_in_transit"
+                string="In Transit"
+                domain="[('x_delivery_status','=','in_transit')]"/>
+        <filter name="x_so_status_delivered"
+                string="Delivered"
+                domain="[('x_delivery_status','=','delivered')]"/>
+        <filter name="x_so_status_not_delivered_on_edd"
+                string="Not Delivered on EDD"
+                domain="[('x_delivery_status','=','not_delivered_on_edd')]"/>
+        <filter name="x_so_status_exception"
+                string="Exception"
+                domain="[('x_delivery_status','=','exception')]"/>
+
+        <separator/>
+
+        <!-- EDD Today or Earlier -->
+        <filter name="x_so_edd_today_or_earlier"
+                string="EDD Today or Earlier"
+                domain="[('x_edd','!=',False),('x_edd','&lt;=', context_today())]"/>
+
+        <!-- Daily Check bucket: shipped + EDD <= today -->
+        <filter name="x_so_daily_check"
+                string="Daily Check (EDD Missed)"
+                domain="[('x_delivery_status','=','shipped'),('x_edd','!=',False),('x_edd','&lt;=', context_today())]"/>
+
+        <!-- Customer Follow-up -->
+        <filter name="x_so_followup_pending"
+                string="Follow-up Pending"
+                domain="[('x_delivery_status','=','delivered'),('x_followup_status','=','pending')]"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Optional: a menu to jump straight into the "Not Delivered on EDD" list -->
+  <record id="action_so_not_delivered_on_edd" model="ir.actions.act_window">
+    <field name="name">Orders: Not Delivered on EDD</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('x_delivery_status','=','not_delivered_on_edd')]</field>
+    <field name="context">{}</field>
+  </record>
+
+  <menuitem id="menu_so_delivery_monitoring_root"
+            name="Delivery Monitoring"
+            parent="sale.sale_order_menu"
+            sequence="95"
+            action="action_so_not_delivered_on_edd"/>
+</odoo>
