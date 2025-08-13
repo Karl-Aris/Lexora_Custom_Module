@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_autobucket_missed_edd" model="ir.cron">
+        <field name="name">Delivery: Auto-bucket Missed EDD</field>
+        <field name="model_id" ref="model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_autobucket_missed_edd()</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <!-- optional: nextcall can be set manually via UI -->
+    </record>
+</odoo>
