@@ -8,14 +8,11 @@ publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
     start: function () {
         this.el.addEventListener('submit', (ev) => {
             const selectedOption = this.el.querySelector('input[name="pm_id"]:checked');
-            if (selectedOption) {
-                const providerCode = selectedOption.dataset.provider;
-                if (providerCode === 'authorize') {
-                    if (!confirm("⚠ You will be charged an additional 3.5% fee for payments made via Authorize.Net.\n\nDo you want to continue?")) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        return false;
-                    }
+            if (selectedOption && selectedOption.dataset.provider === 'authorize') {
+                if (!confirm("⚠ You will be charged an additional 3.5% fee for payments made via Authorize.Net.\n\nDo you want to continue?")) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    return false;
                 }
             }
         });
