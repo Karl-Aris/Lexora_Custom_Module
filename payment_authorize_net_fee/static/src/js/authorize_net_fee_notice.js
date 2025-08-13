@@ -3,15 +3,15 @@
 import publicWidget from "@web/legacy/js/public/public_widget";
 
 publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-    selector: 'form[name="o_payment_form"]',
+    selector: '.o_payment_methods',  // container for all payment methods
     events: {
-        'change input[name="payment_method_id"]': '_onPaymentMethodChange',
+        'click .o_payment_method': '_onPaymentMethodClick',
     },
 
-    _onPaymentMethodChange: function (ev) {
-        const selected = this.$(ev.currentTarget);
-        // Adjust the data-code or value depending on your payment method DOM
-        if (selected.data('provider') === 'authorize') {
+    _onPaymentMethodClick: function (ev) {
+        const methodCard = ev.currentTarget;
+        const providerCode = methodCard.getAttribute('data-provider');  // Odoo sets this
+        if (providerCode && providerCode.toLowerCase().includes('authorize')) {
             alert('You will be charged an additional 3.5% fee for payments made via Authorize.Net.');
         }
     },
