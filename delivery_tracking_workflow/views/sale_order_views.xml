@@ -53,7 +53,7 @@
     <field name="arch" type="xml">
       <xpath expr="//filter[@name='my_orders']" position="after">
         <!-- Step 2: Daily Filter (EDD Today or Earlier & Shipped) -->
-        <filter string="Shipped & EDD Today/Earlier" name="flt_shipped_edd_today" 
+        <filter string="Shipped &amp; EDD Today/Earlier" name="flt_shipped_edd_today" 
                 domain="[('delivery_status','=','shipped'), ('x_edd_date','&lt;=', context_today())]"/>
 
         <!-- Step 4: Manual Tracking bucket -->
@@ -61,7 +61,7 @@
                 domain="[('delivery_status','=','not_delivered_on_edd')]"/>
 
         <!-- Step 5: Delivered & Follow-up Pending -->
-        <filter string="Delivered & Follow-up Pending" name="flt_delivered_followup_pending"
+        <filter string="Delivered &amp; Follow-up Pending" name="flt_delivered_followup_pending"
                 domain="[('delivery_status','=','delivered'), ('follow_up_status','=','pending')]"/>
 
         <!-- Status quick filters -->
@@ -79,46 +79,4 @@
       </xpath>
     </field>
   </record>
-
-  <!-- Optional: Kanban view for delivery tracking -->
-  <record id="view_order_kanban_delivery_tracking" model="ir.ui.view">
-    <field name="name">sale.order.kanban.delivery.tracking</field>
-    <field name="model">sale.order</field>
-    <field name="priority">20</field>
-    <field name="arch" type="xml">
-      <kanban default_group_by="delivery_status" create="false" class="o_kanban_small_column">
-        <field name="name"/>
-        <field name="partner_id"/>
-        <field name="x_edd_date"/>
-        <field name="delivery_status"/>
-        <field name="follow_up_status"/>
-        <templates>
-          <t t-name="kanban-box">
-            <div class="oe_kanban_global_click">
-              <div class="o_kanban_record_top">
-                <strong><field name="name"/></strong>
-              </div>
-              <div class="o_kanban_record_body">
-                <div>Customer: <field name="partner_id"/></div>
-                <div>EDD: <field name="x_edd_date"/></div>
-                <div>Status: <field name="delivery_status"/></div>
-                <div>Follow-up: <field name="follow_up_status"/></div>
-              </div>
-            </div>
-          </t>
-        </templates>
-      </kanban>
-    </field>
-  </record>
-
-  <!-- Action & Menu Shortcut (optional; reuse existing Sales menus) -->
-  <record id="action_orders_delivery_tracking" model="ir.actions.act_window">
-    <field name="name">Delivery Tracking</field>
-    <field name="res_model">sale.order</field>
-    <field name="view_mode">tree,form,kanban,pivot,graph</field>
-    <field name="domain">[]</field>
-    <field name="context">{"search_default_flt_shipped_edd_today": 1}</field>
-  </record>
-
-  <menuitem id="menu_delivery_tracking_root" name="Delivery Tracking" parent="sale.menu_sale_root" action="action_orders_delivery_tracking" sequence="95"/>
 </odoo>
