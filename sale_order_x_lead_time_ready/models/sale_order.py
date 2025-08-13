@@ -1,5 +1,4 @@
 from odoo import models, fields, api
-from datetime import datetime
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -10,25 +9,21 @@ class SaleOrder(models.Model):
         store=True,
     )
 
-    @api.depends('date_order')
+    @api.depends('date_order', 'picking_ids.date_done')
     def _compute_x_lead_time(self):
-        StockPicking = self.env['stock.picking']
         for order in self:
             if not order.date_order:
                 order.x_lead_time = 0
                 continue
 
-            pickings = StockPicking.search([
-                ('sale_id', '=', order.id),
-                ('state', '=', 'done')
-            ])
-            if not pickings:
+            # Get all completed pickings linked to this sale order
+            done_pickings = order.picking_ids.filtered(lambda p: p.state == 'done' and p.date_done)
+            if not done_pickings:
                 order.x_lead_time = 0
                 continue
 
-            last_done = max(pickings.mapped('date_done'))
-            if last_done:
-                delta_days = (last_done - order.date_order).days
-                order.x_lead_time = delta_days
-            else:
-                order.x_lead_time = 0
+            # Take the latest date_done
+            last_done_date = max(done_pickings.mapped('date_done'))
+
+            # Compute difference in days
+            order.x_lead_time = (last_done_date.date() - order.date_order.date()).days
