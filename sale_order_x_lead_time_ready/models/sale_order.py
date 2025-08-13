@@ -10,30 +10,16 @@ class SaleOrder(models.Model):
         store=True,
     )
 
-    @api.depends('date_done', 'effective_date')
+    @api.depends('picking_ids.date_done', 'confirmation_date')
     def _compute_x_lead_time(self):
         for order in self:
-            d1 = order.date_done
-            d2 = order.effective_date
-            if not d1 or not d2:
+            # Use the confirmation date of the sale order as the start
+            start_date = order.confirmation_date.date() if order.confirmation_date else None
+            # Get all done picking dates
+            done_dates = order.picking_ids.filtered(lambda p: p.date_done).mapped('date_done')
+            if start_date and done_dates:
+                # Take the earliest done date
+                end_date = min(done_dates).date() if isinstance(min(done_dates), fields.Datetime) else min(done_dates)
+                order.x_lead_time = (end_date - start_date).days
+            else:
                 order.x_lead_time = 0
-                continue
-            try:
-                d1_date = fields.Date.to_date(d1) if not isinstance(d1, date) else d1
-            except Exception:
-                try:
-                    d1_date = d1.date()
-                except Exception:
-                    d1_date = None
-            try:
-                d2_date = fields.Date.to_date(d2) if not isinstance(d2, date) else d2
-            except Exception:
-                try:
-                    d2_date = d2.date()
-                except Exception:
-                    d2_date = None
-            if not d1_date or not d2_date:
-                order.x_lead_time = 0
-                continue
-            delta = (d1_date - d2_date).days
-            order.x_lead_time = abs(delta)
