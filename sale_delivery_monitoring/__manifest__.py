@@ -1,14 +1,13 @@
 {
-    "name": "Sales: Delivery Monitoring (EDD & Status Buckets)",
-    "version": "17.0.1.0",
-    "summary": "Track shipment EDD & delivery status on Sales Orders with daily auto-bucketing",
-    "author": "Your Company",
-    "license": "LGPL-3",
-    "depends": ["sale_management"],  # minimum: sale; using sale_management for standard views/actions
-    "data": [
-        "data/cron_update_delivery_status.xml",
-        "views/sale_order_views.xml",
+    'name': 'Sale Delivery Monitoring',
+    'version': '1.0',
+    'category': 'Sales',
+    'summary': 'Track delivery status and EDD in Sales Orders',
+    'depends': ['sale_management'],
+    'data': [
+        'views/sale_order_views.xml',
+        'data/cron_data.xml',
     ],
-    "application": False,
-    "installable": True,
+    'installable': True,
+    'application': False,
 }
