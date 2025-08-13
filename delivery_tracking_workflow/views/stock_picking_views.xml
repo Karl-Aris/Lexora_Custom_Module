@@ -9,12 +9,13 @@
 
       <!-- Put fields in the "Additional Info" notebook if available, else after carrier -->
       <xpath expr="//group[.//field[@name='carrier_tracking_ref']]" position="after">
-        <group string="Delivery Monitoring">
-          <field name="x_edd"/>
-          <field name="x_delivery_status"/>
-          <field name="x_followup_status" attrs="{'invisible': [('x_delivery_status','!=','delivered')]}"/>
-        </group>
+          <group string="Delivery Monitoring">
+              <field name="x_edd"/>
+              <field name="x_delivery_status"/>
+              <field name="x_followup_status" modifiers='{"invisible": [["x_delivery_status","!=","delivered"]]}'/>
+          </group>
       </xpath>
+
 
       <!-- Subtle hint in chatter -->
       <xpath expr="//sheet" position="inside">
