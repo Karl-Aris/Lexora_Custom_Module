@@ -4,7 +4,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='other_info']" position="inside">
+            <xpath expr="//page[normalize-space(string())='Other Info']" position="inside">
                 <group>
                     <field name="tracking_number"/>
                     <field name="estimated_delivery_date"/>
