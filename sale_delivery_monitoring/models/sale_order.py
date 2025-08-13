@@ -4,6 +4,7 @@ from datetime import date
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    estimated_delivery_date = fields.Date(string="Estimated Delivery Date")
     delivery_tracking_number = fields.Char(string="Tracking Number")
     delivery_edd = fields.Date(string="Estimated Delivery Date")
     delivery_status = fields.Selection([
