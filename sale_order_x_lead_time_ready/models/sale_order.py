@@ -10,10 +10,10 @@ class SaleOrder(models.Model):
         store=True,
     )
 
-    @api.depends('commitment_date', 'effective_date')
+    @api.depends('date_done', 'effective_date')
     def _compute_x_lead_time(self):
         for order in self:
-            d1 = order.commitment_date
+            d1 = order.date_done
             d2 = order.effective_date
             if not d1 or not d2:
                 order.x_lead_time = 0
