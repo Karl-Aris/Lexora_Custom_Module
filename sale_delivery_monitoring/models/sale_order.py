@@ -5,6 +5,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     # Fields used by the workflow
+    edd = fields.Date(string="Estimated Delivery Date")
     tracking_number = fields.Char(string="Tracking Number", copy=False)
     estimated_delivery_date = fields.Date(string="Estimated Delivery Date", index=True, copy=False)
     delivery_status = fields.Selection(
