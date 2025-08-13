@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Extend Sale Order Form View -->
     <record id="view_order_form_delivery_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.delivery.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Add tracking fields under "Other Information" tab -->
             <xpath expr="//sheet/notebook/page[@name='other_information']" position="inside">
                 <group string="Delivery Tracking">
                     <field name="tracking_number"/>
@@ -18,19 +16,16 @@
         </field>
     </record>
 
-    <!-- Optional Search Filter for Delivery Status -->
     <record id="view_sale_order_filter_delivery_tracking" model="ir.ui.view">
         <field name="name">sale.order.search.delivery.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_orders']" position="after">
-                <filter string="Delivered"
-                        name="delivered"
-                        domain="[('delivery_status', '=', 'delivered')]"/>
-                <filter string="In Transit"
-                        name="in_transit"
-                        domain="[('delivery_status', '=', 'in_transit')]"/>
+                <filter string="Shipped" name="shipped" domain="[('delivery_status','=','shipped')]"/>
+                <filter string="In Transit" name="in_transit" domain="[('delivery_status','=','in_transit')]"/>
+                <filter string="Delivered" name="delivered" domain="[('delivery_status','=','delivered')]"/>
+                <filter string="Not Delivered on EDD" name="not_delivered_on_edd" domain="[('delivery_status','=','not_delivered_on_edd')]"/>
             </xpath>
         </field>
     </record>
