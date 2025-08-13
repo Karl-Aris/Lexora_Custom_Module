@@ -4,7 +4,7 @@
     'summary': 'Compute x_lead_time from commitment_date and effective_date on sale.order',
     'category': 'Sales',
     'author': 'Karl Areglado',
-    'depends': ['sale'],
+    'depends': ['sale', 'stock'],
     'data': [],
     'installable': True,
     'application': False,
