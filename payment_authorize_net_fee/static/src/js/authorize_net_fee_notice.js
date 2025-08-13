@@ -1,33 +1,33 @@
 /** @odoo-module **/
 
-import publicWidget from "@web/legacy/js/public/public_widget";
-import Dialog from "@web/legacy/js/core/dialog";
+import { patch } from "@web/core/utils/patch";
+import { PaymentForm } from "@payment/js/payment_form";
+import { Dialog } from "@web/core/dialog/dialog";
 
-publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-    selector: '.o_payment_form', // Payment form wrapper
-    events: {
-        'click button[type="submit"]': '_onPayClick',
-    },
-
-    _onPayClick: function (ev) {
-        const selectedProvider = this.$('input[name="provider"]:checked').val();
-
-        if (selectedProvider === 'authorize') {  // Must match payment.provider.code
-            ev.preventDefault(); // stop form from submitting
+patch(PaymentForm.prototype, "authorize_net_fee_notice", {
+    async pay(ev) {
+        const selectedProvider = this.paymentProviderId;
+        // Replace 'authorize' with your actual payment.provider.code
+        if (selectedProvider && this.paymentProviderCode === "authorize") {
+            ev.preventDefault();
             ev.stopPropagation();
 
-            // Show nice Odoo popup
-            Dialog.confirm(this, 
-                "You will be charged an additional 3.5% fee for payments made via Authorize.Net. Do you want to continue?",
-                {
-                    confirm_callback: () => {
-                        this.el.submit(); // proceed after user confirms
-                    },
+            const confirmed = await new Promise((resolve) => {
+                this.dialogService.add(Dialog, {
                     title: "Payment Fee Notice",
-                }
-            );
+                    body: "You will be charged an additional 3.5% fee for payments made via Authorize.Net. Do you want to continue?",
+                    buttons: [
+                        { text: "Cancel", close: true, click: () => resolve(false) },
+                        { text: "Continue", primary: true, close: true, click: () => resolve(true) },
+                    ],
+                });
+            });
+
+            if (!confirmed) {
+                return;
+            }
         }
+        // Call the original pay method
+        await this._super(ev);
     },
 });
-
-export default publicWidget.registry.AuthorizeNetFeeNotice;
