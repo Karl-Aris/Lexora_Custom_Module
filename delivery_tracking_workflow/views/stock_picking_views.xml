@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Add fields to picking form & tree, plus search filters for your workflow -->
+  <record id="view_picking_form_delivery_monitoring" model="ir.ui.view">
+    <field name="name">stock.picking.form.delivery.monitoring</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+
+      <!-- Put fields in the "Additional Info" notebook if available, else after carrier -->
+      <xpath expr="//group[.//field[@name='carrier_tracking_ref']]" position="after">
+        <group string="Delivery Monitoring">
+          <field name="x_edd"/>
+          <field name="x_delivery_status"/>
+          <field name="x_followup_status" attrs="{'invisible': [('x_delivery_status','!=','delivered')]}"/>
+        </group>
+      </xpath>
+
+      <!-- Subtle hint in chatter -->
+      <xpath expr="//sheet" position="inside">
+        <label for="x_delivery_status" string="Delivery Status Flow"/>
+        <p class="o_form_label_help">
+          Shipped → (EDD reached) → Not Delivered on EDD → (manual/API) → In Transit / Delivered / Exception
+        </p>
+      </xpath>
+
+    </field>
+  </record>
+
+  <record id="view_picking_tree_delivery_monitoring" model="ir.ui.view">
+    <field name="name">stock.picking.tree.delivery.monitoring</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.vpicktree"/>
+    <field name="arch" type="xml">
+      <xpath expr="//tree" position="inside">
+        <field name="x_edd"/>
+        <field name="x_delivery_status"/>
+        <field name="x_followup_status"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Search filters / facets -->
+  <record id="view_picking_search_delivery_monitoring" model="ir.ui.view">
+    <field name="name">stock.picking.search.delivery.monitoring</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+    <field name="arch" type="xml">
+      <xpath expr="//search" position="inside">
+
+        <filter name="x_status_shipped"
+                string="Shipped"
+                domain="[('x_delivery_status', '=', 'shipped')]"/>
+
+        <filter name="x_status_in_transit"
+                string="In Transit"
+                domain="[('x_delivery_status', '=', 'in_transit')]"/>
+
+        <filter name="x_status_delivered"
+                string="Delivered"
+                domain="[('x_delivery_status', '=', 'delivered')]"/>
+
+        <filter name="x_status_not_delivered_on_edd"
+                string="Not Delivered on EDD"
+                domain="[('x_delivery_status', '=', 'not_delivered_on_edd')]"/>
+
+        <filter name="x_status_exception"
+                string="Exception"
+                domain="[('x_delivery_status', '=', 'exception')]"/>
+
+        <separator/>
+
+        <!-- EDD Today or Earlier -->
+        <filter name="x_edd_today_or_earlier"
+                string="EDD Today or Earlier"
+                domain="[('x_edd','!=',False),('x_edd','&lt;=', context_today())]"/>
+
+        <!-- Daily Check bucket: shipped + EDD <= today -->
+        <filter name="x_daily_check"
+                string="Daily Check (EDD Missed)"
+                domain="[('x_delivery_status','=','shipped'),('x_edd','!=',False),('x_edd','&lt;=', context_today())]"/>
+
+        <!-- Customer Follow-up -->
+        <filter name="x_followup_pending"
+                string="Follow-up Pending"
+                domain="[('x_delivery_status','=','delivered'),('x_followup_status','=','pending')]"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Optional: an action pre-filtered to 'Not Delivered on EDD' -->
+  <record id="action_picking_not_delivered_on_edd" model="ir.actions.act_window">
+    <field name="name">Pickings: Not Delivered on EDD</field>
+    <field name="res_model">stock.picking</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('x_delivery_status','=','not_delivered_on_edd')]</field>
+    <field name="context">{}</field>
+  </record>
+
+  <!-- Optional menu under Inventory / Operations -->
+  <menuitem id="menu_delivery_monitoring_root"
+            name="Delivery Monitoring"
+            parent="stock.menu_stock_warehouse_mgmt"
+            sequence="95"
+            action="action_picking_not_delivered_on_edd"/>
+</odoo>
