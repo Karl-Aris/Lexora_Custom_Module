@@ -7,8 +7,7 @@ import { Dialog } from "@web/core/dialog/dialog";
 patch(PaymentForm.prototype, "authorize_net_fee_notice", {
     async pay(ev) {
         const selectedProvider = this.paymentProviderId;
-        // Replace 'authorize' with your actual payment.provider.code
-        if (selectedProvider && this.paymentProviderCode === "authorize") {
+        if (selectedProvider && this.paymentProviderCode === "authorize") { // <-- must match your provider code
             ev.preventDefault();
             ev.stopPropagation();
 
@@ -27,7 +26,6 @@ patch(PaymentForm.prototype, "authorize_net_fee_notice", {
                 return;
             }
         }
-        // Call the original pay method
-        await this._super(ev);
+        return await super.pay(ev);
     },
 });
