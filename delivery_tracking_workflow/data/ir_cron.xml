@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Daily cron to auto-categorize missed EDD orders -->
+    <record id="ir_cron_auto_categorize_delivery_status" model="ir.cron">
+        <field name="name">Delivery: Auto-Categorize by EDD</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_auto_categorize_delivery_status()</field>
+        <field name="active" eval="True"/>
+        <!-- Run daily at 02:00 (server time) -->
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).replace(hour=2, minute=0, second=0, microsecond=0)"/>
+    </record>
+</odoo>
