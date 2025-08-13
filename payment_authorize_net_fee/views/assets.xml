@@ -1,9 +1,9 @@
 <odoo>
-  <data>
-    <template id="assets_frontend_inherit_authorize_net_fee" inherit_id="web.assets_frontend" name="AuthorizeNet Fee Popup">
-      <xpath expr="." position="inside">
-        <script type="text/javascript" src="/payment_authorize_net_fee/static/src/js/authorize_net_notice.js"/>
-      </xpath>
-    </template>
-  </data>
+    <data>
+        <template id="assets_frontend" inherit_id="web.assets_frontend">
+            <xpath expr="." position="inside">
+                <script type="module" src="/payment_authorize_net_fee/static/src/js/authorize_net_fee_notice.js"/>
+            </xpath>
+        </template>
+    </data>
 </odoo>
