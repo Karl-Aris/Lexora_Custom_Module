@@ -6,7 +6,7 @@
     "license": "LGPL-3",
     "depends": ["sale_management"],  # minimum: sale; using sale_management for standard views/actions
     "data": [
-        "data/ir_cron.xml",
+        "data/cron_update_delivery_status.xml",
         "views/sale_order_views.xml",
     ],
     "application": False,
