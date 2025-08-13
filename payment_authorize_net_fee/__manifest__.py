@@ -1,7 +1,7 @@
 {
     'name': 'Authorize.Net Payment Fee',
     'version': '1.0',
-    'summary': 'Show 3.5% surcharge notice when clicking Pay with Authorize.Net',
+    'summary': 'Show 3.5% surcharge notice when selecting Authorize.Net in checkout',
     'category': 'Accounting',
     'depends': ['payment', 'sale', 'account', 'website_sale', 'web'],
     'assets': {
