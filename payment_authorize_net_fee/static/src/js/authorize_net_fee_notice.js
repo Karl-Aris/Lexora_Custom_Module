@@ -1,17 +1,31 @@
 /** @odoo-module **/
 
 import publicWidget from "@web/legacy/js/public/public_widget";
+import Dialog from "@web/legacy/js/core/dialog";
 
 publicWidget.registry.AuthorizeNetFeeNotice = publicWidget.Widget.extend({
-    selector: '.o_payment_form', // This is the payment form container
+    selector: '.o_payment_form', // Payment form wrapper
     events: {
-        'change input[name="provider"]': '_onProviderChange',
+        'click button[type="submit"]': '_onPayClick',
     },
 
-    _onProviderChange: function (ev) {
-        const selectedValue = ev.currentTarget.value;
-        if (selectedValue === 'authorize') { // must match your provider_id.code
-            alert('You will be charged an additional 3.5% fee for payments made via Authorize.Net.');
+    _onPayClick: function (ev) {
+        const selectedProvider = this.$('input[name="provider"]:checked').val();
+
+        if (selectedProvider === 'authorize') {  // Must match payment.provider.code
+            ev.preventDefault(); // stop form from submitting
+            ev.stopPropagation();
+
+            // Show nice Odoo popup
+            Dialog.confirm(this, 
+                "You will be charged an additional 3.5% fee for payments made via Authorize.Net. Do you want to continue?",
+                {
+                    confirm_callback: () => {
+                        this.el.submit(); // proceed after user confirms
+                    },
+                    title: "Payment Fee Notice",
+                }
+            );
         }
     },
 });
