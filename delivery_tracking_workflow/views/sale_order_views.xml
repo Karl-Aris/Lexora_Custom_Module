@@ -1,82 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <!-- Inherit Sale Order Form: add Tracking + EDD + Delivery Status + Follow-up -->
-  <record id="view_order_form_delivery_tracking" model="ir.ui.view">
-    <field name="name">sale.order.form.delivery.tracking</field>
-    <field name="model">sale.order</field>
-    <field name="inherit_id" ref="sale.view_order_form"/>
-    <field name="arch" type="xml">
-      <xpath expr="//sheet/notebook" position="inside">
-        <page string="Delivery Tracking" name="delivery_tracking">
-          <group>
-            <group>
-              <field name="x_tracking_number"/>
-              <field name="x_edd_date"/>
-              <field name="delivery_status"/>
-              <field name="follow_up_status"/>
-            </group>
-            <group>
-              <field name="is_edd_today_or_earlier" readonly="1" invisible="1"/>
-              <field name="x_delivery_note" placeholder="Notes about delays, exceptions, or call outcomes..."/>
-            </group>
-          </group>
-          <separator string="Quick Actions"/>
-          <group col="6">
-            <button name="action_mark_in_transit" type="object" string="Mark In Transit" class="btn-secondary" attrs="{'invisible': [('delivery_status','in',['in_transit','delivered'])]}"/>
-            <button name="action_mark_delivered" type="object" string="Mark Delivered" class="btn-primary" attrs="{'invisible': [('delivery_status','=','delivered')]}"/>
-            <button name="action_mark_exception" type="object" string="Mark Exception" class="btn-danger"/>
-          </group>
-        </page>
-      </xpath>
-    </field>
-  </record>
+    <!-- Extend Sale Order Form View -->
+    <record id="view_order_form_delivery_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.delivery.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add tracking fields under "Other Information" tab -->
+            <xpath expr="//sheet/notebook/page[@name='other_information']" position="inside">
+                <group string="Delivery Tracking">
+                    <field name="tracking_number"/>
+                    <field name="estimated_delivery_date"/>
+                    <field name="delivery_status"/>
+                    <field name="follow_up_status"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
 
-  <!-- Inherit Tree/List View: show key columns -->
-  <record id="view_order_tree_delivery_tracking" model="ir.ui.view">
-    <field name="name">sale.order.tree.delivery.tracking</field>
-    <field name="model">sale.order</field>
-    <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
-    <field name="arch" type="xml">
-      <xpath expr="//tree" position="inside">
-        <field name="x_edd_date" optional="show"/>
-        <field name="delivery_status" optional="show"/>
-        <field name="follow_up_status" optional="show"/>
-      </xpath>
-    </field>
-  </record>
-
-  <!-- Search View: add filters for the workflow -->
-  <record id="view_order_filter_delivery_tracking" model="ir.ui.view">
-    <field name="name">sale.order.search.delivery.tracking</field>
-    <field name="model">sale.order</field>
-    <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-    <field name="arch" type="xml">
-      <xpath expr="//filter[@name='my_orders']" position="after">
-        <!-- Step 2: Daily Filter (EDD Today or Earlier & Shipped) -->
-        <filter string="Shipped &amp; EDD Today/Earlier" name="flt_shipped_edd_today" 
-                domain="[('delivery_status','=','shipped'), ('x_edd_date','&lt;=', context_today())]"/>
-
-        <!-- Step 4: Manual Tracking bucket -->
-        <filter string="Not Delivered on EDD" name="flt_not_delivered_on_edd"
-                domain="[('delivery_status','=','not_delivered_on_edd')]"/>
-
-        <!-- Step 5: Delivered & Follow-up Pending -->
-        <filter string="Delivered &amp; Follow-up Pending" name="flt_delivered_followup_pending"
-                domain="[('delivery_status','=','delivered'), ('follow_up_status','=','pending')]"/>
-
-        <!-- Status quick filters -->
-        <separator/>
-        <filter string="Shipped" name="flt_shipped" domain="[('delivery_status','=','shipped')]"/>
-        <filter string="In Transit" name="flt_in_transit" domain="[('delivery_status','=','in_transit')]"/>
-        <filter string="Delivered" name="flt_delivered" domain="[('delivery_status','=','delivered')]"/>
-        <filter string="Exception" name="flt_exception" domain="[('delivery_status','=','exception')]"/>
-      </xpath>
-
-      <!-- Group By helpers -->
-      <xpath expr="//group" position="inside">
-        <filter string="Delivery Status" name="grp_delivery_status" context="{'group_by':'delivery_status'}"/>
-        <filter string="EDD" name="grp_edd" context="{'group_by':'x_edd_date'}"/>
-      </xpath>
-    </field>
-  </record>
+    <!-- Optional Search Filter for Delivery Status -->
+    <record id="view_sale_order_filter_delivery_tracking" model="ir.ui.view">
+        <field name="name">sale.order.search.delivery.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_orders']" position="after">
+                <filter string="Delivered"
+                        name="delivered"
+                        domain="[('delivery_status', '=', 'delivered')]"/>
+                <filter string="In Transit"
+                        name="in_transit"
+                        domain="[('delivery_status', '=', 'in_transit')]"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
