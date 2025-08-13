@@ -4,8 +4,8 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Put fields into the 'Other Info' tab -->
-            <xpath expr="//page[@string='Other Info']/group" position="inside">
+            <!-- Use the XML structure instead of string selector -->
+            <xpath expr="//page[@name='other_info']/group" position="inside">
                 <group string="Delivery Tracking">
                     <field name="tracking_number"/>
                     <field name="estimated_delivery_date"/>
