@@ -4,14 +4,15 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='other_info']" position="inside">
-                <group string="Delivery Tracking">
-                    <field name="delivery_tracking_number"/>
-                    <field name="delivery_edd"/>
+            <xpath expr="//page[@name='extra']" position="inside">
+                <group>
+                    <field name="tracking_number"/>
+                    <field name="estimated_delivery_date"/>
                     <field name="delivery_status"/>
                     <field name="follow_up_status"/>
                 </group>
             </xpath>
+
         </field>
     </record>
 </odoo>
