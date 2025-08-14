@@ -27,6 +27,17 @@ class SaleOrder(models.Model):
             ('estimated_delivery_date', '<=', today)
         ])
         for order in orders:
-            # Placeholder for API logic
             order.x_delivery_status = 'not_delivered_edd'
-            order.message_post(body=f"Auto-updated delivery status to 'Not Delivered on EDD' as of {today}.")
+
+            # 1. Post to chatter
+            message = f"Auto-updated delivery status to 'Not Delivered on EDD' as of {today}."
+            order.message_post(body=message, subtype_xmlid="mail.mt_note")
+
+            # 2. Trigger notification to salesperson
+            if order.user_id:
+                order.activity_schedule(
+                    activity_type_xmlid="mail.mail_activity_data_todo",
+                    summary="Order missed estimated delivery date",
+                    note=message,
+                    user_id=order.user_id.id
+                )
