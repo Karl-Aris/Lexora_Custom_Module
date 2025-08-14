@@ -4,13 +4,6 @@ from datetime import date
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    tracking_number = fields.Char(
-        string="Tracking Number",
-        related="carrier_tracking_ref",
-        store=True,
-        readonly=False
-    )
-
     x_delivery_status = fields.Selection([
         ('shipped', 'Shipped'),
         ('in_transit', 'In Transit'),
@@ -19,8 +12,8 @@ class SaleOrder(models.Model):
         ('exception', 'Exception')
     ], string="Delivery Status", default='shipped')
 
+    tracking_number = fields.Char(string="Tracking Number")
     estimated_delivery_date = fields.Date(string="Estimated Delivery Date")
-
     follow_up_status = fields.Selection([
         ('pending', 'Pending'),
         ('done', 'Done')
@@ -34,6 +27,6 @@ class SaleOrder(models.Model):
             ('estimated_delivery_date', '<=', today)
         ])
         for order in orders:
-            # Placeholder for API integration
+            # Placeholder for API logic
             order.x_delivery_status = 'not_delivered_edd'
             order.message_post(body=f"Auto-updated delivery status to 'Not Delivered on EDD' as of {today}.")
