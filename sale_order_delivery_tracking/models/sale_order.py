@@ -10,14 +10,16 @@ class SaleOrder(models.Model):
         ('delivered', 'Delivered'),
         ('not_delivered_edd', 'Not Delivered on EDD'),
         ('exception', 'Exception')
-    ], string="Delivery Status", default='shipped')
+    ], string="Delivery Status", default=False)  # no default, starts blank
 
     tracking_number = fields.Char(string="Tracking Number")
+
     estimated_delivery_date = fields.Date(string="Estimated Delivery Date")
+
     follow_up_status = fields.Selection([
         ('pending', 'Pending'),
         ('done', 'Done')
-    ], string="Follow-Up Status", default='pending')
+    ], string="Follow-Up Status", default=False)  # no default, starts blank
 
     @api.model
     def update_delivery_status_daily(self):
@@ -29,4 +31,6 @@ class SaleOrder(models.Model):
         for order in orders:
             # Placeholder for API logic
             order.x_delivery_status = 'not_delivered_edd'
-            order.message_post(body=f"Auto-updated delivery status to 'Not Delivered on EDD' as of {today}.")
+            order.message_post(
+                body=f"Auto-updated delivery status to 'Not Delivered on EDD' as of {today}."
+            )
