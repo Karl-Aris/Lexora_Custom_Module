@@ -15,9 +15,9 @@ FEDEX_DEFAULT_PROD = "https://apis.fedex.com"
 
 
 class DeliveryCarrier(models.Model):
-    _inherit = "delivery.carrier"
+    _inherit = 'delivery.carrier'
 
-   delivery_type = fields.Selection(
+    delivery_type = fields.Selection(
         selection_add=[('fedex', 'FedEx')],
         ondelete={'fedex': 'cascade'}
     )
