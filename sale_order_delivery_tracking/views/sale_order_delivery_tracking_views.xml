@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <!-- Robust XPath targeting the page by its title -->
-            <xpath expr="//sheet//notebook/page[h2[contains(text(), 'Other Information')]]" position="inside">
+            <xpath expr="//sheet//notebook/page[@name='other_information']" position="inside">
                 <group string="Delivery Tracking">
                     <field name="tracking_number"/>
                     <field name="estimated_delivery_date"/>
