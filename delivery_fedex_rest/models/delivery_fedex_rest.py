@@ -18,8 +18,8 @@ class DeliveryCarrier(models.Model):
     _inherit = 'delivery.carrier'
 
     delivery_type = fields.Selection(
-        selection_add=[('fedex', 'FedEx')],
-        ondelete={'fedex': 'cascade'}
+        selection_add=[('fedex_rest', "FedEx (REST)")],
+        ondelete={'fedex_rest': 'set default'}
     )
 
     # Auth / configuration
