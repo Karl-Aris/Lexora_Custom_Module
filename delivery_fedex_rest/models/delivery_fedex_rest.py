@@ -17,7 +17,10 @@ FEDEX_DEFAULT_PROD = "https://apis.fedex.com"
 class DeliveryCarrier(models.Model):
     _inherit = "delivery.carrier"
 
-    delivery_type = fields.Selection(selection_add=[("fedex_rest", "FedEx (REST)")])
+   delivery_type = fields.Selection(
+        selection_add=[('fedex', 'FedEx')],
+        ondelete={'fedex': 'cascade'}
+    )
 
     # Auth / configuration
     fedex_rest_api_key = fields.Char("FedEx API Key (Client ID)")
