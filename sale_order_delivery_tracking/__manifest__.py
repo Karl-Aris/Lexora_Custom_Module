@@ -1,16 +1,15 @@
+# -*- coding: utf-8 -*-
 {
-    'name': 'Sale Order Tracking Status',
-    'version': '17.0.1.0.0',
-    'summary': 'Track delivery status in sale orders',
-    'category': 'Sales',
-    'author': 'Custom',
-    'website': '',
-    'depends': ['sale_management'],
-    'data': [
-        'views/sale_order_view.xml',
-        'data/cron.xml',
+    "name": "Sale Order Tracking (Enhanced, FedEx-ready)",
+    "version": "17.0.1.0",
+    "summary": "Real-time tracking via carrier APIs (FedEx first), with chatter history & cron",
+    "license": "LGPL-3",
+    "category": "Sales/Sales",
+    "depends": ["sale_management", "mail", "stock"],
+    "data": [
+        "views/sale_order_views.xml",
+        "data/ir_cron.xml",
     ],
-    'installable': True,
-    'application': False,
-    'license': 'LGPL-3',
+    "installable": True,
+    "application": False,
 }
