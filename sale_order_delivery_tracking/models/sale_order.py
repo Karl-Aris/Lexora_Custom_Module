@@ -143,3 +143,4 @@ class SaleOrder(models.Model):
         # Common mappings
         table = {
             "delivered": "delivered",
+        }
