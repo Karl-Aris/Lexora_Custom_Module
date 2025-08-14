@@ -1,14 +1,16 @@
 {
-    'name': 'Sale Order Delivery Tracking',
-    'version': '1.0',
+    'name': 'Sale Order Tracking Status',
+    'version': '17.0.1.0.0',
+    'summary': 'Track delivery status in sale orders',
     'category': 'Sales',
-    'summary': 'Track delivery status, EDD, and follow-up in Sale Orders',
-    'description': 'Custom module to track delivery status, EDD, and customer follow-ups.',
-    'depends': ['sale'],
+    'author': 'Custom',
+    'website': '',
+    'depends': ['sale_management'],
     'data': [
-        'views/sale_order_delivery_tracking_views.xml',
-        'data/sale_order_delivery_tracking_data.xml',
+        'views/sale_order_view.xml',
+        'data/cron.xml',
     ],
     'installable': True,
     'application': False,
+    'license': 'LGPL-3',
 }
