@@ -12,7 +12,9 @@ class SaleOrder(models.Model):
         ('exception', 'Exception')
     ], string="Delivery Status", default='shipped')
 
-    tracking_number = fields.Char(string="Tracking Number")
+    # Using built-in Odoo tracking field instead of custom
+    carrier_tracking_ref = fields.Char(string="Tracking Number")
+
     estimated_delivery_date = fields.Date(string="Estimated Delivery Date")
     follow_up_status = fields.Selection([
         ('pending', 'Pending'),
@@ -28,12 +30,12 @@ class SaleOrder(models.Model):
         ])
         for order in orders:
             order.x_delivery_status = 'not_delivered_edd'
-
-            # 1. Post to chatter
             message = f"Auto-updated delivery status to 'Not Delivered on EDD' as of {today}."
+
+            # Chatter log
             order.message_post(body=message, subtype_xmlid="mail.mt_note")
 
-            # 2. Trigger notification to salesperson
+            # Notification for salesperson
             if order.user_id:
                 order.activity_schedule(
                     activity_type_xmlid="mail.mail_activity_data_todo",
