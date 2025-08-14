@@ -5,7 +5,7 @@
     <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
     <field name="arch" type="xml">
       <xpath expr="//group[@name='provider_details']" position="inside">
-        <group attrs="{'invisible':[('delivery_type','!=','fedex_rest')]}" string="FedEx (REST) Configuration">
+        <group t-if="record.delivery_type.raw_value == 'fedex_rest'" string="FedEx (REST) Configuration">
           <group>
             <field name="fedex_rest_api_key" password="True"/>
             <field name="fedex_rest_api_secret" password="True"/>
