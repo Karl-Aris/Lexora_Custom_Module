@@ -4,7 +4,8 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet/notebook/page[@string='Other Information']" position="inside">
+            <!-- Corrected XPath using name instead of string -->
+            <xpath expr="//sheet/notebook/page[@name='sale_order_information']" position="inside">
                 <group string="Delivery Tracking">
                     <field name="tracking_number"/>
                     <field name="estimated_delivery_date"/>
