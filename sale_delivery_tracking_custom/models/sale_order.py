@@ -3,7 +3,7 @@ from odoo import models, fields
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    delivery_status = fields.Selection([
+    x_delivery_status = fields.Selection([
         ('not_delivered', 'Not Delivered'),
         ('delivered', 'Delivered'),
         ('exception', 'Exception'),
