@@ -5,12 +5,14 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <!-- Add inside the 'Group By' group -->
-            <group expand="0" string="Group By" position="inside">
+
+            <!-- Target the 'group by' section by its filter_group div -->
+            <xpath expr="//filter[@name='date_order']" position="after">
                 <filter string="Delivery Status"
-                        name="groupby_delivery_status"
-                        context="{'group_by': 'x_delivery_status'}"/>
-            </group>
+                        name="group_by_delivery_status"
+                        context="{'group_by':'x_delivery_status'}"/>
+            </xpath>
+
         </field>
     </record>
 </odoo>
