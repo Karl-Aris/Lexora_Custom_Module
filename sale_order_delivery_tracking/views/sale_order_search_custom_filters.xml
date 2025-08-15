@@ -1,71 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_sale_order_search_custom_filters" model="ir.ui.view">
-        <field name="name">sale.order.search.filters.custom</field>
+    <record id="sale_order_custom_search" model="ir.ui.view">
+        <field name="name">sale.order.search.custom.filters</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='my_quotations']" position="after">
+            <search>
+                <!-- Filter by Picking In -->
+                <filter string="Picking In" name="filter_picking_in"
+                        domain="[('x_picking_in','!=',False)]"/>
                 
-                <!-- 1. ETD Missing -->
-                <filter name="etd_missing" string="ETD Missing"
-                        domain="[('delivery_status', 'in', ['','not_delivered']),
-                                 ('etd', '=', False),
-                                 ('carrier_tracking_ref', '!=', False),
-                                 ('carrier_id', '!=', False)]"/>
-
-                <!-- 2. Missed ETD – Not Delivered -->
-                <filter name="missed_etd_not_delivered" string="Missed ETD - Not Delivered"
-                        domain="[('etd','&lt;', context_today()),
-                                 ('delivery_status','=','not_delivered'),
-                                 ('carrier_tracking_ref','!=', False),
-                                 ('carrier_id','!=', False)]"/>
-
-                <!-- 3. Same-Day ETD – Not Delivered Yet -->
-                <filter name="same_day_etd_not_delivered" string="Same-Day ETD - Not Delivered"
-                        domain="[('etd','=', context_today()),
-                                 ('delivery_status','=','not_delivered'),
-                                 ('carrier_tracking_ref','!=', False),
-                                 ('carrier_id','!=', False)]"/>
-
-                <!-- 4. Delivered – Not Contacted -->
-                <filter name="delivered_not_contacted" string="Delivered - Not Contacted"
-                        domain="[('delivery_status','=','delivered'),
-                                 ('contacted','=', False),
-                                 ('carrier_tracking_ref','!=', False),
-                                 ('carrier_id','!=', False)]"/>
-
-                <!-- 5. Delivered – Contacted but Notes Present -->
-                <filter name="delivered_contacted_notes" string="Delivered - Contacted w/ Notes"
-                        domain="[('delivery_status','=','delivered'),
-                                 ('contacted','=', True),
-                                 ('contact_notes','!=', False)]"/>
-
-                <!-- 6. Follow-Up Required – Open -->
-                <filter name="followup_open" string="Follow-Up Required - Open"
-                        domain="[('follow_up_required','=', True),
-                                 '|', ('delivery_status','!=','delivered'),
-                                      ('contacted','=', False)]"/>
-
-                <!-- 7. Actual Delivery Date Missing -->
-                <filter name="actual_delivery_missing" string="Actual Delivery Date Missing"
-                        domain="[('delivery_status','=','delivered'),
-                                 ('actual_delivery_date','=', False)]"/>
-
-                <!-- 8. Delivery Status Missing -->
-                <filter name="delivery_status_missing" string="Delivery Status Missing"
-                        domain="[('delivery_status','=', False),
-                                 ('carrier_tracking_ref','!=', False),
-                                 ('carrier_id','!=', False)]"/>
-
-                <!-- 9. ETD Today & Delivered but Not Contacted -->
-                <filter name="etd_today_delivered_not_contacted" string="ETD Today & Delivered - Not Contacted"
-                        domain="[('etd','=', context_today()),
-                                 ('delivery_status','=','delivered'),
-                                 ('contacted','=', False),
-                                 ('carrier_tracking_ref','!=', False),
-                                 ('carrier_id','!=', False)]"/>
-
-            </xpath>
+                <!-- Filter by Delivery Out -->
+                <filter string="Delivery Out" name="filter_delivery_out"
+                        domain="[('x_delivery_out','!=',False)]"/>
+                
+                <!-- Custom filter using multiple stock pickings -->
+                <filter string="WH/PICK &amp; WH/OUT" name="filter_pick_out"
+                        domain="['|',('x_picking_in','!=',False),('x_delivery_out','!=',False)]"/>
+            </search>
         </field>
     </record>
 </odoo>
