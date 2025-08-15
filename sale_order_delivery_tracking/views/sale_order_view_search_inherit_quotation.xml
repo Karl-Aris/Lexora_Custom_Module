@@ -1,15 +1,21 @@
 <odoo>
-    <record id="sale_order_search_inherit_quotation_custom" model="ir.ui.view">
-        <field name="name">sale.order.search.inherit.quotation.custom</field>
+    <record id="sale_order_search_inherit_quotation_delivery_status" model="ir.ui.view">
+        <field name="name">sale.order.search.inherit.quotation.delivery.status</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
         <field name="arch" type="xml">
-            <!-- Insert new filters into the existing Group By / Filters area -->
-            <xpath expr="//filter[@name='is_local']" position="after">
-                <separator/>
-                <filter string="Shipped" name="filter_shipped" domain="[('state', '=', 'shipped')]"/>
-                <filter string="Returned" name="filter_returned" domain="[('state', '=', 'returned')]"/>
-                <filter string="Cancelled" name="filter_cancelled" domain="[('state', '=', 'cancel')]"/>
+            <!-- Add Delivery Status dropdown under Group By -->
+            <xpath expr="//group[@name='group_by']" position="inside">
+                <filter string="Delivery Status"
+                        name="group_delivery_status"
+                        context="{'group_by':'x_delivery_status'}"/>
+            </xpath>
+
+            <!-- Optional: Add quick filters for specific statuses -->
+            <xpath expr="//search" position="inside">
+                <filter string="Pending" name="filter_pending" domain="[('x_delivery_status','=','pending')]"/>
+                <filter string="Shipped" name="filter_shipped" domain="[('x_delivery_status','=','shipped')]"/>
+                <filter string="Delivered" name="filter_delivered" domain="[('x_delivery_status','=','delivered')]"/>
             </xpath>
         </field>
     </record>
