@@ -3,10 +3,11 @@
     'version': '1.0',
     'category': 'Sales',
     'summary': 'Adds delivery tracking fields to Sales Orders under Other Information tab',
-    'author': 'Carl & ChatGPT',
+    'author': 'Carl',
     'depends': ['sale'],
     'data': [
         'views/sale_order_views.xml',
+        'views/sale_order_search_custom_filters.xml',
     ],
     'installable': True,
     'application': False,
