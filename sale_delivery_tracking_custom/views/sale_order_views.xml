@@ -1,7 +1,5 @@
 <odoo>
-    <!-- ===================== -->
     <!-- Form view: Delivery Tracking fields -->
-    <!-- ===================== -->
     <record id="view_order_form_inherit_delivery_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.delivery.tracking</field>
         <field name="model">sale.order</field>
@@ -20,16 +18,14 @@
         </field>
     </record>
 
-    <!-- ===================== -->
     <!-- Search view: Delivery Status group-by dropdown -->
-    <!-- ===================== -->
     <record id="view_sale_order_filter_custom" model="ir.ui.view">
         <field name="name">sale.order.filter.custom</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <!-- Insert group-by dropdown after the month filter -->
-            <xpath expr="//filter[@name='order_month']" position="after">
+            <!-- Append group directly inside search root -->
+            <xpath expr="/search" position="inside">
                 <group string="Delivery Status" name="group_by_delivery_status"
                        context="{'group_by':'x_delivery_status'}"/>
             </xpath>
