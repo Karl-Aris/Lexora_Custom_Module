@@ -1,1 +1,19 @@
-<odoo> <!-- Form view fields inside Other Information --> <record id="view_order_form_inherit_delivery_tracking" model="ir.ui.view"> <field name="name">sale.order.form.delivery.tracking</field> <field name="model">sale.order</field> <field name="inherit_id" ref="sale.view_order_form"/> <field name="arch" type="xml"> <xpath expr="//page[@name='other_information']/group" position="inside"> <group string="Delivery Tracking"> <field name="x_delivery_status"/> <field name="etd"/> <field name="follow_up_required"/> <field name="actual_delivery_date"/> <field name="contacted"/> <field name="contact_notes"/> </group> </xpath> </field> </record> </odoo>
+<odoo> 
+  <!-- Form view fields inside Other Information --> 
+  <record id="view_order_form_inherit_delivery_tracking" model="ir.ui.view"> 
+    <field name="name">sale.order.form.delivery.tracking</field> <field name="model">sale.order</field> 
+    <field name="inherit_id" ref="sale.view_order_form"/> 
+    <field name="arch" type="xml"> 
+      <xpath expr="//page[@name='other_information']/group" position="inside"> 
+        <group string="Delivery Tracking"> 
+          <field name="x_delivery_status"/> 
+          <field name="etd"/> 
+          <field name="follow_up_required"/> 
+          <field name="actual_delivery_date"/> 
+          <field name="contacted"/> 
+          <field name="contact_notes"/> 
+        </group> 
+      </xpath> 
+    </field> 
+  </record> 
+</odoo>
