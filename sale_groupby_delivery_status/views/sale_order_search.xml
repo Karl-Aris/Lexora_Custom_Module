@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Inherit the Sales Order search view to add a Group By for Delivery Status -->
+    <record id="view_order_filter_inherit_delivery_status" model="ir.ui.view">
+        <field name="name">sale.order.filter.delivery.status</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <!-- Insert after an existing groupby (Order Date) to appear in the Group By section -->
+            <xpath expr="//filter[@context="{'group_by': 'date_order'}"]" position="after">
+                <filter string="Delivery Status"
+                        name="groupby_delivery_status"
+                        context="{'group_by': 'x_delivery_status'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
