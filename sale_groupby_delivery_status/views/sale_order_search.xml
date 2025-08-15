@@ -6,8 +6,8 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <!-- Insert after an existing groupby (Order Date) to appear in the Group By section -->
-            <xpath expr="//filter[@context="{'group_by': 'date_order'}"]" position="after">
+            <!-- Insert after the existing 'groupby_order_date' filter -->
+            <xpath expr="//filter[@name='groupby_order_date']" position="after">
                 <filter string="Delivery Status"
                         name="groupby_delivery_status"
                         context="{'group_by': 'x_delivery_status'}"/>
