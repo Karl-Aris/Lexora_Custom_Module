@@ -1,5 +1,5 @@
 <odoo>
-    <!-- Form view inheritance -->
+    <!-- Existing form view -->
     <record id="view_order_form_inherit_delivery_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.delivery.tracking</field>
         <field name="model">sale.order</field>
@@ -18,18 +18,15 @@
         </field>
     </record>
 
-    <!-- Search view filter for Delivery Status -->
-    <record id="view_order_filter_inherit_delivery_status" model="ir.ui.view">
-        <field name="name">sale.order.filter.delivery.status</field>
+    <!-- Add Group By option -->
+    <record id="view_order_search_inherit_delivery_status" model="ir.ui.view">
+        <field name="name">sale.order.search.delivery.status</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_filter"/>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='my_orders']" position="after">
-                <filter string="Delivery Status" name="x_delivery_status" select="multi">
-                    <filter string="Pending" domain="[('x_delivery_status','=','pending')]"/>
-                    <filter string="Shipped" domain="[('x_delivery_status','=','shipped')]"/>
-                    <filter string="Delivered" domain="[('x_delivery_status','=','delivered')]"/>
-                </filter>
+            <xpath expr="//filter[@name='group_by']" position="inside">
+                <filter string="Delivery Status" name="group_by_delivery_status"
+                        context="{'group_by': 'x_delivery_status'}"/>
             </xpath>
         </field>
     </record>
