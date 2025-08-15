@@ -7,7 +7,6 @@
     'depends': ['sale'],
     'data': [
         'views/sale_order_views.xml',
-        'views/sale_order_search_custom_filters.xml',
     ],
     'installable': True,
     'application': False,
