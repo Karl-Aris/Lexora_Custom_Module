@@ -4,9 +4,10 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- Add fields inside the "Other Information" tab -->
             <xpath expr="//page[@name='other_information']/group" position="inside">
                 <group string="Delivery Tracking">
-                    <field name="delivery_status"/>
+                    <field name="x_delivery_status"/>
                     <field name="etd"/>
                     <field name="follow_up_required"/>
                     <field name="actual_delivery_date"/>
