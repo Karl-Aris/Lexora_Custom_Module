@@ -15,10 +15,11 @@
 
                 <!-- 2. Missed ETD – Not Delivered -->
                 <filter name="missed_etd_not_delivered" string="Missed ETD - Not Delivered"
-                        domain="[('etd','&lt;', context_today()),
+                        domain="[('etd','<', context_today()),
                                  ('delivery_status','=','not_delivered'),
                                  ('carrier_tracking_ref','!=', False),
                                  ('carrier_id','!=', False)]"/>
+
 
                 <!-- 3. Same-Day ETD – Not Delivered Yet -->
                 <filter name="same_day_etd_not_delivered" string="Same-Day ETD - Not Delivered"
