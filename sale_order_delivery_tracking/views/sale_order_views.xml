@@ -17,31 +17,4 @@
             </xpath>
         </field>
     </record>
-
-    <!-- Add Group By option -->
-   <record id="sale_order_view_search_inherit_quotation" model="ir.ui.view">
-        <field name="name">sale.order.view.search.inherit.quotation</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_filter"/>
-        <field name="arch" type="xml">
-            
-            <!-- Add Filters -->
-            <xpath expr="//filter[@name='my_quotations']" position="after">
-                <separator/>
-                <filter string="Pending" name="filter_pending"
-                        domain="[('x_delivery_status', '=', 'pending')]"/>
-                <filter string="Shipped" name="filter_shipped"
-                        domain="[('x_delivery_status', '=', 'shipped')]"/>
-                <filter string="Delivered" name="filter_delivered"
-                        domain="[('x_delivery_status', '=', 'delivered')]"/>
-            </xpath>
-
-            <!-- Add Group By -->
-            <xpath expr="//group[@name='group_by']" position="inside">
-                <filter string="Delivery Status" name="group_by_x_delivery_status"
-                        context="{'group_by':'x_delivery_status'}"/>
-            </xpath>
-
-        </field>
-    </record>
 </odoo>
