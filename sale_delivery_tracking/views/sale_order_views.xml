@@ -1,0 +1,37 @@
+<odoo>
+    <record id="view_order_form_delivery_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.delivery.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_information']/group" position="inside">
+                <group string="Delivery Tracking">
+                    <field name="delivery_status"/>
+                    <field name="etd"/>
+                    <field name="follow_up_required"/>
+                    <field name="actual_delivery_date"/>
+                    <field name="contacted"/>
+                    <field name="contact_notes"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Filters -->
+    <record id="view_order_search_delivery_tracking" model="ir.ui.view">
+        <field name="name">sale.order.search.delivery.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <filter string="Delivery Pending" name="delivery_pending" domain="[('delivery_status','=','pending')]"/>
+            <filter string="Delivery Shipped" name="delivery_shipped" domain="[('delivery_status','=','shipped')]"/>
+            <filter string="Delivery Completed" name="delivery_completed" domain="[('delivery_status','=','delivered')]"/>
+            <filter string="Follow Up Required" name="follow_up_required" domain="[('follow_up_required','=',True)]"/>
+            <filter string="Contacted" name="contacted" domain="[('contacted','=',True)]"/>
+            <filter string="Not Contacted" name="not_contacted" domain="[('contacted','=',False)]"/>
+            <filter string="ETD Passed" name="etd_passed" domain="[('etd','&lt;', context_today())]"/>
+            <filter string="No ETD" name="no_etd" domain="[('etd','=',False)]"/>
+            <filter string="Delivered Late" name="delivered_late" domain="[('actual_delivery_date','&gt;','etd')]"/>
+        </field>
+    </record>
+</odoo>
