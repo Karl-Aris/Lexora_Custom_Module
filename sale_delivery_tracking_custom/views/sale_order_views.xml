@@ -1,5 +1,5 @@
 <odoo>
-    <!-- Form view: Add Delivery Tracking fields to Other Information -->
+    <!-- Form view fields inside Other Information -->
     <record id="view_order_form_inherit_delivery_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.delivery.tracking</field>
         <field name="model">sale.order</field>
@@ -18,22 +18,20 @@
         </field>
     </record>
 
-    <!-- Search view: Add Delivery Status filters & group by -->
+    <!-- Search view filters and group-by -->
     <record id="view_sale_order_search_inherit_delivery_status" model="ir.ui.view">
         <field name="name">sale.order.search.inherit.delivery.status</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sale_order_filter"/>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-            <!-- Insert after Order Month -->
             <xpath expr="//filter[@name='order_month']" position="after">
-                <!-- Group by shipped date (existing logic example) -->
+                <!-- Group By: Delivery Status -->
                 <filter name="group_by_delivery_status"
                         string="Delivery Status"
                         context="{'group_by': 'x_delivery_status'}"/>
 
-                <!-- Delivery Status section -->
+                <!-- Quick filters -->
                 <separator string="Delivery Status"/>
-                <!-- Child filters -->
                 <filter name="delivery_status_not_delivered"
                         string="Not Delivered"
                         domain="[('x_delivery_status', '=', 'not_delivered')]"/>
