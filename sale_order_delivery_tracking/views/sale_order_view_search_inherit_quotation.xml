@@ -2,24 +2,22 @@
     <record id="sale_order_view_search_inherit_quotation" model="ir.ui.view">
         <field name="name">sale.order.view.search.inherit.quotation</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_filter"/>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
 
-            <!-- Filters for x_delivery_status -->
-            <xpath expr="//filter[@name='my_quotations']" position="after">
-                <separator/>
-                <filter string="Pending" name="filter_pending"
-                        domain="[('x_delivery_status', '=', 'pending')]"/>
-                <filter string="Shipped" name="filter_shipped"
-                        domain="[('x_delivery_status', '=', 'shipped')]"/>
-                <filter string="Delivered" name="filter_delivered"
-                        domain="[('x_delivery_status', '=', 'delivered')]"/>
+            <!-- Add filters for Delivery Status -->
+            <xpath expr="//filter[@name='my_orders']" position="after">
+                <filter string="Pending Delivery" name="pending_delivery"
+                        domain="[('x_delivery_status','=','pending')]"/>
+                <filter string="Shipped" name="shipped"
+                        domain="[('x_delivery_status','=','shipped')]"/>
+                <filter string="Delivered" name="delivered"
+                        domain="[('x_delivery_status','=','delivered')]"/>
             </xpath>
 
-            <!-- Group By for x_delivery_status -->
+            <!-- Add Group By for Delivery Status -->
             <xpath expr="//group[@name='group_by']" position="inside">
-                <filter string="Delivery Status"
-                        name="group_by_x_delivery_status"
+                <filter string="Delivery Status" name="group_by_delivery_status"
                         context="{'group_by':'x_delivery_status'}"/>
             </xpath>
 
