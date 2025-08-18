@@ -1,5 +1,5 @@
 <odoo>
-    <!-- Form View: Delivery Tracking fields -->
+    <!-- Existing form view -->
     <record id="view_order_form_inherit_delivery_tracking" model="ir.ui.view">
         <field name="name">sale.order.form.delivery.tracking</field>
         <field name="model">sale.order</field>
@@ -17,46 +17,25 @@
             </xpath>
         </field>
     </record>
-        <!-- Search View: Custom Filters under Delivery Tracking -->
-        <record id="sale_order_view_search_inherit_quotation" model="ir.ui.view">
-        <field name="name">sale.order.search.inherit.quotation</field>
+
+    <!-- Custom Search View -->
+    <record id="sale_order_search_inherit_delivery_tracking" model="ir.ui.view">
+        <field name="name">sale.order.search.inherit.delivery.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
-    
-          <xpath expr="//filter[@name='my_quotations']" position="after">
-            <filter string="Delivery Tracking" name="delivery_tracking_group" context="{'group_by':None}">
-              <group expand="0" string="Delivery Tracking">
-                
-                <!-- Delivery Status Filters -->
-                <filter string="Shipped"
-                        name="delivery_status_shipped"
-                        domain="[('x_delivery_status','=','shipped')]"/>
-                <filter string="Not Shipped"
-                        name="delivery_status_not_shipped"
-                        domain="[('x_delivery_status','=','not_shipped')]"/>
-                <filter string="Partially Shipped"
-                        name="delivery_status_partial"
-                        domain="[('x_delivery_status','=','partial')]"/>
-                
-                <!-- ETD Filters -->
-                <filter string="ETD Today"
-                        name="etd_today"
-                        domain="[('x_etd','=','today')]"/>
-                <filter string="ETD Tomorrow"
-                        name="etd_tomorrow"
-                        domain="[('x_etd','=','tomorrow')]"/>
-                <filter string="ETD Next Week"
-                        name="etd_next_week"
-                        domain="[('x_etd','=','next_week')]"/>
-                
-                <!-- Combined Custom Filter -->
-                <filter string="ETD Today &amp; Delivered but Not Contacted"
-                        name="etd_today_delivered_not_contacted"
-                        domain="[('x_etd','=','today'), ('x_delivery_status','=','delivered'), ('x_contacted','=',False), ('carrier_tracking_ref','!=',False), ('x_studio_carrier','!=',False)]"/>
-              </group>
-            </filter>
-          </xpath>
+            <field name="partner_id" position="after">
+                <group expand="0" string="Delivery Tracking">
+                    <filter string="Delivery Status"
+                            name="x_delivery_status_filter"
+                            domain="[]"
+                            context="{'group_by': 'x_delivery_status'}"/>
+                    <filter string="ETD"
+                            name="x_etd_filter"
+                            domain="[]"
+                            context="{'group_by': 'x_etd'}"/>
+                </group>
+            </field>
         </field>
-      </record>
+    </record>
 </odoo>
