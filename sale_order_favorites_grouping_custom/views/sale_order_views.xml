@@ -2,12 +2,14 @@
     <record id="view_order_filter_inherit_favorites" model="ir.ui.view">
         <field name="name">sale.order.filter.inherit.favorites</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="inherit_id" ref="sale.view_order_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
-                <filter string="Open Orders" domain="[('state', '=', 'sale')]"/>
-                <filter string="Shipped" domain="[('x_shipped_date', '!=', False)]" context="{'group_by':'x_shipped_date'}"/>
-                <filter string="Cancelled" domain="[('state','=','cancel')]"/>
+            <xpath expr="//filter[@name='my_favorite_filter']" position="after">
+                <filter string="Open Orders" name="open_orders" domain="[('state', '=', 'sale')]" context="{'group_by':'state'}">
+                    <filter string="Shipped" domain="[('x_studio_date_shipped', '!=', False)]" context="{'group_by':'x_studio_date_shipped'}"/>
+                    <filter string="Delivered" domain="[('x_studio_date_delivered', '!=', False)]" context="{'group_by':'x_studio_date_delivered'}"/>
+                    <filter string="Partially Delivered" domain="[('x_studio_date_partial_delivery', '!=', False)]" context="{'group_by':'x_studio_date_partial_delivery'}"/>
+                </filter>
             </xpath>
         </field>
     </record>
