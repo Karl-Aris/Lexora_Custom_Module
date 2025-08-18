@@ -17,28 +17,4 @@
             </xpath>
         </field>
     </record>
-
-    <!-- Custom Search View -->
-    <record id="sale_order_search_inherit_delivery_tracking" model="ir.ui.view">
-        <field name="name">sale.order.search.inherit.delivery.tracking</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-        <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-                <group expand="0" string="Delivery Tracking">
-                    
-                    <filter string="Delivery Status"
-                            name="x_delivery_status_filter"
-                            domain="[]"
-                            context="{'group_by': 'x_delivery_status'}"/>
-    
-                    <filter string="ETD"
-                            name="x_etd_filter"
-                            domain="[]"
-                            context="{'group_by': 'x_etd'}"/>
-
-                </group>
-            </field>
-        </field>
-    </record>
 </odoo>
