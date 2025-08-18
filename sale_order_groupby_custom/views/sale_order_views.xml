@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_sale_order_filter_inherit_groupby" model="ir.ui.view">
-        <field name="name">sale.order.search.groupby.custom</field>
+    <record id="view_order_tree_inherit_custom_favorites" model="ir.ui.view">
+        <field name="name">sale.order.tree.inherit.custom.favorites</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//group" position="inside">
-                <filter name="group_by_effective_date" string="Shipped Date" context="{'group_by': 'effective_date'}"/>
-                <filter name="group_by_order_process_date" string="Process Date" context="{'group_by': 'order_process_date'}"/>
-                <filter name="group_by_cancel_date" string="Cancel Date" context="{'group_by': 'cancel_date'}"/>
+            <xpath expr="//search" position="inside">
+
+                <!-- Parent Group: Open Orders -->
+                <separator string="Open Orders"/>
+                <filter domain="[('state', '=', 'draft')]" name="filter_draft" string="Quotation"/>
+                <filter domain="[('order_state', '=', 'po')]" name="filter_ready_to_pick" string="Ready to be Picked"/>
+                <filter domain="[('order_state', '=', 'backorder')]" name="filter_backorders" string="Backorders"/>
+                <filter domain="[('invoice_status', '=', 'to invoice')]" name="filter_to_invoice" string="To Invoice"/>
+
+                <!-- Parent Group: Shipped -->
+                <separator string="Shipped"/>
+                <filter domain="[('order_state', 'in', ['ship'])]" name="filter_shipped" string="Shipped"/>
+                <filter domain="[('order_state', 'in', ['return_initiated','returned'])]" name="filter_returned" string="Returned"/>
+                <filter domain="[('order_state', '=', 'cancel')]" name="filter_cancelled" string="Cancelled"/>
+
             </xpath>
         </field>
     </record>
