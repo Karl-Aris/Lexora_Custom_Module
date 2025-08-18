@@ -6,10 +6,11 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_favorite_filter']" position="after">
                 <filter string="Open Orders" name="open_orders" domain="[('state', '=', 'sale')]" context="{'group_by':'state'}">
-                    <filter string="Shipped" domain="[('x_studio_date_shipped', '!=', False)]" context="{'group_by':'x_studio_date_shipped'}"/>
+                    <filter string="Shipped" name="shipped_orders" domain="[('x_studio_date_shipped', '!=', False)]"/>
+                    <filter string="Delivered" name="delivered_orders" domain="[('x_studio_delivered_date', '!=', False)]"/>
+                    <filter string="Partial" name="partial_orders" domain="[('x_studio_partial_delivery', '=', True)]"/>
                 </filter>
             </xpath>
         </field>
     </record>
-
 </odoo>
