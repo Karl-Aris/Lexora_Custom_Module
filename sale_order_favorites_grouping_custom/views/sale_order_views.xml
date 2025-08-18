@@ -1,14 +1,12 @@
 <odoo>
     <record id="view_order_filter_inherit_favorites" model="ir.ui.view">
-        <field name="name">sale.order.filter.inherit.favorites</field>
+        <field name="name">sale.order.filter.inherit_favorites</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_favorite_filter']" position="after">
                 <filter string="Open Orders" name="open_orders" domain="[('state', '=', 'sale')]" context="{'group_by':'state'}">
                     <filter string="Shipped" name="shipped_orders" domain="[('x_studio_date_shipped', '!=', False)]"/>
-                    <filter string="Delivered" name="delivered_orders" domain="[('x_studio_delivered_date', '!=', False)]"/>
-                    <filter string="Partial" name="partial_orders" domain="[('x_studio_partial_delivery', '=', True)]"/>
                 </filter>
             </xpath>
         </field>
