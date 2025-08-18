@@ -32,10 +32,10 @@
                             context="{'group_by': 'x_delivery_status'}"/>
                     <filter string="ETD"
                             name="x_etd_filter"
-                            domain="[('x_etd', '=', context_today()), 
-                                     ('x_delivery_status', '=', False), 
-                                     ('x_studio_carrier', '!=', False), 
-                                     ('carrier_tracking_ref', '!=', False)]"
+                            domain="[('x_etd', '=', context_today()),
+                                     ('x_delivery_status', '=', False),
+                                     ('x_studio_carrier', '!=', False),
+                                     ('x_carrier_tracking_ref', '!=', False)]"
                             context="{'group_by': 'x_etd'}"/>
                 </group>
             </field>
