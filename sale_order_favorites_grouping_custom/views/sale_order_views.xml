@@ -7,10 +7,9 @@
             <xpath expr="//filter[@name='my_favorite_filter']" position="after">
                 <filter string="Open Orders" name="open_orders" domain="[('state', '=', 'sale')]" context="{'group_by':'state'}">
                     <filter string="Shipped" domain="[('x_studio_date_shipped', '!=', False)]" context="{'group_by':'x_studio_date_shipped'}"/>
-                    <filter string="Delivered" domain="[('x_studio_date_delivered', '!=', False)]" context="{'group_by':'x_studio_date_delivered'}"/>
-                    <filter string="Partially Delivered" domain="[('x_studio_date_partial_delivery', '!=', False)]" context="{'group_by':'x_studio_date_partial_delivery'}"/>
                 </filter>
             </xpath>
         </field>
     </record>
+
 </odoo>
