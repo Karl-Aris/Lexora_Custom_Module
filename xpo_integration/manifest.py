@@ -1,6 +1,6 @@
 {
     'name': 'XPO Shipment Integration',
-    'version': '1.0',
+    'version': '17.0.0.0',
     'category': 'Warehouse',
     'summary': 'Integrate XPO shipment tracking into Odoo',
     'description': 'Track XPO shipments from Odoo Delivery Orders',
