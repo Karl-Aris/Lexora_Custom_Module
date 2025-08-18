@@ -32,10 +32,8 @@
                             context="{'group_by': 'x_delivery_status'}"/>
                     <filter string="ETD"
                             name="x_etd_filter"
-                            domain="[('x_etd', '=', context_today()),
-                                     ('x_delivery_status', '=', False),
-                                     ('x_studio_carrier', '!=', False),
-                            context="{'group_by': 'x_etd'}"/>
+                            domain="[('x_etd','=',context_today()),('x_delivery_status','=',False),('x_studio_carrier','!=',False)]"
+                            context="{'group_by':'x_etd'}"/>
                 </group>
             </field>
         </field>
