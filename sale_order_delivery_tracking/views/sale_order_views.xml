@@ -36,6 +36,7 @@
                             name="x_etd_filter"
                             domain="[ '&amp;', '&amp;', '&amp;', ('x_etd', '=', 'today'), ('x_delivery_status', '=', False), ('x_studio_carrier', '!=', False), ('carrier_tracking_ref', '!=', False) ]"
                             context="{'group_by': 'x_etd'}"/>
+
                 </group>
             </field>
         </field>
