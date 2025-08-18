@@ -7,6 +7,8 @@
             <xpath expr="//search" position="inside">
                 <filter string="Open Orders" name="open_orders" context="{'group_by':'open_status'}" domain="[('state','=','sale')]">
                     <filter string="Shipped" name="open_shipped" domain="[('x_studio_date_shipped','!=',False)]"/>
+                    <filter string="Delivered" name="open_delivered" domain="[('x_studio_date_delivered','!=',False)]"/>
+                    <filter string="Partial" name="open_partial" domain="[('x_studio_date_partial','!=',False)]"/>
                 </filter>
             </xpath>
         </field>
