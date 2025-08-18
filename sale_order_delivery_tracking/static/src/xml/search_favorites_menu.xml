@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <templates id="template" xml:space="preserve">
+        <t t-inherit="web.SearchFavoritesMenu" t-inherit-mode="extension" name="GroupedSearchFavoritesMenu">
+            <xpath expr="//ul" position="replace">
+                <ul>
+                    <t t-foreach="Object.keys(comp.groupedFilters)" t-as="group">
+                        <li class="o_menu_group">
+                            <span><t t-esc="group"/></span>
+                            <ul>
+                                <t t-foreach="comp.groupedFilters[group]" t-as="filter">
+                                    <li>
+                                        <a role="menuitem" t-att-data-filter-id="filter.id">
+                                            <t t-esc="filter.name"/>
+                                        </a>
+                                    </li>
+                                </t>
+                            </ul>
+                        </li>
+                    </t>
+                </ul>
+            </xpath>
+        </t>
+    </templates>
+</odoo>
