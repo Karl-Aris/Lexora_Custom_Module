@@ -3,10 +3,10 @@
     <templates id="template" xml:space="preserve">
         <t t-inherit="web.SearchFavoritesMenu" t-inherit-mode="extension" name="GroupedSearchFavoritesMenu">
             <xpath expr="//ul" position="replace">
-                <ul>
+                <ul class="o_menu_sections">
                     <t t-foreach="Object.keys(comp.groupedFilters)" t-as="group">
                         <li class="o_menu_group">
-                            <span><t t-esc="group"/></span>
+                            <span class="o_group_name"><t t-esc="group"/></span>
                             <ul>
                                 <t t-foreach="comp.groupedFilters[group]" t-as="filter">
                                     <li>
