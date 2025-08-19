@@ -15,7 +15,8 @@
                     <button name="action_test_tracking_connection"
                             string="Test Tracking Connection"
                             type="object"
-                            class="btn-primary"/>
+                            class="btn-primary"
+                            attrs="{'invisible': [('tracking_integration_enabled', '=', False)]}"/>
                 </group>
             </xpath>
         </field>
