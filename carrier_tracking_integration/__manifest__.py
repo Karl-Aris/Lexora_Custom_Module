@@ -1,11 +1,12 @@
 {
-    "name": "Carrier Tracking Integration",
-    "version": "17.0.1.0",
-    "category": "Inventory",
-    "depends": ["delivery", "stock"],
-    "data": [
-        "views/delivery_carrier_views.xml",
-        "views/stock_picking_views.xml",
+    'name': 'Carrier Tracking Integration',
+    'version': '1.0',
+    'category': 'Delivery',
+    'summary': 'Multi-carrier tracking integration (UPS, FedEx, DHL, etc.)',
+    'depends': ['delivery'],
+    'data': [
+        'views/delivery_carrier_views.xml',
     ],
-    "installable": True,
+    'installable': True,
+    'application': False,
 }
