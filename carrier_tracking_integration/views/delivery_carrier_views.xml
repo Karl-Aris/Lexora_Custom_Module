@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_delivery_carrier_form_api_credentials" model="ir.ui.view">
+        <field name="name">delivery.carrier.form.api.credentials</field>
+        <field name="model">delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.delivery_carrier_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add a new tab for API credentials -->
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="API Credentials">
+                    <group>
+                        <field name="carrier_vendor"/>
+                    </group>
+
+                    <group string="UPS" attrs="{'invisible': [('carrier_vendor', '!=', 'ups')]}">
+                        <field name="ups_use_sandbox"/>
+                        <field name="ups_access_key"/>
+                        <field name="ups_client_secret" password="True"/>
+                        <field name="ups_username"/>
+                        <field name="ups_password" password="True"/>
+                        <field name="ups_account_number"/>
+                    </group>
+
+                    <group string="XPO" attrs="{'invisible': [('carrier_vendor', '!=', 'xpo')]}">
+                        <field name="xpo_use_sandbox"/>
+                        <field name="xpo_api_key"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
