@@ -1,0 +1,19 @@
+<odoo>
+    <record id="view_picking_form_carrier_tracking" model="ir.ui.view">
+        <field name="name">stock.picking.form.carrier.tracking</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook/page[@name='operations']" position="after">
+                <page string="Carrier Tracking">
+                    <group>
+                        <field name="carrier_type"/>
+                        <field name="tracking_number"/>
+                        <field name="tracking_status" readonly="1"/>
+                        <button name="track_shipment" type="object" string="Track Shipment" class="oe_highlight"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
