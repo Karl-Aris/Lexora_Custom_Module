@@ -1,13 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="view_delivery_carrier_form_tracking" model="ir.ui.view">
         <field name="name">delivery.carrier.form.tracking</field>
         <field name="model">delivery.carrier</field>
         <field name="inherit_id" ref="delivery.delivery_carrier_form"/>
         <field name="arch" type="xml">
+            <!-- Insert inside the existing 'provider_details' group -->
             <xpath expr="//group[@name='provider_details']" position="inside">
-                <field name="tracking_integration_enabled"/>
-                <field name="tracking_api_key"/>
-                <field name="tracking_account_number"/>
+                <group string="Tracking Integration">
+                    <field name="tracking_integration_enabled"/>
+                    <field name="tracking_carrier"/>
+                    <field name="tracking_api_key"/>
+                    <field name="tracking_account_number"/>
+                </group>
             </xpath>
         </field>
     </record>
