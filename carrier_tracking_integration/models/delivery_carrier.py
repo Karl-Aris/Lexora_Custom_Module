@@ -27,14 +27,27 @@ class DeliveryCarrier(models.Model):
         help="Select which carrier to integrate with"
     )
 
+    # ---------- UI Level ----------
     @api.onchange('tracking_integration_enabled')
     def _onchange_tracking_integration_enabled(self):
-        """Clear tracking fields when integration is disabled."""
+        """Clear tracking fields when integration is disabled (UI only)."""
         if not self.tracking_integration_enabled:
             self.tracking_carrier = False
             self.tracking_api_key = False
             self.tracking_account_number = False
 
+    # ---------- Backend Safety ----------
+    def write(self, vals):
+        """Ensure fields are cleared if integration is disabled (backend safe)."""
+        if 'tracking_integration_enabled' in vals and not vals['tracking_integration_enabled']:
+            vals.update({
+                'tracking_carrier': False,
+                'tracking_api_key': False,
+                'tracking_account_number': False,
+            })
+        return super(DeliveryCarrier, self).write(vals)
+
+    # ---------- Test Button ----------
     def action_test_tracking_connection(self):
         """Simulate testing the tracking API connection"""
         for carrier in self:
