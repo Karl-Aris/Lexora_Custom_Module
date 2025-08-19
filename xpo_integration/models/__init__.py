@@ -1,1 +1,2 @@
-from . import xpo_shipment
+from . import carrier_shipment
+from . import res_config_settings
