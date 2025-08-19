@@ -1,5 +1,5 @@
 from odoo import fields, models, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 class DeliveryCarrier(models.Model):
     _inherit = "delivery.carrier"
@@ -46,6 +46,19 @@ class DeliveryCarrier(models.Model):
                 'tracking_account_number': False,
             })
         return super(DeliveryCarrier, self).write(vals)
+
+    # ---------- Constraint ----------
+    @api.constrains('tracking_integration_enabled', 'tracking_carrier', 'tracking_api_key', 'tracking_account_number')
+    def _check_tracking_fields(self):
+        """Prevent saving invalid carrier configurations."""
+        for carrier in self:
+            if carrier.tracking_integration_enabled:
+                if not carrier.tracking_carrier:
+                    raise ValidationError("You must select a Tracking Carrier when enabling integration.")
+                if not carrier.tracking_api_key:
+                    raise ValidationError("You must enter a Tracking API Key when enabling integration.")
+                if not carrier.tracking_account_number:
+                    raise ValidationError("You must enter a Tracking Account Number when enabling integration.")
 
     # ---------- Test Button ----------
     def action_test_tracking_connection(self):
