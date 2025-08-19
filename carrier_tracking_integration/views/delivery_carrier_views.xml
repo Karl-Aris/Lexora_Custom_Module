@@ -10,8 +10,10 @@
                 <group string="Tracking Integration">
                     <field name="tracking_integration_enabled"/>
                     <field name="tracking_carrier"/>
-                    <field name="tracking_api_key"/>
-                    <field name="tracking_account_number"/>
+                    <field name="tracking_api_key"
+                           attrs="{'readonly': [('tracking_integration_enabled', '=', False)]}"/>
+                    <field name="tracking_account_number"
+                           attrs="{'readonly': [('tracking_integration_enabled', '=', False)]}"/>
                     <button name="action_test_tracking_connection"
                             string="Test Tracking Connection"
                             type="object"
