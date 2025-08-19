@@ -27,6 +27,14 @@ class DeliveryCarrier(models.Model):
         help="Select which carrier to integrate with"
     )
 
+    @api.onchange('tracking_integration_enabled')
+    def _onchange_tracking_integration_enabled(self):
+        """Clear tracking fields when integration is disabled."""
+        if not self.tracking_integration_enabled:
+            self.tracking_carrier = False
+            self.tracking_api_key = False
+            self.tracking_account_number = False
+
     def action_test_tracking_connection(self):
         """Simulate testing the tracking API connection"""
         for carrier in self:
