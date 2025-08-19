@@ -2,9 +2,9 @@
     <record id="res_config_settings_view_form_carrier_tracking" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.carrier.tracking</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="inherit_id" ref="delivery.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook/page[@name='general_settings']" position="inside">
+            <xpath expr="//group[@name='provider_details']" position="inside">
                 <group string="Carrier Tracking Integration">
                     <field name="xpo_api_key"/>
                     <field name="ups_access_key"/>
