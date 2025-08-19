@@ -1,2 +1,2 @@
-from . import carrier_shipment
-from . import res_config_settings
+from . import delivery_carrier_ext
+from . import stock_picking_track
