@@ -1,18 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="res_config_settings_view_form_carrier_tracking" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.carrier.tracking</field>
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="delivery.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='provider_details']" position="inside">
+
+            <!-- Insert after delivery_carrier_ids field to avoid xpath errors -->
+            <xpath expr="//field[@name='delivery_carrier_ids']" position="after">
                 <group string="Carrier Tracking Integration">
                     <field name="xpo_api_key"/>
                     <field name="ups_access_key"/>
                     <field name="ups_username"/>
-                    <field name="ups_password"/>
+                    <field name="ups_password" password="True"/>
                     <field name="ups_account_number"/>
                 </group>
             </xpath>
+
         </field>
     </record>
 </odoo>
