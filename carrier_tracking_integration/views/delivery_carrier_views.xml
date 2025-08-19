@@ -12,6 +12,10 @@
                     <field name="tracking_carrier"/>
                     <field name="tracking_api_key"/>
                     <field name="tracking_account_number"/>
+                    <button name="action_test_tracking_connection"
+                            string="Test Tracking Connection"
+                            type="object"
+                            class="btn-primary"/>
                 </group>
             </xpath>
         </field>
