@@ -9,7 +9,8 @@
             <xpath expr="//group[@name='provider_details']" position="inside">
                 <group string="Tracking Integration">
                     <field name="tracking_integration_enabled"/>
-                    <field name="tracking_carrier"/>
+                    <field name="tracking_carrier"
+                           attrs="{'readonly': [('tracking_integration_enabled', '=', False)]}"/>
                     <field name="tracking_api_key"
                            attrs="{'readonly': [('tracking_integration_enabled', '=', False)]}"/>
                     <field name="tracking_account_number"
