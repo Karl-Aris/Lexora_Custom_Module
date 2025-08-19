@@ -27,6 +27,23 @@ class DeliveryCarrier(models.Model):
         help="Select which carrier to integrate with"
     )
 
+    # ---------- Computed Helper ----------
+    can_test_tracking = fields.Boolean(
+        compute="_compute_can_test_tracking",
+        store=False,
+    )
+
+    @api.depends('tracking_integration_enabled', 'tracking_carrier', 'tracking_api_key', 'tracking_account_number')
+    def _compute_can_test_tracking(self):
+        """Enable Test button only when all required fields are set."""
+        for carrier in self:
+            carrier.can_test_tracking = bool(
+                carrier.tracking_integration_enabled
+                and carrier.tracking_carrier
+                and carrier.tracking_api_key
+                and carrier.tracking_account_number
+            )
+
     # ---------- UI Level ----------
     @api.onchange('tracking_integration_enabled')
     def _onchange_tracking_integration_enabled(self):
