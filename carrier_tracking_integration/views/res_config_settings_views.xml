@@ -4,13 +4,15 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="Carrier Integration" string="Carrier Integration">
-                    <h2>Carrier API Settings</h2>
+            <xpath expr="//div[@id='settings']" position="inside">
+                <div class="app_settings_block" data-string="Carrier Tracking" string="Carrier Tracking">
+                    <h2>Carrier Tracking Integration</h2>
                     <group>
                         <field name="xpo_api_key"/>
-                        <field name="ups_client_id"/>
-                        <field name="ups_client_secret"/>
+                        <field name="ups_access_key"/>
+                        <field name="ups_username"/>
+                        <field name="ups_password"/>
+                        <field name="ups_account_number"/>
                     </group>
                 </div>
             </xpath>
