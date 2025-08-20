@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//page[@name='other_information']/group" position="inside">
-                <group string="Delivery Tracking">
+                <group string="Delivery Tracking" class="o_tracking_group">
                     <!-- Delivery Out Picking (readonly) -->
                     <field name="x_delivery_out" readonly="1"/>
 
@@ -20,8 +20,9 @@
                     <button name="action_track_shipment"
                             string="Track Shipment"
                             type="object"
-                            class="btn-primary"
-                            icon="fa-truck"/>
+                            class="btn-primary o_tracking_button"
+                            icon="fa-truck"
+                            attrs="{'invisible':[('delivery_out_tracking_ref','=',False)]}"/>
                 </group>
             </xpath>
         </field>
