@@ -4,7 +4,8 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Add to Other Information tab -->
+
+            <!-- Add fields inside "Other Information" page -->
             <xpath expr="//page[@name='other_information']/group" position="inside">
                 <group>
                     <field name="delivery_tracking_ref" readonly="1"/>
@@ -13,10 +14,10 @@
                             string="Track Shipment"
                             type="object"
                             class="btn-primary"
-                            icon="fa-truck"
-                            attrs="{'invisible': [('delivery_tracking_ref','=',False)]}"/>
+                            icon="fa-truck"/>
                 </group>
             </xpath>
+
         </field>
     </record>
 </odoo>
