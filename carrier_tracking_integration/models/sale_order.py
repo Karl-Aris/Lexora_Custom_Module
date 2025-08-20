@@ -1,7 +1,10 @@
 # carrier_tracking_integration/models/sale_order.py
 import requests
+import logging
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class SaleOrder(models.Model):
@@ -52,6 +55,8 @@ class SaleOrder(models.Model):
                 raise UserError(_("FedEx request error: %s") % str(e))
 
             data = response.json()
+            _logger.info("FedEx API Response for tracking %s: %s", tracking_number, data)
+
             results = data.get("output", {}).get("completeTrackResults", [])
 
             status = "Unknown"
