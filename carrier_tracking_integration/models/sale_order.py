@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    # Related field from the delivery out picking
     delivery_out_tracking_ref = fields.Char(
         string="Delivery Tracking Ref",
         related="x_delivery_out.carrier_tracking_ref",
@@ -12,10 +13,11 @@ class SaleOrder(models.Model):
         store=False
     )
 
+    # Tracking status field
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
-    tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
     def action_track_shipment(self):
+        """Track FedEx shipment and show a popup notification."""
         for order in self:
             if not order.x_delivery_out or not order.x_delivery_out.carrier_tracking_ref:
                 raise UserError(_("No delivery tracking number found."))
@@ -26,10 +28,10 @@ class SaleOrder(models.Model):
             if not carrier or carrier.tracking_carrier != 'fedex' or not carrier.tracking_integration_enabled:
                 raise UserError(_("FedEx tracking is not configured for this delivery."))
 
-            # Get token via carrier method
+            # Get FedEx token from carrier method (supports caching)
             token = carrier._fedex_get_access_token()
 
-            # Determine FedEx API endpoint
+            # Determine sandbox or production endpoint
             sandbox_mode = self.env['ir.config_parameter'].sudo().get_param('fedex_sandbox_mode', 'True') == 'True'
             url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers" if sandbox_mode else "https://apis.fedex.com/track/v1/trackingnumbers"
 
@@ -49,7 +51,7 @@ class SaleOrder(models.Model):
             except requests.exceptions.RequestException as e:
                 raise UserError(_("FedEx request error: %s") % str(e))
 
-            # Parse response safely
+            # Parse FedEx response safely
             data = response.json()
             results = data.get("output", {}).get("completeTrackResults", [])
             if results and results[0].get("trackResults"):
@@ -58,11 +60,11 @@ class SaleOrder(models.Model):
             else:
                 order.tracking_status = "No status available"
 
-            # Return popup notification
+            # Return popup notification to the user
             return {
                 "effect": {
                     "fadeout": "slow",
                     "message": _("Tracking Status for %s: %s") % (tracking_number, order.tracking_status),
-                    "type": "rainbow_man",  # fun effect, you can change to "info" if preferred
+                    "type": "rainbow_man",  # fun effect; can change to "info"
                 }
             }
