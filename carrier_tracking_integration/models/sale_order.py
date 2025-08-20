@@ -5,33 +5,36 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    # Related field from the delivery out picking
-    delivery_out_tracking_ref = fields.Char(
-        string="Delivery Tracking Ref",
-        related="x_delivery_out.carrier_tracking_ref",
-        readonly=True,
-        store=False
-    )
+    # Field to display tracking number (from linked delivery)
+    tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
 
-    # Tracking status field
+    # Field to store latest tracking status
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
     def action_track_shipment(self):
-        """Track FedEx shipment and show a popup notification."""
+        """Track FedEx shipment based on the linked delivery's carrier_tracking_ref."""
         for order in self:
-            if not order.x_delivery_out or not order.x_delivery_out.carrier_tracking_ref:
-                raise UserError(_("No delivery tracking number found."))
+            # Get the tracking number from the delivery (stock.picking)
+            picking = order.picking_ids.filtered(lambda p: p.picking_type_code == 'outgoing')
+            if not picking:
+                raise UserError(_("No outgoing delivery found for this Sale Order."))
 
-            tracking_number = order.x_delivery_out.carrier_tracking_ref
-            carrier = order.x_delivery_out.carrier_id
+            tracking_number = picking[0].carrier_tracking_ref
+            if not tracking_number:
+                raise UserError(_("No tracking number found on the delivery."))
 
+            # Update the Sale Order tracking_number field
+            order.tracking_number = tracking_number
+
+            # Get the carrier and check if FedEx tracking is enabled
+            carrier = picking[0].carrier_id
             if not carrier or carrier.tracking_carrier != 'fedex' or not carrier.tracking_integration_enabled:
                 raise UserError(_("FedEx tracking is not configured for this delivery."))
 
-            # Get FedEx token via carrier method
+            # Get FedEx token from carrier
             token = carrier._fedex_get_access_token()
 
-            # Use sandbox or production endpoint
+            # Determine endpoint (sandbox/production)
             sandbox_mode = self.env['ir.config_parameter'].sudo().get_param('fedex_sandbox_mode', 'True') == 'True'
             url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers" if sandbox_mode else "https://apis.fedex.com/track/v1/trackingnumbers"
 
@@ -60,7 +63,7 @@ class SaleOrder(models.Model):
             else:
                 order.tracking_status = "No status available"
 
-            # Show popup notification
+            # Show popup
             return {
                 "effect": {
                     "fadeout": "slow",
