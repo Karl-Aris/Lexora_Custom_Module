@@ -1,6 +1,6 @@
-from odoo import models, _
-from odoo.exceptions import UserError
 import requests
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
@@ -11,6 +11,8 @@ class SaleOrder(models.Model):
         readonly=True,
         store=False
     )
+
+    tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
     def action_track_shipment(self):
