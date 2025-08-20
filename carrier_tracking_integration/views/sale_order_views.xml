@@ -4,14 +4,16 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- Insert after Carrier Tracking Ref -->
-            <xpath expr="//field[@name='carrier_tracking_ref']" position="after">
-                <field name="tracking_status" readonly="1"/>
-                <button name="action_track_shipment"
-                        string="Track Shipment"
-                        type="object"
-                        class="btn-primary"
-                        icon="fa-truck"/>
+            <!-- Insert after Carrier Tracking Ref inside Other Information tab -->
+            <xpath expr="//page[@name='other_information']//field[@name='carrier_tracking_ref']" position="after">
+                <group>
+                    <field name="tracking_status" readonly="1"/>
+                    <button name="action_track_shipment"
+                            string="Track Shipment"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-truck"/>
+                </group>
             </xpath>
         </field>
     </record>
