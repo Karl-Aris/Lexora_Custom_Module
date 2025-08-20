@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
 
-            <!-- Add fields inside "Other Information" page -->
+            <!-- Add inside Other Information tab -->
             <xpath expr="//page[@name='other_information']/group" position="inside">
                 <group>
                     <field name="delivery_tracking_ref" readonly="1"/>
