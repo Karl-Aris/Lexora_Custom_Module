@@ -25,24 +25,22 @@ class SaleOrder(models.Model):
                 raise UserError(_("No tracking number found on the delivery."))
 
             order.tracking_number = tracking_number
-
             carrier = picking.carrier_id
+
             if not carrier or carrier.tracking_carrier != 'fedex' or not carrier.tracking_integration_enabled:
                 raise UserError(_("FedEx tracking is not configured for this delivery."))
 
             token = carrier._fedex_get_access_token()
-
-            # Use carrier-specific sandbox toggle
-            if carrier.tracking_sandbox_mode:
-                url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
-            else:
-                url = "https://apis.fedex.com/track/v1/trackingnumbers"
+            url = (
+                "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
+                if carrier.tracking_sandbox_mode
+                else "https://apis.fedex.com/track/v1/trackingnumbers"
+            )
 
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-
             payload = {
                 "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
                 "includeDetailedScans": True,
@@ -55,25 +53,20 @@ class SaleOrder(models.Model):
                 raise UserError(_("FedEx request error: %s") % str(e))
 
             data = response.json()
-            _logger.info("FedEx API Response for tracking %s: %s", tracking_number, data)
+            _logger.info("FedEx API raw response for %s: %s", tracking_number, data)
 
             results = data.get("output", {}).get("completeTrackResults", [])
-
             status = "Unknown"
+
             if results:
                 track_results = results[0].get("trackResults", [])
                 if track_results:
                     result = track_results[0]
 
-                    # Case 1: Explicit FedEx error
+                    # If API returned an error
                     if "error" in result:
-                        status = result["error"].get("message", "Invalid tracking number")
+                        status = result["error"].get("message", "Tracking number not found")
 
-                    # Case 2: Tracking number is not assigned (invalid / fake)
-                    elif not result.get("trackingNumberInfo", {}).get("assigned", True):
-                        status = "Invalid tracking number"
-
-                    # Case 3: Valid tracking number, extract latest status
                     else:
                         status_detail = result.get("latestStatusDetail", {})
                         scan_events = result.get("scanEvents", [])
@@ -84,6 +77,10 @@ class SaleOrder(models.Model):
                             status = status_detail["description"]
                         elif status_detail.get("statusByLocale"):
                             status = status_detail["statusByLocale"]
+
+                        # Sandbox often returns this default response even for invalid numbers
+                        if carrier.tracking_sandbox_mode and status == "Shipment information sent to FedEx":
+                            status = "Invalid or non-existent tracking number (sandbox)"
 
             order.tracking_status = status
 
