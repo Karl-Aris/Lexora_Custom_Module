@@ -1,18 +1,27 @@
 <odoo>
-    <!-- Existing form view -->
-    <record id="view_order_form_inherit_delivery_tracking" model="ir.ui.view">
-        <field name="name">sale.order.form.delivery.tracking</field>
+    <!-- Extend Sale Order Form: Delivery Tracking Section -->
+    <record id="view_order_form_inherit_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//page[@name='other_information']/group" position="inside">
                 <group string="Delivery Tracking">
-                    <field name="x_delivery_status"/>
-                    <field name="x_etd"/>
-                    <field name="x_follow_up_required"/>
-                    <field name="x_actual_delivery_date"/>
-                    <field name="x_contacted"/>
-                    <field name="x_contact_notes"/>
+                    <!-- Delivery Out Picking (readonly) -->
+                    <field name="x_delivery_out" readonly="1"/>
+
+                    <!-- Tracking Ref (from delivery out) -->
+                    <field name="delivery_out_tracking_ref" readonly="1"/>
+
+                    <!-- FedEx Tracking Status -->
+                    <field name="tracking_status" readonly="1"/>
+
+                    <!-- Action button -->
+                    <button name="action_track_shipment"
+                            string="Track Shipment"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-truck"/>
                 </group>
             </xpath>
         </field>
