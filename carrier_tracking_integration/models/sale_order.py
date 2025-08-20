@@ -14,6 +14,7 @@ class SaleOrder(models.Model):
     )
 
     def _compute_delivery_tracking_ref(self):
+        """Compute delivery tracking number from the first outgoing delivery (not cancelled)."""
         for order in self:
             delivery = order.picking_ids.filtered(
                 lambda p: p.picking_type_code == "outgoing" and p.state not in ("cancel")
