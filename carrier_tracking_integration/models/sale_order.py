@@ -38,7 +38,7 @@ class SaleOrder(models.Model):
 
             payload = {
                 "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
-                "includeDetailedScans": True,  # important for real status
+                "includeDetailedScans": True,
             }
 
             try:
@@ -55,16 +55,22 @@ class SaleOrder(models.Model):
                 track_results = results[0].get("trackResults", [])
                 if track_results:
                     result = track_results[0]
-                    status_detail = result.get("latestStatusDetail", {})
-                    scan_events = result.get("scanEvents", [])
 
-                    # Priority: last scan event > description > statusByLocale
-                    if scan_events:
-                        status = scan_events[-1].get("eventDescription", status)
-                    elif status_detail.get("description"):
-                        status = status_detail["description"]
-                    elif status_detail.get("statusByLocale"):
-                        status = status_detail["statusByLocale"]
+                    # Handle invalid number case
+                    if "error" in result:
+                        error_info = result["error"]
+                        status = error_info.get("message", "Tracking number not found")
+                    else:
+                        status_detail = result.get("latestStatusDetail", {})
+                        scan_events = result.get("scanEvents", [])
+
+                        # Priority: last scan event > description > statusByLocale
+                        if scan_events:
+                            status = scan_events[-1].get("eventDescription", status)
+                        elif status_detail.get("description"):
+                            status = status_detail["description"]
+                        elif status_detail.get("statusByLocale"):
+                            status = status_detail["statusByLocale"]
 
             order.tracking_status = status
 
