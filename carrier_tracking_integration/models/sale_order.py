@@ -5,6 +5,14 @@ import requests
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    delivery_out_tracking_ref = fields.Char(
+        string="Delivery Tracking Ref",
+        related="x_delivery_out.carrier_tracking_ref",
+        readonly=True,
+        store=False
+    )
+
+    tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
     def action_track_shipment(self):
         for order in self:
             if not order.x_delivery_out or not order.x_delivery_out.carrier_tracking_ref:
