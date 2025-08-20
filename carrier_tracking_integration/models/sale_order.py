@@ -20,7 +20,7 @@ class SaleOrder(models.Model):
             if not token:
                 raise UserError(_("FedEx API token is missing. Please configure it in System Parameters."))
 
-            url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"  # Sandbox
+            url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"  # Sandbox endpoint
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
