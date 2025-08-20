@@ -6,11 +6,11 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    tracking_status = fields.Char(string="Tracking Status", readonly=True)
-    delivery_tracking_ref = fields.Char(
-        string="Delivery OUT Tracking Number",
-        compute="_compute_delivery_tracking_ref",
-        store=False,
+    delivery_out_tracking_ref = fields.Char(
+        string="Delivery Tracking Ref",
+        related="x_delivery_out.carrier_tracking_ref",
+        readonly=True,
+        store=False
     )
 
     def _compute_delivery_tracking_ref(self):
