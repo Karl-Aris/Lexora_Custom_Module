@@ -11,6 +11,8 @@
                            modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
                     <field name="tracking_api_key"
                            modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
+                    <field name="tracking_secret_key"
+                           modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
                     <field name="tracking_account_number"
                            modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
                     <button name="action_test_tracking_connection"
