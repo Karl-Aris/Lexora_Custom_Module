@@ -15,21 +15,12 @@ class SaleOrder(models.Model):
 
     tracking_status = fields.Char(string="Tracking Status")
 
-    def _compute_delivery_tracking_ref(self):
-        """Compute tracking number only from the OUT (delivery) picking, not from IN."""
-        for order in self:
-            delivery = order.picking_ids.filtered(
-                lambda p: p.picking_type_code == "outgoing"
-                and p.state not in ("cancel")
-            )[:1]  # Take first valid outgoing delivery
-            order.delivery_tracking_ref = delivery.carrier_tracking_ref if delivery else False
-
     def action_track_shipment(self):
         for order in self:
-            if not order.delivery_tracking_ref:
+            if not order.delivery_out_tracking_ref:
                 raise UserError(_("No delivery tracking number found."))
 
-            tracking_number = order.delivery_tracking_ref
+            tracking_number = order.delivery_out_tracking_ref
 
             # Get FedEx token from system parameters
             token = self.env["ir.config_parameter"].sudo().get_param("fedex_api_token")
