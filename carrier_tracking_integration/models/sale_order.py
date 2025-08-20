@@ -13,7 +13,7 @@ class SaleOrder(models.Model):
         store=False
     )
 
-    tracking_status = fields.Char(string="Tracking Status")
+    tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
     def action_track_shipment(self):
         for order in self:
