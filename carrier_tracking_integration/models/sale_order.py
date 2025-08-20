@@ -28,10 +28,10 @@ class SaleOrder(models.Model):
             if not carrier or carrier.tracking_carrier != 'fedex' or not carrier.tracking_integration_enabled:
                 raise UserError(_("FedEx tracking is not configured for this delivery."))
 
-            # Get FedEx token from carrier method (supports caching)
+            # Get FedEx token via carrier method
             token = carrier._fedex_get_access_token()
 
-            # Determine sandbox or production endpoint
+            # Use sandbox or production endpoint
             sandbox_mode = self.env['ir.config_parameter'].sudo().get_param('fedex_sandbox_mode', 'True') == 'True'
             url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers" if sandbox_mode else "https://apis.fedex.com/track/v1/trackingnumbers"
 
@@ -51,7 +51,7 @@ class SaleOrder(models.Model):
             except requests.exceptions.RequestException as e:
                 raise UserError(_("FedEx request error: %s") % str(e))
 
-            # Parse FedEx response safely
+            # Parse FedEx response
             data = response.json()
             results = data.get("output", {}).get("completeTrackResults", [])
             if results and results[0].get("trackResults"):
@@ -60,11 +60,11 @@ class SaleOrder(models.Model):
             else:
                 order.tracking_status = "No status available"
 
-            # Return popup notification to the user
+            # Show popup notification
             return {
                 "effect": {
                     "fadeout": "slow",
                     "message": _("Tracking Status for %s: %s") % (tracking_number, order.tracking_status),
-                    "type": "rainbow_man",  # fun effect; can change to "info"
+                    "type": "rainbow_man",
                 }
             }
