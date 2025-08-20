@@ -13,6 +13,8 @@ class SaleOrder(models.Model):
         store=False
     )
 
+    tracking_status = fields.Char(string="Tracking Status")
+
     def _compute_delivery_tracking_ref(self):
         """Compute tracking number only from the OUT (delivery) picking, not from IN."""
         for order in self:
