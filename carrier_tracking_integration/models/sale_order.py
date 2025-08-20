@@ -7,33 +7,36 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
+    tracking_number = fields.Char(string="Tracking Number", readonly=False, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
     def action_track_shipment(self):
         for order in self:
-            picking = order.picking_ids.filtered(lambda p: p.picking_type_code == 'outgoing')
+            picking = order.picking_ids.filtered(lambda p: p.picking_type_code == "outgoing")
             if not picking:
                 raise UserError(_("No outgoing delivery found for this Sale Order."))
 
             picking = picking[0]
-            tracking_number = picking.carrier_tracking_ref
-            if not tracking_number:
-                raise UserError(_("No tracking number found on the delivery."))
+
+            # Prefer delivery tracking_ref, else fallback to order.tracking_number
+            tracking_number = picking.carrier_tracking_ref or order.tracking_number
+            if not tracking_number or tracking_number == "1":
+                raise UserError(_("No valid FedEx tracking number found."))
 
             order.tracking_number = tracking_number
 
             carrier = picking.carrier_id
-            if not carrier or carrier.tracking_carrier != 'fedex' or not carrier.tracking_integration_enabled:
+            if not carrier or carrier.tracking_carrier != "fedex" or not carrier.tracking_integration_enabled:
                 raise UserError(_("FedEx tracking is not configured for this delivery."))
 
             token = carrier._fedex_get_access_token()
 
-            # Use carrier-specific sandbox toggle instead of global parameter
-            if carrier.tracking_sandbox_mode:
-                url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
-            else:
-                url = "https://apis.fedex.com/track/v1/trackingnumbers"
+            # Use carrier-specific sandbox toggle
+            url = (
+                "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
+                if carrier.tracking_sandbox_mode
+                else "https://apis.fedex.com/track/v1/trackingnumbers"
+            )
 
             headers = {
                 "Content-Type": "application/json",
@@ -60,10 +63,9 @@ class SaleOrder(models.Model):
                 if track_results:
                     result = track_results[0]
 
-                    # Handle invalid number case
+                    # Handle invalid number
                     if "error" in result:
-                        error_info = result["error"]
-                        status = error_info.get("message", "Tracking number not found")
+                        status = result["error"].get("message", "Invalid tracking number")
                     else:
                         status_detail = result.get("latestStatusDetail", {})
                         scan_events = result.get("scanEvents", [])
