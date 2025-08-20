@@ -8,16 +8,17 @@ class SaleOrder(models.Model):
 
     tracking_status = fields.Char(string="Tracking Status", readonly=True)
     delivery_tracking_ref = fields.Char(
-        string="Delivery Tracking Number",
+        string="Delivery OUT Tracking Number",
         compute="_compute_delivery_tracking_ref",
         store=False,
     )
 
     def _compute_delivery_tracking_ref(self):
-        """Compute delivery tracking number from the first outgoing delivery (not cancelled)."""
+        """Compute tracking number only from the OUT (delivery) picking, not from IN."""
         for order in self:
             delivery = order.picking_ids.filtered(
-                lambda p: p.picking_type_code == "outgoing" and p.state not in ("cancel")
+                lambda p: p.picking_type_code == "outgoing"
+                and p.state not in ("cancel")
             )[:1]  # Take first valid outgoing delivery
             order.delivery_tracking_ref = delivery.carrier_tracking_ref if delivery else False
 
