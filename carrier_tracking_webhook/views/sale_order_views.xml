@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_order_form_inherit_webhook_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.webhook.tracking</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <field name="tracking_number" readonly="1"/>
+            </header>
+        </field>
+    </record>
+</odoo>
