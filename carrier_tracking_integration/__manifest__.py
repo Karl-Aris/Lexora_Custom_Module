@@ -3,7 +3,7 @@
     "version": "17.0.1.0.0",
     "summary": "Multi-carrier tracking API integration for UPS, FedEx, DHL, etc.",
     "author": "Karl Areglado",
-    "depends": ["delivery"],
+    "depends": ["delivery", "sale_management"],
     "data": [
         "views/delivery_carrier_views.xml",
         "views/sale_order_views.xml",
