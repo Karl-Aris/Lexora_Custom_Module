@@ -1,6 +1,6 @@
-# carrier_tracking_integration/models/delivery_carrier.py
-import requests
 import logging
+import requests
+
 from odoo import models, fields, _
 from odoo.exceptions import UserError
 
@@ -10,7 +10,10 @@ _logger = logging.getLogger(__name__)
 class DeliveryCarrier(models.Model):
     _inherit = "delivery.carrier"
 
+    # Master toggle + shared credentials
     tracking_integration_enabled = fields.Boolean("Enable Tracking Integration")
+
+    # One dropdown for all carriers
     tracking_carrier = fields.Selection([
         ("ups", "UPS"),
         ("fedex", "FedEx"),
@@ -28,17 +31,19 @@ class DeliveryCarrier(models.Model):
         ("abf", "ABF Freight System"),
         ("wgd", "WGD Midwest (AM Home)"),
         ("aduie_pyle", "A Duie Pyle Inc"),
-        ("saia", "Saia Motor Freight Line"),
+        ("saia", "Saia Motor Freight Line, LLC"),
         ("ch_robinson", "C.H. Robinson"),
         ("ait", "AIT Worldwide"),
         ("frontline", "Frontline Carrier Systems USA Inc"),
     ], string="Carrier")
+
+    # Generic credential fields usable per carrier (you can extend later per‑carrier)
     tracking_api_key = fields.Char("API Key")
-    tracking_account_number = fields.Char("Account Number")
     tracking_secret_key = fields.Char("Secret Key")
+    tracking_account_number = fields.Char("Account Number")
     tracking_sandbox_mode = fields.Boolean("Use Sandbox Mode", default=True)
 
-    # ---------------- FedEx (real OAuth; sandbox vs production) ----------------
+    # ───────────────────────────────────────────────────────── FedEx (real OAuth)
     def _fedex_get_access_token(self):
         self.ensure_one()
         url = (
@@ -52,7 +57,7 @@ class DeliveryCarrier(models.Model):
             "client_id": self.tracking_api_key,
             "client_secret": self.tracking_secret_key,
         }
-        resp = requests.post(url, data=data, headers=headers, timeout=15)
+        resp = requests.post(url, data=data, headers=headers, timeout=20)
         if resp.status_code != 200:
             try:
                 err = resp.json()
@@ -62,13 +67,12 @@ class DeliveryCarrier(models.Model):
             raise UserError(_("FedEx OAuth failed: %s") % msg)
         return resp.json().get("access_token")
 
-    # ---------------- Placeholders (ready for sandbox integration) -------------
-    # NOTE: Each returns a clear placeholder and logs; add real API when creds/docs arrive.
+    # ────────────────────────────────────────────────────── Placeholders (sandbox)
+    # Each method returns a friendly placeholder until real API is wired.
 
-    # UPS (placeholder — add real logic when ready)
     def _ups_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: Implement UPS tracking (OAuth / API key as required)
+        # TODO: Implement UPS tracking (OAuth / API key as per UPS API spec)
         _logger.info("UPS sandbox tracking called for %s", tracking_number)
         return "UPS sandbox tracking not yet implemented"
 
@@ -80,19 +84,19 @@ class DeliveryCarrier(models.Model):
 
     def _estes_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: Estes API (docs: https://developer.estes-express.com/)
+        # TODO: Estes API → https://developer.estes-express.com/
         _logger.info("Estes sandbox tracking called for %s", tracking_number)
         return "Estes sandbox tracking not yet implemented"
 
     def _roadrunner_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: Roadrunner via AfterShip (docs: https://www.aftership.com/carriers/roadrunner-freight/api)
+        # TODO: Roadrunner via AfterShip → https://www.aftership.com/carriers/roadrunner-freight/api
         _logger.info("Roadrunner sandbox tracking called for %s", tracking_number)
         return "Roadrunner sandbox tracking not yet implemented"
 
     def _central_transport_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: Central Transport via ShipEngine (docs: https://www.shipengine.com/integrations/central-transport/)
+        # TODO: Central Transport via ShipEngine → https://www.shipengine.com/integrations/central-transport/
         _logger.info("Central Transport sandbox tracking called for %s", tracking_number)
         return "Central Transport sandbox tracking not yet implemented"
 
@@ -110,43 +114,43 @@ class DeliveryCarrier(models.Model):
 
     def _pitt_ohio_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: Pitt Ohio via AfterShip (docs: https://www.aftership.com/carriers/pitt-ohio/api)
+        # TODO: Pitt Ohio via AfterShip → https://www.aftership.com/carriers/pitt-ohio/api
         _logger.info("Pitt Ohio sandbox tracking called for %s", tracking_number)
         return "Pitt Ohio sandbox tracking not yet implemented"
 
     def _ceva_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: CEVA via AfterShip (docs: https://www.aftership.com/carriers/ceva/api)
+        # TODO: CEVA via AfterShip → https://www.aftership.com/carriers/ceva/api
         _logger.info("CEVA sandbox tracking called for %s", tracking_number)
         return "CEVA sandbox tracking not yet implemented"
 
     def _tforce_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: TForce via AfterShip (docs: https://www.aftership.com/carriers/tforce/api)
+        # TODO: TForce via AfterShip → https://www.aftership.com/carriers/tforce/api
         _logger.info("TForce sandbox tracking called for %s", tracking_number)
         return "TForce sandbox tracking not yet implemented"
 
     def _tst_overland_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: TST Overland via AfterShip (docs: https://www.aftership.com/carriers/tst-overland/api)
+        # TODO: TST Overland via AfterShip → https://www.aftership.com/carriers/tst-overland/api
         _logger.info("TST Overland sandbox tracking called for %s", tracking_number)
         return "TST Overland sandbox tracking not yet implemented"
 
     def _efw_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: EFW via AfterShip (docs: https://www.aftership.com/carriers/efw/api)
+        # TODO: EFW via AfterShip → https://www.aftership.com/carriers/efw/api
         _logger.info("EFW sandbox tracking called for %s", tracking_number)
         return "EFW sandbox tracking not yet implemented"
 
     def _abf_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: ABF via AfterShip (docs: https://www.aftership.com/carriers/abf/api)
+        # TODO: ABF via AfterShip → https://www.aftership.com/carriers/abf/api
         _logger.info("ABF sandbox tracking called for %s", tracking_number)
         return "ABF sandbox tracking not yet implemented"
 
     def _wgd_track_shipment(self, tracking_number):
         self.ensure_one()
-        # TODO: WGD Midwest via AfterShip (docs: https://www.aftership.com/carriers/wgd/api)
+        # TODO: WGD Midwest via AfterShip → https://www.aftership.com/carriers/wgd/api
         _logger.info("WGD Midwest sandbox tracking called for %s", tracking_number)
         return "WGD Midwest sandbox tracking not yet implemented"
 
@@ -180,11 +184,13 @@ class DeliveryCarrier(models.Model):
         _logger.info("Frontline sandbox tracking called for %s", tracking_number)
         return "Frontline sandbox tracking not yet implemented"
 
-    # ---------------- Test Connection button -----------------------------------
+    # ────────────────────────────────────────────────────────── Test connection
     def action_test_tracking_connection(self):
         self.ensure_one()
+        if not self.tracking_integration_enabled:
+            raise UserError(_("Enable Tracking Integration first."))
+
         if self.tracking_carrier == "fedex":
-            # Real check for FedEx
             try:
                 token = self._fedex_get_access_token()
                 if token:
