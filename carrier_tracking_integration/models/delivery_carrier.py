@@ -38,7 +38,7 @@ class DeliveryCarrier(models.Model):
     tracking_secret_key = fields.Char("Secret Key")
     tracking_sandbox_mode = fields.Boolean("Use Sandbox Mode", default=True)
 
-    # ---------------- FedEx ----------------
+    # ---------------- FedEx (real OAuth; sandbox vs production) ----------------
     def _fedex_get_access_token(self):
         self.ensure_one()
         url = (
@@ -62,30 +62,129 @@ class DeliveryCarrier(models.Model):
             raise UserError(_("FedEx OAuth failed: %s") % msg)
         return resp.json().get("access_token")
 
-    # ---------------- Carrier Stubs ----------------
-    def _xpo_track_shipment(self, tracking_number): _logger.info("XPO %s", tracking_number); return "XPO tracking not yet implemented"
-    def _estes_track_shipment(self, tracking_number): _logger.info("Estes %s", tracking_number); return "Estes tracking not yet implemented"
-    def _roadrunner_track_shipment(self, tracking_number): _logger.info("Roadrunner %s", tracking_number); return "Roadrunner tracking not yet implemented"
-    def _central_transport_track_shipment(self, tracking_number): _logger.info("Central %s", tracking_number); return "Central Transport tracking not yet implemented"
-    def _jbhunt_track_shipment(self, tracking_number): _logger.info("JB Hunt %s", tracking_number); return "JB Hunt tracking not yet implemented"
-    def _titanium_track_shipment(self, tracking_number): _logger.info("Titanium %s", tracking_number); return "Titanium tracking not yet implemented"
-    def _pitt_ohio_track_shipment(self, tracking_number): _logger.info("Pitt Ohio %s", tracking_number); return "Pitt Ohio tracking not yet implemented"
-    def _ceva_track_shipment(self, tracking_number): _logger.info("CEVA %s", tracking_number); return "CEVA tracking not yet implemented"
-    def _tforce_track_shipment(self, tracking_number): _logger.info("TForce %s", tracking_number); return "TForce tracking not yet implemented"
-    def _tst_overland_track_shipment(self, tracking_number): _logger.info("TST Overland %s", tracking_number); return "TST Overland tracking not yet implemented"
-    def _efw_track_shipment(self, tracking_number): _logger.info("EFW %s", tracking_number); return "EFW tracking not yet implemented"
-    def _abf_track_shipment(self, tracking_number): _logger.info("ABF %s", tracking_number); return "ABF tracking not yet implemented"
-    def _wgd_track_shipment(self, tracking_number): _logger.info("WGD %s", tracking_number); return "WGD Midwest tracking not yet implemented"
-    def _aduie_pyle_track_shipment(self, tracking_number): _logger.info("A Duie Pyle %s", tracking_number); return "A Duie Pyle tracking not yet implemented"
-    def _saia_track_shipment(self, tracking_number): _logger.info("Saia %s", tracking_number); return "Saia tracking not yet implemented"
-    def _ch_robinson_track_shipment(self, tracking_number): _logger.info("CH Robinson %s", tracking_number); return "C.H. Robinson tracking not yet implemented"
-    def _ait_track_shipment(self, tracking_number): _logger.info("AIT %s", tracking_number); return "AIT tracking not yet implemented"
-    def _frontline_track_shipment(self, tracking_number): _logger.info("Frontline %s", tracking_number); return "Frontline tracking not yet implemented"
+    # ---------------- Placeholders (ready for sandbox integration) -------------
+    # NOTE: Each returns a clear placeholder and logs; add real API when creds/docs arrive.
 
-    # ---------------- Test Connection ----------------
+    # UPS (placeholder — add real logic when ready)
+    def _ups_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Implement UPS tracking (OAuth / API key as required)
+        _logger.info("UPS sandbox tracking called for %s", tracking_number)
+        return "UPS sandbox tracking not yet implemented"
+
+    def _xpo_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: XPO Logistics tracking API
+        _logger.info("XPO sandbox tracking called for %s", tracking_number)
+        return "XPO sandbox tracking not yet implemented"
+
+    def _estes_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Estes API (docs: https://developer.estes-express.com/)
+        _logger.info("Estes sandbox tracking called for %s", tracking_number)
+        return "Estes sandbox tracking not yet implemented"
+
+    def _roadrunner_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Roadrunner via AfterShip (docs: https://www.aftership.com/carriers/roadrunner-freight/api)
+        _logger.info("Roadrunner sandbox tracking called for %s", tracking_number)
+        return "Roadrunner sandbox tracking not yet implemented"
+
+    def _central_transport_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Central Transport via ShipEngine (docs: https://www.shipengine.com/integrations/central-transport/)
+        _logger.info("Central Transport sandbox tracking called for %s", tracking_number)
+        return "Central Transport sandbox tracking not yet implemented"
+
+    def _jbhunt_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: JB Hunt Dedicated (API onboarding required)
+        _logger.info("JB Hunt sandbox tracking called for %s", tracking_number)
+        return "JB Hunt sandbox tracking not yet implemented"
+
+    def _titanium_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Titanium Logistics (API onboarding required)
+        _logger.info("Titanium sandbox tracking called for %s", tracking_number)
+        return "Titanium Logistics sandbox tracking not yet implemented"
+
+    def _pitt_ohio_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Pitt Ohio via AfterShip (docs: https://www.aftership.com/carriers/pitt-ohio/api)
+        _logger.info("Pitt Ohio sandbox tracking called for %s", tracking_number)
+        return "Pitt Ohio sandbox tracking not yet implemented"
+
+    def _ceva_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: CEVA via AfterShip (docs: https://www.aftership.com/carriers/ceva/api)
+        _logger.info("CEVA sandbox tracking called for %s", tracking_number)
+        return "CEVA sandbox tracking not yet implemented"
+
+    def _tforce_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: TForce via AfterShip (docs: https://www.aftership.com/carriers/tforce/api)
+        _logger.info("TForce sandbox tracking called for %s", tracking_number)
+        return "TForce sandbox tracking not yet implemented"
+
+    def _tst_overland_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: TST Overland via AfterShip (docs: https://www.aftership.com/carriers/tst-overland/api)
+        _logger.info("TST Overland sandbox tracking called for %s", tracking_number)
+        return "TST Overland sandbox tracking not yet implemented"
+
+    def _efw_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: EFW via AfterShip (docs: https://www.aftership.com/carriers/efw/api)
+        _logger.info("EFW sandbox tracking called for %s", tracking_number)
+        return "EFW sandbox tracking not yet implemented"
+
+    def _abf_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: ABF via AfterShip (docs: https://www.aftership.com/carriers/abf/api)
+        _logger.info("ABF sandbox tracking called for %s", tracking_number)
+        return "ABF sandbox tracking not yet implemented"
+
+    def _wgd_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: WGD Midwest via AfterShip (docs: https://www.aftership.com/carriers/wgd/api)
+        _logger.info("WGD Midwest sandbox tracking called for %s", tracking_number)
+        return "WGD Midwest sandbox tracking not yet implemented"
+
+    def _aduie_pyle_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: A Duie Pyle (API onboarding required)
+        _logger.info("A Duie Pyle sandbox tracking called for %s", tracking_number)
+        return "A Duie Pyle sandbox tracking not yet implemented"
+
+    def _saia_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Saia Motor Freight (API onboarding required)
+        _logger.info("Saia sandbox tracking called for %s", tracking_number)
+        return "Saia sandbox tracking not yet implemented"
+
+    def _ch_robinson_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: C.H. Robinson (API onboarding required / TMS)
+        _logger.info("C.H. Robinson sandbox tracking called for %s", tracking_number)
+        return "C.H. Robinson sandbox tracking not yet implemented"
+
+    def _ait_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: AIT Worldwide (API onboarding required)
+        _logger.info("AIT Worldwide sandbox tracking called for %s", tracking_number)
+        return "AIT Worldwide sandbox tracking not yet implemented"
+
+    def _frontline_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # TODO: Frontline Carrier Systems USA Inc (API onboarding required)
+        _logger.info("Frontline sandbox tracking called for %s", tracking_number)
+        return "Frontline sandbox tracking not yet implemented"
+
+    # ---------------- Test Connection button -----------------------------------
     def action_test_tracking_connection(self):
         self.ensure_one()
         if self.tracking_carrier == "fedex":
+            # Real check for FedEx
             try:
                 token = self._fedex_get_access_token()
                 if token:
@@ -94,14 +193,9 @@ class DeliveryCarrier(models.Model):
                 raise UserError(_("FedEx connection failed: %s") % str(e))
 
         elif self.tracking_carrier == "ups":
+            # Placeholder until real UPS logic is added
             raise UserError(_("UPS test connection placeholder ✅"))
 
-        elif self.tracking_carrier in [
-            "xpo", "estes", "roadrunner", "central_transport", "jbhunt",
-            "titanium", "pitt_ohio", "ceva", "tforce", "tst_overland", "efw",
-            "abf", "wgd", "aduie_pyle", "saia", "ch_robinson", "ait", "frontline"
-        ]:
-            raise UserError(_("%s test connection placeholder ✅") % self.tracking_carrier.upper())
-
         else:
-            raise UserError(_("Carrier not supported yet: %s") % self.tracking_carrier)
+            # Generic placeholder for all other carriers for now
+            raise UserError(_("%s test connection placeholder ✅") % (self.tracking_carrier or "").upper())
