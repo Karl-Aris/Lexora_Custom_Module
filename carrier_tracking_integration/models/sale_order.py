@@ -31,9 +31,7 @@ class SaleOrder(models.Model):
 
             status = "Unknown"
 
-            # --------------------------
-            # FedEx Tracking
-            # --------------------------
+            # ---------------- FedEx (real) ----------------
             if carrier.tracking_carrier == "fedex":
                 token = carrier._fedex_get_access_token()
                 url = (
@@ -64,14 +62,11 @@ class SaleOrder(models.Model):
                     track_results = results[0].get("trackResults", [])
                     if track_results:
                         result = track_results[0]
-
                         if "error" in result:
-                            error_info = result["error"]
-                            status = error_info.get("message", "Tracking number not found")
+                            status = result["error"].get("message", "Tracking number not found")
                         else:
                             status_detail = result.get("latestStatusDetail", {})
                             scan_events = result.get("scanEvents", [])
-
                             if scan_events:
                                 status = scan_events[-1].get("eventDescription", status)
                             elif status_detail.get("description"):
@@ -79,30 +74,52 @@ class SaleOrder(models.Model):
                             elif status_detail.get("statusByLocale"):
                                 status = status_detail["statusByLocale"]
 
-            # --------------------------
-            # UPS Tracking
-            # --------------------------
+            # ---------------- UPS (placeholder) ----------------
             elif carrier.tracking_carrier == "ups":
-                try:
-                    status = carrier._ups_track_shipment(tracking_number)
-                except Exception as e:
-                    raise UserError(_("UPS request error: %s") % str(e))
+                status = carrier._ups_track_shipment(tracking_number)
 
-            # --------------------------
-            # XPO Tracking
-            # --------------------------
+            # ---------------- Other carriers (placeholders) ----------------
             elif carrier.tracking_carrier == "xpo":
-                try:
-                    status = carrier._xpo_track_shipment(tracking_number)
-                except Exception as e:
-                    raise UserError(_("XPO request error: %s") % str(e))
-
+                status = carrier._xpo_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "estes":
+                status = carrier._estes_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "roadrunner":
+                status = carrier._roadrunner_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "central_transport":
+                status = carrier._central_transport_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "jbhunt":
+                status = carrier._jbhunt_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "titanium":
+                status = carrier._titanium_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "pitt_ohio":
+                status = carrier._pitt_ohio_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "ceva":
+                status = carrier._ceva_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "tforce":
+                status = carrier._tforce_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "tst_overland":
+                status = carrier._tst_overland_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "efw":
+                status = carrier._efw_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "abf":
+                status = carrier._abf_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "wgd":
+                status = carrier._wgd_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "aduie_pyle":
+                status = carrier._aduie_pyle_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "saia":
+                status = carrier._saia_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "ch_robinson":
+                status = carrier._ch_robinson_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "ait":
+                status = carrier._ait_track_shipment(tracking_number)
+            elif carrier.tracking_carrier == "frontline":
+                status = carrier._frontline_track_shipment(tracking_number)
             else:
                 raise UserError(_("Unsupported carrier: %s") % carrier.tracking_carrier)
 
-            # Save status
+            # Save status & show rainbow
             order.tracking_status = status
-
             return {
                 "effect": {
                     "fadeout": "slow",
