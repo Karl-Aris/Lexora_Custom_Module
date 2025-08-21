@@ -25,7 +25,6 @@ class SaleOrder(models.Model):
                 raise UserError(_("No tracking number found on the delivery."))
 
             order.tracking_number = tracking_number
-
             carrier = picking.carrier_id
             if not carrier or not carrier.tracking_integration_enabled:
                 raise UserError(_("Tracking integration is not configured for this delivery."))
@@ -88,6 +87,15 @@ class SaleOrder(models.Model):
                     status = carrier._ups_track_shipment(tracking_number)
                 except Exception as e:
                     raise UserError(_("UPS request error: %s") % str(e))
+
+            # --------------------------
+            # XPO Tracking
+            # --------------------------
+            elif carrier.tracking_carrier == "xpo":
+                try:
+                    status = carrier._xpo_track_shipment(tracking_number)
+                except Exception as e:
+                    raise UserError(_("XPO request error: %s") % str(e))
 
             else:
                 raise UserError(_("Unsupported carrier: %s") % carrier.tracking_carrier)
