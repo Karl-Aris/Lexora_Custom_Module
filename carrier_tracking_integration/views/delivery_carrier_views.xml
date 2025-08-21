@@ -1,6 +1,6 @@
 <odoo>
-    <record id="view_delivery_carrier_form_tracking" model="ir.ui.view">
-        <field name="name">delivery.carrier.form.tracking</field>
+    <record id="view_delivery_carrier_form_tracking_unified" model="ir.ui.view">
+        <field name="name">delivery.carrier.form.tracking.unified</field>
         <field name="model">delivery.carrier</field>
         <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
         <field name="arch" type="xml">
@@ -8,18 +8,21 @@
                 <group string="Tracking Integration">
                     <field name="tracking_integration_enabled"/>
                     <field name="tracking_carrier"
-                           modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
-                    <field name="tracking_api_key"
-                           modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
-                    <field name="tracking_secret_key"
-                           modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
+                           modifiers='{"invisible": [["tracking_integration_enabled", "=", false]]}'/>
+                    <field name="tracking_sandbox_mode"
+                           modifiers='{"invisible": [["tracking_integration_enabled", "=", false]]}'/>
                     <field name="tracking_account_number"
-                           modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
+                           modifiers='{"invisible": [["tracking_integration_enabled", "=", false]]}'/>
+                    <field name="tracking_api_key"
+                           modifiers='{"invisible": [["tracking_integration_enabled", "=", false]]}'/>
+                    <field name="tracking_secret_key"
+                           password="True"
+                           modifiers='{"invisible": [["tracking_integration_enabled", "=", false]]}'/>
                     <button name="action_test_tracking_connection"
                             string="Test Tracking Connection"
                             type="object"
                             class="btn-primary"
-                            modifiers='{"invisible": [["tracking_integration_enabled","=",false]]}'/>
+                            modifiers='{"invisible": [["tracking_integration_enabled", "=", false]]}'/>
                 </group>
             </xpath>
         </field>
