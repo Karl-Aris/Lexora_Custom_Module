@@ -1,7 +1,6 @@
-# carrier_tracking_integration/models/sale_order.py
-import requests
 import logging
-from odoo import api, fields, models, _
+import requests
+from odoo import models, fields, _
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -31,7 +30,7 @@ class SaleOrder(models.Model):
 
             status = "Unknown"
 
-            # ---------------- FedEx (real) ----------------
+            # ─────────────────────────────────────────────────────────── FedEx real
             if carrier.tracking_carrier == "fedex":
                 token = carrier._fedex_get_access_token()
                 url = (
@@ -47,17 +46,15 @@ class SaleOrder(models.Model):
                     "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
                     "includeDetailedScans": True,
                 }
-
                 try:
-                    response = requests.post(url, headers=headers, json=payload, timeout=20)
-                    response.raise_for_status()
-                    _logger.info("FedEx Track Response (%s): %s", tracking_number, response.text)
+                    resp = requests.post(url, headers=headers, json=payload, timeout=25)
+                    resp.raise_for_status()
+                    _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)
                 except requests.exceptions.RequestException as e:
                     raise UserError(_("FedEx request error: %s") % str(e))
 
-                data = response.json()
+                data = resp.json()
                 results = data.get("output", {}).get("completeTrackResults", [])
-
                 if results:
                     track_results = results[0].get("trackResults", [])
                     if track_results:
@@ -74,11 +71,11 @@ class SaleOrder(models.Model):
                             elif status_detail.get("statusByLocale"):
                                 status = status_detail["statusByLocale"]
 
-            # ---------------- UPS (placeholder) ----------------
+            # ─────────────────────────────────────────────────────────── UPS placeholder
             elif carrier.tracking_carrier == "ups":
                 status = carrier._ups_track_shipment(tracking_number)
 
-            # ---------------- Other carriers (placeholders) ----------------
+            # ───────────────────────────────────────────────────── Other carriers
             elif carrier.tracking_carrier == "xpo":
                 status = carrier._xpo_track_shipment(tracking_number)
             elif carrier.tracking_carrier == "estes":
@@ -118,7 +115,6 @@ class SaleOrder(models.Model):
             else:
                 raise UserError(_("Unsupported carrier: %s") % carrier.tracking_carrier)
 
-            # Save status & show rainbow
             order.tracking_status = status
             return {
                 "effect": {
