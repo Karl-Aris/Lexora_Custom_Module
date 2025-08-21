@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import requests
 from odoo import models, fields, _
@@ -13,24 +14,18 @@ class SaleOrder(models.Model):
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
     def action_track_shipment(self):
+        """Track shipment from sale order using carrier logic"""
         for order in self:
-            picking = order.picking_ids.filtered(lambda p: p.picking_type_code == "outgoing")
-            if not picking:
-                raise UserError(_("No outgoing delivery found for this Sale Order."))
+            if not order.carrier_id:
+                raise UserError(_("No delivery carrier set for this order."))
+            if not order.tracking_number:
+                raise UserError(_("No tracking number available for this order."))
 
-            picking = picking[0]
-            tracking_number = picking.carrier_tracking_ref
-            if not tracking_number:
-                raise UserError(_("No tracking number found on the delivery."))
-
-            order.tracking_number = tracking_number
-            carrier = picking.carrier_id
-            if not carrier or not carrier.tracking_integration_enabled:
-                raise UserError(_("Tracking integration is not configured for this delivery."))
-
+            carrier = order.carrier_id
+            tracking_number = order.tracking_number
             status = "Unknown"
 
-            # ─────────────────────────────────────────────────────────── FedEx real
+            # ───────────────────────────── FedEx (real API)
             if carrier.tracking_carrier == "fedex":
                 token = carrier._fedex_get_access_token()
                 url = (
@@ -50,10 +45,10 @@ class SaleOrder(models.Model):
                     resp = requests.post(url, headers=headers, json=payload, timeout=25)
                     resp.raise_for_status()
                     _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)
+                    data = resp.json()
                 except requests.exceptions.RequestException as e:
                     raise UserError(_("FedEx request error: %s") % str(e))
 
-                data = resp.json()
                 results = data.get("output", {}).get("completeTrackResults", [])
                 if results:
                     track_results = results[0].get("trackResults", [])
@@ -71,11 +66,11 @@ class SaleOrder(models.Model):
                             elif status_detail.get("statusByLocale"):
                                 status = status_detail["statusByLocale"]
 
-            # ─────────────────────────────────────────────────────────── UPS placeholder
+            # ───────────────────────────── UPS (placeholder)
             elif carrier.tracking_carrier == "ups":
                 status = carrier._ups_track_shipment(tracking_number)
 
-            # ───────────────────────────────────────────────────── Other carriers
+            # ───────────────────────────── Other carriers (placeholders)
             elif carrier.tracking_carrier == "xpo":
                 status = carrier._xpo_track_shipment(tracking_number)
             elif carrier.tracking_carrier == "estes":
@@ -115,7 +110,10 @@ class SaleOrder(models.Model):
             else:
                 raise UserError(_("Unsupported carrier: %s") % carrier.tracking_carrier)
 
+            # Save status in order field
             order.tracking_status = status
+
+            # Show rainbow man popup
             return {
                 "effect": {
                     "fadeout": "slow",
