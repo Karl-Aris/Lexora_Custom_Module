@@ -10,12 +10,11 @@ _logger = logging.getLogger(__name__)
 class DeliveryCarrier(models.Model):
     _inherit = "delivery.carrier"
 
-    # your existing fields...
     tracking_integration_enabled = fields.Boolean("Enable Tracking Integration")
     tracking_carrier = fields.Selection([
         ("ups", "UPS"),
         ("fedex", "FedEx"),
-        ("dhl", "DHL"),
+        ("xpo", "XPO Logistics"),
     ], string="Carrier")
     tracking_api_key = fields.Char("API Key")
     tracking_account_number = fields.Char("Account Number")
@@ -37,10 +36,20 @@ class DeliveryCarrier(models.Model):
         }
         resp = requests.post(url, data=data, headers=headers, timeout=15)
         if resp.status_code != 200:
-            raise UserError(_("FedEx OAuth failed: %s") % resp.text)
+            try:
+                err = resp.json()
+                msg = err.get("error_description") or err.get("error") or resp.text
+            except Exception:
+                msg = resp.text
+            raise UserError(_("FedEx OAuth failed: %s") % msg)
         return resp.json().get("access_token")
 
-    # NEW: Test connection button
+    def _xpo_track_shipment(self, tracking_number):
+        self.ensure_one()
+        # 🔧 TODO: Replace with real XPO API call once credentials/docs are available
+        _logger.info("XPO Tracking called for %s", tracking_number)
+        return "XPO tracking not yet implemented"
+
     def action_test_tracking_connection(self):
         self.ensure_one()
         if self.tracking_carrier == "fedex":
@@ -53,10 +62,17 @@ class DeliveryCarrier(models.Model):
 
         elif self.tracking_carrier == "ups":
             try:
-                # We’ll stub UPS connection check until UPS API is wired
+                # Stub UPS test
                 raise UserError(_("UPS test connection placeholder ✅"))
             except Exception as e:
                 raise UserError(_("UPS connection failed: %s") % str(e))
+
+        elif self.tracking_carrier == "xpo":
+            try:
+                # Stub XPO test
+                raise UserError(_("XPO Logistics test connection placeholder ✅"))
+            except Exception as e:
+                raise UserError(_("XPO connection failed: %s") % str(e))
 
         else:
             raise UserError(_("Carrier not supported yet: %s") % self.tracking_carrier)
