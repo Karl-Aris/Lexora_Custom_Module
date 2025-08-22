@@ -119,13 +119,13 @@ class SaleOrder(models.Model):
 
                             tracking_number = results[0].get("trackingNumber", "Unknown")
 
-                            scan_events = result.get("scanEvents", [])
-                            if scan_events:
-                                status = scan_events[-1].get("eventDescription", status)
-                            elif status_detail.get("description"):
-                                status = status_detail["description"]
-                            elif status_detail.get("statusByLocale"):
-                                status = status_detail["statusByLocale"]
+                            # scan_events = result.get("scanEvents", [])
+                            # if scan_events:
+                            #     status = scan_events[-1].get("eventDescription", status)
+                            # elif status_detail.get("description"):
+                            #     status = status_detail["description"]
+                            # elif status_detail.get("statusByLocale"):
+                            #     status = status_detail["statusByLocale"]
 
             except requests.exceptions.RequestException as e:
                 _logger.error("FedEx request error: %s", str(e))
