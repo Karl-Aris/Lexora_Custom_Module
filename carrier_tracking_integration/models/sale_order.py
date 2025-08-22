@@ -2,6 +2,7 @@ import logging
 import requests
 from odoo import models, fields, _
 from odoo.exceptions import UserError
+import json
 
 _logger = logging.getLogger(__name__)
 
@@ -10,6 +11,7 @@ class SaleOrder(models.Model):
 
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
+    fedex_token = fields.Char(string="FedEx Access Token", readonly=True, copy=False)
 
     def _get_fedex_token(self):
         """Fetch the FedEx OAuth token."""
@@ -43,6 +45,17 @@ class SaleOrder(models.Model):
             _logger.error("Error in FedEx token request: %s", str(e))
             raise UserError(_("Error in FedEx token request: %s") % str(e))
 
+    def _get_token_or_refresh(self):
+        """Check if token exists or refresh it if expired"""
+        if self.fedex_token:
+            # If token exists, just use it
+            return self.fedex_token
+        else:
+            # If token doesn't exist, fetch a new one
+            new_token = self._get_fedex_token()
+            self.fedex_token = new_token  # Store the token in the model
+            return new_token
+
     def action_track_shipment(self):
         """Track shipment from sale order using carrier logic"""
         for order in self:
@@ -54,8 +67,8 @@ class SaleOrder(models.Model):
             status = "Unknown"
             json_data = None
 
-            # Fetch the FedEx token dynamically
-            new_token = self._get_fedex_token()
+            # Fetch the FedEx token dynamically (or refresh if expired)
+            new_token = self._get_token_or_refresh()
 
             # ───────────────────────────── FedEx (real API)
             track_url = "https://apis-sandbox.fedex.com/track/v1/tcn"
@@ -78,7 +91,15 @@ class SaleOrder(models.Model):
             try:
                 # Send POST request for tracking
                 resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
-                resp.raise_for_status()
+
+                if resp.status_code == 401:  # Token expired, regenerate and retry
+                    _logger.info("Token expired, refreshing the token...")
+                    new_token = self._get_fedex_token()  # Refresh token
+                    self.fedex_token = new_token  # Store the new token
+                    track_headers['Authorization'] = "Bearer " + new_token
+                    resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
+                
+                resp.raise_for_status()  # Will raise an error if the request was unsuccessful
                 _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)
 
                 data = resp.json()
