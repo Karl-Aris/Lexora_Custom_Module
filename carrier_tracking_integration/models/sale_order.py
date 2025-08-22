@@ -86,7 +86,8 @@ class SaleOrder(models.Model):
 
                     data = resp.json()
                     results = data.get("output", {}).get("completeTrackResults", [])
-                    json_data = results;
+                    json_data = results
+                    _logger.info("JSON Data returned: %s", json.dumps(json_data, indent=4))  # Pretty-print JSON data
                     if results:
                         track_results = results[0].get("trackResults", [])
                         if track_results:
@@ -117,8 +118,7 @@ class SaleOrder(models.Model):
             return {
                 "effect": {
                     "fadeout": "slow",
-                    # "message": _("Tracking Status for %s: %s") % (tracking_number, status),
-                    "message": json_data,
+                    "message": _("Tracking Status for %s: %s") % (tracking_number, status),
                     "type": "rainbow_man",
                 }
             }
