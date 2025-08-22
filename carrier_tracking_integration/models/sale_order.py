@@ -75,11 +75,13 @@ class SaleOrder(models.Model):
                     'X-locale': "en_US",
                     'Authorization': "Bearer " + new_token,
                 }
-                
+
+                json_data = None
                 try:
                     # Send POST request for tracking
                     resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
                     resp.raise_for_status()
+                    json_data = resp.text
                     _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)  # Log the response
 
                     data = resp.json()
@@ -114,7 +116,7 @@ class SaleOrder(models.Model):
                 "effect": {
                     "fadeout": "slow",
                     # "message": _("Tracking Status for %s: %s") % (tracking_number, status),
-                    "message": resp.text,
+                    "message": json_data,
                     "type": "rainbow_man",
                 }
             }
