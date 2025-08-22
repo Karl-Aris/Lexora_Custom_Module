@@ -72,9 +72,8 @@ class SaleOrder(models.Model):
                 }
                 headers = {
                     'Content-Type': "application/json",
-                    'Token' : new_token,
                     'X-locale': "en_US",
-                    'Authorization': "Bearer "
+                    'Authorization': "Bearer " + new_token,
                     }
                 
                 response = requests.post(url, data=payload, headers=headers)
