@@ -82,11 +82,11 @@ class SaleOrder(models.Model):
                     # Send POST request for tracking
                     resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
                     resp.raise_for_status()
-                    json_data = resp.text
                     _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)  # Log the response
 
                     data = resp.json()
                     results = data.get("output", {}).get("completeTrackResults", [])
+                    json_data = results;
                     if results:
                         track_results = results[0].get("trackResults", [])
                         if track_results:
@@ -111,6 +111,7 @@ class SaleOrder(models.Model):
 
             # Save status in order field
             order.tracking_status = status
+            order.tracking_number = tracking_number
 
             # Show rainbow man popup
             return {
