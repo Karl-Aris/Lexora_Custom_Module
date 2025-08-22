@@ -1,9 +1,9 @@
 import logging
 import requests
+import uuid
+import time
 from odoo import models, fields, _
 from odoo.exceptions import UserError
-import json
-import uuid
 
 _logger = logging.getLogger(__name__)
 
@@ -12,10 +12,18 @@ class SaleOrder(models.Model):
 
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
-    fedex_token = fields.Char(string="FedEx Access Token", readonly=True, copy=False)
+
+    _fedex_token = None  # Cache for token
+    _token_expiry_time = None  # Token expiry time
 
     def _get_fedex_token(self):
-        """Fetch the FedEx OAuth token."""
+        """Fetch the FedEx OAuth token (with caching)."""
+        # Check if token is cached and still valid
+        if self._fedex_token and time.time() < self._token_expiry_time:
+            _logger.info("Using cached FedEx token.")
+            return self._fedex_token
+
+        # If no valid cached token, fetch a new one
         url = "https://apis-sandbox.fedex.com/oauth/token"
         payload = {
             'grant_type': 'client_credentials',
@@ -33,8 +41,12 @@ class SaleOrder(models.Model):
             if response.status_code == 200:
                 response_data = response.json()
                 new_token = response_data.get('access_token')
+                expires_in = response_data.get('expires_in', 3600)  # Default expiry 1 hour
                 if new_token:
-                    _logger.info("Access Token: %s", new_token)
+                    # Cache the token and its expiry time
+                    self._fedex_token = new_token
+                    self._token_expiry_time = time.time() + expires_in
+                    _logger.info("New Access Token: %s", new_token)
                     return new_token
                 else:
                     _logger.error("No access token found in the response.")
@@ -46,17 +58,6 @@ class SaleOrder(models.Model):
             _logger.error("Error in FedEx token request: %s", str(e))
             raise UserError(_("Error in FedEx token request: %s") % str(e))
 
-    def _get_token_or_refresh(self):
-        """Check if token exists or refresh it if expired"""
-        if self.fedex_token:
-            # If token exists, just use it
-            return self.fedex_token
-        else:
-            # If token doesn't exist, fetch a new one
-            new_token = self._get_fedex_token()
-            self.fedex_token = new_token  # Store the token in the model
-            return new_token
-
     def action_track_shipment(self):
         """Track shipment from sale order using carrier logic"""
         for order in self:
@@ -67,11 +68,9 @@ class SaleOrder(models.Model):
             tracking_number = '9632080400676090940600881054121257'  # Replace with actual order tracking number
             status = "Unknown"
             json_data = None
-            transaction_id = str(uuid.uuid4())  # Generate a unique transaction ID
-            customer_transaction_id = "Order_" + str(order.id)  # Use order ID for customer transaction ID
 
-            # Fetch the FedEx token dynamically (or refresh if expired)
-            new_token = self._get_token_or_refresh()
+            # Fetch the FedEx token dynamically (with caching)
+            new_token = self._get_fedex_token()
 
             # ───────────────────────────── FedEx (real API)
             track_url = "https://apis-sandbox.fedex.com/track/v1/tcn"
@@ -85,26 +84,20 @@ class SaleOrder(models.Model):
                 ],
                 "includeDetailedScans": True
             }
+
+            # Prepare the headers
             track_headers = {
                 'Content-Type': "application/json",
                 'X-locale': "en_US",
                 'Authorization': "Bearer " + new_token,
-                'x-customer-transaction-id': transaction_id,  # Dynamically generated transaction ID
-                'customerTransactionId': customer_transaction_id  # Use a unique identifier like the order ID
+                'x-customer-transaction-id': str(uuid.uuid4()),  # Unique transaction ID
+                'customerTransactionId': "Order_" + str(order.id)  # Customer-specific transaction ID
             }
 
             try:
                 # Send POST request for tracking
                 resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
-
-                if resp.status_code == 401:  # Token expired, regenerate and retry
-                    _logger.info("Token expired, refreshing the token...")
-                    new_token = self._get_fedex_token()  # Refresh token
-                    self.fedex_token = new_token  # Store the new token
-                    track_headers['Authorization'] = "Bearer " + new_token
-                    resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
-                
-                resp.raise_for_status()  # Will raise an error if the request was unsuccessful
+                resp.raise_for_status()  # Will raise an exception for 4xx/5xx responses
                 _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)
 
                 data = resp.json()
