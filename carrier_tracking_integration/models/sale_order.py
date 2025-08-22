@@ -13,15 +13,16 @@ class SaleOrder(models.Model):
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
-    _fedex_token = None  # Cache for token
-    _token_expiry_time = None  # Token expiry time
+    # Cache for token in memory (using class-level variables is not ideal in Odoo, better use _context or singleton)
+    _fedex_token_cache = None  # Global cache for token
+    _token_expiry_time_cache = None  # Global cache for token expiry time
 
     def _get_fedex_token(self):
         """Fetch the FedEx OAuth token (with caching)."""
         # Check if token is cached and still valid
-        if self._fedex_token and time.time() < self._token_expiry_time:
+        if self._fedex_token_cache and time.time() < self._token_expiry_time_cache:
             _logger.info("Using cached FedEx token.")
-            return self._fedex_token
+            return self._fedex_token_cache
 
         # If no valid cached token, fetch a new one
         url = "https://apis-sandbox.fedex.com/oauth/token"
@@ -43,9 +44,9 @@ class SaleOrder(models.Model):
                 new_token = response_data.get('access_token')
                 expires_in = response_data.get('expires_in', 3600)  # Default expiry 1 hour
                 if new_token:
-                    # Cache the token and its expiry time
-                    self._fedex_token = new_token
-                    self._token_expiry_time = time.time() + expires_in
+                    # Cache the token and its expiry time in the class-level cache
+                    SaleOrder._fedex_token_cache = new_token
+                    SaleOrder._token_expiry_time_cache = time.time() + expires_in
                     _logger.info("New Access Token: %s", new_token)
                     return new_token
                 else:
