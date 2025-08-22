@@ -74,7 +74,7 @@ class SaleOrder(models.Model):
             new_token = self._get_fedex_token()
 
             # ───────────────────────────── FedEx (real API)
-            track_url = "https://apis-sandbox.fedex.com/track/v1/tcn"
+            track_url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
             track_payload = {
                 "trackingInfo": [
                     {
