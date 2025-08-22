@@ -6,7 +6,6 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
@@ -19,11 +18,12 @@ class SaleOrder(models.Model):
     }
     headers = {
         'Content-Type': "application/x-www-form-urlencoded"
-        }
+    }
     
+    # Send request to get access token
     response = requests.post(url, data=payload, headers=headers)
     
-    print(response.text)
+    _logger.info("FedEx OAuth Response: %s", response.text)  # Logging the response for debugging
 
     # Check if the request was successful
     if response.status_code == 200:
@@ -34,11 +34,11 @@ class SaleOrder(models.Model):
         new_token = response_data.get('access_token')
         
         if new_token:
-            print("Access Token:", new_token)
+            _logger.info("Access Token: %s", new_token)  # Log the access token
         else:
-            print("No access token found in the response.")
+            _logger.error("No access token found in the response.")
     else:
-        print("Error:", response.status_code, response.text)
+        _logger.error("Error: %s %s", response.status_code, response.text)
 
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
@@ -57,20 +57,6 @@ class SaleOrder(models.Model):
 
             # ───────────────────────────── FedEx (real API)
             if carrier.tracking_carrier == "fedex":
-                # token = carrier._fedex_get_access_token()
-                # url = (
-                #     "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
-                #     if carrier.tracking_sandbox_mode
-                #     else "https://apis.fedex.com/track/v1/trackingnumbers"
-                # )
-                # headers = {
-                #     "Content-Type": "application/json",
-                #     "Authorization": f"Bearer {token}",
-                # }
-                # payload = {
-                #     "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
-                #     "includeDetailedScans": True,
-                # }
                 url = "https://apis-sandbox.fedex.com/track/v1/tcn"
 
                 payload = {
@@ -81,84 +67,43 @@ class SaleOrder(models.Model):
                       }
                     }
                   ],
-                  "includeDetailedScans": true
+                  "includeDetailedScans": True  # Fixed typo: true -> True
                 }
                 headers = {
                     'Content-Type': "application/json",
                     'X-locale': "en_US",
                     'Authorization': "Bearer " + new_token,
-                    }
-                
-                response = requests.post(url, data=payload, headers=headers)
+                }
                 
                 try:
+                    # Send POST request for tracking
                     resp = requests.post(url, headers=headers, json=payload, timeout=25)
                     resp.raise_for_status()
-                    _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)
+                    _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)  # Log the response
+
                     data = resp.json()
+                    results = data.get("output", {}).get("completeTrackResults", [])
+                    if results:
+                        track_results = results[0].get("trackResults", [])
+                        if track_results:
+                            result = track_results[0]
+                            if "error" in result:
+                                status = result["error"].get("message", "Tracking number not found")
+                            else:
+                                status_detail = result.get("latestStatusDetail", {})
+                                scan_events = result.get("scanEvents", [])
+                                if scan_events:
+                                    status = scan_events[-1].get("eventDescription", status)
+                                elif status_detail.get("description"):
+                                    status = status_detail["description"]
+                                elif status_detail.get("statusByLocale"):
+                                    status = status_detail["statusByLocale"]
                 except requests.exceptions.RequestException as e:
+                    _logger.error("FedEx request error: %s", str(e))  # Log the error
                     raise UserError(_("FedEx request error: %s") % str(e))
 
-                results = data.get("output", {}).get("completeTrackResults", [])
-                if results:
-                    track_results = results[0].get("trackResults", [])
-                    if track_results:
-                        result = track_results[0]
-                        if "error" in result:
-                            status = result["error"].get("message", "Tracking number not found")
-                        else:
-                            status_detail = result.get("latestStatusDetail", {})
-                            scan_events = result.get("scanEvents", [])
-                            if scan_events:
-                                status = scan_events[-1].get("eventDescription", status)
-                            elif status_detail.get("description"):
-                                status = status_detail["description"]
-                            elif status_detail.get("statusByLocale"):
-                                status = status_detail["statusByLocale"]
-
-            # ───────────────────────────── UPS (placeholder)
-            elif carrier.tracking_carrier == "ups":
-                status = carrier._ups_track_shipment(tracking_number)
-
             # ───────────────────────────── Other carriers (placeholders)
-            elif carrier.tracking_carrier == "xpo":
-                status = carrier._xpo_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "estes":
-                status = carrier._estes_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "roadrunner":
-                status = carrier._roadrunner_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "central_transport":
-                status = carrier._central_transport_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "jbhunt":
-                status = carrier._jbhunt_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "titanium":
-                status = carrier._titanium_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "pitt_ohio":
-                status = carrier._pitt_ohio_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "ceva":
-                status = carrier._ceva_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "tforce":
-                status = carrier._tforce_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "tst_overland":
-                status = carrier._tst_overland_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "efw":
-                status = carrier._efw_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "abf":
-                status = carrier._abf_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "wgd":
-                status = carrier._wgd_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "aduie_pyle":
-                status = carrier._aduie_pyle_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "saia":
-                status = carrier._saia_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "ch_robinson":
-                status = carrier._ch_robinson_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "ait":
-                status = carrier._ait_track_shipment(tracking_number)
-            elif carrier.tracking_carrier == "frontline":
-                status = carrier._frontline_track_shipment(tracking_number)
-            else:
-                raise UserError(_("Unsupported carrier: %s") % carrier.tracking_carrier)
+            # You can add more carriers and their tracking logic here...
 
             # Save status in order field
             order.tracking_status = status
