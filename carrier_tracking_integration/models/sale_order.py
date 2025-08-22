@@ -113,7 +113,8 @@ class SaleOrder(models.Model):
             return {
                 "effect": {
                     "fadeout": "slow",
-                    "message": _("Tracking Status for %s: %s") % (tracking_number, status),
+                    # "message": _("Tracking Status for %s: %s") % (tracking_number, status),
+                    "message": resp.text,
                     "type": "rainbow_man",
                 }
             }
