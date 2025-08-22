@@ -25,6 +25,8 @@ class SaleOrder(models.Model):
     
     print(response.text)
 
+    new_token = response.access_token
+
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
@@ -70,7 +72,7 @@ class SaleOrder(models.Model):
                 }
                 headers = {
                     'Content-Type': "application/json",
-                    'Token' : response.access_token,
+                    'Token' : new_token,
                     'X-locale': "en_US",
                     'Authorization': "Bearer "
                     }
