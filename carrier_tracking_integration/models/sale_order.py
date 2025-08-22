@@ -65,11 +65,11 @@ class SaleOrder(models.Model):
         for order in self:
             if not order.carrier_id:
                 raise UserError(_("No delivery carrier set for this order."))
-            if not order.tracking_number:
+            if not order.carrier_tracking_ref:
                 raise UserError(_("No tracking number set for this order."))
 
             carrier = order.carrier_id
-            tracking_number = order.tracking_number
+            tracking_number = order.carrier_tracking_ref
             status = "Unknown"
             json_data = None
 
