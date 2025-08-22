@@ -48,8 +48,8 @@ class SaleOrder(models.Model):
         for order in self:
             if not order.carrier_id:
                 raise UserError(_("No delivery carrier set for this order."))
-            if not order.tracking_number:
-                raise UserError(_("No tracking number available for this order."))
+            # if not order.tracking_number:
+            #     raise UserError(_("No tracking number available for this order."))
 
             carrier = order.carrier_id
             tracking_number = order.tracking_number
