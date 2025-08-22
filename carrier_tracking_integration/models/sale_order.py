@@ -59,7 +59,7 @@ class SaleOrder(models.Model):
             if carrier.tracking_carrier == "fedex":
                 url = "https://apis-sandbox.fedex.com/track/v1/tcn"
 
-                payload = {
+                track_payload = {
                   "trackingInfo": [
                     {
                       "trackingNumberInfo": {
@@ -69,7 +69,7 @@ class SaleOrder(models.Model):
                   ],
                   "includeDetailedScans": True  # Fixed typo: true -> True
                 }
-                headers = {
+                track_headers = {
                     'Content-Type': "application/json",
                     'X-locale': "en_US",
                     'Authorization': "Bearer " + new_token,
@@ -77,7 +77,7 @@ class SaleOrder(models.Model):
                 
                 try:
                     # Send POST request for tracking
-                    resp = requests.post(url, headers=headers, json=payload, timeout=25)
+                    resp = requests.post(url, headers=track_headers, json=track_payload, timeout=25)
                     resp.raise_for_status()
                     _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)  # Log the response
 
