@@ -59,72 +59,72 @@ class SaleOrder(models.Model):
 
             # ───────────────────────────── FedEx (real API)
             # if carrier.tracking_carrier == "fedex":
-                track_url = "https://apis-sandbox.fedex.com/track/v1/tcn"
+            track_url = "https://apis-sandbox.fedex.com/track/v1/tcn"
 
-                track_payload = {
-                  "trackingInfo": [
-                    {
-                      "trackingNumberInfo": {
-                        "trackingNumber": tracking_number
-                      }
+            track_payload = {
+                "trackingInfo": [
+                {
+                    "trackingNumberInfo": {
+                    "trackingNumber": tracking_number
                     }
-                  ],
-                  "includeDetailedScans": True  # Fixed typo: true -> True
                 }
-                track_headers = {
-                    'Content-Type': "application/json",
-                    'X-locale': "en_US",
-                    'Authorization': "Bearer " + new_token,
-                }
-
-                
-                try:
-                    # Send POST request for tracking
-                    resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
-                    resp.raise_for_status()
-                    _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)  # Log the response
-
-                    data = resp.json()
-                    results = data.get("output", {}).get("completeTrackResults", [])
-                    json_data = results
-                    _logger.info("JSON Data returned: %s", json.dumps(json_data, indent=4))  # Pretty-print JSON data
-                    if results:
-                        track_results = results[0].get("trackResults", [])
-                        if track_results:
-                            result = track_results[0]
-                            if "error" in result:
-                                status = result["error"].get("message", "Tracking number not found")
-                            else:
-                                # Extract the status from latestStatusDetail
-                                status_detail = result.get("latestStatusDetail", {})
-                                status = status_detail.get("statusByLocale", "Unknown")  # Default to "Unknown" if not found
-                        
-                                # Extract the tracking number from completeTrackResults
-                                tracking_number = results[0].get("trackingNumber", "Unknown")  # Default to "Unknown" if not found
-                                
-                                scan_events = result.get("scanEvents", [])
-                                if scan_events:
-                                    status = scan_events[-1].get("eventDescription", status)
-                                elif status_detail.get("description"):
-                                    status = status_detail["description"]
-                                elif status_detail.get("statusByLocale"):
-                                    status = status_detail["statusByLocale"]
-                except requests.exceptions.RequestException as e:
-                    _logger.error("FedEx request error: %s", str(e))  # Log the error
-                    raise UserError(_("FedEx request error: %s") % str(e))
-
-            # ───────────────────────────── Other carriers (placeholders)
-            # You can add more carriers and their tracking logic here...
-
-            # Save status in order field
-            order.tracking_status = status
-            order.tracking_number = tracking_number
-
-            # Show rainbow man popup
-            return {
-                "effect": {
-                    "fadeout": "slow",
-                    "message": _("Tracking Status for %s: %s") % (tracking_number, status),
-                    "type": "rainbow_man",
-                }
+                ],
+                "includeDetailedScans": True  # Fixed typo: true -> True
             }
+            track_headers = {
+                'Content-Type': "application/json",
+                'X-locale': "en_US",
+                'Authorization': "Bearer " + new_token,
+            }
+
+            
+            try:
+                # Send POST request for tracking
+                resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
+                resp.raise_for_status()
+                _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)  # Log the response
+
+                data = resp.json()
+                results = data.get("output", {}).get("completeTrackResults", [])
+                json_data = results
+                _logger.info("JSON Data returned: %s", json.dumps(json_data, indent=4))  # Pretty-print JSON data
+                if results:
+                    track_results = results[0].get("trackResults", [])
+                    if track_results:
+                        result = track_results[0]
+                        if "error" in result:
+                            status = result["error"].get("message", "Tracking number not found")
+                        else:
+                            # Extract the status from latestStatusDetail
+                            status_detail = result.get("latestStatusDetail", {})
+                            status = status_detail.get("statusByLocale", "Unknown")  # Default to "Unknown" if not found
+                    
+                            # Extract the tracking number from completeTrackResults
+                            tracking_number = results[0].get("trackingNumber", "Unknown")  # Default to "Unknown" if not found
+                            
+                            scan_events = result.get("scanEvents", [])
+                            if scan_events:
+                                status = scan_events[-1].get("eventDescription", status)
+                            elif status_detail.get("description"):
+                                status = status_detail["description"]
+                            elif status_detail.get("statusByLocale"):
+                                status = status_detail["statusByLocale"]
+            except requests.exceptions.RequestException as e:
+                _logger.error("FedEx request error: %s", str(e))  # Log the error
+                raise UserError(_("FedEx request error: %s") % str(e))
+
+        # ───────────────────────────── Other carriers (placeholders)
+        # You can add more carriers and their tracking logic here...
+
+        # Save status in order field
+        order.tracking_status = status
+        order.tracking_number = tracking_number
+
+        # Show rainbow man popup
+        return {
+            "effect": {
+                "fadeout": "slow",
+                "message": _("Tracking Status for %s: %s") % (tracking_number, status),
+                "type": "rainbow_man",
+            }
+        }
