@@ -58,7 +58,7 @@ class SaleOrder(models.Model):
             json_data = None
 
             # ───────────────────────────── FedEx (real API)
-            if carrier.tracking_carrier == "fedex":
+            # if carrier.tracking_carrier == "fedex":
                 track_url = "https://apis-sandbox.fedex.com/track/v1/tcn"
 
                 track_payload = {
@@ -102,13 +102,13 @@ class SaleOrder(models.Model):
                                 # Extract the tracking number from completeTrackResults
                                 tracking_number = results[0].get("trackingNumber", "Unknown")  # Default to "Unknown" if not found
                                 
-                                # scan_events = result.get("scanEvents", [])
-                                # if scan_events:
-                                #     status = scan_events[-1].get("eventDescription", status)
-                                # elif status_detail.get("description"):
-                                #     status = status_detail["description"]
-                                # elif status_detail.get("statusByLocale"):
-                                #     status = status_detail["statusByLocale"]
+                                scan_events = result.get("scanEvents", [])
+                                if scan_events:
+                                    status = scan_events[-1].get("eventDescription", status)
+                                elif status_detail.get("description"):
+                                    status = status_detail["description"]
+                                elif status_detail.get("statusByLocale"):
+                                    status = status_detail["statusByLocale"]
                 except requests.exceptions.RequestException as e:
                     _logger.error("FedEx request error: %s", str(e))  # Log the error
                     raise UserError(_("FedEx request error: %s") % str(e))
