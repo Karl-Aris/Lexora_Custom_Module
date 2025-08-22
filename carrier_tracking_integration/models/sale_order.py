@@ -95,7 +95,13 @@ class SaleOrder(models.Model):
                             if "error" in result:
                                 status = result["error"].get("message", "Tracking number not found")
                             else:
+                                # Extract the status from latestStatusDetail
                                 status_detail = result.get("latestStatusDetail", {})
+                                status = status_detail.get("statusByLocale", "Unknown")  # Default to "Unknown" if not found
+                        
+                                # Extract the tracking number from completeTrackResults
+                                tracking_number = results[0].get("trackingNumber", "Unknown")  # Default to "Unknown" if not found
+                                
                                 scan_events = result.get("scanEvents", [])
                                 if scan_events:
                                     status = scan_events[-1].get("eventDescription", status)
