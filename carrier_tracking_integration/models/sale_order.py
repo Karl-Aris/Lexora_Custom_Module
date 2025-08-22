@@ -55,6 +55,7 @@ class SaleOrder(models.Model):
             # tracking_number = order.tracking_number
             tracking_number = '9632080400676090940600881054121257'
             status = "Unknown"
+            json_data = None
 
             # ───────────────────────────── FedEx (real API)
             if carrier.tracking_carrier == "fedex":
@@ -76,7 +77,7 @@ class SaleOrder(models.Model):
                     'Authorization': "Bearer " + new_token,
                 }
 
-                json_data = None
+                
                 try:
                     # Send POST request for tracking
                     resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
