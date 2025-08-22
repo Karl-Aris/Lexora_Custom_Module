@@ -10,6 +10,21 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    url = "https://apis-sandbox.fedex.com/oauth/token"
+
+    payload = {
+        grant_type:client_credentials
+        client_id:l770fae96d7b5144c9aec2ada941608b60
+        client_secret:8c2f94b246314d459bf711854201f0d4
+    }
+    headers = {
+        'Content-Type': "application/x-www-form-urlencoded"
+        }
+    
+    response = requests.post(url, data=payload, headers=headers)
+    
+    print(response.text)
+
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
@@ -27,20 +42,41 @@ class SaleOrder(models.Model):
 
             # ───────────────────────────── FedEx (real API)
             if carrier.tracking_carrier == "fedex":
-                token = carrier._fedex_get_access_token()
-                url = (
-                    "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
-                    if carrier.tracking_sandbox_mode
-                    else "https://apis.fedex.com/track/v1/trackingnumbers"
-                )
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {token}",
-                }
+                # token = carrier._fedex_get_access_token()
+                # url = (
+                #     "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
+                #     if carrier.tracking_sandbox_mode
+                #     else "https://apis.fedex.com/track/v1/trackingnumbers"
+                # )
+                # headers = {
+                #     "Content-Type": "application/json",
+                #     "Authorization": f"Bearer {token}",
+                # }
+                # payload = {
+                #     "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
+                #     "includeDetailedScans": True,
+                # }
+                url = "https://apis-sandbox.fedex.com/track/v1/tcn"
+
                 payload = {
-                    "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
-                    "includeDetailedScans": True,
+                  "trackingInfo": [
+                    {
+                      "trackingNumberInfo": {
+                        "trackingNumber": tracking_number
+                      }
+                    }
+                  ],
+                  "includeDetailedScans": true
                 }
+                headers = {
+                    'Content-Type': "application/json",
+                    'Token' : response.access_token,
+                    'X-locale': "en_US",
+                    'Authorization': "Bearer "
+                    }
+                
+                response = requests.post(url, data=payload, headers=headers)
+                
                 try:
                     resp = requests.post(url, headers=headers, json=payload, timeout=25)
                     resp.raise_for_status()
