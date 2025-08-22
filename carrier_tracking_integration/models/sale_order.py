@@ -13,9 +13,9 @@ class SaleOrder(models.Model):
     url = "https://apis-sandbox.fedex.com/oauth/token"
 
     payload = {
-        grant_type:client_credentials
-        client_id:l770fae96d7b5144c9aec2ada941608b60
-        client_secret:8c2f94b246314d459bf711854201f0d4
+        grant_type:'client_credentials'
+        client_id:'l770fae96d7b5144c9aec2ada941608b60'
+        client_secret:'8c2f94b246314d459bf711854201f0d4'
     }
     headers = {
         'Content-Type': "application/x-www-form-urlencoded"
