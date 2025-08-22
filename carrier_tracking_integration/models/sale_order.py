@@ -57,7 +57,7 @@ class SaleOrder(models.Model):
 
             # ───────────────────────────── FedEx (real API)
             if carrier.tracking_carrier == "fedex":
-                url = "https://apis-sandbox.fedex.com/track/v1/tcn"
+                track_url = "https://apis-sandbox.fedex.com/track/v1/tcn"
 
                 track_payload = {
                   "trackingInfo": [
@@ -77,7 +77,7 @@ class SaleOrder(models.Model):
                 
                 try:
                     # Send POST request for tracking
-                    resp = requests.post(url, headers=track_headers, json=track_payload, timeout=25)
+                    resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
                     resp.raise_for_status()
                     _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)  # Log the response
 
