@@ -25,7 +25,20 @@ class SaleOrder(models.Model):
     
     print(response.text)
 
-    new_token = response.access_token
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse JSON response
+        response_data = response.json()
+        
+        # Extract the access token
+        new_token = response_data.get('access_token')
+        
+        if new_token:
+            print("Access Token:", new_token)
+        else:
+            print("No access token found in the response.")
+    else:
+        print("Error:", response.status_code, response.text)
 
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
