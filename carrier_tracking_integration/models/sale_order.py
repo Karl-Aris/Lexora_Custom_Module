@@ -3,6 +3,7 @@ import requests
 from odoo import models, fields, _
 from odoo.exceptions import UserError
 import json
+import uuid
 
 _logger = logging.getLogger(__name__)
 
@@ -66,6 +67,8 @@ class SaleOrder(models.Model):
             tracking_number = '9632080400676090940600881054121257'  # Replace with actual order tracking number
             status = "Unknown"
             json_data = None
+            transaction_id = str(uuid.uuid4())  # Generate a unique transaction ID
+            customer_transaction_id = "Order_" + str(order.id)  # Use order ID for customer transaction ID
 
             # Fetch the FedEx token dynamically (or refresh if expired)
             new_token = self._get_token_or_refresh()
@@ -86,7 +89,8 @@ class SaleOrder(models.Model):
                 'Content-Type': "application/json",
                 'X-locale': "en_US",
                 'Authorization': "Bearer " + new_token,
-                'x-customer-transaction-id': "624deea6-b709-470c-8c39-4b5511281492" 
+                'x-customer-transaction-id': transaction_id,  # Dynamically generated transaction ID
+                'customerTransactionId': customer_transaction_id  # Use a unique identifier like the order ID
             }
 
             try:
