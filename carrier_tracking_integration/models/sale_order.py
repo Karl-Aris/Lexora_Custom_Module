@@ -10,6 +10,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     url = "https://apis-sandbox.fedex.com/oauth/token"
+    new_token = None
 
     payload = {
         'grant_type':'client_credentials',
