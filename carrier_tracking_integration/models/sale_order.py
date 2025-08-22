@@ -86,6 +86,7 @@ class SaleOrder(models.Model):
                 'Content-Type': "application/json",
                 'X-locale': "en_US",
                 'Authorization': "Bearer " + new_token,
+                'x-customer-transaction-id': "624deea6-b709-470c-8c39-4b5511281492" 
             }
 
             try:
