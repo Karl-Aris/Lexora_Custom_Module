@@ -26,11 +26,11 @@ class SaleOrder(models.Model):
             return self._fedex_token_cache
 
         # If no valid cached token, fetch a new one
-        url = "https://apis-sandbox.fedex.com/oauth/token"
+        url = "https://apis.fedex.com/oauth/token"
         payload = {
             'grant_type': 'client_credentials',
-            'client_id': 'l770fae96d7b5144c9aec2ada941608b60',
-            'client_secret': '8c2f94b246314d459bf711854201f0d4'
+            'client_id': 'l7273ae8450f404bb0bf6b336f0c98c870',
+            'client_secret': 'bd16ad9153284b398884c15c0f1bd9e6'
         }
         headers = {
             'Content-Type': "application/x-www-form-urlencoded"
@@ -75,7 +75,7 @@ class SaleOrder(models.Model):
             new_token = self._get_fedex_token()
 
             # ───────────────────────────── FedEx (real API)
-            track_url = "https://apis-sandbox.fedex.com/track/v1/trackingnumbers"
+            track_url = "https://apis.fedex.com/track/v1/trackingnumbers"
             track_payload = {
                 "trackingInfo": [
                     {
