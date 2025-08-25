@@ -1,30 +1,28 @@
 <odoo>
-  <record id="delivery_carrier_form_fedex_rest" model="ir.ui.view">
-    <field name="name">delivery.carrier.form.fedex.rest</field>
-    <field name="model">delivery.carrier</field>
-    <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
-    <field name="arch" type="xml">
-      <xpath expr="//group[@name='delivery_type']" position="inside">
-        <field name="delivery_type"/>
-      </xpath>
+    <record id="delivery_carrier_form_fedex_rest" model="ir.ui.view">
+        <field name="name">delivery.carrier.form.fedex.rest</field>
+        <field name="model">delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.delivery_carrier_form"/>
+        <field name="arch" type="xml">
 
-      <xpath expr="//page[@name='configuration']" position="inside">
-        <group string="FedEx (REST)" attrs="{'invisible': [('delivery_type','!=','fedex_rest')]}">
-          <group>
-            <field name="fedex_use_sandbox"/>
-            <field name="fedex_api_key" password="True"/>
-            <field name="fedex_api_secret" password="True"/>
-            <field name="fedex_account_number"/>
-          </group>
-          <group>
-            <field name="fedex_service_type_rest"/>
-            <field name="fedex_packaging_type_rest"/>
-            <field name="fedex_pickup_type_rest"/>
-            <field name="fedex_label_image_type"/>
-            <field name="fedex_label_stock_type"/>
-          </group>
-        </group>
-      </xpath>
-    </field>
-  </record>
+            <!-- Add a new page/tab specifically for FedEx REST -->
+            <xpath expr="//notebook" position="inside">
+                <page string="FedEx REST Settings" attrs="{'invisible': [('delivery_type', '!=', 'fedex_rest')]}">
+                    <group>
+                        <field name="fedex_rest_api_key"/>
+                        <field name="fedex_rest_api_secret"/>
+                        <field name="fedex_rest_account_number"/>
+                        <field name="fedex_rest_sandbox"/>
+                    </group>
+                    <group string="Options">
+                        <field name="fedex_rest_service_type"/>
+                        <field name="fedex_rest_packaging_type"/>
+                        <field name="fedex_rest_pickup_type"/>
+                        <field name="fedex_rest_label_type"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
 </odoo>
