@@ -1,26 +1,21 @@
 <odoo>
-    <!-- Extend Sale Order Form: Tracking Section -->
-    <record id="view_order_form_inherit_tracking" model="ir.ui.view">
-        <field name="name">sale.order.form.tracking</field>
+    <record id="view_order_form_fedex_tracking" model="ir.ui.view">
+        <field name="name">sale.order.form.fedex.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='other_information']/group" position="inside">
-                <group string="Shipment Tracking">
-                    <!-- Tracking Number (from delivery) -->
-                    <field name="tracking_number" readonly="1"/>
-
-                    <!-- Tracking Status -->
-                    <field name="tracking_status" readonly="1"/>
-
-                    <!-- Action Button -->
-                    <button name="action_track_shipment"
-                            string="Track Shipment"
-                            type="object"
-                            class="btn-primary"
-                            icon="fa-truck"/>
+            <header position="inside">
+                <button name="action_track_shipment"
+                        string="Track Shipment"
+                        type="object"
+                        class="btn-primary"/>
+            </header>
+            <sheet position="inside">
+                <group>
+                    <field name="tracking_number"/>
+                    <field name="tracking_status"/>
                 </group>
-            </xpath>
+            </sheet>
         </field>
     </record>
 </odoo>
