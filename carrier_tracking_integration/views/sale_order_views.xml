@@ -16,7 +16,7 @@
             </xpath>
 
             <!-- Add Tracking Number and Status in Other Information tab -->
-            <xpath expr="//sheet/notebook/page[@name='other_information']" position="inside">
+            <xpath expr="//page[@name='other_information']/group" position="inside">
                 <group string="FedEx Tracking">
                     <field name="fedex_tracking_number"/>
                     <field name="fedex_tracking_status" readonly="1"/>
