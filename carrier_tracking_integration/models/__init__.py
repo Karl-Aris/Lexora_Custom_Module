@@ -1,2 +1,2 @@
-from . import delivery_carrier
+from . import delivery_fedex_rest
 from . import sale_order
