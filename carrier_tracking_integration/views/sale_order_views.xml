@@ -1,35 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Inherit Sales Order form -->
     <record id="view_order_form_inherit_fedex" model="ir.ui.view">
         <field name="name">sale.order.form.fedex.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-
-            <!-- Try inserting into the notebook -->
-            <xpath expr="//sheet/notebook" position="inside">
-                <page string="FedEx Tracking">
-                    <group>
-                        <field name="fedex_tracking_number"/>
-                        <button name="action_fedex_track" type="object"
-                                string="Track FedEx"
-                                class="btn-primary"/>
-                    </group>
-                </page>
+            <xpath expr="//header" position="inside">
+                <button name="action_fedex_track"
+                        string="FedEx Track"
+                        type="object"
+                        class="oe_highlight"/>
             </xpath>
-
-            <!-- Fallback: if no notebook exists, insert under sheet -->
-            <xpath expr="//sheet" position="inside">
-                <group>
-                    <separator string="FedEx Tracking"/>
-                    <field name="fedex_tracking_number"/>
-                    <button name="action_fedex_track" type="object"
-                            string="Track FedEx"
-                            class="btn-primary"/>
-                </group>
-            </xpath>
-
         </field>
     </record>
 </odoo>
