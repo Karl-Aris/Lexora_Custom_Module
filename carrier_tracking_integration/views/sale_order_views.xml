@@ -1,21 +1,16 @@
 <odoo>
-    <record id="view_order_form_fedex_tracking" model="ir.ui.view">
+    <record id="view_order_form_inherit_fedex" model="ir.ui.view">
         <field name="name">sale.order.form.fedex.tracking</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <header position="inside">
-                <button name="action_track_shipment"
-                        string="Track Shipment"
-                        type="object"
-                        class="btn-primary"/>
-            </header>
-            <sheet position="inside">
-                <group string="Shipment Tracking">
-                    <field name="tracking_number"/>
-                    <field name="tracking_status"/>
+            <xpath expr="//sheet/notebook/page[@name='delivery']" position="inside">
+                <group>
+                    <field name="tracking_number" readonly="1"/>
+                    <field name="tracking_status" readonly="1"/>
+                    <button name="action_track_shipment" type="object" string="Track Shipment" class="btn-primary"/>
                 </group>
-            </sheet>
+            </xpath>
         </field>
     </record>
 </odoo>
