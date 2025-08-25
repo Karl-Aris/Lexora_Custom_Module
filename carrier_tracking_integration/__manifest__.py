@@ -1,14 +1,13 @@
 {
-    "name": "Carrier Tracking Integration",
-    "version": "17.0.1.0.0",
-    "summary": "Multi-carrier tracking API integration for UPS, FedEx, DHL, etc.",
-    "author": "Karl Areglado",
-    "depends": ["delivery", "sale_management"],
-    "data": [
-        "views/delivery_carrier_views.xml",
-        "views/sale_order_views.xml",
+    'name': 'FedEx Tracking (REST API)',
+    'version': '1.0',
+    'category': 'Delivery',
+    'summary': 'Track FedEx shipments via REST API',
+    'description': 'Integrates FedEx REST API for shipment tracking in Sale Orders.',
+    'depends': ['sale_management', 'delivery'],
+    'data': [
+        'views/sale_order_views.xml',
     ],
-    "installable": True,
-    "application": False,
-    "license": "LGPL-3",
+    'installable': True,
+    'application': False,
 }
