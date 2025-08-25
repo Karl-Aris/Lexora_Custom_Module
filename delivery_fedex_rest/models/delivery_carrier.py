@@ -14,49 +14,36 @@ _logger = logging.getLogger(__name__)
 class DeliveryCarrier(models.Model):
     _inherit = "delivery.carrier"
 
-    # Extend provider selection with our new type
-    delivery_type = fields.Selection(selection_add=[("fedex_rest", "FedEx (REST)")])
+    delivery_type = fields.Selection(selection_add=[('fedex_rest', "FedEx (REST)")])
 
-    # FedEx REST credentials & options
-    fedex_api_key = fields.Char("FedEx API Key")
-    fedex_api_secret = fields.Char("FedEx API Secret")
-    fedex_account_number = fields.Char("FedEx Account Number")
-    fedex_use_sandbox = fields.Boolean("Use FedEx Sandbox", default=True)
+    fedex_rest_api_key = fields.Char("FedEx API Key")
+    fedex_rest_api_secret = fields.Char("FedEx API Secret")
+    fedex_rest_account_number = fields.Char("FedEx Account Number")
+    fedex_rest_sandbox = fields.Boolean("Use Sandbox", default=True)
 
-    # Shipping config (keep names similar to Odoo's FedEx for familiarity)
-    fedex_service_type_rest = fields.Selection([
-        ("FEDEX_GROUND", "FedEx Ground"),
-        ("FEDEX_EXPRESS_SAVER", "Express Saver"),
-        ("FEDEX_2_DAY", "2 Day"),
-        ("STANDARD_OVERNIGHT", "Standard Overnight"),
-        ("PRIORITY_OVERNIGHT", "Priority Overnight"),
-        ("INTERNATIONAL_PRIORITY", "International Priority"),
-        ("INTERNATIONAL_ECONOMY", "International Economy"),
-    ], string="FedEx Service (REST)", default="FEDEX_GROUND")
+    fedex_rest_service_type = fields.Selection([
+        ('FEDEX_GROUND', 'FedEx Ground'),
+        ('FEDEX_EXPRESS_SAVER', 'FedEx Express Saver'),
+        ('STANDARD_OVERNIGHT', 'Standard Overnight'),
+        ('PRIORITY_OVERNIGHT', 'Priority Overnight'),
+    ], string="Service Type")
 
-    fedex_packaging_type_rest = fields.Selection([
-        ("YOUR_PACKAGING", "Your Packaging"),
-        ("FEDEX_PAK", "FedEx Pak"),
-        ("FEDEX_BOX", "FedEx Box"),
-        ("FEDEX_TUBE", "FedEx Tube"),
-        ("FEDEX_ENVELOPE", "FedEx Envelope"),
-    ], string="Packaging Type", default="YOUR_PACKAGING")
+    fedex_rest_packaging_type = fields.Selection([
+        ('YOUR_PACKAGING', 'Your Packaging'),
+        ('FEDEX_BOX', 'FedEx Box'),
+        ('FEDEX_PAK', 'FedEx Pak'),
+    ], string="Packaging Type")
 
-    fedex_pickup_type_rest = fields.Selection([
-        ("DROPOFF_AT_FEDEX_LOCATION", "Drop off at FedEx location"),
-        ("USE_SCHEDULED_PICKUP", "Use scheduled pickup"),
-    ], string="Pickup Type", default="DROPOFF_AT_FEDEX_LOCATION")
+    fedex_rest_pickup_type = fields.Selection([
+        ('DROPOFF_AT_FEDEX_LOCATION', 'Dropoff at FedEx Location'),
+        ('CONTACT_FEDEX_TO_SCHEDULE', 'Schedule Pickup'),
+    ], string="Pickup Type")
 
-    fedex_label_image_type = fields.Selection([
-        ("PDF", "PDF"),
-        ("PNG", "PNG"),
-        ("ZPLII", "ZPL II"),
-    ], string="Label Image Type", default="PDF")
-
-    fedex_label_stock_type = fields.Selection([
-        ("PAPER_85X11_TOP_HALF_LABEL", "Paper 8.5x11 (Top Half)"),
-        ("STOCK_4X6", "Thermal 4x6"),
-    ], string="Label Stock")
+    fedex_rest_label_type = fields.Selection([
+        ('PDF', 'PDF'),
+        ('PNG', 'PNG'),
+        ('ZPL', 'ZPL'),
+    ], string="Label Format", default='PDF')
 
     # ----------------------------
     # Public API required by Odoo
