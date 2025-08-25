@@ -7,6 +7,7 @@
     'depends': ['sale_management', 'delivery'],
     'data': [
         'views/sale_order_views.xml',
+        'views/delivery_carrier_views.xml',
     ],
     'installable': True,
     'application': False,
