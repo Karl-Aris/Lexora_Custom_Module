@@ -14,100 +14,80 @@ class SaleOrder(models.Model):
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
-    # Cache for token in memory (using class-level variables is not ideal in Odoo, better use _context or singleton)
-    _fedex_token_cache = None  # Global cache for token
-    _token_expiry_time_cache = None  # Global cache for token expiry time
+    _fedex_token_cache = None
+    _token_expiry_time_cache = None
 
     def _get_fedex_token(self):
-        """Fetch the FedEx OAuth token (with caching)."""
-        # Check if token is cached and still valid
+        """Fetch FedEx OAuth token (with caching)."""
         if self._fedex_token_cache and time.time() < self._token_expiry_time_cache:
-            _logger.info("Using cached FedEx token.")
             return self._fedex_token_cache
 
-        # If no valid cached token, fetch a new one
-        url = "https://apis.fedex.com/oauth/token"
+        client_id = self.env['ir.config_parameter'].sudo().get_param('fedex.client_id')
+        client_secret = self.env['ir.config_parameter'].sudo().get_param('fedex.client_secret')
+        use_sandbox = self.env['ir.config_parameter'].sudo().get_param('fedex.use_sandbox', 'False') == 'True'
+
+        if not client_id or not client_secret:
+            raise UserError(_("FedEx credentials are not configured. Please set system parameters."))
+
+        base_url = "https://apis-sandbox.fedex.com" if use_sandbox else "https://apis.fedex.com"
+        url = f"{base_url}/oauth/token"
+
         payload = {
             'grant_type': 'client_credentials',
-            'client_id': 'l7273ae8450f404bb0bf6b336f0c98c870',
-            'client_secret': 'bd16ad9153284b398884c15c0f1bd9e6'
+            'client_id': client_id,
+            'client_secret': client_secret
         }
-        headers = {
-            'Content-Type': "application/x-www-form-urlencoded"
-        }
+        headers = {'Content-Type': "application/x-www-form-urlencoded"}
 
         try:
             response = requests.post(url, data=payload, headers=headers)
-            _logger.info("FedEx OAuth Response: %s", response.text)
+            response.raise_for_status()
+            data = response.json()
 
-            if response.status_code == 200:
-                response_data = response.json()
-                new_token = response_data.get('access_token')
-                expires_in = response_data.get('expires_in', 3600)  # Default expiry 1 hour
-                if new_token:
-                    # Cache the token and its expiry time in the class-level cache
-                    SaleOrder._fedex_token_cache = new_token
-                    SaleOrder._token_expiry_time_cache = time.time() + expires_in
-                    _logger.info("New Access Token: %s", new_token)
-                    return new_token
-                else:
-                    _logger.error("No access token found in the response.")
-                    raise UserError(_("No access token found from FedEx."))
+            new_token = data.get('access_token')
+            expires_in = data.get('expires_in', 3600)
+
+            if new_token:
+                SaleOrder._fedex_token_cache = new_token
+                SaleOrder._token_expiry_time_cache = time.time() + expires_in
+                return new_token
             else:
-                _logger.error("Error fetching token: %s %s", response.status_code, response.text)
-                raise UserError(_("Error fetching FedEx token: %s") % response.text)
+                raise UserError(_("No access token found from FedEx."))
         except requests.exceptions.RequestException as e:
-            _logger.error("Error in FedEx token request: %s", str(e))
-            raise UserError(_("Error in FedEx token request: %s") % str(e))
+            raise UserError(_("Error fetching FedEx token: %s") % str(e))
 
     def action_track_shipment(self):
-        """Track shipment from sale order using carrier logic"""
+        """Track FedEx shipment using REST API"""
         for order in self:
             if not order.carrier_id:
                 raise UserError(_("No delivery carrier set for this order."))
             if not order.carrier_tracking_ref:
                 raise UserError(_("No tracking number set for this order."))
 
-            carrier = order.carrier_id
             tracking_number = order.carrier_tracking_ref
-            status = "Unknown"
-            json_data = None
+            token = self._get_fedex_token()
 
-            # Fetch the FedEx token dynamically (with caching)
-            new_token = self._get_fedex_token()
+            use_sandbox = self.env['ir.config_parameter'].sudo().get_param('fedex.use_sandbox', 'False') == 'True'
+            base_url = "https://apis-sandbox.fedex.com" if use_sandbox else "https://apis.fedex.com"
+            track_url = f"{base_url}/track/v1/trackingnumbers"
 
-            # ───────────────────────────── FedEx (real API)
-            track_url = "https://apis.fedex.com/track/v1/trackingnumbers"
             track_payload = {
-                "trackingInfo": [
-                    {
-                        "trackingNumberInfo": {
-                            "trackingNumber": tracking_number
-                        }
-                    }
-                ],
+                "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
                 "includeDetailedScans": True
             }
-
-            # Prepare the headers
-            track_headers = {
+            headers = {
                 'Content-Type': "application/json",
                 'X-locale': "en_US",
-                'Authorization': "Bearer " + new_token,
-                'x-customer-transaction-id': str(uuid.uuid4()),  # Unique transaction ID
-                'customerTransactionId': "Order_" + str(order.id)  # Customer-specific transaction ID
+                'Authorization': f"Bearer {token}",
+                'x-customer-transaction-id': str(uuid.uuid4())
             }
 
             try:
-                # Send POST request for tracking
-                resp = requests.post(track_url, headers=track_headers, json=track_payload, timeout=25)
-                resp.raise_for_status()  # Will raise an exception for 4xx/5xx responses
-                _logger.info("FedEx Track Response (%s): %s", tracking_number, resp.text)
-
+                resp = requests.post(track_url, headers=headers, json=track_payload, timeout=25)
+                resp.raise_for_status()
                 data = resp.json()
                 results = data.get("output", {}).get("completeTrackResults", [])
-                json_data = results
-                _logger.info("JSON Data returned: %s", json.dumps(json_data, indent=4))
+                status = "Unknown"
 
                 if results:
                     track_results = results[0].get("trackResults", [])
@@ -119,29 +99,16 @@ class SaleOrder(models.Model):
                             status_detail = result.get("latestStatusDetail", {})
                             status = status_detail.get("statusByLocale", "Unknown")
 
-                            tracking_number = results[0].get("trackingNumber", "Unknown")
+                order.tracking_status = status
+                order.tracking_number = tracking_number
 
-                            # scan_events = result.get("scanEvents", [])
-                            # if scan_events:
-                            #     status = scan_events[-1].get("eventDescription", status)
-                            # elif status_detail.get("description"):
-                            #     status = status_detail["description"]
-                            # elif status_detail.get("statusByLocale"):
-                            #     status = status_detail["statusByLocale"]
+                return {
+                    "effect": {
+                        "fadeout": "slow",
+                        "message": _("Tracking Status for %s: %s") % (tracking_number, status),
+                        "type": "rainbow_man",
+                    }
+                }
 
             except requests.exceptions.RequestException as e:
-                _logger.error("FedEx request error: %s", str(e))
-                raise UserError(_("FedEx request error: %s") % str(e))
-
-            # Save status in order field
-            order.tracking_status = status
-            order.tracking_number = tracking_number
-
-            # Show rainbow man popup
-            return {
-                "effect": {
-                    "fadeout": "slow",
-                    "message": _("Tracking Status for %s: %s") % (tracking_number, status),
-                    "type": "rainbow_man",
-                }
-            }
+                raise UserError(_("FedEx tracking request error: %s") % str(e))
