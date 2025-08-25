@@ -15,8 +15,8 @@
                         attrs="{'invisible': [('carrier_id.delivery_type', '!=', 'fedex_rest')]}"/>
             </xpath>
 
-            <!-- Add Tracking Number and Status in Delivery tab -->
-            <xpath expr="//sheet/notebook/page[@name='delivery']" position="inside">
+            <!-- Add Tracking Number and Status in Other Information tab -->
+            <xpath expr="//sheet/notebook/page[@name='other_information']" position="inside">
                 <group string="FedEx Tracking">
                     <field name="fedex_tracking_number"/>
                     <field name="fedex_tracking_status" readonly="1"/>
