@@ -11,7 +11,7 @@
                         class="btn-primary"/>
             </header>
             <sheet position="inside">
-                <group>
+                <group string="Shipment Tracking">
                     <field name="tracking_number"/>
                     <field name="tracking_status"/>
                 </group>
