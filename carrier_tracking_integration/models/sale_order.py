@@ -8,59 +8,36 @@ _logger = logging.getLogger(__name__)
 
 
 class SaleOrder(models.Model):
-    _inherit = "sale.order"
+    _inherit = 'sale.order'
 
-    fedex_tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
-    tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
-
-    def action_track_shipment(self):
-        """Track shipment via FedEx REST API"""
-        for order in self:
-            if not order.carrier_id or order.carrier_id.delivery_type != "fedex_rest":
-                raise UserError(_("This order is not using FedEx REST as carrier."))
-            if not order.carrier_tracking_ref:
-                raise UserError(_("No tracking number set for this order."))
-
-            carrier = order.carrier_id
-            token = carrier._get_fedex_token()
-
-            track_url = f"{carrier._get_fedex_base_url()}/track/v1/trackingnumbers"
-            payload = {
-                "trackingInfo": [
-                    {"trackingNumberInfo": {"trackingNumber": order.carrier_tracking_ref}}
-                ],
-                "includeDetailedScans": True,
-            }
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {token}",
-                "X-locale": "en_US",
-                "x-customer-transaction-id": str(uuid.uuid4()),
+    def action_fedex_track(self):
+        """Called by the FedEx Track button"""
+        self.ensure_one()
+        # Call your FedEx REST API wrapper here
+        tracking_numbers = self.picking_ids.mapped('carrier_tracking_ref')
+        if not tracking_numbers:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'FedEx Tracking',
+                    'message': 'No tracking numbers found on this order.',
+                    'sticky': False,
+                }
             }
 
-            try:
-                resp = requests.post(track_url, json=payload, headers=headers, timeout=25)
-                _logger.info("FedEx Track Response: %s", resp.text)
-                resp.raise_for_status()
-                data = resp.json()
-
-                results = data.get("output", {}).get("completeTrackResults", [])
-                status = "Unknown"
-                if results:
-                    track_results = results[0].get("trackResults", [])
-                    if track_results:
-                        latest = track_results[0]
-                        detail = latest.get("latestStatusDetail", {})
-                        status = detail.get("statusByLocale", "Unknown")
-
-                order.tracking_number = order.carrier_tracking_ref
-                order.tracking_status = status
-
-                return {
-                    "effect": {
-                        "fadeout": "slow",
-                        "message": _("Tracking Status for %s: %s") % (order.carrier_tracking_ref, status),
-                        "type": "rainbow_man",
+        # Call your carrier integration service here
+        response_msg = f"Tracking numbers: {', '.join(tracking_numbers)}"
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'FedEx Tracking',
+                'message': response_msg,
+                'sticky': True,
+            }
+        }
                     }
                 }
 
