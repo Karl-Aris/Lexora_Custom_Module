@@ -2,7 +2,6 @@ import logging
 import requests
 import uuid
 import time
-import json
 from odoo import models, fields, _
 from odoo.exceptions import UserError
 
@@ -14,28 +13,21 @@ class SaleOrder(models.Model):
     tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
-    _fedex_token_cache = None
-    _token_expiry_time_cache = None
+    def _get_fedex_token(self, carrier):
+        """Fetch FedEx OAuth token for the given delivery carrier (with caching)."""
+        if not carrier.fedex_client_id or not carrier.fedex_client_secret:
+            raise UserError(_("FedEx credentials are missing on the delivery carrier."))
 
-    def _get_fedex_token(self):
-        """Fetch FedEx OAuth token (with caching)."""
-        if self._fedex_token_cache and time.time() < self._token_expiry_time_cache:
-            return self._fedex_token_cache
+        if carrier.fedex_token_cache and carrier.fedex_token_expiry and time.time() < carrier.fedex_token_expiry:
+            return carrier.fedex_token_cache
 
-        client_id = self.env['ir.config_parameter'].sudo().get_param('fedex.client_id')
-        client_secret = self.env['ir.config_parameter'].sudo().get_param('fedex.client_secret')
-        use_sandbox = self.env['ir.config_parameter'].sudo().get_param('fedex.use_sandbox', 'False') == 'True'
-
-        if not client_id or not client_secret:
-            raise UserError(_("FedEx credentials are not configured. Please set system parameters."))
-
-        base_url = "https://apis-sandbox.fedex.com" if use_sandbox else "https://apis.fedex.com"
+        base_url = "https://apis-sandbox.fedex.com" if carrier.fedex_use_sandbox else "https://apis.fedex.com"
         url = f"{base_url}/oauth/token"
 
         payload = {
             'grant_type': 'client_credentials',
-            'client_id': client_id,
-            'client_secret': client_secret
+            'client_id': carrier.fedex_client_id,
+            'client_secret': carrier.fedex_client_secret
         }
         headers = {'Content-Type': "application/x-www-form-urlencoded"}
 
@@ -44,34 +36,40 @@ class SaleOrder(models.Model):
             response.raise_for_status()
             data = response.json()
 
-            new_token = data.get('access_token')
-            expires_in = data.get('expires_in', 3600)
+            token = data.get("access_token")
+            expires_in = data.get("expires_in", 3600)
 
-            if new_token:
-                SaleOrder._fedex_token_cache = new_token
-                SaleOrder._token_expiry_time_cache = time.time() + expires_in
-                return new_token
-            else:
-                raise UserError(_("No access token found from FedEx."))
+            if not token:
+                raise UserError(_("No access token returned by FedEx."))
+
+            carrier.write({
+                "fedex_token_cache": token,
+                "fedex_token_expiry": time.time() + expires_in,
+            })
+
+            return token
         except requests.exceptions.RequestException as e:
-            raise UserError(_("Error fetching FedEx token: %s") % str(e))
+            raise UserError(_("FedEx token request error: %s") % str(e))
 
     def action_track_shipment(self):
-        """Track FedEx shipment using REST API"""
+        """Track FedEx shipment using the configured Delivery Carrier REST API."""
         for order in self:
             if not order.carrier_id:
                 raise UserError(_("No delivery carrier set for this order."))
             if not order.carrier_tracking_ref:
                 raise UserError(_("No tracking number set for this order."))
 
-            tracking_number = order.carrier_tracking_ref
-            token = self._get_fedex_token()
+            carrier = order.carrier_id
+            if carrier.delivery_type != "fixed" and not (carrier.fedex_client_id and carrier.fedex_client_secret):
+                raise UserError(_("Selected carrier is not configured for FedEx REST."))
 
-            use_sandbox = self.env['ir.config_parameter'].sudo().get_param('fedex.use_sandbox', 'False') == 'True'
-            base_url = "https://apis-sandbox.fedex.com" if use_sandbox else "https://apis.fedex.com"
+            token = self._get_fedex_token(carrier)
+            tracking_number = order.carrier_tracking_ref
+
+            base_url = "https://apis-sandbox.fedex.com" if carrier.fedex_use_sandbox else "https://apis.fedex.com"
             track_url = f"{base_url}/track/v1/trackingnumbers"
 
-            track_payload = {
+            payload = {
                 "trackingInfo": [{"trackingNumberInfo": {"trackingNumber": tracking_number}}],
                 "includeDetailedScans": True
             }
@@ -83,7 +81,7 @@ class SaleOrder(models.Model):
             }
 
             try:
-                resp = requests.post(track_url, headers=headers, json=track_payload, timeout=25)
+                resp = requests.post(track_url, headers=headers, json=payload, timeout=25)
                 resp.raise_for_status()
                 data = resp.json()
                 results = data.get("output", {}).get("completeTrackResults", [])
@@ -99,8 +97,10 @@ class SaleOrder(models.Model):
                             status_detail = result.get("latestStatusDetail", {})
                             status = status_detail.get("statusByLocale", "Unknown")
 
-                order.tracking_status = status
-                order.tracking_number = tracking_number
+                order.write({
+                    "tracking_status": status,
+                    "tracking_number": tracking_number,
+                })
 
                 return {
                     "effect": {
@@ -109,6 +109,5 @@ class SaleOrder(models.Model):
                         "type": "rainbow_man",
                     }
                 }
-
             except requests.exceptions.RequestException as e:
                 raise UserError(_("FedEx tracking request error: %s") % str(e))
