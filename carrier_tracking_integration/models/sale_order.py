@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
+    fedex_tracking_number = fields.Char(string="Tracking Number", readonly=True, copy=False)
     tracking_status = fields.Char(string="Tracking Status", readonly=True, copy=False)
 
     def action_track_shipment(self):
