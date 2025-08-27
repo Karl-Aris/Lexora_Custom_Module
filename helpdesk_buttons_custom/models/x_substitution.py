@@ -2,8 +2,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 class XSubstitution(models.Model):
-    _name = 'x_substitution'  # This must match your model name in Odoo
-    _description = 'Substitution Line'
+    _inherit  = 'x_substitution'  # This must match your model name in Odoo
 
     @api.model
     def perform_substitution(self):
