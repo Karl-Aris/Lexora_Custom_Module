@@ -4,26 +4,21 @@ from odoo.fields import Command
 
 
 class XSubstitution(models.Model):
-    _inherit = 'x_substitution'
+    _inherit = 'x_substitution'  # Adjust if needed
 
-    @api.multi
     def perform_substitution(self):
         for record in self:
-            # Validate ticket
             if not record.x_ticket_id:
                 raise UserError("No Helpdesk Ticket linked to the Substitution record.")
 
-            # Get PO number from helpdesk ticket
             po_number = record.x_ticket_id.x_po
             if not po_number:
                 raise UserError("No PO number found in the linked Helpdesk Ticket.")
 
-            # Search for matching sales order
             sales_order = self.env['sale.order'].search([('purchase_order', '=', po_number)], limit=1)
             if not sales_order:
                 raise UserError("No Sales Order found for PO: %s" % po_number)
 
-            # Prepare substitution lines from SO order lines
             substitution_lines = []
             for line in sales_order.order_line:
                 substitution_lines.append(Command.create({
@@ -35,7 +30,6 @@ class XSubstitution(models.Model):
                     'x_result': '',
                 }))
 
-            # Write to One2many field in x_substitution record
             record.write({
-                'x_substitution_line_ids': substitution_lines,  # Replace with your actual One2many field name
+                'x_substitution_lines': substitution_lines  # Replace with your actual One2many field
             })
