@@ -75,15 +75,13 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     # 1) Transform domains coming from search filters (e.g., "Search PO# for: ...")
-    def _search(self, args, offset=0, limit=None, order=None, count=False):
+    def _search(self, args, offset=0, limit=None, order=None):
         try:
             new_args = _transform_domain_recursive(args)
         except Exception:
-            # Fail-safe: never block searches due to our transformation
             new_args = args
-        return super()._search(new_args, offset=offset, limit=limit, order=order, count=count)
-
-    # 2) Make the global quick search behave the same way (split terms on PO#)
+        return super()._search(new_args, offset=offset, limit=limit, order=order)
+        # 2) Make the global quick search behave the same way (split terms on PO#)
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         args = args or []
