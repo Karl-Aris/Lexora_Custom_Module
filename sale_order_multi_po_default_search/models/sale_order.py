@@ -43,8 +43,21 @@ class SaleOrder(models.Model):
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         args = args or []
+
         if name:
-            terms = _split_terms(name)
-            if terms:
-                args += [_build_or_domain('purchase_order', terms)]
+            # Normalize all separators (newline, comma, tab, space)
+            for sep in ['\n', '\r', ',', '\t']:
+                name = name.replace(sep, ' ')
+            terms = [t.strip() for t in name.split(' ') if t.strip()]
+
+            if len(terms) > 1:
+                # Build OR domain on purchase_order
+                domain = []
+                for idx, t in enumerate(terms):
+                    if idx > 0:
+                        domain.insert(0, '|')
+                    domain.append(('purchase_order', 'ilike', t))
+                args.append(domain)
+                return self.search(args, limit=limit).name_get()
+
         return super().name_search(name, args=args, operator=operator, limit=limit)
