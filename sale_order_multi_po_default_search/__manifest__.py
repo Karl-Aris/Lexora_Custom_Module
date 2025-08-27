@@ -3,7 +3,7 @@
     "name": "Sale Order PO# Multi-term Search",
     "summary": "Split the PO# search text into multiple terms and OR-match them on sale orders.",
     "version": "17.0.1.0.0",
-    "license": "MIT",
+    "license": "LGPL-3",
     "author": "Karl Areglado",
     "depends": ["sale"],
     "data": [],
