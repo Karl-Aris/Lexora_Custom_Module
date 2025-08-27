@@ -1,13 +1,17 @@
-from odoo import models, api, _
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-from odoo.fields import Command
-
 
 class XSubstitution(models.Model):
-    _inherit = 'x_substitution'  # Adjust if needed
+    _name = 'x_substitution'  # This must match your model name in Odoo
+    _description = 'Substitution Line'
 
+    @api.model
     def perform_substitution(self):
+        # This method will be called from Studio button (Call a method)
         for record in self:
+            if record.x_result != 'Sub Accepted':
+                continue
+
             if not record.x_ticket_id:
                 raise UserError("No Helpdesk Ticket linked to the Substitution record.")
 
@@ -19,17 +23,58 @@ class XSubstitution(models.Model):
             if not sales_order:
                 raise UserError("No Sales Order found for PO: %s" % po_number)
 
-            substitution_lines = []
-            for line in sales_order.order_line:
-                substitution_lines.append(Command.create({
-                    'x_original_sku': line.product_id.id,
-                    'x_quantity': line.product_uom_qty,
-                    'x_substituted_sku': False,
-                    'x_new_quantity': 0.0,
-                    'x_note': '',
-                    'x_result': '',
-                }))
+            sales_order.write({'x_is_substitution': True})
 
-            record.write({
-                'x_substitution_lines': substitution_lines  # Replace with your actual One2many field
+            old_product = record.x_original_sku
+            new_product = record.x_substituted_sku
+
+            if not old_product or not new_product:
+                raise UserError("Both old and new SKUs must be set.")
+
+            if not record.x_quantity or not record.x_new_quantity:
+                raise UserError("Both old and new quantities must be provided.")
+
+            old_lines = sales_order.order_line.filtered(lambda l: l.product_id.id == old_product.id)
+
+            if not old_lines:
+                raise UserError("No matching lines found for product: %s" % old_product.display_name)
+
+            first_line = old_lines[0]
+            price_unit = first_line.price_unit
+            name = first_line.name
+
+            if sales_order.state == 'draft':
+                for line in old_lines:
+                    if line.state in ('draft', 'sent'):
+                        if line.product_uom_qty == record.x_quantity:
+                            line.unlink()
+                        elif line.product_uom_qty > record.x_quantity:
+                            line.write({'product_uom_qty': line.product_uom_qty - record.x_quantity})
+                        else:
+                            raise UserError("Substitution quantity is greater than existing line quantity.")
+                    else:
+                        line.write({'product_uom_qty': 0})
+            else:
+                for line in old_lines:
+                    if line.product_uom_qty >= record.x_quantity:
+                        line.write({'product_uom_qty': line.product_uom_qty - record.x_quantity})
+                    else:
+                        raise UserError("Substitution quantity is greater than existing line quantity.")
+
+            self.env['sale.order.line'].create({
+                'order_id': sales_order.id,
+                'product_id': new_product.id,
+                'product_uom_qty': record.x_new_quantity,
+                'price_unit': price_unit,
+                'name': name,
             })
+
+            sales_order.message_post(body=(
+                "SKU substitution performed:<br/>"
+                "<b>%s</b> (Qty: %s) → <b>%s</b> (Qty: %s)" % (
+                    old_product.display_name,
+                    record.x_quantity,
+                    new_product.display_name,
+                    record.x_new_quantity
+                )
+            ))
