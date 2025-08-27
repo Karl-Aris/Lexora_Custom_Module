@@ -4,8 +4,9 @@
     <field name="model">sale.order</field>
     <field name="inherit_id" ref="sale.view_sales_order_filter"/>
     <field name="arch" type="xml">
-      <xpath expr="//filter[@name='purchase_order']" position="replace">
-        <filter string="PO#" name="purchase_order" domain="[]" context="{'search_multi_po': True}"/>
+      <!-- Add a search field for purchase_order -->
+      <xpath expr="//search" position="inside">
+        <field name="purchase_order" string="PO#" context="{'search_multi_po': True}"/>
       </xpath>
     </field>
   </record>
