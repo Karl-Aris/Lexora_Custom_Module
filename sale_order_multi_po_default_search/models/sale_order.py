@@ -7,16 +7,16 @@ class SaleOrder(models.Model):
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         args = args or []
         if name:
-            # split by newline, comma, or space
             separators = ['\n', ',', ' ']
             text = name
             for sep in separators:
                 text = text.replace(sep, ' ')
             terms = [t.strip() for t in text.split(' ') if t.strip()]
-            if len(terms) > 1:
-                # Build OR domain only on purchase_order field
-                domain = ["|"] * (len(terms) - 1)
-                domain += [("purchase_order", "=", t) for t in terms]
-                args = args + [domain]
-                return self.search(args, limit=limit).name_get()
+            if terms:
+                domain = []
+                for term in terms:
+                    if domain:
+                        domain = ['|'] + domain
+                    domain.append(('purchase_order', 'ilike', term))
+                args += [domain]
         return super()._name_search(name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
