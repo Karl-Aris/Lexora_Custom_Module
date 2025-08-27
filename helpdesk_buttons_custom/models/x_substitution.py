@@ -2,9 +2,12 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 class XSubstitution(models.Model):
-    _inherit = 'x_substitution'
+    _name = 'x_substitution'  # This must match your model name in Odoo
+    _description = 'Substitution Line'
 
+    @api.model
     def perform_substitution(self):
+        # This method will be called from Studio button (Call a method)
         for record in self:
             if record.x_result != 'Sub Accepted':
                 continue
@@ -16,10 +19,7 @@ class XSubstitution(models.Model):
             if not po_number:
                 raise UserError("No PO number found in the linked Helpdesk Ticket.")
 
-            sales_order = self.env['sale.order'].search([
-                ('purchase_order', '=', po_number)
-            ], limit=1)
-
+            sales_order = self.env['sale.order'].search([('purchase_order', '=', po_number)], limit=1)
             if not sales_order:
                 raise UserError("No Sales Order found for PO: %s" % po_number)
 
@@ -34,9 +34,7 @@ class XSubstitution(models.Model):
             if not record.x_quantity or not record.x_new_quantity:
                 raise UserError("Both old and new quantities must be provided.")
 
-            old_lines = sales_order.order_line.filtered(
-                lambda l: l.product_id.id == old_product.id
-            )
+            old_lines = sales_order.order_line.filtered(lambda l: l.product_id.id == old_product.id)
 
             if not old_lines:
                 raise UserError("No matching lines found for product: %s" % old_product.display_name)
@@ -80,5 +78,3 @@ class XSubstitution(models.Model):
                     record.x_new_quantity
                 )
             ))
-
-        return True
