@@ -1,17 +1,12 @@
-# -*- coding: utf-8 -*-
 from odoo import models, api
 
-def _split_terms(text: str):
+def _split_terms(text):
     if not text:
         return []
-    # Normalize separators: newline, commas, multiple spaces
     for sep in ('\n', ',',):
         text = text.replace(sep, ' ')
-    # Collapse duplicates and strip
     parts = [p.strip() for p in text.split(' ') if p and p.strip()]
-    # Deduplicate while keeping order
-    seen = set()
-    terms = []
+    seen, terms = set(), []
     for p in parts:
         if p not in seen:
             seen.add(p)
@@ -19,75 +14,49 @@ def _split_terms(text: str):
     return terms
 
 def _or_domain_on_po(terms):
-    """
-    Build an OR domain over ('purchase_order','ilike', term) for each term.
-    For n terms, returns a flat list like:
-      ['|','|', ('purchase_order','ilike',t1), ('purchase_order','ilike',t2), ('purchase_order','ilike',t3)]
-    """
-    if not terms:
-        return []
+    # Return a flat OR domain, not nested
     dom = []
-    # For k conditions you need (k-1) '|' in front (flat form)
     for idx, t in enumerate(terms):
         if idx > 0:
-            dom = ['|'] + dom
+            dom.insert(0, '|')
         dom.append(('purchase_order', 'ilike', t))
     return dom
 
-def _transform_domain_recursive(node):
-    """
-    Recursively walk a domain and replace any ('purchase_order','ilike', <multi-words>)
-    with an OR domain over the split terms.
+def _transform_domain(domain):
+    """Replace ('purchase_order','ilike','multi words') with OR conditions flat"""
+    if not isinstance(domain, list):
+        return domain
 
-    Handles nested lists with &, |, ! operators.
-    """
-    # If node is a tuple (leaf)
-    if isinstance(node, tuple):
-        if (
-            len(node) >= 3
-            and node[0] == 'purchase_order'
-            and node[1] == 'ilike'
-            and isinstance(node[2], str)
-            and any(sep in node[2] for sep in (' ', ',', '\n'))
-        ):
-            terms = _split_terms(node[2])
+    new_domain = []
+    for item in domain:
+        if isinstance(item, tuple) and len(item) >= 3 and item[0] == 'purchase_order' and item[1] == 'ilike':
+            terms = _split_terms(item[2])
             if len(terms) > 1:
-                return _or_domain_on_po(terms)
-        return node
-
-    # If node is a list (could be a domain or sub-domain)
-    if isinstance(node, list):
-        out = []
-        for item in node:
-            transformed = _transform_domain_recursive(item)
-            # If a leaf expanded into a list (OR domain), splice it in
-            if isinstance(transformed, list):
-                out.extend(transformed)
+                new_domain += _or_domain_on_po(terms)
             else:
-                out.append(transformed)
-        return out
-
-    # Anything else: return unchanged
-    return node
+                new_domain.append(item)
+        elif isinstance(item, list):
+            new_domain.append(_transform_domain(item))
+        else:
+            new_domain.append(item)
+    return new_domain
 
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    # 1) Transform domains coming from search filters (e.g., "Search PO# for: ...")
     def _search(self, args, offset=0, limit=None, order=None):
         try:
-            new_args = _transform_domain_recursive(args)
+            args = _transform_domain(args)
         except Exception:
-            new_args = args
-        return super()._search(new_args, offset=offset, limit=limit, order=order)
-        # 2) Make the global quick search behave the same way (split terms on PO#)
+            pass
+        return super()._search(args, offset=offset, limit=limit, order=order)
+
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         args = args or []
         if name:
             terms = _split_terms(name)
             if terms:
-                # Add our PO# OR domain so quick search can find by split terms.
-                args = list(args) + [_or_domain_on_po(terms)]
+                args += [_or_domain_on_po(terms)]
         return super()._name_search(name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
