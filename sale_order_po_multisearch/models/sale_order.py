@@ -5,7 +5,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     @api.model
-    def _search(self, args, offset=0, limit=None, order=None, count=False):
+    def search(self, args, offset=0, limit=None, order=None, count=False):
         """Intercept the domain and expand multi-line search terms into OR domain."""
         new_args = []
         for arg in args:
@@ -22,4 +22,4 @@ class SaleOrder(models.Model):
                         new_args.extend(domain)
                         continue
             new_args.append(arg)
-        return super()._search(new_args, offset=offset, limit=limit, order=order, count=count)
+        return super().search(new_args, offset=offset, limit=limit, order=order, count=count)
