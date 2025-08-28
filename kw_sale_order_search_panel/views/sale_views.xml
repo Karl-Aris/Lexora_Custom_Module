@@ -8,6 +8,7 @@
                 <searchpanel>
                     <field name="state" enable_counters="1"/>
                     <field name="invoice_status" enable_counters="1"/>
+                    <field name="vendor_bill" enable_counters="1"/>
                 </searchpanel>
             </search>
         </field>
