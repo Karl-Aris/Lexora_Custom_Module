@@ -7,7 +7,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     def search(self, args, offset=0, limit=None, order=None):
-        _logger.info(">>> Incoming search args: %s", args)  # Debugging
+        _logger.info(">>> Incoming search args: %s", args)
 
         new_args = []
         for arg in args:
@@ -16,15 +16,18 @@ class SaleOrder(models.Model):
                 value = arg[2]
 
                 if operator in ('ilike', '=ilike', '=', '==') and isinstance(value, str):
-                    # Normalize separators (comma, newline, space)
-                    terms = [t.strip() for t in value.replace('\n', ',').replace(' ', ',').split(',') if t.strip()]
+                    # split value into terms
+                    terms = [t.strip() for t in value.replace('\n', ',').split(',') if t.strip()]
                     if len(terms) > 1:
-                        # Build OR domain using strict '=' operator
-                        domain = ['|'] * (len(terms) - 1)
-                        for term in terms:
+                        # Build OR domain flat at the same level
+                        domain = []
+                        for i, term in enumerate(terms):
+                            if i > 0:
+                                domain.append('|')
                             domain.append(('purchase_order', '=', term))
+                        _logger.info(">>> Rewritten domain: %s", domain)
                         new_args.append(domain)
                         continue
             new_args.append(arg)
 
-        return super(SaleOrder, self).search(new_args, offset=offset, limit=limit, order=order)
+        return super().search(new_args, offset=offset, limit=limit, order=order)
