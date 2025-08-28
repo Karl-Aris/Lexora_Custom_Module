@@ -1,34 +1,16 @@
-from odoo import models, api
-import logging
-
-_logger = logging.getLogger(__name__)
-
+from odoo import models
 
 class SaleOrder(models.Model):
-    _inherit = "sale.order"
+    _inherit = 'sale.order'
 
-    @api.model
-    def search(self, args, offset=0, limit=None, order=None, count=False):
-        # Only apply logic inside Quotation/Order view context
-        if self.env.context.get("from_sale_order_tree", False):
-            new_args = []
-            for arg in args:
-                if isinstance(arg, (list, tuple)) and len(arg) >= 3 and arg[0] == "purchase_order" and arg[1] == "ilike":
-                    raw_value = arg[2]
-                    if raw_value and ("\n" in raw_value or "," in raw_value):
-                        # Split by newline or comma
-                        values = [v.strip() for v in raw_value.replace(",", "\n").split("\n") if v.strip()]
-                        if values:
-                            # Build OR domain
-                            domain = []
-                            for val in values:
-                                if domain:
-                                    domain.insert(0, "|")
-                                domain.append(("purchase_order", "ilike", val))
-                            new_args.extend(domain)
-                            _logger.debug("Expanded PO search: %s -> %s", raw_value, domain)
-                            continue
-                new_args.append(arg)
-            args = new_args
-
-        return super(SaleOrder, self).search(args, offset=offset, limit=limit, order=order, count=count)
+    def _name_search(self, name='', args=None, operator='ilike', limit=None, name_get_uid=None):
+        args = args or []
+        if name and self.env.context.get('purchase_order_multisearch'):
+            # Split input by comma or newline
+            terms = [term.strip() for term in name.replace('\n', ',').split(',') if term.strip()]
+            if terms:
+                domain = ['|'] * (len(terms) - 1)
+                for term in terms:
+                    domain.append(('purchase_order', operator, term))
+                return self._search(domain + args, limit=limit, access_rights_uid=name_get_uid)
+        return super()._name_search(name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
