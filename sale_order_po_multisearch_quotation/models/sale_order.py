@@ -1,5 +1,4 @@
 from odoo import models, api
-from odoo.http import request
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
@@ -19,10 +18,11 @@ class SaleOrder(models.Model):
                 # Split on newlines and commas
                 terms = [t.strip() for t in arg[2].replace(",", "\n").splitlines() if t.strip()]
                 if len(terms) > 1:
+                    # Build OR domain
                     or_domain = []
                     for term in terms:
                         if or_domain:
-                            or_domain.append("|")
+                            or_domain.insert(0, "|")
                         or_domain.append(("purchase_order", "ilike", term))
                     new_args.extend(or_domain)
                 else:
@@ -32,16 +32,15 @@ class SaleOrder(models.Model):
         return new_args
 
     @api.model
-    def search(self, args, offset=0, limit=None, order=None):
+    def search(self, args, offset=0, limit=None, order=None, count=False):
         ctx = self._context or {}
-        # Only apply in quotations menu
         if ctx.get("params", {}).get("action") == "sale.action_quotations_with_onboarding":
             args = self._expand_po_domain(args)
-        return super().search(args, offset=offset, limit=limit, order=order)
+        return super().search(args, offset=offset, limit=limit, order=order, count=count)
 
     @api.model
-    def search_count(self, args):
+    def search_count(self, args, limit=None):
         ctx = self._context or {}
         if ctx.get("params", {}).get("action") == "sale.action_quotations_with_onboarding":
             args = self._expand_po_domain(args)
-        return super().search_count(args)
+        return super().search_count(args, limit=limit)
