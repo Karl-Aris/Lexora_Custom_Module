@@ -1,9 +1,12 @@
-from odoo import models
+from odoo import models, api
+from odoo.http import request
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    def _expand_purchase_order_domain(self, args):
+    @api.model
+    def _expand_po_domain(self, args):
+        """Expand purchase_order domain when multiline search is used"""
         new_args = []
         for arg in args:
             if (
@@ -13,32 +16,32 @@ class SaleOrder(models.Model):
                 and arg[1] in ("ilike", "like")
                 and arg[2]
             ):
-                # Split by newlines or commas
-                terms = [t.strip() for t in arg[2].replace(",", "\n").split("\n") if t.strip()]
+                # Split on newlines and commas
+                terms = [t.strip() for t in arg[2].replace(",", "\n").splitlines() if t.strip()]
                 if len(terms) > 1:
-                    ors = []
-                    for t in terms:
-                        ors.append(("purchase_order", "ilike", t))
-                    # Build OR domain dynamically
-                    domain = []
-                    for i, cond in enumerate(ors):
-                        if i > 0:
-                            domain.append("|")
-                        domain.append(cond)
-                    new_args.append(domain)
+                    or_domain = []
+                    for term in terms:
+                        if or_domain:
+                            or_domain.append("|")
+                        or_domain.append(("purchase_order", "ilike", term))
+                    new_args.extend(or_domain)
                 else:
                     new_args.append(arg)
             else:
                 new_args.append(arg)
         return new_args
 
+    @api.model
     def search(self, args, offset=0, limit=None, order=None):
-        # Only apply inside Quotations action
-        if self.env.context.get("params", {}).get("action") == self.env.ref("sale.action_quotations_with_onboarding").id:
-            args = self._expand_purchase_order_domain(args)
+        ctx = self._context or {}
+        # Only apply in quotations menu
+        if ctx.get("params", {}).get("action") == "sale.action_quotations_with_onboarding":
+            args = self._expand_po_domain(args)
         return super().search(args, offset=offset, limit=limit, order=order)
 
+    @api.model
     def search_count(self, args):
-        if self.env.context.get("params", {}).get("action") == self.env.ref("sale.action_quotations_with_onboarding").id:
-            args = self._expand_purchase_order_domain(args)
+        ctx = self._context or {}
+        if ctx.get("params", {}).get("action") == "sale.action_quotations_with_onboarding":
+            args = self._expand_po_domain(args)
         return super().search_count(args)
