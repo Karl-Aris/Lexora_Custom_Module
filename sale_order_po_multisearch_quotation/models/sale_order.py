@@ -3,14 +3,22 @@ from odoo import models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    def _name_search(self, name='', args=None, operator='ilike', limit=None, name_get_uid=None):
-        args = args or []
-        if name and self.env.context.get('purchase_order_multisearch'):
-            # Split input by comma or newline
-            terms = [term.strip() for term in name.replace('\n', ',').split(',') if term.strip()]
-            if terms:
-                domain = ['|'] * (len(terms) - 1)
-                for term in terms:
-                    domain.append(('purchase_order', operator, term))
-                return self._search(domain + args, limit=limit, access_rights_uid=name_get_uid)
-        return super()._name_search(name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
+    def search(self, args, offset=0, limit=None, order=None):
+        """Intercept domain when searching by purchase_order with multiple values"""
+        new_args = []
+        for arg in args:
+            if isinstance(arg, (list, tuple)) and arg[0] == 'purchase_order' and isinstance(arg[2], str):
+                # Split by comma
+                terms = [t.strip() for t in arg[2].replace('\n', ',').split(',') if t.strip()]
+                if len(terms) > 1:
+                    # Build OR domain
+                    domain = ['|'] * (len(terms) - 1)
+                    for term in terms:
+                        domain.append(('purchase_order', arg[1], term))
+                    new_args.append(domain)
+                else:
+                    new_args.append(arg)
+            else:
+                new_args.append(arg)
+
+        return super(SaleOrder, self).search(new_args, offset=offset, limit=limit, order=order)
