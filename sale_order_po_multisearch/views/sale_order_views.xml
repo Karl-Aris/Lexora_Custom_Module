@@ -2,11 +2,15 @@
     <record id="view_order_filter_po_multisearch" model="ir.ui.view">
         <field name="name">sale.order.search.po.multisearch</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <!-- inherit the right search view -->
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='my_filter']" position="after">
-                <filter name="po_multi_search" string="PO Multi Search"
-                    domain="[]" context="{'multi_po_search': True}"/>
+            <!-- Insert inside the <search> element -->
+            <xpath expr="//search" position="inside">
+                <filter name="po_multi_search"
+                        string="PO Multi Search"
+                        domain="[]"
+                        context="{'multi_po_search': True}"/>
             </xpath>
         </field>
     </record>
