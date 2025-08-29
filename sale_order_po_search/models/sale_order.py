@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 
 class SaleOrder(models.Model):
@@ -6,27 +6,21 @@ class SaleOrder(models.Model):
 
     purchase_order = fields.Char(string="Purchase Order")
 
-    @api.model
-    def _name_search(self, name="", args=None, operator="ilike", limit=100, name_get_uid=None):
+    def _search_purchase_order(self, operator, value):
         """
-        Custom search on purchase_order:
-        - Splits pasted input by commas into phrases
-        - Builds an OR domain with ilike for each phrase
-        Example:
-            Input: "TEST 13 SO, TEST 11 SO, TEST 10 AGAIN PO"
-            Domain: ['|','|',
-                     ('purchase_order','ilike','TEST 13 SO'),
-                     ('purchase_order','ilike','TEST 11 SO'),
-                     ('purchase_order','ilike','TEST 10 AGAIN PO')]
+        Custom search for purchase_order
+        - Split input by commas or newlines into phrases
+        - Apply OR domain with ilike for each phrase
         """
-        args = list(args or [])
-        if name:
-            # split by commas to keep full phrases
-            phrases = [phrase.strip() for phrase in name.split(",") if phrase.strip()]
-            if phrases:
-                domain = ["|"] * (len(phrases) - 1) + [
-                    ("purchase_order", "ilike", phrase) for phrase in phrases
-                ]
-                return self.search(domain + args, limit=limit).name_get()
+        if not value:
+            return []
 
-        return super()._name_search(name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
+        # split input into phrases
+        phrases = [v.strip() for v in value.replace("\n", ",").split(",") if v.strip()]
+        if not phrases:
+            return []
+
+        # Build OR domain dynamically
+        domain = ["|"] * (len(phrases) - 1)
+        domain += [("purchase_order", "ilike", phrase) for phrase in phrases]
+        return domain
