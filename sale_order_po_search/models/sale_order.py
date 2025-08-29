@@ -1,32 +1,26 @@
-from odoo import models, fields
+from odoo import models
 
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    purchase_order = fields.Char(string="Purchase Order")
+    def _search(self, args, offset=0, limit=None, order=None, count=False):
+        # If there's a plain-text search in the domain, split and inject into purchase_order
+        new_args = []
+        for arg in args:
+            if isinstance(arg, tuple) and arg[0] == '__search':
+                value = arg[2]
+                if value:
+                    phrases = [v.strip() for v in value.replace("\n", ",").split(",") if v.strip()]
+                    if phrases:
+                        domain = ["|"] * (len(phrases) - 1)
+                        domain += [("purchase_order", "ilike", phrase) for phrase in phrases]
+                        new_args.append(domain)
+                    else:
+                        new_args.append(arg)
+                else:
+                    new_args.append(arg)
+            else:
+                new_args.append(arg)
 
-    def _search_purchase_order(self, operator, value):
-        """
-        Custom search for Char field purchase_order
-        - Split input by commas or newlines into phrases
-        - Each phrase searched with ilike (OR logic)
-        Example:
-            Input: "TEST 13 SO, TEST 11 SO, TEST 10 AGAIN PO"
-            Domain: ['|','|',
-                     ('purchase_order','ilike','TEST 13 SO'),
-                     ('purchase_order','ilike','TEST 11 SO'),
-                     ('purchase_order','ilike','TEST 10 AGAIN PO')]
-        """
-        if not value:
-            return []
-
-        # Normalize separators → commas
-        phrases = [v.strip() for v in value.replace("\n", ",").split(",") if v.strip()]
-        if not phrases:
-            return []
-
-        # Build OR domain
-        domain = ["|"] * (len(phrases) - 1)
-        domain += [("purchase_order", "ilike", phrase) for phrase in phrases]
-        return domain
+        return super()._search(new_args, offset=offset, limit=limit, order=order, count=count)
