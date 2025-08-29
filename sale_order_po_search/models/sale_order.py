@@ -8,19 +8,25 @@ class SaleOrder(models.Model):
 
     def _search_purchase_order(self, operator, value):
         """
-        Custom search for purchase_order
+        Custom search for Char field purchase_order
         - Split input by commas or newlines into phrases
-        - Apply OR domain with ilike for each phrase
+        - Each phrase searched with ilike (OR logic)
+        Example:
+            Input: "TEST 13 SO, TEST 11 SO, TEST 10 AGAIN PO"
+            Domain: ['|','|',
+                     ('purchase_order','ilike','TEST 13 SO'),
+                     ('purchase_order','ilike','TEST 11 SO'),
+                     ('purchase_order','ilike','TEST 10 AGAIN PO')]
         """
         if not value:
             return []
 
-        # split input into phrases
+        # Normalize separators → commas
         phrases = [v.strip() for v in value.replace("\n", ",").split(",") if v.strip()]
         if not phrases:
             return []
 
-        # Build OR domain dynamically
+        # Build OR domain
         domain = ["|"] * (len(phrases) - 1)
         domain += [("purchase_order", "ilike", phrase) for phrase in phrases]
         return domain
