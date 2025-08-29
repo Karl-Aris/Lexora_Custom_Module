@@ -10,8 +10,8 @@ class SaleOrder(models.Model):
     def _name_search(self, name="", args=None, operator="ilike", limit=100, name_get_uid=None):
         """
         Custom search on purchase_order:
-        - Splits pasted input by commas (phrase-based search)
-        - Each phrase is matched with ilike
+        - Splits pasted input by commas into phrases
+        - Builds an OR domain with ilike for each phrase
         Example:
             Input: "TEST 13 SO, TEST 11 SO, TEST 10 AGAIN PO"
             Domain: ['|','|',
@@ -21,11 +21,11 @@ class SaleOrder(models.Model):
         """
         args = list(args or [])
         if name:
-            # split only by comma to preserve phrases
-            search_terms = [t.strip() for t in name.split(",") if t.strip()]
-            if search_terms:
-                domain = ["|"] * (len(search_terms) - 1) + [
-                    ("purchase_order", "ilike", term) for term in search_terms
+            # split by commas to keep full phrases
+            phrases = [phrase.strip() for phrase in name.split(",") if phrase.strip()]
+            if phrases:
+                domain = ["|"] * (len(phrases) - 1) + [
+                    ("purchase_order", "ilike", phrase) for phrase in phrases
                 ]
                 return self.search(domain + args, limit=limit).name_get()
 
