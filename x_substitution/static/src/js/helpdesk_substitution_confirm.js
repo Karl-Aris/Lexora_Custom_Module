@@ -19,7 +19,7 @@ patch(FormController.prototype, "x_substitution_confirm_save", {
                         title: "Confirmation",
                         body: "Are you sure you want to proceed on this substitution?",
                         confirm: async () => {
-                            resolve(super.saveButtonClicked(params));
+                            resolve(this._super(params));
                         },
                         cancel: () => {
                             resolve(false);
@@ -29,6 +29,6 @@ patch(FormController.prototype, "x_substitution_confirm_save", {
             }
         }
 
-        return super.saveButtonClicked(params);
+        return this._super(params);
     },
 });
