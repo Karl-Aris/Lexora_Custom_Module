@@ -5,9 +5,11 @@ import { FormController } from "@web/views/form/form_controller";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { useService } from "@web/core/utils/hooks";
 
-// Use patch to wrap the method with access to the original
+// Keep a reference to the original function
+const originalSave = FormController.prototype.saveButtonClicked;
+
 patch(FormController.prototype, {
-    saveButtonClicked: function (original, params = {}) {
+    async saveButtonClicked(params = {}) {
         // Only apply on helpdesk.ticket
         if (this.model.root.resModel === "helpdesk.ticket") {
             const result = this.model.root.data.x_result;
@@ -20,7 +22,8 @@ patch(FormController.prototype, {
                         title: "Confirmation",
                         body: "Are you sure you want to proceed on this substitution?",
                         confirm: async () => {
-                            resolve(original.call(this, params));  // ✅ safe call
+                            // ✅ call the saved original
+                            resolve(originalSave.call(this, params));
                         },
                         cancel: () => {
                             resolve(false);
@@ -30,7 +33,7 @@ patch(FormController.prototype, {
             }
         }
 
-        // fallback → call original directly
-        return original.call(this, params);
+        // fallback → call original
+        return originalSave.call(this, params);
     },
 });
