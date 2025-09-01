@@ -5,7 +5,7 @@ import { FormController } from "@web/views/form/form_controller";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { useService } from "@web/core/utils/hooks";
 
-patch(FormController.prototype, "x_substitution_confirm_save", {
+patch(FormController.prototype, {
     async saveButtonClicked(params = {}) {
         // Only apply on helpdesk.ticket
         if (this.model.root.resModel === "helpdesk.ticket") {
