@@ -6,7 +6,7 @@ import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_d
 import { useService } from "@web/core/utils/hooks";
 
 patch(FormController.prototype, {
-    async saveButtonClicked(params = {}) {
+    async saveButtonClicked(original, params = {}) {
         // Only apply on helpdesk.ticket
         if (this.model.root.resModel === "helpdesk.ticket") {
             const result = this.model.root.data.x_result;
@@ -19,8 +19,8 @@ patch(FormController.prototype, {
                         title: "Confirmation",
                         body: "Are you sure you want to proceed on this substitution?",
                         confirm: async () => {
-                            // ✅ directly call parent method
-                            resolve(FormController.prototype.saveButtonClicked.call(this, params));
+                            // ✅ safely call the original save
+                            resolve(original.call(this, params));
                         },
                         cancel: () => {
                             resolve(false);
@@ -30,7 +30,7 @@ patch(FormController.prototype, {
             }
         }
 
-        // ✅ call parent method normally
-        return FormController.prototype.saveButtonClicked.call(this, params);
+        // fallback to original
+        return original.call(this, params);
     },
 });
