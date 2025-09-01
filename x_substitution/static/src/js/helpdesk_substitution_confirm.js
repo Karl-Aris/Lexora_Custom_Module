@@ -6,7 +6,7 @@ import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_d
 import { useService } from "@web/core/utils/hooks";
 
 patch(FormController.prototype, {
-    async saveButtonClicked(params = {}) {
+    async saveButtonClicked(original, params = {}) {
         // Only apply on helpdesk.ticket
         if (this.model.root.resModel === "helpdesk.ticket") {
             const result = this.model.root.data.x_result;
@@ -19,7 +19,7 @@ patch(FormController.prototype, {
                         title: "Confirmation",
                         body: "Are you sure you want to proceed on this substitution?",
                         confirm: async () => {
-                            resolve(this._super(params));
+                            resolve(original.call(this, params));  // call original save
                         },
                         cancel: () => {
                             resolve(false);
@@ -29,6 +29,8 @@ patch(FormController.prototype, {
             }
         }
 
-        return this._super(params);
+        // fallback to original save
+        return original.call(this, params);
     },
 });
+
