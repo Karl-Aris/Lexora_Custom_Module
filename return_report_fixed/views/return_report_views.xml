@@ -1,34 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Action to open Return Reports -->
-    <record id="action_return_report" model="ir.actions.act_window">
-        <field name="name">Return Reports</field>
-        <field name="res_model">return.report</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first Return Report
-            </p>
-        </field>
-    </record>
-
-    <!-- Menu Items -->
-    <menuitem id="menu_return_report_root"
-              name="Return Reports"
-              sequence="10"/>
-
-    <menuitem id="menu_return_report"
-              name="Reports"
-              parent="menu_return_report_root"
-              action="action_return_report"
-              sequence="10"/>
-
-    <!-- Tree/List View -->
     <record id="view_return_report_tree" model="ir.ui.view">
         <field name="name">return.report.tree</field>
         <field name="model">return.report</field>
         <field name="arch" type="xml">
-            <tree string="Return Reports">
+            <tree>
                 <field name="name"/>
                 <field name="date"/>
                 <field name="state"/>
@@ -36,7 +12,6 @@
         </field>
     </record>
 
-    <!-- Form View -->
     <record id="view_return_report_form" model="ir.ui.view">
         <field name="name">return.report.form</field>
         <field name="model">return.report</field>
@@ -47,16 +22,16 @@
                             type="object"
                             string="Confirm"
                             class="btn-primary"
-                            attrs="{'invisible': [('state','!=','draft')]}"/>
+                            modifiers='{"invisible": [["state", "!=", "draft"]]}'
+                    />
                     <button name="action_done"
                             type="object"
                             string="Mark as Done"
                             class="btn-success"
-                            attrs="{'invisible': [('state','!=','confirmed')]}"/>
-                    <field name="state" widget="statusbar"
-                           statusbar_visible="draft,confirmed,done"/>
+                            modifiers='{"invisible": [["state", "!=", "confirmed"]]}'
+                    />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
                 </header>
-
                 <sheet>
                     <group>
                         <field name="name"/>
@@ -67,4 +42,8 @@
             </form>
         </field>
     </record>
-</odoo>
+
+    <record id="action_return_report" model="ir.actions.act_window">
+        <field name="name">Return Reports</field>
+        <field name="res_model">return.report</field>
+        <field name="v
