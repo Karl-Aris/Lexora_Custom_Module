@@ -22,14 +22,12 @@
                             type="object"
                             string="Confirm"
                             class="btn-primary"
-                            modifiers='{"invisible": [["state", "!=", "draft"]]}'
-                    />
+                            modifiers='{"invisible": [["state", "!=", "draft"]]}'/>
                     <button name="action_done"
                             type="object"
                             string="Mark as Done"
                             class="btn-success"
-                            modifiers='{"invisible": [["state", "!=", "confirmed"]]}'
-                    />
+                            modifiers='{"invisible": [["state", "!=", "confirmed"]]}'/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
                 </header>
                 <sheet>
@@ -46,4 +44,15 @@
     <record id="action_return_report" model="ir.actions.act_window">
         <field name="name">Return Reports</field>
         <field name="res_model">return.report</field>
-        <field name="v
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_return_report_root"
+              name="Return Reports"
+              sequence="10"/>
+    <menuitem id="menu_return_report"
+              name="Manage Reports"
+              parent="menu_return_report_root"
+              action="action_return_report"
+              sequence="10"/>
+</odoo>
