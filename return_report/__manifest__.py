@@ -9,6 +9,6 @@
         "security/ir.model.access.csv",
         "views/return_report_views.xml",
     ],
-    "application": true,
-    "installable": true
+    "application": True,
+    "installable": True,
 }
