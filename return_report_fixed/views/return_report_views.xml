@@ -1,34 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <menuitem id="menu_return_report_root" name="Return Report" sequence="10"/>
-    
-    <menuitem id="menu_return_report" name="Reports"
-              parent="menu_return_report_root" sequence="20"/>
+    <record id="view_return_report_form" model="ir.ui.view">
+        <field name="name">return.report.form</field>
+        <field name="model">return.report</field>
+        <field name="arch" type="xml">
+            <form string="Return Report">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- You can add smart buttons here later -->
+                    </div>
 
-    <record id="action_return_report" model="ir.actions.act_window">
-        <field name="name">Return Reports</field>
-        <field name="res_model">return.report</field>
-        <field name="view_mode">tree,form</field>
-    </record>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="state" widget="statusbar"/>
+                        </group>
+                    </group>
 
-    <menuitem id="menu_return_report_action"
-              name="Return Reports"
-              parent="menu_return_report"
-              action="action_return_report"
-              sequence="30"/>
+                    <notebook>
+                        <page string="Return Details">
+                            <group>
+                                <field name="product_id"/>
+                                <field name="quantity"/>
+                                <field name="reason"/>
+                            </group>
+                        </page>
 
-    <!-- Action -->
-    <record id="action_return_report" model="ir.actions.act_window">
-        <field name="name">Return Reports</field>
-        <field name="res_model">return.report</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first return report
-            </p>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
         </field>
     </record>
 
-    <!-- Tree View -->
     <record id="view_return_report_tree" model="ir.ui.view">
         <field name="name">return.report.tree</field>
         <field name="model">return.report</field>
@@ -36,30 +46,11 @@
             <tree>
                 <field name="name"/>
                 <field name="date"/>
-                <field name="customer_id"/>
+                <field name="partner_id"/>
                 <field name="product_id"/>
                 <field name="quantity"/>
+                <field name="state"/>
             </tree>
-        </field>
-    </record>
-
-    <!-- Form View -->
-    <record id="view_return_report_form" model="ir.ui.view">
-        <field name="name">return.report.form</field>
-        <field name="model">return.report</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <field name="name"/>
-                        <field name="date"/>
-                        <field name="customer_id"/>
-                        <field name="product_id"/>
-                        <field name="quantity"/>
-                        <field name="reason"/>
-                    </group>
-                </sheet>
-            </form>
         </field>
     </record>
 </odoo>
