@@ -3,8 +3,7 @@
     "version": "17.0.1.0.0",
     "summary": "Custom Return Report Application",
     "category": "Reporting",
-    "author": "Your Company",
-    "website": "https://yourcompany.com",
+    "author": "Karl Areglado",
     "depends": ["base"],
     "data": [
         "security/ir.model.access.csv",
