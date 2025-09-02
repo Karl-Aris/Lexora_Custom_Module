@@ -7,10 +7,12 @@ class ReturnReport(models.Model):
     name = fields.Char(string="Reference", required=True)
     date = fields.Date(string="Return Date")
     note = fields.Text(string="Notes")
-
-    # Status bar field
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
         ('done', 'Done'),
     ], string="Status", default='draft')
+
+    def action_confirm(self):
+        for record in self:
+            record.state = 'confirmed'
