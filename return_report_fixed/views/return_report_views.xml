@@ -1,17 +1,20 @@
 <odoo>
-    <!-- Menu Items -->
-    <menuitem id="menu_return_report_root"
-              name="Return Report"
-              sequence="10"
-              icon="fa-undo"
-              />
+    <menuitem id="menu_return_report_root" name="Return Report" sequence="10"/>
+    
+    <menuitem id="menu_return_report" name="Reports"
+              parent="menu_return_report_root" sequence="20"/>
 
-    <menuitem id="menu_return_report"
-              name="Reports"
-              parent="menu_return_report_root"
+    <record id="action_return_report" model="ir.actions.act_window">
+        <field name="name">Return Reports</field>
+        <field name="res_model">return.report</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_return_report_action"
+              name="Return Reports"
+              parent="menu_return_report"
               action="action_return_report"
-              sequence="20"
-              />
+              sequence="30"/>
 
     <!-- Action -->
     <record id="action_return_report" model="ir.actions.act_window">
