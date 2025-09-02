@@ -4,9 +4,13 @@ class ReturnReport(models.Model):
     _name = "return.report"
     _description = "Return Report"
 
-    name = fields.Char(string="Report Name", required=True)
-    date = fields.Date(string="Date", default=fields.Date.today)
-    customer_id = fields.Many2one("res.partner", string="Customer")
-    product_id = fields.Many2one("product.product", string="Product")
-    quantity = fields.Float(string="Quantity")
-    reason = fields.Text(string="Reason for Return")
+    name = fields.Char(string="Reference", required=True)
+    date = fields.Date(string="Return Date")
+    note = fields.Text(string="Notes")
+
+    # Status bar field
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('confirmed', 'Confirmed'),
+        ('done', 'Done'),
+    ], string="Status", default='draft')
