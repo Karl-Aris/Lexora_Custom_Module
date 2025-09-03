@@ -10,10 +10,6 @@ class ReturnReportLine(models.Model):
         required=True,
         ondelete="cascade"
     )
-    product_id = fields.Many2one(
-        'product.product',
-        string="Product",
-        required=True
-    )
+    
     quantity = fields.Float(string="Quantity", default=1.0)
     reason = fields.Char(string="Reason for Return")
