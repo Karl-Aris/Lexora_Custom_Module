@@ -1,0 +1,9 @@
+<odoo>
+    <record id="seq_return_report" model="ir.sequence">
+        <field name="name">Return Report</field>
+        <field name="code">return.report</field>
+        <field name="prefix">RR</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>
