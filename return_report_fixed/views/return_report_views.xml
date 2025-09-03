@@ -31,6 +31,7 @@
                             modifiers='{"invisible": [["state", "!=", "confirmed"]]}'/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
                 </header>
+
                 <sheet>
                     <group>
                         <field name="name"/>
@@ -40,7 +41,7 @@
 
                     <notebook>
                         <page string="Return Lines">
-                            <field name="line_ids">
+                            <field name="line_ids" context="{'default_report_id': active_id}">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
                                     <field name="quantity"/>
@@ -69,7 +70,9 @@
     </record>
 
     <menuitem id="menu_return_report_root" name="Return Reports" sequence="10"/>
-    <menuitem id="menu_return_report" name="Manage Reports"
+    <menuitem id="menu_return_report"
+              name="Manage Reports"
               parent="menu_return_report_root"
-              action="action_return_report" sequence="10"/>
+              action="action_return_report"
+              sequence="10"/>
 </odoo>
