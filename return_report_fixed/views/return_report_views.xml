@@ -43,13 +43,11 @@
                         <page string="Return Lines">
                             <field name="line_ids" context="{'default_report_id': active_id}">
                                 <tree editable="bottom">
-                                    <field name="product_id"/>
                                     <field name="quantity"/>
                                     <field name="reason"/>
                                 </tree>
                                 <form>
                                     <group>
-                                        <field name="product_id"/>
                                         <field name="quantity"/>
                                         <field name="reason"/>
                                     </group>
