@@ -1,53 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Tree View -->
-    <record id="view_return_report_tree" model="ir.ui.view">
-        <field name="name">return.report.tree</field>
-        <field name="model">return.report</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="date"/>
-                <field name="state"/>
-            </tree>
-        </field>
-    </record>
-
     <!-- Form View -->
     <record id="view_return_report_form" model="ir.ui.view">
         <field name="name">return.report.form</field>
         <field name="model">return.report</field>
         <field name="arch" type="xml">
             <form string="Return Report">
-                <header>
-                    <button name="action_confirm"
-                            type="object"
-                            string="Confirm"
-                            class="btn-primary"
-                            modifiers='{"invisible": [["state", "!=", "draft"]]}'/>
-                    <button name="action_done"
-                            type="object"
-                            string="Mark as Done"
-                            class="btn-success"
-                            modifiers='{"invisible": [["state", "!=", "confirmed"]]}'/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
-                </header>
-
                 <sheet>
                     <group>
                         <field name="name"/>
                         <field name="date"/>
-                        <field name="note"/>
+                        <field name="partner_id"/>
                     </group>
-
                     <notebook>
                         <page string="Return Lines">
-                            <field name="line_ids" context="{'default_report_id': active_id}">
+                            <field name="line_ids">
                                 <tree editable="bottom">
+                                    <field name="x_return_product"/>
                                     <field name="quantity"/>
                                     <field name="reason"/>
                                 </tree>
                                 <form>
                                     <group>
+                                        <field name="x_return_product"/>
                                         <field name="quantity"/>
                                         <field name="reason"/>
                                     </group>
@@ -60,16 +35,32 @@
         </field>
     </record>
 
-    <!-- Action + Menu -->
+    <!-- Tree View -->
+    <record id="view_return_report_tree" model="ir.ui.view">
+        <field name="name">return.report.tree</field>
+        <field name="model">return.report</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="partner_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
     <record id="action_return_report" model="ir.actions.act_window">
         <field name="name">Return Reports</field>
         <field name="res_model">return.report</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_return_report_root" name="Return Reports" sequence="10"/>
+    <!-- Menu -->
+    <menuitem id="menu_return_report_root"
+              name="Return Report"
+              sequence="10"/>
     <menuitem id="menu_return_report"
-              name="Manage Reports"
+              name="Reports"
               parent="menu_return_report_root"
               action="action_return_report"
               sequence="10"/>
