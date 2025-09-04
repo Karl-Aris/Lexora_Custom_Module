@@ -1,0 +1,26 @@
+
+<odoo>
+    <record id="view_deduction_import_wizard" model="ir.ui.view">
+        <field name="name">deduction.import.wizard.form</field>
+        <field name="model">deduction.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Deductions" enctype="multipart/form-data">
+                <group>
+                    <field name="file_data" filename="filename"/>
+                    <field name="filename"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_deduction_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Deductions</field>
+        <field name="res_model">deduction.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
