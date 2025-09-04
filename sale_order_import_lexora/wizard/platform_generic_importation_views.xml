@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<!--    <record id="sale_order_import_button_tree_inherit_js_class" model="ir.ui.view">
+       <field name="name">sale.order.import.button.tree.inherit</field>
+       <field name="model">sale.order</field>
+       <field name="inherit_id" ref="sale.view_order_tree"/>
+       <field name="arch" type="xml">
+           <xpath expr="//tree" position="attributes">
+               <attribute name="js_class">sale_order_import_lexora</attribute>
+           </xpath>
+       </field>
+   </record> -->
+
+    <record id="platform_import_wizard" model="ir.ui.view">
+        <field name="name">platform.generic.importation.wizard</field>
+        <field name="model">platform.generic.importation</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="has_header_error" readonly="1" invisible="1"/>
+                <field name="header_error_display" readonly="1" invisible="not has_header_error"/>
+                <group>
+                    <group><field name="platform_id" options="{'no_create': True}"/></group>
+                    <group><field name="payment_term_id" options="{'no_create': True}"/></group>
+                </group>
+                <group>
+                    <field name="line_ids">
+                        <tree>
+                            <field name="name" required="1"/>
+                            <field name="field_id" string="Odoo Field"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="action_upload" string="Proceed" type="object" class="btn-primary" data-hotkey="z" invisible="not attachment or has_header_error"/>
+                    <button name="cancel_button" string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    <field name="attachment" string="Upload File"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_importation_platform_wizard_open" model="ir.actions.act_window">
+        <field name="name">Platform Importation</field>
+        <field name="res_model">platform.generic.importation</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="platform_import_wizard"/>
+        <field name="context"></field>
+        <field name="target">new</field>
+    </record>
+</odoo>

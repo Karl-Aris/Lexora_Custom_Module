@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+   <record id="sale_order_import_button_tree_inherit_js_class" model="ir.ui.view">
+       <field name="name">sale.order.import.button.tree.inherit</field>
+       <field name="model">sale.order</field>
+       <field name="inherit_id" ref="sale.view_order_tree"/>
+       <field name="arch" type="xml">
+           <xpath expr="//tree" position="attributes">
+               <attribute name="js_class">sale_order_import_lexora</attribute>
+           </xpath>
+       </field>
+   </record>
+
+    <record id="sale_order_import_wizard" model="ir.ui.view">
+        <field name="name">sale.order.sale_order_import_lexora</field>
+        <field name="model">sale.order.importation</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="is_header_invalid" invisible="1"/>
+                <h2>Importation Guidelines</h2>
+                <br/>
+                <p>
+                    <strong>1. Download template:</strong>
+                    <ul>
+                        <li>
+                            Obtain the template here:
+                            <a
+                                style="font-weight: bold;"
+                                href="sale_order_import_lexora/static/src/files/Lexora-Order-Template.xlsx"
+                                download="Lexora Order Template">
+                                    <i class="fa fa-file-excel-o"></i> Lexora Order Template
+                            </a>
+                        </li>
+                    </ul>
+                </p>
+                <p>
+                    <strong>2. Fill out the template using the guidelines below:</strong>
+                    <field name="header_guidelines_display" widget="html" readonly="1"/>
+                </p>
+                <p>
+                    <strong>3. Attach the Filled Template:</strong>
+                    <ul>
+                        <li>
+                            Once you have completed the template with the required information,
+                            <br/>save the document and attach it to this wizard using the <strong>Upload your file button</strong> below.
+                        </li>
+                    </ul>
+                </p>
+                <footer>
+                    <field
+                        name="invalid_headers_warning"
+                        class="fst-italic col-12 alert alert-danger pb-0"
+                        string=""
+                        readonly="1"
+                        invisible="not is_header_invalid"
+                        widget="html"
+                        />
+                    <button name="action_upload" string="Proceed" type="object" class="btn-primary" data-hotkey="z" invisible="is_header_invalid or not attachment"/>
+                    <button name="cancel_button" string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    <field name="attachment" string="Upload File"/>
+                    <field name="mode"/>
+                    <field name="template_id" options="{'no_quick_create':True, 'no_creata':True}" invisible="mode == 'xlsx'" placeholder="Select a template" required="mode == 'csv'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_importation_wizard_open" model="ir.actions.act_window">
+        <field name="name">Orders Importation</field>
+        <field name="res_model">sale.order.importation</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="sale_order_import_wizard"/>
+        <field name="context"></field>
+        <field name="target">new</field>
+    </record>
+</odoo>

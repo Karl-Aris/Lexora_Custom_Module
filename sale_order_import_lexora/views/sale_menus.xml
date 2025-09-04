@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <menuitem id="platform_main_menu"
+        name="Platform Importation"
+        groups="sales_team.group_sale_manager"
+        sequence="59"
+        parent="sale.menu_sale_config"
+        />
+
+    <record id="platform_generic_action" model="ir.actions.act_window">
+        <field name="name">Platform Importation</field>
+        <field name="res_model">platform.generic</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="platform_generic_tree_view" model="ir.ui.view">
+        <field name="name">platform.generic.tree.view</field>
+        <field name="model">platform.generic</field>
+        <field name="arch" type="xml">
+            <tree editable="top" create="1" delete="1" multi_edit="1">
+                <field name="field_name" required="True" />
+                <field name="platform_column_ids" required="True" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <menuitem id="platform_generic_menu"
+        name="Platform Importation"
+        action="platform_generic_action"
+        groups="sales_team.group_sale_manager"
+        sequence="70"
+        parent="sale_order_import_lexora.platform_main_menu"
+        />
+
+    <record id="platform_generic_lines_action" model="ir.actions.act_window">
+        <field name="name">Platform Importation Lines</field>
+        <field name="res_model">platform.generic.lines</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="platform_generic_lines_tree_view" model="ir.ui.view">
+        <field name="name">platform.generic.lines.tree.view</field>
+        <field name="model">platform.generic.lines</field>
+        <field name="arch" type="xml">
+            <tree editable="top" create="1" delete="1" multi_edit="1">
+                <field name="name" required="True" />
+                <field name="platform_id" required="True" />
+                <field name="field_id" options="{'no_create': True}"/>
+            </tree>
+        </field>
+    </record>
+
+    <menuitem id="platform_generic_lines_menu"
+        name="Platform Importation Lines"
+        action="platform_generic_lines_action"
+        groups="sales_team.group_sale_manager"
+        sequence="70"
+        parent="sale_order_import_lexora.platform_main_menu"
+        />
+
+    <record id="platform_import_action" model="ir.actions.act_window">
+        <field name="name">Platforms</field>
+        <field name="res_model">platform.import</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="platform_import_tree_view" model="ir.ui.view">
+        <field name="name">platform.import.tree.view</field>
+        <field name="model">platform.import</field>
+        <field name="arch" type="xml">
+            <tree editable="top" create="1" delete="1" multi_edit="1">
+                <field name="name" required="True" />
+                <field name="line_ids" options="{'no_create': True}" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <menuitem id="platform_menu"
+        name="Platforms"
+        action="platform_import_action"
+        groups="sales_team.group_sale_manager"
+        sequence="70"
+        parent="sale_order_import_lexora.platform_main_menu"
+        />
+
+    <record id="sale_order_import_result_action" model="ir.actions.act_window">
+        <field name="name">Sale Order Importation Result</field>
+        <field name="res_model">sale.order.upload.result</field>
+        <field name="context">{'create': False}</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="sale_menu_import_result"
+        name="Import Results"
+        action="sale_order_import_result_action"
+        groups="sales_team.group_sale_manager"
+        sequence="71"
+        parent="sale.menu_sale_config"
+        />
+</odoo>
