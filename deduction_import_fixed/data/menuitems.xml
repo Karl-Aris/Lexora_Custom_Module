@@ -1,5 +1,0 @@
-<odoo>
-  <menuitem id="menu_deduction_root" name="Deduction Import" sequence="10"/>
-  <menuitem id="menu_deduction_actions" name="Deductions" parent="menu_deduction_root" action="action_deduction_vendor" sequence="10" />
-  <menuitem id="menu_deduction_import" name="Import Deductions" parent="menu_deduction_root" action="action_deduction_import_wizard" sequence="20" />
-</odoo>
