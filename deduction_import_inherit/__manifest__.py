@@ -3,7 +3,7 @@
     "name": "Deduction Import Wizard",
     "version": "17.0.1.0.0",
     "depends": ["base"],
-    "author": "Custom",
+    "author": "Karl Areglado",
     "category": "Tools",
     "summary": "Massive importation for Deduction Vendor",
     "data": [
