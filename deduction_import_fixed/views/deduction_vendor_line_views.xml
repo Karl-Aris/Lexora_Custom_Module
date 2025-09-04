@@ -1,0 +1,32 @@
+<odoo>
+  <record id="view_deduction_vendor_line_tree" model="ir.ui.view">
+    <field name="name">deduction.vendor.line.tree</field>
+    <field name="model">deduction.vendor.line</field>
+    <field name="arch" type="xml">
+      <tree string="Deduction Vendor Lines">
+        <field name="deduction_id"/>
+        <field name="sku_id"/>
+        <field name="po_number"/>
+        <field name="amount"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_deduction_vendor_line_form" model="ir.ui.view">
+    <field name="name">deduction.vendor.line.form</field>
+    <field name="model">deduction.vendor.line</field>
+    <field name="arch" type="xml">
+      <form string="Deduction Vendor Line">
+        <sheet>
+          <group>
+            <field name="deduction_id"/>
+            <field name="sku_id"/>
+            <field name="po_number"/>
+            <field name="amount"/>
+            <field name="cogs"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+</odoo>
