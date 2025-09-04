@@ -1,0 +1,8 @@
+
+<odoo>
+    <menuitem id="menu_deduction_root" name="Deductions"/>
+    <menuitem id="menu_deduction_import"
+              parent="menu_deduction_root"
+              name="Import Deductions"
+              action="action_deduction_import_wizard"/>
+</odoo>
