@@ -70,18 +70,23 @@ class SaleOrder(models.Model):
     def _update_quality_check(self):
         QualityCheck = self.env['quality.check']
         for rec in self:
-            product_ids = rec.order_line.mapped('product_id.id')
-            if not product_ids:
+            if not rec.order_line:
                 continue
-
-            # Get quality checks for these products
+    
+            # collect product IDs from sale order lines
+            product_ids = rec.order_line.mapped('product_id.id')
+    
+            # get quality checks for these products
             checks = QualityCheck.search([('product_id', 'in', product_ids)])
-
+    
             status_list = []
             for check in checks:
-                product_code = check.product_id.default_code or check.product_id.name
+                product = check.product_id
+                product_code = product.default_code or product.display_name
                 state = check.quality_state.capitalize() if check.quality_state else "None"
                 status_list.append(f"{product_code} ({state})")
-
+    
             if status_list:
-                rec.x_quality_check_status = ", ".join(status_list)
+                rec.x_quality_check = ", ".join(status_list)
+            else:
+                rec.x_quality_check = ""
