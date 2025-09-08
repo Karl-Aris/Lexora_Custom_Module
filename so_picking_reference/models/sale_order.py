@@ -41,6 +41,14 @@ class SaleOrder(models.Model):
                 if picking_out:
                     vals['x_delivery_out'] = picking_out.name
 
+            if not rec.x_returned:
+                picking_return = Picking.search(
+                    domain_base + [('name', '=like', 'WH/IN/RETURN%')],
+                    limit=1
+                )
+                if picking_return:
+                    vals['x_returned'] = picking_return.name
+
             if vals:
                 rec.write(vals)
 
