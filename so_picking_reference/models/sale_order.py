@@ -66,24 +66,3 @@ class SaleOrder(models.Model):
                 ], limit=1)
                 if invoice:
                     rec.x_invoice_number = invoice.name
-
-    def _update_quality_check(self):
-        QualityCheck = self.env['quality.check']
-        for rec in self:
-            if not rec.purchase_order:
-                continue
-    
-            # Find all quality checks linked to this PO#
-            checks = QualityCheck.search([('purchase_order', '=', rec.purchase_order)])
-    
-            status_list = []
-            for check in checks:
-                product = check.product_id
-                product_code = product.default_code or product.display_name or "No Product"
-                state = check.quality_state.capitalize() if check.quality_state else "None"
-                status_list.append(f"{product_code} ({state})")
-    
-            if status_list:
-                rec.x_quality_check_status = ", ".join(status_list)
-            else:
-                rec.x_quality_check_status = False
