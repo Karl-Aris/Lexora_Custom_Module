@@ -1,30 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Add to Tree View -->
-    <record id="view_order_tree_inherit_badge" model="ir.ui.view">
-        <field name="name">sale.order.tree.badge</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//tree" position="inside">
-                <field name="order_line_qty_sku_text"/>
-                <field name="order_line_qty_name_text"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Add to Form View -->
-    <record id="view_order_form_inherit_badge" model="ir.ui.view">
-        <field name="name">sale.order.form.badge</field>
+    <!-- Add Quality Check status to Form View -->
+    <record id="view_order_form_inherit_badge_qc" model="ir.ui.view">
+        <field name="name">sale.order.form.qc.badge</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
                 <group>
-                    <!-- SKU HTML badges only -->
-                    <field name="order_line_qty_sku_html" readonly="1"/>
-                    <!-- Combo HTML: [SKU] Name -->
-                    <field name="order_line_qty_display_html" readonly="1"/>
+                    <field name="qc_status_html" readonly="1"/>
                 </group>
             </xpath>
         </field>
