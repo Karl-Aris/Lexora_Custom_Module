@@ -22,6 +22,7 @@ class ReturnsReport(models.Model):
     return_reason = fields.Text(string="Reason for Return")
     approved_by = fields.Many2one("res.users", string="Approved By")
     is_processed = fields.Boolean(string="Processed", default=False)
+    reference = fields.Char(string="Reference")
 
 
 class StockMoveLine(models.Model):
