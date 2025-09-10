@@ -41,6 +41,7 @@
 
     <menuitem id="menu_returns_report_root" name="Returns Report" sequence="10"/>
     <menuitem id="menu_returns_report" name="Reports" parent="menu_returns_report_root" sequence="10"/>
+
     <act_window id="action_returns_report"
                 name="Returns Report"
                 res_model="returns.report"
