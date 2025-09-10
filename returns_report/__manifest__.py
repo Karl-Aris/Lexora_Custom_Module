@@ -1,17 +1,16 @@
 {
     'name': 'Returns Report',
     'version': '1.0.0',
-    'summary': 'Module for Returns Report',
-    'description': 'Adds example fields and business logic to stock.move.line for Odoo 17 Enterprise.',
+    'summary': 'Custom model for Returns Report',
+    'description': 'A new model returns.report inheriting stock.move.line structure via delegation.',
     'category': 'Inventory/Inventory',
-    'author': 'You',
+    'author': 'Karl Areglado',
     'depends': ['stock'],
     'data': [
-        'security/security.xml',
         'security/ir.model.access.csv',
-        'views/stock_move_line_views.xml',
+        'views/returns_report_views.xml',
     ],
     'installable': True,
-    'application': False,
+    'application': True,
     'license': 'LGPL-3',
 }
