@@ -56,19 +56,16 @@ class SaleOrder(models.Model):
                 rec.write(vals)
 
     def _match_invoice_number(self):
-        Move = self.env['account.move']
-        for rec in self:
-            if rec.purchase_order:
-                invoice = Move.search([
-                    ('x_po_so_id', '=', rec.purchase_order),
-                    ('state', '=', 'posted'),
-                    ('name', '!=', '/'),
-                ], limit=1)
-                if invoice:
-                    vals = {}
-                    if not rec.x_invoice_number:
-                        vals['x_invoice_number'] = invoice.name
-                    if invoice.invoice_date:
-                        vals['x_invoice_date'] = invoice.invoice_date
-                    if vals:
-                        rec.write(vals)
+    Move = self.env['account.move']
+    for rec in self:
+        # Only attempt if there's a purchase order and no invoice number yet
+        if rec.purchase_order and not rec.x_invoice_number:
+            invoice = Move.search([
+                ('x_po_so_id', '=', rec.purchase_order.id),  # Make sure to use .id
+                ('state', '=', 'posted'),
+                ('name', '!=', '/'),
+            ], limit=1)
+            
+            if invoice:
+                rec.x_invoice_number = invoice.name
+
