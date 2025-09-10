@@ -66,9 +66,9 @@ class SaleOrder(models.Model):
                 ], limit=1)
                 if invoice:
                     vals = {}
-                    if not rec.x_invoice_number:
+                    if not rec.x_invoice_number or rec.x_invoice_number != invoice.name:
                         vals['x_invoice_number'] = invoice.name
-                    if invoice.invoice_date:
+                    if not rec.x_invoice_date or rec.x_invoice_date != invoice.invoice_date:
                         vals['x_invoice_date'] = invoice.invoice_date
                     if vals:
                         rec.write(vals)
