@@ -11,12 +11,14 @@ class ReturnsReport(models.Model):
         ondelete="cascade",
     )
 
+    # Correct related fields
     product_id = fields.Many2one(related="move_line_id.product_id", store=True)
     lot_id = fields.Many2one(related="move_line_id.lot_id", store=True)
-    qty_done = fields.Float(related="move_line_id.qty_done", store=True)
+    quantity = fields.Float(related="move_line_id.quantity", store=True)  # was qty_done
     location_id = fields.Many2one(related="move_line_id.location_id", store=True)
     location_dest_id = fields.Many2one(related="move_line_id.location_dest_id", store=True)
 
+    # Custom return fields
     return_reason = fields.Text(string="Reason for Return")
     approved_by = fields.Many2one("res.users", string="Approved By")
     is_processed = fields.Boolean(string="Processed", default=False)
