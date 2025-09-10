@@ -1,36 +1,35 @@
 <odoo>
-    <!-- Tree View -->
     <record id="view_returns_report_tree" model="ir.ui.view">
         <field name="name">returns.report.tree</field>
         <field name="model">returns.report</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree string="Returns Report">
                 <field name="product_id"/>
                 <field name="lot_id"/>
-                <field name="qty_done"/>
+                <field name="quantity"/> <!-- was qty_done -->
                 <field name="location_id"/>
                 <field name="location_dest_id"/>
                 <field name="return_reason"/>
+                <field name="approved_by"/>
                 <field name="is_processed"/>
             </tree>
         </field>
     </record>
 
-    <!-- Form View -->
     <record id="view_returns_report_form" model="ir.ui.view">
         <field name="name">returns.report.form</field>
         <field name="model">returns.report</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Returns Report">
                 <sheet>
-                    <group string="Stock Move Line Data">
+                    <group>
                         <field name="product_id"/>
                         <field name="lot_id"/>
-                        <field name="qty_done"/>
+                        <field name="quantity"/> <!-- was qty_done -->
                         <field name="location_id"/>
                         <field name="location_dest_id"/>
                     </group>
-                    <group string="Return Details">
+                    <group>
                         <field name="return_reason"/>
                         <field name="approved_by"/>
                         <field name="is_processed"/>
@@ -40,16 +39,11 @@
         </field>
     </record>
 
-    <!-- Action -->
-    <record id="action_returns_report" model="ir.actions.act_window">
-        <field name="name">Returns Reports</field>
-        <field name="res_model">returns.report</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <!-- Menu -->
-    <menuitem id="menu_returns_report_root" name="Returns Reports" sequence="10"/>
-    <menuitem id="menu_returns_report" name="Reports"
-              parent="menu_returns_report_root"
-              action="action_returns_report"/>
+    <menuitem id="menu_returns_report_root" name="Returns Report" sequence="10"/>
+    <menuitem id="menu_returns_report" name="Reports" parent="menu_returns_report_root" sequence="10"/>
+    <act_window id="action_returns_report"
+                name="Returns Report"
+                res_model="returns.report"
+                view_mode="tree,form"
+                parent="menu_returns_report"/>
 </odoo>
