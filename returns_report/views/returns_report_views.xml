@@ -6,7 +6,7 @@
             <tree string="Returns Report">
                 <field name="product_id"/>
                 <field name="lot_id"/>
-                <field name="quantity"/> <!-- was qty_done -->
+                <field name="quantity"/>
                 <field name="location_id"/>
                 <field name="location_dest_id"/>
                 <field name="return_reason"/>
@@ -25,7 +25,7 @@
                     <group>
                         <field name="product_id"/>
                         <field name="lot_id"/>
-                        <field name="quantity"/> <!-- was qty_done -->
+                        <field name="quantity"/>
                         <field name="location_id"/>
                         <field name="location_dest_id"/>
                     </group>
