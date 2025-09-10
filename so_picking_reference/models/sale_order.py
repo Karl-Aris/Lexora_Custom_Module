@@ -21,7 +21,6 @@ class SaleOrder(models.Model):
         for rec in self:
             if not rec.purchase_order:
                 continue
-
             vals = {}
             domain_base = [('purchase_order', '=', rec.purchase_order)]
 
@@ -51,14 +50,14 @@ class SaleOrder(models.Model):
                         vals['x_returned'] = picking_return.name
                     if not rec.x_return_date and picking_return.date_done:
                         vals['x_return_date'] = picking_return.date_done
-            
+
             if vals:
                 rec.write(vals)
 
     def _match_invoice_number(self):
         Move = self.env['account.move']
         for rec in self:
-            if rec.purchase_order:
+            if rec.purchase_order and (not rec.x_invoice_number or not rec.x_invoice_date):
                 invoice = Move.search([
                     ('x_po_so_id', '=', rec.purchase_order),
                     ('state', '=', 'posted'),
@@ -66,9 +65,9 @@ class SaleOrder(models.Model):
                 ], limit=1)
                 if invoice:
                     vals = {}
-                    if not rec.x_invoice_number or rec.x_invoice_number != invoice.name:
+                    if not rec.x_invoice_number:
                         vals['x_invoice_number'] = invoice.name
-                    if not rec.x_invoice_date or rec.x_invoice_date != invoice.invoice_date:
+                    if not rec.x_invoice_date and invoice.invoice_date:
                         vals['x_invoice_date'] = invoice.invoice_date
                     if vals:
                         rec.write(vals)
