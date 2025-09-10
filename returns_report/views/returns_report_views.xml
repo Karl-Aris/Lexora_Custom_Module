@@ -42,9 +42,15 @@
     <menuitem id="menu_returns_report_root" name="Returns Report" sequence="10"/>
     <menuitem id="menu_returns_report" name="Reports" parent="menu_returns_report_root" sequence="10"/>
 
-    <act_window id="action_returns_report"
-                name="Returns Report"
-                res_model="returns.report"
-                view_mode="tree,form"
-                parent="menu_returns_report"/>
+    <record id="action_returns_report" model="ir.actions.act_window">
+        <field name="name">Returns Report</field>
+        <field name="res_model">returns.report</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_action_returns_report"
+              name="Returns Report"
+              parent="menu_returns_report"
+              action="action_returns_report"
+              sequence="20"/>
 </odoo>
