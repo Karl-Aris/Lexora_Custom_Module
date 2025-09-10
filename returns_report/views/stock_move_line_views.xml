@@ -1,0 +1,29 @@
+<odoo>
+    <record id="view_move_line_form_inherit_x" model="ir.ui.view">
+        <field name="name">stock.move.line.form.inherit.x</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Custom">
+                    <field name="x_serial_number"/>
+                    <field name="x_quality_checked"/>
+                    <field name="x_location_verified"/>
+                    <field name="x_note"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_line_tree_inherit_x" model="ir.ui.view">
+        <field name="name">stock.move.line.tree.inherit.x</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="x_serial_number"/>
+                <field name="x_quality_checked"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
