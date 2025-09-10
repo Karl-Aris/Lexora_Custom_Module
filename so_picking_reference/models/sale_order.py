@@ -58,14 +58,11 @@ class SaleOrder(models.Model):
     def _match_invoice_number(self):
         Move = self.env['account.move']
         for rec in self:
-            # Only attempt if there's a purchase order and no invoice number yet
             if rec.purchase_order and not rec.x_invoice_number:
                 invoice = Move.search([
-                    ('x_po_so_id', '=', rec.purchase_order.id),  # Make sure to use .id
+                    ('x_po_so_id', '=', rec.purchase_order),
                     ('state', '=', 'posted'),
                     ('name', '!=', '/'),
                 ], limit=1)
-                
                 if invoice:
                     rec.x_invoice_number = invoice.name
-    
