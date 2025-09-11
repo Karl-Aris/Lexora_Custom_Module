@@ -4,13 +4,6 @@
               name="Custom Stock"
               sequence="10"/>
 
-    <!-- Submenu for Stock Move Lines -->
-    <menuitem id="menu_stock_move_line_root"
-              name="Stock Move Lines"
-              parent="menu_custom_stock_root"
-              action="action_stock_move_line_list"
-              sequence="20"/>
-
     <!-- Action to open stock.move.line -->
     <record id="action_stock_move_line_list" model="ir.actions.act_window">
         <field name="name">Stock Move Lines</field>
@@ -18,13 +11,20 @@
         <field name="view_mode">tree,form</field>
     </record>
 
+    <!-- Submenu for Stock Move Lines -->
+    <menuitem id="menu_stock_move_line_root"
+              name="Stock Move Lines"
+              parent="menu_custom_stock_root"
+              action="action_stock_move_line_list"
+              sequence="20"/>
+              
     <!-- Optional: Extend tree view to show custom field -->
     <record id="view_stock_move_line_tree_inherit" model="ir.ui.view">
         <field name="name">stock.move.line.tree.inherit.custom</field>
         <field name="model">stock.move.line</field>
         <field name="inherit_id" ref="stock.view_move_line_tree"/>
         <field name="arch" type="xml">
-            <field name="product_uom_id" position="after">
+            <field name="product_id" position="after">
                 <field name="x_custom_note"/>
                 <field name="x_qty_double"/>
             </field>
