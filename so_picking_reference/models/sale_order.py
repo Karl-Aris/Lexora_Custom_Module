@@ -19,33 +19,49 @@ class SaleOrder(models.Model):
     def _update_pickings_fast(self):
         Picking = self.env['stock.picking']
         for rec in self:
+            if not rec.purchase_order:
+                continue
             vals = {}
+            domain_base = [('purchase_order', '=', rec.purchase_order)]
 
-            # Outgoing (delivery)
-            if not rec.x_out_date:
-                picking_out = Picking.search(
-                    [('sale_id', '=', rec.id), ('picking_type_id.code', '=', 'outgoing')],
-                    order='date_done desc, id desc',
-                    limit=1
-                )
-                if picking_out and picking_out.date_done:
-                    vals['x_out_date'] = picking_out.date_done
-                    vals['x_delivery_out'] = picking_out.name
-
-            # Picking (internal transfer to staging)
-            if not rec.x_picking_date:
+            if not rec.x_picking_in or not rec.x_picking_date:
                 picking_in = Picking.search(
-                    [('sale_id', '=', rec.id), ('picking_type_id.code', '=', 'internal')],
-                    order='date_done desc, id desc',
+                    domain_base + [('name', '=like', 'WH/PICK%')],
                     limit=1
                 )
-                if picking_in and picking_in.date_done:
-                    vals['x_picking_date'] = picking_in.date_done
-                    vals['x_picking_in'] = picking_in.name
+                
+                if picking_in:
+                    
+                    if not rec.x_picking_in:
+                        vals['x_picking_in'] = picking_in.name
+                    if not rec.x_picking_date and picking_in.date_done:
+                        vals['x_picking_date'] = picking_in.date_done
+                        
+            if not rec.x_delivery_out or not rec.x_out_date:
+                picking_out = Picking.search(
+                    domain_base + [('name', '=like', 'WH/OUT%')],
+                    limit=1
+                )
+                if picking_out:
+                    if not rec.x_delivery_out:
+                        vals['x_delivery_out'] = picking_out.name
+                    if not rec.x_out_date and picking_out.date_done:
+                        vals['x_out_date'] = picking_out.date_done
+                     
+
+            if not rec.x_returned or not rec.x_return_date:
+                picking_return = Picking.search(
+                    domain_base + [('name', '=like', 'WH/IN/RETURN%')],
+                    limit=1
+                )
+                if picking_return:
+                    if not rec.x_returned:
+                        vals['x_returned'] = picking_return.name
+                    if not rec.x_return_date and picking_return.date_done:
+                        vals['x_return_date'] = picking_return.date_done
 
             if vals:
                 rec.write(vals)
-
 
     def _match_invoice_number(self):
         Move = self.env['account.move']
