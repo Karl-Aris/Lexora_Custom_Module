@@ -7,11 +7,12 @@ class CustomStockMoveLine(models.Model):
 
     move_line_id = fields.Many2one('stock.move.line', required=True, ondelete='cascade', string="Stock Move Line")
 
+    # Custom fields
     x_custom_field = fields.Char(string="Custom Field")
     x_custom_note = fields.Text(string="Custom Note")
     x_computed_field = fields.Float(string="Computed Field", compute='_compute_custom_value')
 
-    # Related fields for views
+    # Explicit related fields for views
     product_id = fields.Many2one(related='move_line_id.product_id', string='Product', readonly=True)
     product_uom_qty = fields.Float(related='move_line_id.product_uom_qty', string='Quantity', readonly=True)
     quantity_done = fields.Float(related='move_line_id.quantity_done', string='Done', readonly=True)
