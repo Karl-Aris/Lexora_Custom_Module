@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class CustomStockMoveLine(models.Model):
     _name = 'custom.stock.move.line'
