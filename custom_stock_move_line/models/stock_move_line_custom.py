@@ -1,7 +1,7 @@
 from odoo import models, fields, api
 
 class StockMoveLineCustom(models.Model):
-    _name = 'x.stock.move.line.custom'  # new model
+    _name = 'stock.move.line.custom'  # new model
     _description = 'Custom Stock Move Line'
     _inherit = 'stock.move.line'         # inherit fields and methods from stock.move.line
 
