@@ -1,57 +1,56 @@
 from odoo import models, api
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    @api.model
-    def create(self, vals):
-        record = super().create(vals)
-        record._update_pickings_fast()
-        record._match_invoice_number()
-        return record
-
-    def write(self, vals):
-        res = super().write(vals)
-        self._update_pickings_fast()
-        self._match_invoice_number()
-        return res
-
     def _update_pickings_fast(self):
         Picking = self.env['stock.picking']
         for rec in self:
-            if not rec.purchase_order:
+            # ensure we have a purchase_order id
+            if not rec.purchase_order or not rec.purchase_order.id:
+                _logger.debug('SaleOrder %s: no purchase_order, skipping', rec.id)
                 continue
-            vals = {}
-            domain_base = [('purchase_order', '=', rec.purchase_order)]  # ⚠️ check this field
 
-            # Picking in
+            po_id = rec.purchase_order.id
+            vals = {}
+            domain_base = [('purchase_order', '=', po_id)]
+
+            # PICK (picking in)
             if not rec.x_picking_in or not rec.x_picking_date:
                 picking_in = Picking.search(
-                    domain_base + [('name', '=like', 'WH/PICK%')],
+                    domain_base + [('name', 'ilike', 'WH/PICK')],
+                    order='date_done desc, id desc',
                     limit=1
                 )
+                _logger.debug('SaleOrder %s: picking_in search returned %s', rec.id, picking_in and picking_in.name)
                 if picking_in:
                     if not rec.x_picking_in:
                         vals['x_picking_in'] = picking_in.name
                     if not rec.x_picking_date and picking_in.date_done:
                         vals['x_picking_date'] = picking_in.date_done
 
-            # Delivery out
+            # OUT (delivery out)
             if not rec.x_delivery_out or not rec.x_out_date:
                 picking_out = Picking.search(
-                    domain_base + [('name', '=like', 'WH/OUT%')],
+                    domain_base + [('name', 'ilike', 'WH/OUT')],
+                    order='date_done desc, id desc',
                     limit=1
                 )
+                _logger.debug('SaleOrder %s: picking_out search returned %s', rec.id, picking_out and picking_out.name)
                 if picking_out:
                     if not rec.x_delivery_out:
                         vals['x_delivery_out'] = picking_out.name
                     if not rec.x_out_date and picking_out.date_done:
                         vals['x_out_date'] = picking_out.date_done
 
-            # Returned
+            # Returns (existing logic)
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
-                    domain_base + [('name', '=like', 'WH/IN/RETURN%')],
+                    domain_base + [('name', 'ilike', 'WH/IN/RETURN')],
+                    order='date_done desc, id desc',
                     limit=1
                 )
                 if picking_return:
@@ -61,24 +60,5 @@ class SaleOrder(models.Model):
                         vals['x_return_date'] = picking_return.date_done
 
             if vals:
-                # avoid recursion
-                super(SaleOrder, rec).write(vals)
-
-    def _match_invoice_number(self):
-        Move = self.env['account.move']
-        for rec in self:
-            if rec.purchase_order and (not rec.x_invoice_number or not rec.x_invoice_date):
-                invoice = Move.search([
-                    ('x_po_so_id', '=', rec.purchase_order),
-                    ('state', '=', 'posted'),
-                    ('name', '!=', '/'),
-                ], limit=1)
-                if invoice:
-                    vals = {}
-                    if not rec.x_invoice_number:
-                        vals['x_invoice_number'] = invoice.name
-                    if not rec.x_invoice_date and invoice.invoice_date:
-                        vals['x_invoice_date'] = invoice.invoice_date
-                    if vals:
-                        # avoid recursion
-                        super(SaleOrder, rec).write(vals)
+                _logger.info('SaleOrder %s writing %s', rec.id, vals)
+                rec.write(vals)
