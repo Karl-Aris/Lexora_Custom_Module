@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_return_order_tree" model="ir.ui.view">
+        <field name="name">return.order.tree</field>
+        <field name="model">return.order</field>
+        <field name="arch" type="xml">
+            <tree string="Return Orders">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="picking_id"/>
+                <field name="state"/>
+                <field name="x_location"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_return_order_form" model="ir.ui.view">
+        <field name="name">return.order.form</field>
+        <field name="model">return.order</field>
+        <field name="arch" type="xml">
+            <form string="Return Order">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="partner_id"/>
+                        <field name="picking_id"/>
+                        <field name="state"/>
+                        <field name="x_location"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_return_order" model="ir.actions.act_window">
+        <field name="name">Return Orders</field>
+        <field name="res_model">return.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_return_order_root" name="Return Orders"
+              parent="sale.menu_sale_order"
+              action="action_return_order"/>
+</odoo>
