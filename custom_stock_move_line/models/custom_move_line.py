@@ -11,7 +11,7 @@ class CustomStockMoveLine(models.Model):
     x_custom_field = fields.Char(string="Custom Field")
     x_custom_note = fields.Text(string="Custom Note")
 
-    # Computed field
+    # Computed field example
     x_computed_field = fields.Float(string="Computed Field", compute='_compute_custom_value')
 
     @api.depends('product_uom_qty', 'quantity_done')
