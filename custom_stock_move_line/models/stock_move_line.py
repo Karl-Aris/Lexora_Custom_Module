@@ -13,7 +13,7 @@ class StockMoveLine(models.Model):
         store=True
     )
 
-    @api.depends('product_uom_qty')
+    @api.depends('qty_done')
     def _compute_qty_double(self):
         for line in self:
-            line.x_qty_double = line.product_uom_qty * 2
+            line.x_qty_double = line.qty_done * 2
