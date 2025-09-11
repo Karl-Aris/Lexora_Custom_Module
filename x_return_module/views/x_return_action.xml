@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_x_return" model="ir.actions.act_window">
+        <field name="name">Return Lines</field>
+        <field name="res_model">x.return</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_x_return_tree"/>
+        <!-- domain filters to show only records with WH/INT/RETURN in reference (case-insensitive) -->
+        <field name="domain">[('reference', 'ilike', 'WH/INT/RETURN')]</field>
+    </record>
+
+    <menuitem id="menu_x_return_root" name="X Returns" sequence="80" />
+    <menuitem id="menu_x_return" name="Return Lines" parent="menu_x_return_root" action="action_x_return" sequence="10"/>
+</odoo>
