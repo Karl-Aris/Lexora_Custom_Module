@@ -5,7 +5,9 @@
     "summary": "Custom Stock Move Line using _inherits",
     "author": "Carl",
     "depends": ["stock"],
-    "data": [],
+    "data": [
+        "views/custom_move_line_views.xml",
+    ],
     "installable": True,
     "application": False,
 }
