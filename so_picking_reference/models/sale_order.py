@@ -22,9 +22,9 @@ class SaleOrder(models.Model):
             if not rec.purchase_order:
                 continue
             vals = {}
-            domain_base = [('purchase_order', '=', rec.purchase_order)]
+            domain_base = [('purchase_order', '=', rec.purchase_order)]  # ⚠️ check this field
 
-            # Picking (WH/PICK%)
+            # Picking in
             if not rec.x_picking_in or not rec.x_picking_date:
                 picking_in = Picking.search(
                     domain_base + [('name', '=like', 'WH/PICK%')],
@@ -36,7 +36,7 @@ class SaleOrder(models.Model):
                     if not rec.x_picking_date and picking_in.date_done:
                         vals['x_picking_date'] = picking_in.date_done
 
-            # Delivery (WH/OUT%)
+            # Delivery out
             if not rec.x_delivery_out or not rec.x_out_date:
                 picking_out = Picking.search(
                     domain_base + [('name', '=like', 'WH/OUT%')],
@@ -48,7 +48,7 @@ class SaleOrder(models.Model):
                     if not rec.x_out_date and picking_out.date_done:
                         vals['x_out_date'] = picking_out.date_done
 
-            # Returns (WH/IN/RETURN%)
+            # Returned
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
                     domain_base + [('name', '=like', 'WH/IN/RETURN%')],
@@ -61,7 +61,8 @@ class SaleOrder(models.Model):
                         vals['x_return_date'] = picking_return.date_done
 
             if vals:
-                rec.write(vals)
+                # avoid recursion
+                super(SaleOrder, rec).write(vals)
 
     def _match_invoice_number(self):
         Move = self.env['account.move']
@@ -79,4 +80,5 @@ class SaleOrder(models.Model):
                     if not rec.x_invoice_date and invoice.invoice_date:
                         vals['x_invoice_date'] = invoice.invoice_date
                     if vals:
-                        rec.write(vals)
+                        # avoid recursion
+                        super(SaleOrder, rec).write(vals)
