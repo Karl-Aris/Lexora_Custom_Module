@@ -1,0 +1,18 @@
+<odoo>
+    <menuitem id="menu_return_orders_root"
+              name="Returns"
+              parent="sale.sale_order_menu"
+              sequence="95"/>
+
+    <record id="action_return_orders" model="ir.actions.act_window">
+        <field name="name">Return Orders</field>
+        <field name="res_model">return.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', 'in', ('initiated','returned'))]</field>
+    </record>
+
+    <menuitem id="menu_return_orders"
+              name="Return Orders"
+              parent="menu_return_orders_root"
+              action="action_return_orders"/>
+</odoo>

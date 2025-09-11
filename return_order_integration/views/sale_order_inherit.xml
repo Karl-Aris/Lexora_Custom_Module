@@ -1,0 +1,22 @@
+<odoo>
+    <record id="view_order_form_inherit_return" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.return</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Returns" name="returns_page">
+                    <field name="return_order_ids" context="{'default_sale_order_id': active_id}">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="picking_name"/>
+                            <field name="return_date"/>
+                            <field name="qc_condition"/>
+                            <field name="state"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
