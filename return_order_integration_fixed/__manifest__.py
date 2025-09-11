@@ -5,6 +5,7 @@
     'summary': 'Manage Return Orders linked with Stock Picking (WH/INT/RETURN).',
     'depends': ['sale', 'stock', 'stock_barcode'],
     'data': [
+        'security/ir.model.access.csv',
         'views/return_order_views.xml',
         'views/sale_order_views.xml',
     ],
