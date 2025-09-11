@@ -28,27 +28,4 @@
                         <field name="move_line_id"/>
                         <field name="product_id"/>
                         <field name="product_uom_qty"/>
-                        <field name="quantity_done"/>
-                        <field name="x_custom_field"/>
-                        <field name="x_custom_note"/>
-                        <field name="x_computed_field"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <!-- Action -->
-    <record id="action_custom_stock_move_line" model="ir.actions.act_window">
-        <field name="name">Custom Stock Move Lines</field>
-        <field name="res_model">custom.stock.move.line</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <!-- Menu item -->
-    <menuitem id="menu_custom_stock_move_line"
-              name="Custom Stock Move Lines"
-              parent="stock.menu_stock_config"
-              action="action_custom_stock_move_line"
-              sequence="10"/>
-</odoo>
+                        <field n
