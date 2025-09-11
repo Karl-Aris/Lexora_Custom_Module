@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Tree view -->
     <record id="view_custom_stock_move_line_tree" model="ir.ui.view">
         <field name="name">custom.stock.move.line.tree</field>
         <field name="model">custom.stock.move.line</field>
         <field name="arch" type="xml">
-            <tree>
-                <field name="move_line_id"/>
+            <tree string="Custom Stock Move Lines">
                 <field name="product_id"/>
                 <field name="product_uom_qty"/>
                 <field name="quantity_done"/>
@@ -17,15 +15,13 @@
         </field>
     </record>
 
-    <!-- Form view -->
     <record id="view_custom_stock_move_line_form" model="ir.ui.view">
         <field name="name">custom.stock.move.line.form</field>
         <field name="model">custom.stock.move.line</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Custom Stock Move Line">
                 <sheet>
                     <group>
-                        <field name="move_line_id"/>
                         <field name="product_id"/>
                         <field name="product_uom_qty"/>
                         <field name="quantity_done"/>
@@ -37,18 +33,4 @@
             </form>
         </field>
     </record>
-
-    <!-- Action -->
-    <record id="action_custom_stock_move_line" model="ir.actions.act_window">
-        <field name="name">Custom Stock Move Lines</field>
-        <field name="res_model">custom.stock.move.line</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <!-- Menu item -->
-    <menuitem id="menu_custom_stock_move_line"
-              name="Custom Stock Move Lines"
-              parent="stock.menu_stock_config"
-              action="action_custom_stock_move_line"
-              sequence="10"/>
 </odoo>
