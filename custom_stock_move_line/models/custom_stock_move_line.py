@@ -1,3 +1,5 @@
+from odoo import models, fields, api
+
 class CustomStockMoveLine(models.Model):
     _name = 'custom.stock.move.line'
     _description = 'Custom Stock Move Line'
@@ -9,10 +11,10 @@ class CustomStockMoveLine(models.Model):
     x_custom_note = fields.Text(string="Custom Note")
     x_computed_field = fields.Float(string="Computed Field", compute='_compute_custom_value')
 
-    # Add related fields explicitly
+    # Related fields for views
+    product_id = fields.Many2one(related='move_line_id.product_id', string='Product', readonly=True)
     product_uom_qty = fields.Float(related='move_line_id.product_uom_qty', string='Quantity', readonly=True)
     quantity_done = fields.Float(related='move_line_id.quantity_done', string='Done', readonly=True)
-    product_id = fields.Many2one(related='move_line_id.product_id', string='Product', readonly=True)
 
     @api.depends('move_line_id.product_uom_qty', 'move_line_id.quantity_done')
     def _compute_custom_value(self):
