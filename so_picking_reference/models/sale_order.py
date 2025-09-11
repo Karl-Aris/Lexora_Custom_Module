@@ -24,22 +24,31 @@ class SaleOrder(models.Model):
             vals = {}
             domain_base = [('purchase_order', '=', rec.purchase_order)]
 
-            if not rec.x_picking_in:
+            # Picking (WH/PICK%)
+            if not rec.x_picking_in or not rec.x_picking_date:
                 picking_in = Picking.search(
                     domain_base + [('name', '=like', 'WH/PICK%')],
                     limit=1
                 )
                 if picking_in:
-                    vals['x_picking_in'] = picking_in.name
+                    if not rec.x_picking_in:
+                        vals['x_picking_in'] = picking_in.name
+                    if not rec.x_picking_date and picking_in.date_done:
+                        vals['x_picking_date'] = picking_in.date_done
 
-            if not rec.x_delivery_out:
+            # Delivery (WH/OUT%)
+            if not rec.x_delivery_out or not rec.x_out_date:
                 picking_out = Picking.search(
                     domain_base + [('name', '=like', 'WH/OUT%')],
                     limit=1
                 )
                 if picking_out:
-                    vals['x_delivery_out'] = picking_out.name
+                    if not rec.x_delivery_out:
+                        vals['x_delivery_out'] = picking_out.name
+                    if not rec.x_out_date and picking_out.date_done:
+                        vals['x_out_date'] = picking_out.date_done
 
+            # Returns (WH/IN/RETURN%)
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
                     domain_base + [('name', '=like', 'WH/IN/RETURN%')],
