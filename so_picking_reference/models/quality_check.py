@@ -5,13 +5,13 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     # New fields
-    x_out_quality_id = fields.Many2one(
+    x_out_id = fields.Many2one(
         'quality.check',
         string="OUT Quality Check",
         readonly=True
     )
     x_return_id = fields.Many2one(
-        'stock.picking',
+           'quality.check',
         string="Return Picking",
         readonly=True
     )
@@ -29,24 +29,20 @@ class SaleOrder(models.Model):
 
     def _update_custom_links(self):
         """Update OUT quality check and RETURN picking link"""
-        Picking = self.env['stock.picking']
+        Picking = self.env['quality.check']
         QualityCheck = self.env['quality.check']
 
         for rec in self:
             # OUT picking & quality check
             if not rec.x_out_id:
-                picking_out = Picking.search([
+                picking_out = QualityCheck.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
                 ], limit=1)
 
+                
                 if picking_out:
-                    quality_check = QualityCheck.search(
-                        [('picking_id', '=', picking_out.id)],
-                        limit=1
-                    )
-                    if quality_check:
-                        rec.x_out_id = quality_check.id
+                    rec.x_out_id = picking_out.id
 
             # RETURN picking
             if not rec.x_return_id:
@@ -57,4 +53,3 @@ class SaleOrder(models.Model):
 
                 if picking_return:
                     rec.x_return_id = picking_return.id
-
