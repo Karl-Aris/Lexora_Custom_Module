@@ -4,24 +4,24 @@ class QualityCheck(models.Model):
     _inherit = "quality.check"
 
     condition_status_html = fields.Html(
-        string="Condition Status",
+        string="Condition Badge",
         compute="_compute_condition_status_html",
+        store=False,
     )
 
     @api.depends("x_studio_condition")
     def _compute_condition_status_html(self):
-        for qc in self:
-            label = qc.x_studio_condition or ""
-            color = "secondary"
+        for record in self:
+            label = record.x_studio_condition or ""
+            color = "secondary"  # default gray
 
-            if label == "Good":
+            if label.lower() == "good":
                 color = "success"  # green
-            elif label == "Damaged":
-                color = "danger"  # red
-            elif label == "Partial Return":
-                color = "warning"  # yellow/orange
+            elif label.lower() == "damaged":
+                color = "danger"   # red
+            elif label.lower() == "partial return":
+                color = "secondary"  # gray
 
-            qc.condition_status_html = (
+            record.condition_status_html = (
                 f'<span class="badge rounded-pill text-bg-{color}">{label}</span>'
-                if label else ""
             )
