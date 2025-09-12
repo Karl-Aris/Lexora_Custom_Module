@@ -1,21 +1,22 @@
-from odoo import models, api, fields
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Example computed field (replace with your real one if you added it)
-    x_some_field = fields.Char(
-        string="Some Field",
-        compute="_compute_some_field",
-        store=True
+    # Many2one fields are clickable in the form view and will open the linked record
+    x_out_id = fields.Many2one(
+        comodel_name='quality.check',
+        string="OUT Quality Check",
+        readonly=True,
+        ondelete="set null"
     )
 
-    @api.depends('order_line.move_ids')
-    def _compute_some_field(self):
-        """ Example compute method """
-        for order in self:
-            # Replace with your logic
-            order.x_some_field = len(order.order_line.mapped("move_ids"))
+    x_return_id = fields.Many2one(
+        comodel_name='quality.check',
+        string="Return Quality Check",
+        readonly=True,
+        ondelete="set null"
+    )
 
     @api.model
     def create(self, vals):
