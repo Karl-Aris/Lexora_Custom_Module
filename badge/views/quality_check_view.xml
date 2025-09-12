@@ -1,19 +1,13 @@
-<odoo>
-    <record id="view_returns_report_tree_badge" model="ir.ui.view">
-        <field name="name">returns.report.tree.badge</field>
-        <field name="model">quality.check</field>
-        <field name="inherit_id" ref="studio_customization.odoo_studio_quality_1c60b36f-3075-449d-a71f-ba00ba61295b"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='x_studio_condition']" position="attributes">
-                <attribute name="widget">badge</attribute>
-                <attribute name="options">
-                    {"terminology": {
-                        "Good": "success",
-                        "Damaged": "danger",
-                        "Partial": "secondary"
-                    }}
-                </attribute>
-            </xpath>
-        </field>
-    </record>
-</odoo>
+<record id="view_returns_report_tree_badge" model="ir.ui.view">
+    <field name="name">returns.report.tree.badge</field>
+    <field name="model">quality.check</field>
+    <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='x_studio_condition']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-success">x_studio_condition == 'Good'</attribute>
+            <attribute name="decoration-danger">x_studio_condition == 'Damaged'</attribute>
+            <attribute name="decoration-secondary">x_studio_condition == 'Partial'</attribute>
+        </xpath>
+    </field>
+</record>
