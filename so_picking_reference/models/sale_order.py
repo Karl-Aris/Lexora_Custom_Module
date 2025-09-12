@@ -1,3 +1,4 @@
+
 from odoo import models, api
 
 class SaleOrder(models.Model):
@@ -45,6 +46,7 @@ class SaleOrder(models.Model):
                 if picking_out:
                     if not rec.x_delivery_out:
                         vals['x_delivery_out'] = picking_out.name
+                        vals['x_out_id'] = picking_out.id
                     if not rec.x_out_date and picking_out.date_done:
                         vals['x_out_date'] = picking_out.date_done
                      
@@ -57,6 +59,7 @@ class SaleOrder(models.Model):
                 if picking_return:
                     if not rec.x_returned:
                         vals['x_returned'] = picking_return.name
+                        vals['x_return_id'] = picking_return.id
                     if not rec.x_return_date and picking_return.date_done:
                         vals['x_return_date'] = picking_return.date_done
 
