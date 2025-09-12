@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Add Quality Check status to Form View -->
-    <record id="view_order_form_inherit_badge_qc" model="ir.ui.view">
-        <field name="name">sale.order.form.qc.badge</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+    <!-- Add Condition Status badge to Quality Check Form -->
+    <record id="view_quality_check_form_inherit_badge" model="ir.ui.view">
+        <field name="name">quality.check.form.condition.badge</field>
+        <field name="model">quality.check</field>
+        <field name="inherit_id" ref="quality.view_quality_check_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
                 <group>
-                    <field name="qc_status_html" readonly="1"/>
+                    <field name="condition_status_html" readonly="1"/>
                 </group>
             </xpath>
         </field>
