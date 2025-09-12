@@ -1,7 +1,19 @@
-from odoo import models, api
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    # clickable fields → link directly to quality.check form
+    x_out_id = fields.Many2one(
+        'quality.check',
+        string="OUT Quality Check",
+        readonly=True
+    )
+    x_return_id = fields.Many2one(
+        'quality.check',
+        string="Return Quality Check",
+        readonly=True
+    )
 
     @api.model
     def create(self, vals):
