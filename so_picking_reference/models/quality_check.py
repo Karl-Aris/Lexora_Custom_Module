@@ -4,9 +4,9 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.model
-    def create(self, vals_list):
+    def create(self, vals):
         """Batch-safe create method"""
-        records = super().create(vals_list)
+        records = super().create(vals)
         records._update_quality_checks_fast()
         return records
 
@@ -19,33 +19,42 @@ class SaleOrder(models.Model):
         """Push quality.check IDs into sale.order fields"""
         QualityCheck = self.env['quality.check']
 
-        # Collect all sale order names to search QC records in batch
-        sale_order_map = {so.id: so for so in self if so.order_line}
-
-        if not sale_order_map:
+        # Map sale order IDs → records (only valid ones with order_line)
+        sale_orders = self.filtered(lambda so: so.order_line)
+        if not sale_orders:
             return
+
+        # Collect sale order names
+        sale_order_names = sale_orders.mapped("name")
 
         # Search all relevant quality.check records in one query
         qc_records = QualityCheck.search([
-            ('picking_id.origin', 'in', list(sale_order_map.values())),
+            ('picking_id.origin', 'in', sale_order_names),
             '|',
             ('picking_id.name', '=like', 'WH/OUT%'),
             ('picking_id.name', '=like', 'WH/IN/RETURN%')
         ])
 
-        for so in sale_order_map.values():
+        for so in sale_orders:
             vals = {}
 
-            # OUT QC
-            qc_out = qc_records.filtered(lambda q: q.picking_id.origin == so.name and q.picking_id.name.startswith('WH/OUT'))
-            if qc_out and not so.x_out_id:
-                vals['x_out_id'] = qc_out[0].id
+            # OUT QC → x_out_id
+            if not so.x_out_id:
+                qc_out = qc_records.filtered(
+                    lambda q: q.picking_id.origin == so.name
+                    and q.picking_id.name.startswith('WH/OUT')
+                )
+                if qc_out:
+                    vals['x_out_id'] = qc_out[0].id
 
-            # RETURN QC
-            qc_return = qc_records.filtered(lambda q: q.picking_id.origin == so.name and q.picking_id.name.startswith('WH/IN/RETURN'))
-            if qc_return and not so.x_return_id:
-                vals['x_return_id'] = qc_return[0].id
+            # RETURN QC → x_return_id
+            if not so.x_return_id:
+                qc_return = qc_records.filtered(
+                    lambda q: q.picking_id.origin == so.name
+                    and q.picking_id.name.startswith('WH/IN/RETURN')
+                )
+                if qc_return:
+                    vals['x_return_id'] = qc_return[0].id
 
             if vals:
                 so.write(vals)
-
