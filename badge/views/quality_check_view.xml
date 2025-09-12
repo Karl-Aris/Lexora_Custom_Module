@@ -1,12 +1,18 @@
 <odoo>
-    <!-- Inherit Quality Check form -->
-    <record id="view_quality_check_form_inherit_badge" model="ir.ui.view">
-        <field name="name">quality.check.form.inherit.badge</field>
+    <record id="view_quality_check_tree_badge" model="ir.ui.view">
+        <field name="name">quality.check.tree.badge</field>
         <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality_control.quality_check_view_form"/>
+        <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='test_type_id']" position="after">
-                <field name="condition_badge" readonly="1" nolabel="1"/>
+            <xpath expr="//field[@name='x_studio_condition']" position="attributes">
+                <attribute name="widget">badge</attribute>
+                <attribute name="options">
+                    {"terminology": {
+                        "Good": "success",
+                        "Damaged": "danger",
+                        "Partial": "secondary"
+                    }}
+                </attribute>
             </xpath>
         </field>
     </record>
