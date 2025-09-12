@@ -1,20 +1,10 @@
-<odoo>
-    <!-- Inherit the Quality Check Tree View -->
-    <record id="view_quality_check_tree_inherit_condition_badge" model="ir.ui.view">
-        <field name="name">quality.check.tree.inherit.condition.badge</field>
-        <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='x_studio_condition']" position="attributes">
-                <attribute name="widget">badge</attribute>
-                <attribute name="options">
-                    {"terminology": {
-                        "Good": "success",
-                        "Damaged": "danger",
-                        "Partial": "secondary"
-                    }}
-                </attribute>
-            </xpath>
-        </field>
-    </record>
-</odoo>
+<record id="view_quality_check_tree_inherit_condition_badge" model="ir.ui.view">
+    <field name="name">quality.check.tree.inherit.condition.badge</field>
+    <field name="model">quality.check</field>
+    <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="after">
+            <field name="x_studio_condition"/>
+        </xpath>
+    </field>
+</record>
