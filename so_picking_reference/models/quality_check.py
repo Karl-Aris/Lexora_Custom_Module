@@ -34,7 +34,7 @@ class SaleOrder(models.Model):
 
         for rec in self:
             # OUT picking & quality check
-            if not rec.x_out_quality_id:
+            if not rec.x_out_id:
                 picking_out = Picking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
@@ -46,7 +46,7 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check:
-                        rec.x_out_quality_id = quality_check.id
+                        rec.x_out_id = quality_check.id
 
             # RETURN picking
             if not rec.x_return_id:
@@ -57,3 +57,4 @@ class SaleOrder(models.Model):
 
                 if picking_return:
                     rec.x_return_id = picking_return.id
+
