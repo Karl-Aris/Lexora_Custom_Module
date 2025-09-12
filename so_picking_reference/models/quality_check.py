@@ -1,55 +1,38 @@
-from odoo import models, fields, api
+from odoo import models, api
 
 
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-
-    # New fields
-    x_out_id = fields.Many2one(
-        'quality.check',
-        string="OUT Quality Check",
-        readonly=True
-    )
-    x_return_id = fields.Many2one(
-           'quality.check',
-        string="Return Picking",
-        readonly=True
-    )
+class QualityCheck(models.Model):
+    _inherit = 'quality.check'
 
     @api.model
     def create(self, vals):
         record = super().create(vals)
-        record._update_custom_links()
+        record._update_sale_order_from_quality_check()
         return record
 
     def write(self, vals):
         res = super().write(vals)
-        self._update_custom_links()
+        self._update_sale_order_from_quality_check()
         return res
 
-    def _update_custom_links(self):
-        """Update OUT quality check and RETURN picking link"""
-        Picking = self.env['quality.check']
-        QualityCheck = self.env['quality.check']
-
+    def _update_sale_order_from_quality_check(self):
+        """Push data from quality.check into the related sale.order"""
         for rec in self:
-            # OUT picking & quality check
-            if not rec.x_out_id:
-                picking_out = QualityCheck.search([
-                    ('sale_id', '=', rec.id),
-                    ('name', '=like', 'WH/OUT%')
-                ], limit=1)
+            sale_order = rec.picking_id.sale_id
+            if sale_order:
+                vals = {}
 
-                
-                if picking_out:
-                    rec.x_out_id = picking_out.id
+                # Example: push QC name/id into sale.order custom fields
+                if not sale_order.x_out_id and rec.picking_id.name.startswith("WH/OUT"):
+                    vals['x_out_id'] = rec.id
 
-            # RETURN picking
-            if not rec.x_return_id:
-                picking_return = Picking.search([
-                    ('sale_id', '=', rec.id),
-                    ('name', '=like', 'WH/IN/RETURN%')
-                ], limit=1)
+                if not sale_order.x_return_id and rec.picking_id.name.startswith("WH/IN/RETURN"):
+                    vals['x_return_id'] = rec.id
 
-                if picking_return:
-                    rec.x_return_id = picking_return.id
+                # You can map more fields here if needed
+                # e.g. QC notes, QC date, etc.
+                # if rec.notes:
+                #     vals['x_qc_notes'] = rec.notes
+
+                if vals:
+                    sale_order.write(vals)
