@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Form View Inherit -->
-    <record id="view_quality_check_form_inherit_badge" model="ir.ui.view">
-        <field name="name">quality.check.form.condition.badge</field>
+    <record id="view_quality_check_tree_inherit_badge" model="ir.ui.view">
+        <field name="name">quality.check.tree.condition.badge</field>
         <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality_control.quality_check_view_form"/>
+        <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="inside">
-                <group>
-                    <field name="condition_status_html" readonly="1"/>
-                </group>
+            <!-- Insert badge right after your Condition field -->
+            <xpath expr="//tree/field[@name='x_studio_condition']" position="after">
+                <field name="condition_status_html" readonly="1"/>
             </xpath>
         </field>
     </record>
+
 
     <!-- Tree/List View Inherit -->
     <record id="view_quality_check_tree_inherit_badge" model="ir.ui.view">
