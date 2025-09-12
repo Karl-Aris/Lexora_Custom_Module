@@ -42,9 +42,10 @@ class SaleOrder(models.Model):
                 vals['x_out_id'] = qc_out[0].id
 
             # RETURN QC
-            qc_return = qc_records.filtered(lambda q: q.picking_id.origin == so.name and 'RETURN' in q.picking_id.name)
+            qc_return = qc_records.filtered(lambda q: q.picking_id.origin == so.name and q.picking_id.name.startswith('WH/IN/RETURN'))
             if qc_return and not so.x_return_id:
                 vals['x_return_id'] = qc_return[0].id
 
             if vals:
                 so.write(vals)
+
