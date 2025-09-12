@@ -18,21 +18,20 @@ class QualityCheck(models.Model):
     def _update_sale_order_from_quality_check(self):
         """Push data from quality.check into the related sale.order"""
         for rec in self:
-            sale_order = rec.picking_id.sale_id
-            if sale_order:
-                vals = {}
+            picking = rec.picking_id
+            if not picking or not picking.sale_id:
+                continue  # skip if no related sale order
 
-                # Example: push QC name/id into sale.order custom fields
-                if not sale_order.x_out_id and rec.picking_id.name.startswith("WH/OUT"):
-                    vals['x_out_id'] = rec.id
+            sale_order = picking.sale_id
+            update_vals = {}
 
-                if not sale_order.x_return_id and rec.picking_id.name.startswith("WH/IN/RETURN"):
-                    vals['x_return_id'] = rec.id
+            # OUT picking → link to sale.order.x_out_id
+            if not sale_order.x_out_id and picking.name and picking.name.startswith("WH/OUT"):
+                update_vals['x_out_id'] = rec.id
 
-                # You can map more fields here if needed
-                # e.g. QC notes, QC date, etc.
-                # if rec.notes:
-                #     vals['x_qc_notes'] = rec.notes
+            # RETURN picking → link to sale.order.x_return_id
+            if not sale_order.x_return_id and picking.name and picking.name.startswith("WH/IN/RETURN"):
+                update_vals['x_return_id'] = rec.id
 
-                if vals:
-                    sale_order.write(vals)
+            if update_vals:
+                sale_order.write(update_vals)
