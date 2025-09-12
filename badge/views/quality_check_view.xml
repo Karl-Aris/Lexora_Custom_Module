@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Add Condition Status badge to Quality Check Form -->
     <record id="view_quality_check_form_inherit_badge" model="ir.ui.view">
         <field name="name">quality.check.form.condition.badge</field>
         <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality.view_quality_check_form"/>
+        <field name="inherit_id" ref="quality_control.quality_check_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
                 <group>
