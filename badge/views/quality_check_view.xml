@@ -1,8 +1,8 @@
 <odoo>
-    <record id="view_quality_check_tree_badge" model="ir.ui.view">
-        <field name="name">quality.check.tree.badge</field>
+    <record id="view_returns_report_tree_badge" model="ir.ui.view">
+        <field name="name">returns.report.tree.badge</field>
         <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
+        <field name="inherit_id" ref="studio_customization.odoo_studio_quality_1c60b36f-3075-449d-a71f-ba00ba61295b"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='x_studio_condition']" position="attributes">
                 <attribute name="widget">badge</attribute>
