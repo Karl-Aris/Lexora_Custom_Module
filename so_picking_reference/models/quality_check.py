@@ -19,15 +19,12 @@ class SaleOrder(models.Model):
         """Push quality.check IDs into sale.order fields"""
         QualityCheck = self.env['quality.check']
 
-        # Map sale order IDs → records (only valid ones with order_line)
         sale_orders = self.filtered(lambda so: so.order_line)
         if not sale_orders:
             return
 
-        # Collect sale order names
         sale_order_names = sale_orders.mapped("name")
 
-        # Search all relevant quality.check records in one query
         qc_records = QualityCheck.search([
             ('picking_id.origin', 'in', sale_order_names),
             '|',
@@ -57,4 +54,5 @@ class SaleOrder(models.Model):
                     vals['x_return_id'] = qc_return[0].id
 
             if vals:
-                so.write(vals)
+                # avoid mail.thread followers duplication
+                so.with_context(mail_notrack=True, mail_auto_subscribe=False).write(vals)
