@@ -4,7 +4,7 @@
     'category': 'Sales',
     'depends': ['sale'],
     'data': [
-        'views/sale_order_views.xml',
+        'views/quality_check_view.xml',
     ],
     'installable': True,
     'application': False,
