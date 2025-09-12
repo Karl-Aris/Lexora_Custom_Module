@@ -3,25 +3,23 @@ from odoo import models, fields, api
 class QualityCheck(models.Model):
     _inherit = "quality.check"
 
-    x_condition_badge = fields.Html(
+    condition_badge = fields.Html(
         string="Condition Badge",
         compute="_compute_condition_badge",
+        sanitize=False
     )
 
     @api.depends("x_studio_condition")
     def _compute_condition_badge(self):
-        for qc in self:
-            condition = qc.x_studio_condition or ""
-            color = "secondary"
-            label = condition
+        for rec in self:
+            color = "secondary"  # default gray
+            if rec.x_studio_condition == "Good":
+                color = "success"
+            elif rec.x_studio_condition == "Damaged":
+                color = "danger"
 
-            if condition == "Good":
-                color = "success"   # green
-            elif condition == "Damaged":
-                color = "danger"    # red
-            elif condition == "Partial Return":
-                color = "secondary" # gray
-
-            qc.x_condition_badge = (
-                f'<span class="badge rounded-pill text-bg-{color}">{label}</span>'
-            )
+            rec.condition_badge = f"""
+                <span class="badge bg-{color}">
+                    {rec.x_studio_condition or ''}
+                </span>
+            """
