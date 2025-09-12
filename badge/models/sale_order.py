@@ -1,34 +1,33 @@
 from odoo import models, fields, api
 
-class SaleOrder(models.Model):
-    _inherit = "sale.order"
+class QualityCheck(models.Model):
+    _inherit = "quality.check"
 
-    qc_status_html = fields.Html(
-        string="Quality Check Status",
-        compute="_compute_qc_status_html",
+    condition_status_html = fields.Html(
+        string="Condition Status",
+        compute="_compute_condition_status_html",
     )
 
-    @api.depends("x_quality_check.quality_state")
-    def _compute_qc_status_html(self):
-        for order in self:
-            qc_html = ""
-            for qc in order.x_quality_check:
-                label = ""
-                color = "secondary"
+    @api.depends("x_studio_condition")
+    def _compute_condition_status_html(self):
+        for qc in self:
+            label = ""
+            color = "secondary"
 
-                if qc.quality_state == "pass":
-                    label = "Good"
-                    color = "success"  # green
-                elif qc.quality_state == "fail":
-                    label = "Damaged"
-                    color = "danger"  # red
-                else:
-                    label = "Partial Return"
-                    color = "warning"  # yellow/orange
+            if qc.x_studio_condition == "Good":
+                label = "Good"
+                color = "success"  # green
+            elif qc.x_studio_condition == "Damaged":
+                label = "Damaged"
+                color = "danger"  # red
+            elif qc.x_studio_condition == "Partial Return":
+                label = "Partial Return"
+                color = "warning"  # yellow/orange
 
-                qc_html += (
+            if label:
+                qc.condition_status_html = (
                     f'<span class="badge rounded-pill text-bg-{color}">'
-                    f"{label}</span><br/>"
+                    f"{label}</span>"
                 )
-
-            order.qc_status_html = qc_html
+            else:
+                qc.condition_status_html = ""
