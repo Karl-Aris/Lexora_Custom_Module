@@ -3,40 +3,25 @@ from odoo import models, fields, api
 class QualityCheck(models.Model):
     _inherit = "quality.check"
 
-    condition_badge_html = fields.Html(
-        string="Condition (HTML)",
-        compute="_compute_condition_badge_display",
-    )
-
-    condition_text = fields.Char(
-        string="Condition (Text)",
-        compute="_compute_condition_badge_display",
+    x_condition_badge = fields.Html(
+        string="Condition Badge",
+        compute="_compute_condition_badge",
     )
 
     @api.depends("x_studio_condition")
-    def _compute_condition_badge_display(self):
-        for record in self:
-            condition = (record.x_studio_condition or "").strip()
-            badge_html = ""
-            plain_text = condition
+    def _compute_condition_badge(self):
+        for qc in self:
+            condition = qc.x_studio_condition or ""
+            color = "secondary"
+            label = condition
 
-            # assign badge color
-            if condition.lower() == "good":
-                badge_html = (
-                    f'<span class="badge rounded-pill text-bg-success">{condition}</span>'
-                )
-            elif condition.lower() == "damaged":
-                badge_html = (
-                    f'<span class="badge rounded-pill text-bg-danger">{condition}</span>'
-                )
-            elif condition.lower() == "partial return":
-                badge_html = (
-                    f'<span class="badge rounded-pill text-bg-secondary">{condition}</span>'
-                )
-            else:
-                badge_html = (
-                    f'<span class="badge rounded-pill text-bg-light">{condition}</span>'
-                )
+            if condition == "Good":
+                color = "success"   # green
+            elif condition == "Damaged":
+                color = "danger"    # red
+            elif condition == "Partial Return":
+                color = "secondary" # gray
 
-            record.condition_badge_html = badge_html
-            record.condition_text = plain_text
+            qc.x_condition_badge = (
+                f'<span class="badge rounded-pill text-bg-{color}">{label}</span>'
+            )
