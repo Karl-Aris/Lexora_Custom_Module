@@ -1,19 +1,21 @@
-from odoo import models, fields, api
+from odoo import models, api, fields
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # clickable fields → link directly to quality.check form
-    x_out_id = fields.Many2one(
-        'quality.check',
-        string="OUT Quality Check",
-        readonly=True
+    # Example computed field (replace with your real one if you added it)
+    x_some_field = fields.Char(
+        string="Some Field",
+        compute="_compute_some_field",
+        store=True
     )
-    x_return_id = fields.Many2one(
-        'quality.check',
-        string="Return Quality Check",
-        readonly=True
-    )
+
+    @api.depends('order_line.move_ids')
+    def _compute_some_field(self):
+        """ Example compute method """
+        for order in self:
+            # Replace with your logic
+            order.x_some_field = len(order.order_line.mapped("move_ids"))
 
     @api.model
     def create(self, vals):
