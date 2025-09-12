@@ -9,15 +9,15 @@ class QualityCheck(models.Model):
         sanitize=False,
     )
 
-    @api.depends("x_studio_condition")
+    @api.depends("quality_state")
     def _compute_condition_badge(self):
         for rec in self:
-            value = (rec.x_studio_condition or "").strip().lower()
-            if value == "good":
+            value = rec.quality_state or "none"
+            if value == "pass":
                 rec.condition_badge = '<span class="badge rounded-pill text-bg-success">Good</span>'
-            elif value == "damaged":
+            elif value == "fail":
                 rec.condition_badge = '<span class="badge rounded-pill text-bg-danger">Damaged</span>'
-            elif value == "partial":
-                rec.condition_badge = '<span class="badge rounded-pill text-bg-secondary">Partial</span>'
+            elif value == "none":
+                rec.condition_badge = '<span class="badge rounded-pill text-bg-warning">Partial Return</span>'
             else:
                 rec.condition_badge = '<span class="badge rounded-pill text-bg-light">N/A</span>'
