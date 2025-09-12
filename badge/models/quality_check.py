@@ -11,23 +11,17 @@ class QualityCheck(models.Model):
     @api.depends("x_studio_condition")
     def _compute_condition_status_html(self):
         for qc in self:
-            label = ""
+            label = qc.x_studio_condition or ""
             color = "secondary"
 
-            if qc.x_studio_condition == "Good":
-                label = "Good"
+            if label == "Good":
                 color = "success"  # green
-            elif qc.x_studio_condition == "Damaged":
-                label = "Damaged"
+            elif label == "Damaged":
                 color = "danger"  # red
-            elif qc.x_studio_condition == "Partial Return":
-                label = "Partial Return"
+            elif label == "Partial Return":
                 color = "warning"  # yellow/orange
 
-            if label:
-                qc.condition_status_html = (
-                    f'<span class="badge rounded-pill text-bg-{color}">'
-                    f"{label}</span>"
-                )
-            else:
-                qc.condition_status_html = ""
+            qc.condition_status_html = (
+                f'<span class="badge rounded-pill text-bg-{color}">{label}</span>'
+                if label else ""
+            )
