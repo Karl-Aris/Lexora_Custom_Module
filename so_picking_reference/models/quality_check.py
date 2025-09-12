@@ -3,19 +3,20 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Many2one fields are clickable in the form view and will open the linked record
+    # Clickable links to quality.check records (safe definitions)
     x_out_id = fields.Many2one(
         comodel_name='quality.check',
         string="OUT Quality Check",
         readonly=True,
-        ondelete="set null"
+        ondelete='set null',   # important: matches DB behavior
+        index=True
     )
-
     x_return_id = fields.Many2one(
         comodel_name='quality.check',
         string="Return Quality Check",
         readonly=True,
-        ondelete="set null"
+        ondelete='set null',   # same here
+        index=True
     )
 
     @api.model
