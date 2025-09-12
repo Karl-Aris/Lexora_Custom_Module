@@ -1,13 +1,20 @@
-<record id="view_returns_report_tree_badge" model="ir.ui.view">
-    <field name="name">returns.report.tree.badge</field>
-    <field name="model">quality.check</field>
-    <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
-    <field name="arch" type="xml">
-        <xpath expr="//field[@name='x_studio_condition']" position="attributes">
-            <attribute name="widget">badge</attribute>
-            <attribute name="decoration-success">x_studio_condition == 'Good'</attribute>
-            <attribute name="decoration-danger">x_studio_condition == 'Damaged'</attribute>
-            <attribute name="decoration-secondary">x_studio_condition == 'Partial'</attribute>
-        </xpath>
-    </field>
-</record>
+<odoo>
+    <!-- Inherit the Quality Check Tree View -->
+    <record id="view_quality_check_tree_inherit_condition_badge" model="ir.ui.view">
+        <field name="name">quality.check.tree.inherit.condition.badge</field>
+        <field name="model">quality.check</field>
+        <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='x_studio_condition']" position="attributes">
+                <attribute name="widget">badge</attribute>
+                <attribute name="options">
+                    {"terminology": {
+                        "Good": "success",
+                        "Damaged": "danger",
+                        "Partial": "secondary"
+                    }}
+                </attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
