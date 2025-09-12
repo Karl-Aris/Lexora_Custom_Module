@@ -4,7 +4,6 @@
     <field name="model">quality.check</field>
     <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
     <field name="arch" type="xml">
-      <!-- Insert our badge HTML field after quality_state -->
       <xpath expr="//field[@name='quality_state']" position="after">
         <field name="condition_badge" widget="html" string="Condition"/>
       </xpath>
