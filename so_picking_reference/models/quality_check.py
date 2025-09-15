@@ -60,13 +60,12 @@ class SaleOrder(models.Model):
             if not so.x_out_id:
                 qc_out = next((q for q in qc_list if q.picking_id.name.startswith('WH/OUT')), False)
                 if qc_out:
-                    updates['x_out_id'] = qc_out.id
+                    updates['x_out_id'] = qc_out.name
 
             if not so.x_return_id:
                 qc_return = next((q for q in qc_list if q.picking_id.name.startswith('WH/IN/RETURN')), False)
                 if qc_return:
-                    updates['x_return_id'] = qc_return.id
+                    updates['x_return_id'] = qc_return.name
 
-            if updates:
-                # Prevent recursive write effects (mail, followers, etc.)
+            if updates: 
                 super(SaleOrder, so.with_context(mail_notrack=True, mail_auto_subscribe=False)).write(updates)
