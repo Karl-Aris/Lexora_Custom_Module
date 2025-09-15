@@ -11,7 +11,7 @@ class SaleOrder(models.Model):
         readonly=True
     )
     x_return_id = fields.Many2one(
-        'stock.picking',
+        'quality.check',
         string="Return Picking",
         readonly=True
     )
@@ -57,3 +57,4 @@ class SaleOrder(models.Model):
 
                 if picking_return:
                     rec.x_return_id = picking_return.name
+
