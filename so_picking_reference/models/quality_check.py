@@ -4,7 +4,7 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    x_out_quality_id = fields.Char(
+    x_out_id = fields.Char(
         string="OUT Quality Check",
         readonly=True
     )
@@ -22,7 +22,7 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        # call after super, but avoid recursion by not assigning with "="
+        # call after super, but avoid recursion
         self._update_custom_links()
         return res
 
@@ -65,4 +65,4 @@ class SaleOrder(models.Model):
                         updates['x_return_id'] = quality_check_return.name
 
             if updates:
-                rec.sudo().write(updates)  # ✅ safe, only updates these fields
+                rec.update(updates)  # ✅ safe, does not trigger mail followers or deletes
