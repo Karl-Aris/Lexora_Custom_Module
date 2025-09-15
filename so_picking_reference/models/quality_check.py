@@ -1,17 +1,15 @@
 from odoo import models, fields, api
 
-
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # New fields
-    x_out_id = fields.Char(
-        string="OUT Quality Check",
+    x_out_ids = fields.Char(
+        string="OUT Quality Checks",
         readonly=True
     )
 
-    x_return_id = fields.Char(
-        string="Return Picking",
+    x_return_ids = fields.Char(
+        string="Return Pickings",
         readonly=True
     )
 
@@ -27,37 +25,33 @@ class SaleOrder(models.Model):
         return res
 
     def _update_custom_links(self):
-        """Update OUT quality check and RETURN picking link"""
+        """Update OUT quality checks and RETURN pickings links"""
         QualityCheck = self.env['quality.check']
-        StockPicking = self.env['stock.picking']  # ✅ fixed
+        StockPicking = self.env['stock.picking']
 
         for rec in self:
-            # OUT picking & quality check
-            if not rec.x_out_id:
+            # OUT picking & quality checks
+            if not rec.x_out_ids:
                 picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
-                ], limit=1)
-
+                ])
                 if picking_out:
-                    quality_check = QualityCheck.search(
-                        [('picking_id', '=', picking_out.id)],
-                        limit=1
-                    )
-                    if quality_check:
-                        rec.x_out_id = str(quality_check.name)
+                    quality_checks = QualityCheck.search([
+                        ('picking_id', 'in', picking_out.ids)
+                    ])
+                    if quality_checks:
+                        rec.x_out_ids = ", ".join(quality_checks.mapped('name'))
 
-            # RETURN picking
-            if not rec.x_return_id:
+            # RETURN picking & quality checks
+            if not rec.x_return_ids:
                 picking_return = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/IN/RETURN%')
-                ], limit=1)
-
+                ])
                 if picking_return:
-                    quality_check_return = QualityCheck.search(
-                        [('picking_id', '=', picking_return.id)],
-                        limit=1
-                    )
-                    if quality_check_return:
-                        rec.x_return_id = str(quality_check_return.name)
+                    quality_checks = QualityCheck.search([
+                        ('picking_id', 'in', picking_return.ids)
+                    ])
+                    if quality_checks:
+                        rec.x_return_ids = ", ".join(quality_checks.mapped('name'))
