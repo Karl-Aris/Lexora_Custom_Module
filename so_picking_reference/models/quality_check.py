@@ -4,7 +4,6 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # New fields
     x_out_quality_id = fields.Char(
         string="OUT Quality Check",
         readonly=True
@@ -23,15 +22,18 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
+        # call after super, but avoid recursion by not assigning with "="
         self._update_custom_links()
         return res
 
     def _update_custom_links(self):
-        """Update OUT quality check and RETURN picking link"""
+        """Update OUT quality check and RETURN picking link safely"""
         QualityCheck = self.env['quality.check']
-        StockPicking = self.env['stock.picking']  # ✅ fixed
+        StockPicking = self.env['stock.picking']
 
         for rec in self:
+            updates = {}
+
             # OUT picking & quality check
             if not rec.x_out_quality_id:
                 picking_out = StockPicking.search([
@@ -45,7 +47,7 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check:
-                        rec.x_out_quality_id = str(quality_check.name)
+                        updates['x_out_quality_id'] = quality_check.name
 
             # RETURN picking
             if not rec.x_return_id:
@@ -60,4 +62,7 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check_return:
-                        rec.x_return_id = str(quality_check_return.name)
+                        updates['x_return_id'] = quality_check_return.name
+
+            if updates:
+                rec.sudo().write(updates)  # ✅ safe, only updates these fields
