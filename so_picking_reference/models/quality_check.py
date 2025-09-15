@@ -4,68 +4,56 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Clickable links to quality.check records
-    x_out_id = fields.Many2one(
-        comodel_name='quality.check',
+    # New fields
+    x_out_quality_id = fields.Many2one(
+        'quality.check',
         string="OUT Quality Check",
-        readonly=True,
-        ondelete='set null',
-        index=True,
+        readonly=True
     )
     x_return_id = fields.Many2one(
-        comodel_name='quality.check',
-        string="Return Quality Check",
-        readonly=True,
-        ondelete='set null',
-        index=True,
+        'stock.picking',
+        string="Return Picking",
+        readonly=True
     )
 
     @api.model
     def create(self, vals):
-        records = super().create(vals)
-        records._update_quality_checks_fast()
-        return records
+        record = super().create(vals)
+        record._update_custom_links()
+        return record
 
     def write(self, vals):
         res = super().write(vals)
-        self._update_quality_checks_fast()
+        self._update_custom_links()
         return res
 
-    def _update_quality_checks_fast(self):
-        """Link OUT/RETURN quality checks to sale orders."""
+    def _update_custom_links(self):
+        """Update OUT quality check and RETURN picking link"""
+        Picking = self.env['stock.picking']
         QualityCheck = self.env['quality.check']
 
-        sale_orders = self.filtered(lambda so: so.order_line and (not so.x_out_id or not so.x_return_id))
-        if not sale_orders:
-            return
+        for rec in self:
+            # OUT picking & quality check
+            if not rec.x_out_quality_id:
+                picking_out = Picking.search([
+                    ('sale_id', '=', rec.id),
+                    ('name', '=like', 'WH/OUT%')
+                ], limit=1)
 
-        sale_order_names = sale_orders.mapped("name")
+                if picking_out:
+                    quality_check = QualityCheck.search(
+                        [('picking_id', '=', picking_out.id)],
+                        limit=1
+                    )
+                    if quality_check:
+                        rec.x_out_quality_id = quality_check.name
 
-        qc_records = QualityCheck.search([
-            ('picking_id.origin', 'in', sale_order_names),
-            '|',
-            ('picking_id.name', 'ilike', 'WH/OUT/'),
-            ('picking_id.name', 'ilike', 'WH/IN/RETURN/')
-        ])
+            # RETURN picking
+            if not rec.x_return_id:
+                picking_return = Picking.search([
+                    ('sale_id', '=', rec.id),
+                    ('name', '=like', 'WH/IN/RETURN%')
+                ], limit=1)
 
-        # Group by sale order origin
-        qc_by_origin = {}
-        for qc in qc_records:
-            qc_by_origin.setdefault(qc.picking_id.origin, []).append(qc)
-
-        for so in sale_orders:
-            updates = {}
-            qc_list = qc_by_origin.get(so.name, [])
-
-            if not so.x_out_id:
-                qc_out = next((q for q in qc_list if q.picking_id.name.startswith('WH/OUT')), False)
-                if qc_out:
-                    updates['x_out_id'] = qc_out.name
-
-            if not so.x_return_id:
-                qc_return = next((q for q in qc_list if q.picking_id.name.startswith('WH/IN/RETURN')), False)
-                if qc_return:
-                    updates['x_return_id'] = qc_return.name
-
-            if updates: 
-                super(SaleOrder, so.with_context(mail_notrack=True, mail_auto_subscribe=False)).write(updates)
+                if picking_return:
+                    rec.x_return_id = picking_return.name
