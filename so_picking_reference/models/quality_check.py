@@ -3,12 +3,12 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    x_out_ids = fields.Char(
+    x_out_id = fields.Char(
         string="OUT Quality Checks",
         readonly=True
     )
 
-    x_return_ids = fields.Char(
+    x_return_id = fields.Char(
         string="Return Pickings",
         readonly=True
     )
@@ -31,7 +31,7 @@ class SaleOrder(models.Model):
 
         for rec in self:
             # OUT picking & quality checks
-            if not rec.x_out_ids:
+            if not rec.x_out_id:
                 picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
@@ -41,10 +41,10 @@ class SaleOrder(models.Model):
                         ('picking_id', 'in', picking_out.ids)
                     ])
                     if quality_checks:
-                        rec.x_out_ids = ", ".join(quality_checks.mapped('name'))
+                        rec.x_out_id = ", ".join(quality_checks.mapped('name'))
 
             # RETURN picking & quality checks
-            if not rec.x_return_ids:
+            if not rec.x_return_id:
                 picking_return = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/IN/RETURN%')
@@ -54,4 +54,4 @@ class SaleOrder(models.Model):
                         ('picking_id', 'in', picking_return.ids)
                     ])
                     if quality_checks:
-                        rec.x_return_ids = ", ".join(quality_checks.mapped('name'))
+                        rec.x_return_id = ", ".join(quality_checks.mapped('name'))
