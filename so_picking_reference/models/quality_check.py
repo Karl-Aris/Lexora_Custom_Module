@@ -4,15 +4,13 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # New fields
-    x_out_quality_id = fields.Many2one(
-        'quality.check',
-        string="OUT Quality Check",
+    # Use Char fields instead of Many2one
+    x_out_quality_ref = fields.Char(
+        string="OUT Quality Check Ref",
         readonly=True
     )
-    x_return_id = fields.Many2one(
-        'quality.check',
-        string="Return Picking",
+    x_return_ref = fields.Char(
+        string="Return Picking Ref",
         readonly=True
     )
 
@@ -28,14 +26,14 @@ class SaleOrder(models.Model):
         return res
 
     def _update_custom_links(self):
-        """Update OUT quality check and RETURN picking link"""
-        Picking = self.env['stock.picking']
+        """Update OUT quality check and RETURN picking references"""
         QualityCheck = self.env['quality.check']
+        StockPicking = self.env['quality.check']
 
         for rec in self:
             # OUT picking & quality check
-            if not rec.x_out_quality_id:
-                picking_out = Picking.search([
+            if not rec.x_out_quality_ref:
+                picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
                 ], limit=1)
@@ -46,15 +44,19 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check:
-                        rec.x_out_quality_id = quality_check.name
+                        rec.x_out_quality_ref = quality_check.name  # ✅ now valid, storing string
 
             # RETURN picking
-            if not rec.x_return_id:
-                picking_return = Picking.search([
+            if not rec.x_return_ref:
+                picking_return = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/IN/RETURN%')
                 ], limit=1)
 
                 if picking_return:
-                    rec.x_return_id = picking_return.name
-
+                    quality_check_return = QualityCheck.search(
+                        [('picking_id', '=', picking_return.id)],
+                        limit=1
+                    )
+                    if quality_check_return:
+                        rec.x_return_ref = quality_check_return.name  # ✅ now valid
