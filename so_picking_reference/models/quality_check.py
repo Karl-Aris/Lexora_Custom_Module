@@ -5,13 +5,12 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     # New fields
-    x_out_quality_id =  fields.Char( 
+    x_out_quality_id = fields.Char(
         string="OUT Quality Check",
         readonly=True
     )
-     
+
     x_return_id = fields.Char(
-   
         string="Return Picking",
         readonly=True
     )
@@ -30,7 +29,7 @@ class SaleOrder(models.Model):
     def _update_custom_links(self):
         """Update OUT quality check and RETURN picking link"""
         QualityCheck = self.env['quality.check']
-        StockPicking = self.env['quality.check']
+        StockPicking = self.env['stock.picking']  # ✅ fixed
 
         for rec in self:
             # OUT picking & quality check
@@ -46,7 +45,7 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check:
-                        rec.x_out_quality_id = quality_check.id  # ✅ assign ID (or record)
+                        rec.x_out_quality_id = str(quality_check.id)
 
             # RETURN picking
             if not rec.x_return_id:
@@ -61,4 +60,4 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check_return:
-                        rec.x_return_id = quality_check_return.id  # ✅ assign ID (or record)
+                        rec.x_return_id = str(quality_check_return.id)
