@@ -4,12 +4,12 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     x_out_id = fields.Char(
-        string="OUT Quality Checks",
+        string="Delivery Quality Check ID",
         readonly=True
     )
 
     x_return_id = fields.Char(
-        string="Return Pickings",
+        string="Return Quality Check ID",
         readonly=True
     )
 
@@ -55,3 +55,4 @@ class SaleOrder(models.Model):
                     ])
                     if quality_checks:
                         rec.x_return_id = ", ".join(quality_checks.mapped('name'))
+
