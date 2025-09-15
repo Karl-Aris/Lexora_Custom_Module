@@ -4,13 +4,15 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Use Char fields instead of Many2one
-    x_out_quality_ref = fields.Char(
-        string="OUT Quality Check Ref",
+    # New fields
+    x_out_quality_id =  fields.Char( 
+        string="OUT Quality Check",
         readonly=True
     )
-    x_return_ref = fields.Char(
-        string="Return Picking Ref",
+     
+    x_return_id = fields.Char(
+   
+        string="Return Picking",
         readonly=True
     )
 
@@ -26,13 +28,13 @@ class SaleOrder(models.Model):
         return res
 
     def _update_custom_links(self):
-        """Update OUT quality check and RETURN picking references"""
+        """Update OUT quality check and RETURN picking link"""
         QualityCheck = self.env['quality.check']
         StockPicking = self.env['quality.check']
 
         for rec in self:
             # OUT picking & quality check
-            if not rec.x_out_quality_ref:
+            if not rec.x_out_quality_id:
                 picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
@@ -44,10 +46,10 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check:
-                        rec.x_out_quality_ref = quality_check.name  # ✅ now valid, storing string
+                        rec.x_out_quality_id = quality_check.id  # ✅ assign ID (or record)
 
             # RETURN picking
-            if not rec.x_return_ref:
+            if not rec.x_return_id:
                 picking_return = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/IN/RETURN%')
@@ -59,4 +61,4 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check_return:
-                        rec.x_return_ref = quality_check_return.name  # ✅ now valid
+                        rec.x_return_id = quality_check_return.id  # ✅ assign ID (or record)
