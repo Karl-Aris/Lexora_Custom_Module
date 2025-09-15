@@ -35,7 +35,7 @@ class SaleOrder(models.Model):
             updates = {}
 
             # OUT picking & quality check
-            if not rec.x_out_id :
+            if not rec.x_out_id:
                 picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
@@ -47,7 +47,7 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check:
-                        updates['x_out_id '] = quality_check.name
+                        updates['x_out_id'] = quality_check.name  # ✅ fixed (removed space)
 
             # RETURN picking
             if not rec.x_return_id:
@@ -65,5 +65,4 @@ class SaleOrder(models.Model):
                         updates['x_return_id'] = quality_check_return.name
 
             if updates:
-                rec.update(updates)  # ✅ safe, does not trigger mail followers or deletes
-
+                rec.sudo().write(updates)  # ✅ safer than update()
