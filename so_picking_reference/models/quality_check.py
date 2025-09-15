@@ -45,7 +45,7 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check:
-                        rec.x_out_quality_id = str(quality_check.id)
+                        rec.x_out_quality_id = str(quality_check.name)
 
             # RETURN picking
             if not rec.x_return_id:
@@ -60,4 +60,4 @@ class SaleOrder(models.Model):
                         limit=1
                     )
                     if quality_check_return:
-                        rec.x_return_id = str(quality_check_return.id)
+                        rec.x_return_id = str(quality_check_return.name)
