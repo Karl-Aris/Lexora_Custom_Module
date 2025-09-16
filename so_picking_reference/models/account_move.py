@@ -15,7 +15,6 @@ class AccountMove(models.Model):
         return res
 
     def _update_sale_order_from_vendor_bill(self):
-        SaleOrder = self.env['sale.order']
         for rec in self:
             if rec.move_type == 'in_invoice' and rec.sale_order_id and rec.name != '/':
                 vals = {
@@ -23,8 +22,7 @@ class AccountMove(models.Model):
                     'x_amount': rec.amount_total_signed,
                     'x_bol': rec.ref,
                 }
+                # Update invoice date if available
                 if rec.invoice_date:
                     vals['x_vb_date'] = rec.invoice_date
-
-                # Prevent recursion: bypass SaleOrder.write override
-                super(SaleOrder, rec.sale_order_id).write(vals)
+                rec.sale_order_id.write(vals)
