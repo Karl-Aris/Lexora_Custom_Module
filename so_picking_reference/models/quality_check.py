@@ -21,7 +21,9 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        self._update_custom_links()
+        # Iterate over self to update each record individually
+        for rec in self:
+            rec._update_custom_links()
         return res
 
     def _update_custom_links(self):
@@ -55,4 +57,3 @@ class SaleOrder(models.Model):
                     ])
                     if quality_checks:
                         rec.x_return_id = ", ".join(quality_checks.mapped('name'))
-
