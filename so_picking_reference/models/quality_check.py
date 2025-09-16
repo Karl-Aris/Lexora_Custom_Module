@@ -21,7 +21,6 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        # Iterate over self to update each record individually
         for rec in self:
             rec._update_custom_links()
         return res
@@ -32,6 +31,8 @@ class SaleOrder(models.Model):
         StockPicking = self.env['stock.picking']
 
         for rec in self:
+            vals = {}
+
             # OUT picking & quality checks
             if not rec.x_out_id:
                 picking_out = StockPicking.search([
@@ -43,7 +44,7 @@ class SaleOrder(models.Model):
                         ('picking_id', 'in', picking_out.ids)
                     ])
                     if quality_checks:
-                        rec.x_out_id = ", ".join(quality_checks.mapped('name'))
+                        vals['x_out_id'] = ", ".join(quality_checks.mapped('name'))
 
             # RETURN picking & quality checks
             if not rec.x_return_id:
@@ -56,4 +57,8 @@ class SaleOrder(models.Model):
                         ('picking_id', 'in', picking_return.ids)
                     ])
                     if quality_checks:
-                        rec.x_return_id = ", ".join(quality_checks.mapped('name'))
+                        vals['x_return_id'] = ", ".join(quality_checks.mapped('name'))
+
+            if vals:
+                # Prevent recursion: bypass overridden write
+                super(SaleOrder, rec).write(vals)
