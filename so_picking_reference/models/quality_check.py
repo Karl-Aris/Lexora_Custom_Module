@@ -15,49 +15,45 @@ class SaleOrder(models.Model):
 
     @api.model
     def create(self, vals):
-        # First create the record
         record = super().create(vals)
-        # Then update only custom fields
         record._update_custom_links()
         return record
 
     def write(self, vals):
-        # ⚠️ Run custom link update BEFORE super().write()
-        self._update_custom_links()
-        return super().write(vals)
+        res = super().write(vals)
+        # Iterate over self to update each record individually
+        for rec in self:
+            rec._update_custom_links()
+        return res
 
     def _update_custom_links(self):
-        """Update OUT and RETURN quality check info
-        without ever calling or triggering unlink()
-        """
+        """Update OUT quality checks and RETURN pickings links"""
         QualityCheck = self.env['quality.check']
         StockPicking = self.env['stock.picking']
 
         for rec in self:
-            updates = {}
-
             # OUT picking & quality checks
             if not rec.x_out_id:
                 picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
-                ], limit=1)
+                ])
                 if picking_out:
-                    qc = QualityCheck.search([('picking_id', '=', picking_out.id)])
-                    if qc:
-                        updates['x_out_id'] = ", ".join(qc.mapped('name'))
+                    quality_checks = QualityCheck.search([
+                        ('picking_id', 'in', picking_out.ids)
+                    ])
+                    if quality_checks:
+                        rec.x_out_id = ", ".join(quality_checks.mapped('name'))
 
             # RETURN picking & quality checks
             if not rec.x_return_id:
                 picking_return = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/IN/RETURN%')
-                ], limit=1)
+                ])
                 if picking_return:
-                    qc = QualityCheck.search([('picking_id', '=', picking_return.id)])
-                    if qc:
-                        updates['x_return_id'] = ", ".join(qc.mapped('name'))
-
-            # ⚠️ Write only to primitive fields, bypassing stock logic
-            if updates:
-                rec.with_context(bypass_unlink=True).sudo().write(updates)
+                    quality_checks = QualityCheck.search([
+                        ('picking_id', 'in', picking_return.ids)
+                    ])
+                    if quality_checks:
+                        rec.x_return_id = ", ".join(quality_checks.mapped('name'))
