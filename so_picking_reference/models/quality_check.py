@@ -26,14 +26,16 @@ class SaleOrder(models.Model):
         return res
 
     def _update_custom_links(self):
-        """Safely update OUT quality checks and RETURN pickings links
-        without deleting or altering stock.move/stock.picking records
+        """Safely update OUT and RETURN quality checks
+        without touching stock.move or stock.move.line
         """
         QualityCheck = self.env['quality.check']
         StockPicking = self.env['stock.picking']
 
         for rec in self:
-            # OUT picking & quality checks (only read, never delete)
+            vals = {}
+
+            # OUT picking & quality checks
             if not rec.x_out_id:
                 picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
@@ -44,11 +46,9 @@ class SaleOrder(models.Model):
                         ('picking_id', '=', picking_out.id)
                     ])
                     if quality_checks:
-                        rec.sudo().write({
-                            'x_out_id': ", ".join(quality_checks.mapped('name'))
-                        })
+                        vals['x_out_id'] = ", ".join(quality_checks.mapped('name'))
 
-            # RETURN picking & quality checks (only read, never delete)
+            # RETURN picking & quality checks
             if not rec.x_return_id:
                 picking_return = StockPicking.search([
                     ('sale_id', '=', rec.id),
@@ -59,6 +59,8 @@ class SaleOrder(models.Model):
                         ('picking_id', '=', picking_return.id)
                     ])
                     if quality_checks:
-                        rec.sudo().write({
-                            'x_return_id': ", ".join(quality_checks.mapped('name'))
-                        })
+                        vals['x_return_id'] = ", ".join(quality_checks.mapped('name'))
+
+            # Only update if there’s something new
+            if vals:
+                rec.sudo().write(vals)
