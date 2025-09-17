@@ -25,4 +25,5 @@ class AccountMove(models.Model):
                     'x_vb_number': rec.name,
                     'x_amount': rec.amount_total_signed,
                     'x_bol' : rec.ref,
+                    'x_vb_date' : rec.invoice_date,
                 })
