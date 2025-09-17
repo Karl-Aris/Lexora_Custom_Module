@@ -26,33 +26,34 @@ class SaleOrder(models.Model):
         return res
 
     def _update_custom_links(self):
-        """Safely update OUT and RETURN quality checks without deleting any stock.move.line"""
+        """Update OUT and RETURN quality checks without touching stock.move.line"""
         QualityCheck = self.env['quality.check']
         StockPicking = self.env['stock.picking']
 
         for rec in self:
-            # OUT picking & quality checks
-            if not rec.x_out_id:
-                picking_out = StockPicking.search([
-                    ('sale_id', '=', rec.id),
-                    ('name', '=like', 'WH/OUT%')
-                ], limit=1)  # limit ensures no mass operations
-                if picking_out:
-                    quality_checks = QualityCheck.search([
-                        ('picking_id', '=', picking_out.id)
-                    ])
-                    if quality_checks:
-                        rec.x_out_id = ", ".join(quality_checks.mapped('name'))
+            out_names = []
+            return_names = []
 
-            # RETURN picking & quality checks
-            if not rec.x_return_id:
-                picking_return = StockPicking.search([
-                    ('sale_id', '=', rec.id),
-                    ('name', '=like', 'WH/IN/RETURN%')
-                ], limit=1)
-                if picking_return:
-                    quality_checks = QualityCheck.search([
-                        ('picking_id', '=', picking_return.id)
-                    ])
-                    if quality_checks:
-                        rec.x_return_id = ", ".join(quality_checks.mapped('name'))
+            picking_outs = StockPicking.search([
+                ('sale_id', '=', rec.id),
+                ('name', '=like', 'WH/OUT%')
+            ])
+            if picking_outs:
+                quality_checks = QualityCheck.search([
+                    ('picking_id', 'in', picking_outs.ids)
+                ])
+                out_names = quality_checks.mapped('name')
+
+            picking_returns = StockPicking.search([
+                ('sale_id', '=', rec.id),
+                ('name', '=like', 'WH/IN/RETURN%')
+            ])
+            if picking_returns:
+                quality_checks = QualityCheck.search([
+                    ('picking_id', 'in', picking_returns.ids)
+                ])
+                return_names = quality_checks.mapped('name')
+
+            # assign directly instead of write() → avoids recomputation cascade
+            rec.x_out_id = ", ".join(out_names) if out_names else False
+            rec.x_return_id = ", ".join(return_names) if return_names else False
