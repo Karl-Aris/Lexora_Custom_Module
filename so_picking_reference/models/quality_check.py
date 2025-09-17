@@ -26,8 +26,8 @@ class SaleOrder(models.Model):
         return res
 
     def _update_custom_links(self):
-        """Safely update OUT and RETURN quality checks
-        without touching stock.move or stock.move.line
+        """Update OUT and RETURN quality check info
+        without ever calling or triggering unlink()
         """
         QualityCheck = self.env['quality.check']
         StockPicking = self.env['stock.picking']
@@ -46,6 +46,7 @@ class SaleOrder(models.Model):
                         ('picking_id', '=', picking_out.id)
                     ])
                     if quality_checks:
+                        # Store only names as text, no record assignment
                         vals['x_out_id'] = ", ".join(quality_checks.mapped('name'))
 
             # RETURN picking & quality checks
@@ -61,6 +62,6 @@ class SaleOrder(models.Model):
                     if quality_checks:
                         vals['x_return_id'] = ", ".join(quality_checks.mapped('name'))
 
-            # Only update if there’s something new
+            # Write only safe primitive fields (never relations)
             if vals:
                 rec.sudo().write(vals)
