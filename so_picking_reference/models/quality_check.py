@@ -4,12 +4,12 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     x_out_id = fields.Char(
-        string="OUT Quality Checks",
+        string="Delivery Quality Check ID",
         readonly=True
     )
 
     x_return_id = fields.Char(
-        string="Return Pickings",
+        string="Return Quality Check ID",
         readonly=True
     )
 
@@ -21,11 +21,12 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        self._update_custom_links()
+        for rec in self:
+            rec._update_custom_links()
         return res
 
     def _update_custom_links(self):
-        """Update OUT quality checks and RETURN pickings links"""
+        """Safely update OUT and RETURN quality checks without deleting any stock.move.line"""
         QualityCheck = self.env['quality.check']
         StockPicking = self.env['stock.picking']
 
@@ -35,10 +36,10 @@ class SaleOrder(models.Model):
                 picking_out = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/OUT%')
-                ])
+                ], limit=1)  # limit ensures no mass operations
                 if picking_out:
                     quality_checks = QualityCheck.search([
-                        ('picking_id', 'in', picking_out.ids)
+                        ('picking_id', '=', picking_out.id)
                     ])
                     if quality_checks:
                         rec.x_out_id = ", ".join(quality_checks.mapped('name'))
@@ -48,10 +49,10 @@ class SaleOrder(models.Model):
                 picking_return = StockPicking.search([
                     ('sale_id', '=', rec.id),
                     ('name', '=like', 'WH/IN/RETURN%')
-                ])
+                ], limit=1)
                 if picking_return:
                     quality_checks = QualityCheck.search([
-                        ('picking_id', 'in', picking_return.ids)
+                        ('picking_id', '=', picking_return.id)
                     ])
                     if quality_checks:
                         rec.x_return_id = ", ".join(quality_checks.mapped('name'))
