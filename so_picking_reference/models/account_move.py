@@ -16,14 +16,13 @@ class AccountMove(models.Model):
 
     def _update_sale_order_from_vendor_bill(self):
         for rec in self:
-            if (
-                rec.move_type == 'in_invoice' and
-                rec.sale_order_id and
-                rec.name != '/'
-            ):
-                rec.sale_order_id.write({
+            if rec.move_type == 'in_invoice' and rec.sale_order_id and rec.name != '/':
+                vals = {
                     'x_vb_number': rec.name,
                     'x_amount': rec.amount_total_signed,
-                    'x_bol' : rec.ref,
-                    'x_vb_date' : rec.invoice_date,
-                })
+                    'x_bol': rec.ref,
+                }
+                # Update invoice date if available
+                if rec.invoice_date:
+                    vals['x_vb_date'] = rec.invoice_date
+                rec.sale_order_id.write(vals)
