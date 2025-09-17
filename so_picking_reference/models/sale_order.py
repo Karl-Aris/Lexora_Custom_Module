@@ -1,4 +1,3 @@
-
 from odoo import models, api
 
 class SaleOrder(models.Model):
@@ -7,14 +6,20 @@ class SaleOrder(models.Model):
     @api.model
     def create(self, vals):
         record = super().create(vals)
+        # Run helper methods after create, but avoid recursive writes
         record._update_pickings_fast()
         record._match_invoice_number()
         return record
 
     def write(self, vals):
+        # Call super first
         res = super().write(vals)
-        self._update_pickings_fast()
-        self._match_invoice_number()
+
+        # Run helper methods only once, and prevent recursive writes
+        for rec in self:
+            rec._update_pickings_fast()
+            rec._match_invoice_number()
+
         return res
 
     def _update_pickings_fast(self):
@@ -22,6 +27,7 @@ class SaleOrder(models.Model):
         for rec in self:
             if not rec.purchase_order:
                 continue
+
             vals = {}
             domain_base = [('purchase_order', '=', rec.purchase_order)]
 
@@ -30,14 +36,12 @@ class SaleOrder(models.Model):
                     domain_base + [('name', '=like', 'WH/PICK%')],
                     limit=1
                 )
-                
                 if picking_in:
-                    
                     if not rec.x_picking_in:
                         vals['x_picking_in'] = picking_in.name
                     if not rec.x_picking_date and picking_in.date_done:
                         vals['x_picking_date'] = picking_in.date_done
-                        
+
             if not rec.x_delivery_out or not rec.x_out_date:
                 picking_out = Picking.search(
                     domain_base + [('name', '=like', 'WH/OUT%')],
@@ -45,10 +49,9 @@ class SaleOrder(models.Model):
                 )
                 if picking_out:
                     if not rec.x_delivery_out:
-                        vals['x_delivery_out'] = picking_out.name 
+                        vals['x_delivery_out'] = picking_out.name
                     if not rec.x_out_date and picking_out.date_done:
                         vals['x_out_date'] = picking_out.date_done
-                     
 
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
@@ -57,12 +60,13 @@ class SaleOrder(models.Model):
                 )
                 if picking_return:
                     if not rec.x_returned:
-                        vals['x_returned'] = picking_return.name 
+                        vals['x_returned'] = picking_return.name
                     if not rec.x_return_date and picking_return.date_done:
                         vals['x_return_date'] = picking_return.date_done
 
             if vals:
-                rec.write(vals)
+                # Use super() to avoid calling your custom write() again
+                super(SaleOrder, rec).write(vals)
 
     def _match_invoice_number(self):
         Move = self.env['account.move']
@@ -80,4 +84,5 @@ class SaleOrder(models.Model):
                     if not rec.x_invoice_date and invoice.invoice_date:
                         vals['x_invoice_date'] = invoice.invoice_date
                     if vals:
-                        rec.write(vals)
+                        # Again: safe write, no recursion
+                        super(SaleOrder, rec).write(vals)
