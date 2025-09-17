@@ -32,7 +32,8 @@ class SaleOrder(models.Model):
                 )
                 if picking_in:
                     vals['x_picking_in'] = picking_in.name
-
+                    vals['x_picking_date'] = picking_in.date_done
+                    
             if not rec.x_delivery_out:
                 picking_out = Picking.search(
                     domain_base + [('name', '=like', 'WH/OUT%')],
@@ -40,6 +41,7 @@ class SaleOrder(models.Model):
                 )
                 if picking_out:
                     vals['x_delivery_out'] = picking_out.name
+                    vals['x_out_date'] = picking_out.date_done
 
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
@@ -66,3 +68,4 @@ class SaleOrder(models.Model):
                 ], limit=1)
                 if invoice:
                     rec.x_invoice_number = invoice.name
+                    rec.x_invoice_date = invoice.invoice_date
