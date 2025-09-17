@@ -6,20 +6,14 @@ class SaleOrder(models.Model):
     @api.model
     def create(self, vals):
         record = super().create(vals)
-        # Run helper methods after create, but avoid recursive writes
         record._update_pickings_fast()
         record._match_invoice_number()
         return record
 
     def write(self, vals):
-        # Call super first
         res = super().write(vals)
-
-        # Run helper methods only once, and prevent recursive writes
-        for rec in self:
-            rec._update_pickings_fast()
-            rec._match_invoice_number()
-
+        self._update_pickings_fast()
+        self._match_invoice_number()
         return res
 
     def _update_pickings_fast(self):
@@ -31,27 +25,23 @@ class SaleOrder(models.Model):
             vals = {}
             domain_base = [('purchase_order', '=', rec.purchase_order)]
 
-            if not rec.x_picking_in or not rec.x_picking_date:
+            if not rec.x_picking_in:
                 picking_in = Picking.search(
                     domain_base + [('name', '=like', 'WH/PICK%')],
                     limit=1
                 )
                 if picking_in:
-                    if not rec.x_picking_in:
-                        vals['x_picking_in'] = picking_in.name
-                    if not rec.x_picking_date and picking_in.date_done:
-                        vals['x_picking_date'] = picking_in.date_done
-
-            if not rec.x_delivery_out or not rec.x_out_date:
+                    vals['x_picking_in'] = picking_in.name
+                    vals['x_picking_date'] = picking_in.date_done
+                    
+            if not rec.x_delivery_out:
                 picking_out = Picking.search(
                     domain_base + [('name', '=like', 'WH/OUT%')],
                     limit=1
                 )
                 if picking_out:
-                    if not rec.x_delivery_out:
-                        vals['x_delivery_out'] = picking_out.name
-                    if not rec.x_out_date and picking_out.date_done:
-                        vals['x_out_date'] = picking_out.date_done
+                    vals['x_delivery_out'] = picking_out.name
+                    vals['x_out_date'] = picking_out.date_done
 
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
@@ -63,26 +53,19 @@ class SaleOrder(models.Model):
                         vals['x_returned'] = picking_return.name
                     if not rec.x_return_date and picking_return.date_done:
                         vals['x_return_date'] = picking_return.date_done
-
+            
             if vals:
-                # Use super() to avoid calling your custom write() again
-                super(SaleOrder, rec).write(vals)
+                rec.write(vals)
 
     def _match_invoice_number(self):
         Move = self.env['account.move']
         for rec in self:
-            if rec.purchase_order and (not rec.x_invoice_number or not rec.x_invoice_date):
+            if rec.purchase_order and not rec.x_invoice_number:
                 invoice = Move.search([
                     ('x_po_so_id', '=', rec.purchase_order),
                     ('state', '=', 'posted'),
                     ('name', '!=', '/'),
                 ], limit=1)
                 if invoice:
-                    vals = {}
-                    if not rec.x_invoice_number:
-                        vals['x_invoice_number'] = invoice.name
-                    if not rec.x_invoice_date and invoice.invoice_date:
-                        vals['x_invoice_date'] = invoice.invoice_date
-                    if vals:
-                        # Again: safe write, no recursion
-                        super(SaleOrder, rec).write(vals)
+                    rec.x_invoice_number = invoice.name
+                    rec.x_invoice_date = invoice.invoice_date
