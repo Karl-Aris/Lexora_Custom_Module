@@ -23,13 +23,16 @@ class AccountMove(models.Model):
                     ('move_type', '=', 'in_invoice'),
                     ('name', '!=', '/')
                 ])
+
                 # collect all bill names
                 vb_numbers = ', '.join(related_moves.mapped('name'))
+                # sum all amounts
+                total_amount = sum(related_moves.mapped('amount_total_signed'))
 
                 vals = {
                     'x_vb_number': vb_numbers,
-                    'x_amount': rec.amount_total_signed,  # keeps last invoice amount
-                    'x_bol': rec.ref,
+                    'x_amount': total_amount,   # now sum of all bills
+                    'x_bol': rec.ref,           # still using last bill’s ref
                 }
                 if rec.invoice_date:
                     vals['x_vb_date'] = rec.invoice_date
