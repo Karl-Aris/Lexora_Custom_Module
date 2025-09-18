@@ -1,0 +1,25 @@
+<odoo>
+    <!-- Add purchase_order to search view -->
+    <record id="view_sale_order_po_search" model="ir.ui.view">
+        <field name="name">sale.order.purchase.order.search</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <search position="inside">
+                <field name="purchase_order" string="PO # like "/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Add purchase_order to tree view for visibility -->
+    <record id="view_sale_order_po_tree" model="ir.ui.view">
+        <field name="name">sale.order.purchase.order.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="purchase_order"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
