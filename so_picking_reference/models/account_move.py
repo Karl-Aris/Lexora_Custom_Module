@@ -28,12 +28,17 @@ class AccountMove(models.Model):
                 vb_numbers = ', '.join(related_moves.mapped('name'))
                 # sum all amounts
                 total_amount = sum(related_moves.mapped('amount_total_signed'))
+                # collect all invoice dates as strings
+                vb_dates = ', '.join(
+                    [d.strftime('%Y-%m-%d') for d in related_moves.mapped('invoice_date') if d]
+                )
 
                 vals = {
                     'x_vb_number': vb_numbers,
-                    'x_amount': total_amount,   # now sum of all bills
-                    'x_bol': rec.ref,           # still using last bill’s ref
+                    'x_amount': total_amount,       # sum of all bills
+                    'x_bol': rec.ref,               # last bill ref
+                    'x_vb_date_char': vb_dates,     # all vendor bill dates
                 }
                 if rec.invoice_date:
-                    vals['x_vb_date'] = rec.invoice_date
+                    vals['x_vb_date'] = rec.invoice_date  # still keep latest date in x_vb_date
                 rec.sale_order_id.write(vals)
