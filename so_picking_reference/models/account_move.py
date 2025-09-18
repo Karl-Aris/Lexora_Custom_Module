@@ -16,13 +16,21 @@ class AccountMove(models.Model):
 
     def _update_sale_order_from_vendor_bill(self):
         for rec in self:
-            if rec.move_type == 'in_invoice' and rec.sale_order_id and rec.name != '/':
+            if rec.move_type == 'in_invoice' and rec.sale_order_id:
+                # get all related vendor bills for the sale order
+                related_moves = self.search([
+                    ('sale_order_id', '=', rec.sale_order_id.id),
+                    ('move_type', '=', 'in_invoice'),
+                    ('name', '!=', '/')
+                ])
+                # collect all bill names
+                vb_numbers = ', '.join(related_moves.mapped('name'))
+
                 vals = {
-                    'x_vb_number': rec.name,
-                    'x_amount': rec.amount_total_signed,
+                    'x_vb_number': vb_numbers,
+                    'x_amount': rec.amount_total_signed,  # keeps last invoice amount
                     'x_bol': rec.ref,
                 }
-                # Update invoice date if available
                 if rec.invoice_date:
                     vals['x_vb_date'] = rec.invoice_date
                 rec.sale_order_id.write(vals)
