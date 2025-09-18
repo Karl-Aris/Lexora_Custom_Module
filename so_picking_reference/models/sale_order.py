@@ -1,4 +1,3 @@
-
 from odoo import models, api
 
 class SaleOrder(models.Model):
@@ -30,9 +29,7 @@ class SaleOrder(models.Model):
                     domain_base + [('name', '=like', 'WH/PICK%')],
                     limit=1
                 )
-                
                 if picking_in:
-                    
                     if not rec.x_picking_in:
                         vals['x_picking_in'] = picking_in.name
                     if not rec.x_picking_date and picking_in.date_done:
@@ -49,7 +46,6 @@ class SaleOrder(models.Model):
                     if not rec.x_out_date and picking_out.date_done:
                         vals['x_out_date'] = picking_out.date_done
                      
-
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
                     domain_base + [('name', '=like', 'WH/IN/RETURN%')],
@@ -67,7 +63,7 @@ class SaleOrder(models.Model):
     def _match_invoice_number(self):
         Move = self.env['account.move']
         for rec in self:
-            if rec.purchase_order and (not rec.x_invoice_number or not rec.x_invoice_date):
+            if rec.purchase_order and (not rec.x_invoice_number or not rec.x_invoice_date or not rec.x_invoice_amount):
                 invoice = Move.search([
                     ('x_po_so_id', '=', rec.purchase_order),
                     ('state', '=', 'posted'),
@@ -79,5 +75,7 @@ class SaleOrder(models.Model):
                         vals['x_invoice_number'] = invoice.name
                     if not rec.x_invoice_date and invoice.invoice_date:
                         vals['x_invoice_date'] = invoice.invoice_date
+                    if not rec.x_invoice_amount:
+                        vals['x_invoice_amount'] = invoice.amount_total_signed
                     if vals:
                         rec.write(vals)
