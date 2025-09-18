@@ -1,3 +1,4 @@
+
 from odoo import models, api
 
 class SaleOrder(models.Model):
@@ -21,25 +22,33 @@ class SaleOrder(models.Model):
         for rec in self:
             if not rec.purchase_order:
                 continue
-
             vals = {}
             domain_base = [('purchase_order', '=', rec.purchase_order)]
 
-            if not rec.x_picking_in:
+            if not rec.x_picking_in or not rec.x_picking_date:
                 picking_in = Picking.search(
                     domain_base + [('name', '=like', 'WH/PICK%')],
                     limit=1
                 )
+                
                 if picking_in:
-                    vals['x_picking_in'] = picking_in.name
-
-            if not rec.x_delivery_out:
+                    
+                    if not rec.x_picking_in:
+                        vals['x_picking_in'] = picking_in.name
+                    if not rec.x_picking_date and picking_in.date_done:
+                        vals['x_picking_date'] = picking_in.date_done
+                        
+            if not rec.x_delivery_out or not rec.x_out_date:
                 picking_out = Picking.search(
                     domain_base + [('name', '=like', 'WH/OUT%')],
                     limit=1
                 )
                 if picking_out:
-                    vals['x_delivery_out'] = picking_out.name
+                    if not rec.x_delivery_out:
+                        vals['x_delivery_out'] = picking_out.name 
+                    if not rec.x_out_date and picking_out.date_done:
+                        vals['x_out_date'] = picking_out.date_done
+                     
 
             if not rec.x_returned or not rec.x_return_date:
                 picking_return = Picking.search(
@@ -48,21 +57,27 @@ class SaleOrder(models.Model):
                 )
                 if picking_return:
                     if not rec.x_returned:
-                        vals['x_returned'] = picking_return.name
+                        vals['x_returned'] = picking_return.name 
                     if not rec.x_return_date and picking_return.date_done:
                         vals['x_return_date'] = picking_return.date_done
-            
+
             if vals:
                 rec.write(vals)
 
     def _match_invoice_number(self):
         Move = self.env['account.move']
         for rec in self:
-            if rec.purchase_order and not rec.x_invoice_number:
+            if rec.purchase_order and (not rec.x_invoice_number or not rec.x_invoice_date):
                 invoice = Move.search([
                     ('x_po_so_id', '=', rec.purchase_order),
                     ('state', '=', 'posted'),
                     ('name', '!=', '/'),
                 ], limit=1)
                 if invoice:
-                    rec.x_invoice_number = invoice.name
+                    vals = {}
+                    if not rec.x_invoice_number:
+                        vals['x_invoice_number'] = invoice.name
+                    if not rec.x_invoice_date and invoice.invoice_date:
+                        vals['x_invoice_date'] = invoice.invoice_date
+                    if vals:
+                        rec.write(vals)
