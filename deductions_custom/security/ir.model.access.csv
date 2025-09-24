@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_deduction_vendor_user,deduction.vendor.user,model_deduction_vendor,base.group_user,1,1,1,1
+access_deduction_vendor_line_user,deduction.vendor.line.user,model_deduction_vendor_line,base.group_user,1,1,1,1
+access_mail_message_user,mail.message.user,mail.model_mail_message,base.group_user,1,0,0,0
+access_mail_activity_user,mail.activity.user,mail.model_mail_activity,base.group_user,1,1,1,1
+access_mail_followers_user,mail.followers.user,mail.model_mail_followers,base.group_user,1,1,1,1

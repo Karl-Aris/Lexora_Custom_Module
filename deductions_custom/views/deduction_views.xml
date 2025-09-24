@@ -1,0 +1,111 @@
+<odoo>
+    <record id="view_deduction_vendor_form" model="ir.ui.view">
+        <field name="name">deduction.vendor.form</field>
+        <field name="model">deduction.vendor</field>
+        <field name="arch" type="xml">
+            <form string="Deductions">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="deduction_date"/>
+                            <field name="deduction_total_amount_view" readonly="1"/>
+                            <field name="po_numbers_from_lines" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <separator string="SKU Info" colspan="2"/>
+
+                    <group>
+                        <field name="sku_info">
+                            <tree editable="inline">
+                                <field name="partner_id" readonly="1"/>   
+                                <field name="purchase_order"/>
+                                <field name="sale_order_id"/>
+                                <field name="sku_id"/>
+                                <field name="external_sku"/>
+                                <field name="deduction_total_amount"/>
+                                <field name="sku_paid_amount"/>
+                                <field name="cogs"/>
+                                <field name="condition" readonly="1"/>
+                                <field name="x_location_display" readonly="1"/>
+                                <field name="reason"/>
+                                <field name="resolution"/>
+                                <field name="taken_actions"/>
+                                <field name="ticket_status"/>
+                                <field name="deduction_status"/>
+                                <field name="invoice_status"/>
+                                <field name="currency_id" invisible="1"/>
+                            </tree>
+                        </field>
+                    </group>
+
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_deduction_vendor_tree" model="ir.ui.view">
+        <field name="name">deduction.vendor.tree</field>
+        <field name="model">deduction.vendor</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="missing_po_list"/>
+                <field name="po_numbers_from_lines"/>
+                <field name="deduction_total_amount_view"/>
+                <field name="deduction_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_deduction_vendor_search" model="ir.ui.view">
+        <field name="name">deduction.vendor.search</field>
+        <field name="model">deduction.vendor</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="deduction_date"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Add a button in the action toolbar -->
+    <record id="deduction_vendor_action_client" model="ir.actions.act_window">
+        <field name="name">Deduction Vendors</field>
+        <field name="res_model">deduction.vendor</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_deduction_vendor_tree"/>
+        <field name="search_view_id" ref="view_deduction_vendor_search"/>
+    </record>
+
+    
+
+    <!-- <record id="action_deduction_vendor" model="ir.actions.act_window">
+        <field name="name">Deductions</field>
+        <field name="res_model">deduction.vendor</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create the first deduction
+            </p>
+        </field>
+    </record> -->
+
+    <record id="action_deduction_vendor" model="ir.actions.act_window">
+        <field name="name">Deductions</field>
+        <field name="res_model">deduction.vendor</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[  
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_deduction_vendor_tree')}),  
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_deduction_vendor_form')})
+        ]"/>
+        <field name="search_view_id" ref="view_deduction_vendor_search"/>
+    </record>
+
+    <!-- <menuitem id="menu_deduction_root" name="Deductions" sequence="10"/>
+    <menuitem id="menu_deduction_vendor" name="Deductions"
+              parent="menu_deduction_root" action="action_deduction_vendor" sequence="10"/> -->
+</odoo>
