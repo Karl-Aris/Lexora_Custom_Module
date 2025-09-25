@@ -1,5 +1,5 @@
 import re
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class SaleOrder(models.Model):
@@ -20,26 +20,19 @@ class SaleOrder(models.Model):
             return ["|"] * (len(conds) - 1) + conds
         return conds
 
-    def _search(self, domain, offset=0, limit=None, order=None, access_rights_uid=None):
-        """Intercept purchase_order searches and expand into OR tokens with '=' operator."""
-        new_domain = []
-        for arg in domain:
-            if isinstance(arg, (list, tuple)) and len(arg) == 3:
-                field, operator, value = arg
-                if field == "purchase_order" and operator in ("ilike", "like", "=") and value:
-                    tokens = self._tokenize(value)
-                    if len(tokens) > 1:
-                        new_domain.extend(self._make_or_domain(field, tokens))
-                        continue  # skip appending original arg
-                    else:
-                        # single token → also force '='
-                        arg = (field, "=", tokens[0])
-            new_domain.append(arg)
+    @api.model
+    def search_purchase_order(self, value, limit=100):
+        """
+        Custom search method for purchase_order field.
+        Does not affect global _search.
+        """
+        tokens = self._tokenize(value)
+        if not tokens:
+            return self.browse()
 
-        return super()._search(
-            new_domain,
-            offset=offset,
-            limit=limit,
-            order=order,
-            access_rights_uid=access_rights_uid,
-        )
+        if len(tokens) > 1:
+            domain = self._make_or_domain("purchase_order", tokens)
+        else:
+            domain = [("purchase_order", "=", tokens[0])]
+
+        return self.search(domain, limit=limit)
