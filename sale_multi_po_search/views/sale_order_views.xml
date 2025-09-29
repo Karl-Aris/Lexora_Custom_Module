@@ -1,17 +1,23 @@
+
 <odoo>
-    <!-- Add purchase_order to search view -->
+    <!-- Extend sale order search view -->
     <record id="view_sale_order_po_search" model="ir.ui.view">
         <field name="name">sale.order.purchase.order.search</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <search position="inside">
-                <field name="purchase_order" string="PO # like "/>
+                <!-- Text search -->
+                <field name="purchase_order" string="Purchase Order"/>
+
+                <!-- Quick filter: show only purchase orders with -R -->
+                <filter string="Replacements -R" name="filter_purchase_order_r"
+                        domain="[('purchase_order', 'ilike', '-R')]"/>
             </search>
         </field>
     </record>
 
-    <!-- Add purchase_order to tree view for visibility -->
+    <!-- Extend sale order tree view -->
     <record id="view_sale_order_po_tree" model="ir.ui.view">
         <field name="name">sale.order.purchase.order.tree</field>
         <field name="model">sale.order</field>
@@ -23,3 +29,4 @@
         </field>
     </record>
 </odoo>
+
