@@ -36,6 +36,7 @@ class DeductionVendor(models.Model):
     cogs = fields.Float(string='COGS')
 
     ticket_status = fields.Selection([
+        ('filed', 'FILED'),
         ('filed_creative', 'FILED - CREATIVE'),
         ('filed_damaged', 'FILED - DAMAGED'),
         ('filed_damage', 'FILED - DAMAGE'),
