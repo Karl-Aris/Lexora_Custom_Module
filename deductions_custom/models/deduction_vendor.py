@@ -428,6 +428,7 @@ class DeductionVendorLine(models.Model):
     taken_actions = fields.Text(string='Taken Actions')
 
     ticket_status = fields.Selection([
+        ('filed', 'FILED'),
         ('filed_creative', 'FILED - CREATIVE'),
         ('filed_damaged', 'FILED - DAMAGED'),
         ('filed_damage', 'FILED - DAMAGE'),
